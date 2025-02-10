@@ -15,8 +15,13 @@ export function executeAST(ast: any): any {
 
         if (peek.type === 'CONSOLA') {
             if (peek.value === 'EXPRESION') {
-                const _ast = executeAST(peek.children);
-                console.log(typeof _ast === 'object'? Array.isArray(_ast)? _ast : _ast.value : _ast);
+                if (peek.children[0].type === 'LIMPIAR') {
+                    console.clear();
+                } else {
+                    
+                    const _ast = executeAST(peek.children);
+                    console.log(typeof _ast === 'object'? Array.isArray(_ast)? _ast : _ast.value : _ast);
+                }
             } else console.log(peek.value);
 
         } else if (peek.type === 'TIPO') {

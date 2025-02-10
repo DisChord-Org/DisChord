@@ -10,6 +10,7 @@ export const types = [
 
 export const statements = {
     CONSOLA: 'CONSOLA',
+    LIMPIAR: 'LIMPIAR',
     TIPO: 'TIPO',
     L_EXPRESSION: 'L_EXPRESSION',
     R_EXPRESSION: 'R_EXPRESSION',

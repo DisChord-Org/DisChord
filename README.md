@@ -5,11 +5,20 @@ Intérprete para crear bots de Discord de forma rápida y eficaz.
 - Aún no funciona el ejemplo. Aún se está creando la sintaxis, lógica y funciones básicas del intérprete.
 
 ```ts
-// DISCORD BOT USING DisChord
-BOT "MiToken" {
-    CONSOLA "BOT ONLINE"
-    COMANDO "saludo" {
-        RESPONDER "¡Hola, mundo!"
+// Hello world using DisChord
+
+FUNCION hola (lenguaje) {                     // Creamos una función llamada "hola" con un parámetro llamado "lenguaje".
+    SI (lenguaje IGUAL "DisChord") {          // Si el parámetro es igual a "DisChord"
+        VAR mensaje IGUAL "- ¡Hola mundo!  -" // Asignar una variable
+    } SINO {                                  // En caso contrario
+        VAR mensaje IGUAL ". . ."             // Asignar una variable
     }
+
+    DEVOLVER <mensaje>                        // Devolver la variable mensaje
 }
+
+CONSOLA LIMPIAR                               // Limpiar la consola
+CONSOLA "- - - - - - - - -"                   // Enviar un mensaje a la consola
+CONSOLA ( hola("DisChord") )                  // Enviar un mensaje a la consola (La llamada a la función "hola" en este caso)
+CONSOLA "- - - - - - - - -"                   // Enviar un mensaje a la consola
 ```

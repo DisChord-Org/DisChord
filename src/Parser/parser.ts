@@ -16,9 +16,28 @@ export class Parser {
                 case statements.CONSOLA:
                 case statements.TIPO:
                 case statements.DEVOLVER:
-                    const statement: any = this.consume(this.peek().type);
+                    const statement = this.consume(this.peek().type);
 
-                    if(this.peek().type === statements.L_EXPRESSION) {
+                    if (statement.type === statements.CONSOLA && this.peek().type === statements.LIMPIAR) {
+                        this.consume(statements.LIMPIAR);
+
+                        this.nodes.push(
+                            {
+                                type: statement.type,
+                                value: 'EXPRESION',
+                                children: [
+                                    {
+                                        type: statements.LIMPIAR,
+                                        value: statements.LIMPIAR
+                                    }
+                                ]
+                            }
+                        );
+
+                        break;
+                    }
+
+                    if (this.peek().type === statements.L_EXPRESSION) {
                         let expressionArray = this.blocks(statements.L_EXPRESSION, statements.R_EXPRESSION);
                         this.nodes.push(
                             {
@@ -27,7 +46,7 @@ export class Parser {
                                 children: expressionArray
                             }
                         );
-                    }else this.nodes.push(
+                    } else this.nodes.push(
                         {
                             type: statement.type,
                             value: 'EXPRESION',

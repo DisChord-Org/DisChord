@@ -1,14 +1,11 @@
 export = [
-    "BOT",
-    "COMANDO",
-    "RESPONDER",
     "SI",
     "SINO",
     "ADEMAS",
     "VAR",
     "MIENTRAS",
-
     "CONSOLA",
+    "LIMPIAR",
     "TIPO",
     "FUNCION",
     "DEVOLVER",
