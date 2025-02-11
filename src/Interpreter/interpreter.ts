@@ -319,6 +319,13 @@ export function executeAST(ast: any): any {
             });
 
             varsInstance[peek.value.value] = JSON.stringify(varName);
+        
+        } else if (peek.type === 'BORRAR') {
+            const varName = JSON.parse(varsInstance[peek.value.value]);
+
+            delete varName[peek.children.value];
+
+            varsInstance[peek.value.value] = JSON.stringify(varName);
 
         } else if (peek.type === 'PARAR' || peek.type === 'SALTAR') {
             return {

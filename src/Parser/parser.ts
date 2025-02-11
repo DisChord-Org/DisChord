@@ -246,11 +246,26 @@ export class Parser {
                     );
                     break;
 
+                case object_operators.BORRAR:
+                    this.consume(object_operators.BORRAR);
+                    const objName: any = this.consume(this.peek().type);
+                    this.consume('DE');
+                    const objVar: any = this.consume(this.peek().type);
+
+                    this.nodes.push(
+                        {
+                            type: object_operators.BORRAR,
+                            value: objVar,
+                            children: objName
+                        }
+                    );
+                    break;
+
                 default:
                     if (this.peek().type === statements.SEPARADOR) {
                         /*
                         Es posible que el parser intente interpretar el token ";" (o el separador) como si fuera el nombre de una función.
-                        
+
                         Es decir, ejemplo: "saludar(<1 MAS 1>; <1 MAS 1>)"
                         después del primer parámetro, se encuentra el token ";" y, según la próxima condición:
 

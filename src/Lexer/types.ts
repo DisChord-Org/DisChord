@@ -69,5 +69,6 @@ export const array_operators = {
 }
 
 export const object_operators = {
-    ESTABLECER: 'ESTABLECER'
+    ESTABLECER: 'ESTABLECER',
+    BORRAR: 'BORRAR'
 }

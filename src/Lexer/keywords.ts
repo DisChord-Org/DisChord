@@ -28,6 +28,7 @@ export = [
     "FILTRAR",
     "CLASIFICAR",
     "ESTABLECER",
+    "BORRAR",
 
     "MAS",
     "MENOS",
