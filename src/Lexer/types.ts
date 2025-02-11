@@ -67,3 +67,7 @@ export const array_operators = {
     FILTRAR: 'FILTRAR',
     CLASIFICAR: 'CLASIFICAR'
 }
+
+export const object_operators = {
+    ESTABLECER: 'ESTABLECER'
+}

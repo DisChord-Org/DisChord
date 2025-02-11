@@ -1,5 +1,5 @@
 import { ASTNode, Token } from "src/Types/Token";
-import { array_operators, comparation_operators, operators, statements, types } from "../Lexer/types"
+import { array_operators, comparation_operators, object_operators, operators, statements, types } from "../Lexer/types"
 
 const functions: string[] = [];
 
@@ -231,6 +231,21 @@ export class Parser {
                     );
                     break;
 
+                case object_operators.ESTABLECER:
+                    this.consume(object_operators.ESTABLECER);
+                    const obj: any = this.parseObject();
+                    this.consume('EN');
+                    const objVarName: any = this.consume(this.peek().type);
+
+                    this.nodes.push(
+                        {
+                            type: object_operators.ESTABLECER,
+                            value: objVarName,
+                            children: obj
+                        }
+                    );
+                    break;
+
                 default:
                     if (this.peek().type === statements.SEPARADOR) {
                         /*
@@ -357,17 +372,17 @@ export class Parser {
 
     private parseObject(): ASTNode {
         const obj: any = { type: "OBJETO", pairs: [] };
-    
         this.consume(statements.L_BRACE);
     
         while (this.current < this.tokens.length && this.peek().type !== statements.R_BRACE) {
-            let keyToken = this.consume(this.peek().type);
-            let key = keyToken.value;
-    
+            const keyToken = this.consume(this.peek().type);
+            const key = keyToken.value;
             this.consume(":");
     
             let value: ASTNode;
-            if (this.peek().type === statements.L_EXPRESSION) {
+            if (this.peek().type === statements.L_BRACE) {
+                value = this.parseObject();
+            } else if (this.peek().type === statements.L_EXPRESSION) {
                 value = {
                     type: "EXPRESION",
                     children: this.blocks(statements.L_EXPRESSION, statements.R_EXPRESSION)
@@ -382,9 +397,8 @@ export class Parser {
                 this.consume(",");
             }
         }
-
+    
         this.consume(statements.R_BRACE);
         return obj;
-    }
-    
+    }    
 }

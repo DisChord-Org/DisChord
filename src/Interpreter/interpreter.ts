@@ -309,6 +309,17 @@ export function executeAST(ast: any): any {
                     else if (peek.right?.value === 'MAYOR' || peek.right[0]?.value === 'MAYOR') return var1.sort((a: any, b: any) => { return b - a});
             }
 
+        } else if (peek.type === 'ESTABLECER') {
+            const varName = JSON.parse(varsInstance[peek.value.value]);
+            const obj = executeAST([ peek.children ]);
+            const objKeys = Object.keys(obj.value);
+
+            objKeys.forEach((key) => {
+                varName[key] = obj.value[key];
+            });
+
+            varsInstance[peek.value.value] = JSON.stringify(varName);
+
         } else if (peek.type === 'PARAR' || peek.type === 'SALTAR') {
             return {
                 type: peek.type

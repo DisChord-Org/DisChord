@@ -27,6 +27,7 @@ export = [
     "BUSCAR_INDEX",
     "FILTRAR",
     "CLASIFICAR",
+    "ESTABLECER",
 
     "MAS",
     "MENOS",
