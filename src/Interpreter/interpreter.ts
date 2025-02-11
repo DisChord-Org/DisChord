@@ -7,6 +7,7 @@ const functionsInstance: any = [];
 
 export function executeAST(ast: any): any {
     // console.log(ast);
+    // console.log(JSON.stringify(ast, null, 2));
     // console.log(JSON.parse(JSON.stringify(ast, null, 2)));
 
     let current = 0;
@@ -149,7 +150,8 @@ export function executeAST(ast: any): any {
             if (result?.type === 'PARAR' || result?.type === 'SALTAR' || result?.type === 'DEVOLVER') return result;
 
         } else if (peek.type === 'VAR') {
-            const value = executeAST(Array.isArray(peek.content)? peek.content : [ peek.content ]);
+            let value = executeAST(Array.isArray(peek.content)? peek.content : [ peek.content ]);
+            if(value.type === 'OBJETO') value.value = JSON.stringify(value.value);
             varsInstance[peek.value] = value.value? value.value : value;
 
         } else if (peek.type === 'MIENTRAS') {
@@ -358,6 +360,30 @@ export function executeAST(ast: any): any {
             return {
                 type: "LISTA",
                 value: parseArray(peek.value)
+            };
+
+        } else if (peek.type === 'OBJETO') {
+            let obj: any = {};
+
+            for (const pair of peek.pairs) { // Recorrer cada par del objeto
+                // pair.key es la clave (ya sea un string o lo que se haya definido en el AST).
+                // pair.value es la expresión o nodo AST que representa el valor asociado.
+                // Hay que evaluar la expresión usando executeAST; 
+                // Y se asumirá que executeAST recibe un array de nodos, por eso envolvemos pair.value en un array.
+                let evaluated = executeAST( [ pair.value ] );
+
+                // Si la evaluación devuelve un objeto con la propiedad "value", se usará ese valor.
+                // Esto depende de las estructuras literales en el intérprete.
+                if (evaluated && typeof evaluated === 'object' && evaluated.hasOwnProperty('value')) {
+                    obj[pair.key] = evaluated.value;
+                } else {
+                    obj[pair.key] = evaluated;
+                }
+            }
+        
+            return {
+                type: "OBJETO",
+                value: obj
             };
 
         } else if (peek.type === 'NULO') {

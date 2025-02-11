@@ -50,7 +50,7 @@ export class Parser {
                         {
                             type: statement.type,
                             value: 'EXPRESION',
-                            children: [ this.consume(types) ]
+                            children: [ this.peek().type === statements.L_BRACE? this.parseObject() : this.consume(types) ]
                         }
                     );
 
@@ -210,6 +210,9 @@ export class Parser {
                 case "INDEFINIDO":
                     this.nodes.push(this.consume(this.peek().type));
                     break;
+                case statements.L_BRACE:
+                    this.nodes.push(this.parseObject());
+                    break;
 
                 case array_operators.MODIFICAR:
                     this.consume(array_operators.MODIFICAR);
@@ -272,7 +275,7 @@ export class Parser {
 
     private consume(expectedTypes: any): Token {
         const token = this.tokens[this.current];
-        const expected = Array.isArray(expectedTypes) ? expectedTypes : [expectedTypes];
+        const expected = Array.isArray(expectedTypes) ? expectedTypes : [ expectedTypes ];
 
         if (!expected.includes(token.type)) throw new Error(`Se esperaba uno de ${expected.join(', ')} pero se encontró ${token.type}`);
 
@@ -351,4 +354,37 @@ export class Parser {
             }
         );
     }
+
+    private parseObject(): ASTNode {
+        const obj: any = { type: "OBJETO", pairs: [] };
+    
+        this.consume(statements.L_BRACE);
+    
+        while (this.current < this.tokens.length && this.peek().type !== statements.R_BRACE) {
+            let keyToken = this.consume(this.peek().type);
+            let key = keyToken.value;
+    
+            this.consume(":");
+    
+            let value: ASTNode;
+            if (this.peek().type === statements.L_EXPRESSION) {
+                value = {
+                    type: "EXPRESION",
+                    children: this.blocks(statements.L_EXPRESSION, statements.R_EXPRESSION)
+                };
+            } else {
+                value = this.consume(this.peek().type);
+            }
+    
+            obj.pairs.push({ key, value });
+    
+            if (this.peek().type === ",") {
+                this.consume(",");
+            }
+        }
+
+        this.consume(statements.R_BRACE);
+        return obj;
+    }
+    
 }
