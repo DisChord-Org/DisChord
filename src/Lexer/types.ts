@@ -70,5 +70,8 @@ export const array_operators = {
 
 export const object_operators = {
     ESTABLECER: 'ESTABLECER',
-    BORRAR: 'BORRAR'
+    BORRAR: 'BORRAR',
+    TRANSFORMAR: 'TRANSFORMAR',
+    VALORES: 'VALORES',
+    ENTRADAS: 'ENTRADAS'
 }

@@ -29,6 +29,9 @@ export = [
     "CLASIFICAR",
     "ESTABLECER",
     "BORRAR",
+    "TRANSFORMAR",
+    "VALORES",
+    "ENTRADAS",
 
     "MAS",
     "MENOS",

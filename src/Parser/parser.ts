@@ -261,6 +261,20 @@ export class Parser {
                     );
                     break;
 
+                case object_operators.TRANSFORMAR:
+                case object_operators.VALORES:
+                case object_operators.ENTRADAS:
+                    const st: any = this.consume(this.peek().type);
+                    const stObject: any = this.blocks(statements.L_EXPRESSION, statements.R_EXPRESSION);
+
+                    this.nodes.push(
+                        {
+                            type: st.type,
+                            value: stObject
+                        }
+                    );
+                    break;
+
                 default:
                     if (this.peek().type === statements.SEPARADOR) {
                         /*
@@ -316,22 +330,22 @@ export class Parser {
         let depth = 1; // Inicializar depth en 1 (ya estamos dentro de la expresión)
         let blockTokens = [];
         this.consume(openType); // Consumir el primer L_EXPRESSION
-    
+
         while (this.current < this.tokens.length && depth > 0) {
             const token = this.tokens[this.current];
 
             if (token.type === openType) depth++;
             if (token.type === closeType) depth--;
-    
+
             if (depth === 0) { // Fin del bloque principal
                 this.current++; // Saltar el R_EXPRESSION de cierre
                 break;
             }
-    
+
             blockTokens.push(token); // Añadir tokens internos
             this.current++;
         }
-    
+
         return new Parser(blockTokens).parse();
     }
 

@@ -183,7 +183,7 @@ export function executeAST(ast: any): any {
 
             var1.forEach((v: any) => {
                 varsInstanceCopy[peek.value[1].type] = v;
-                
+
                 executeAST(peek.children);
 
                 delete varsInstanceCopy[peek.value[1].type];
@@ -207,6 +207,18 @@ export function executeAST(ast: any): any {
             if (peek.value[2].value === true) peek.value[2].value = 'verdadero';
 
             varsInstance[peek.value[0].type][parseInt(peek.value[1].value) - 1] = peek.value[2].value;
+
+        } else if (peek.type === 'TRANSFORMAR' || peek.type === 'VALORES' || peek.type === 'ENTRADAS') {
+            const obj = executeAST(peek.value);
+
+            switch(peek.type) {
+                case 'TRANSFORMAR':
+                    return Object.keys(obj?.value? obj.value : JSON.parse(obj));
+                case 'VALORES':
+                    return Object.values(obj?.value? obj.value : JSON.parse(obj));
+                case 'ENTRADAS':
+                    return Object.entries(obj?.value? obj.value : JSON.parse(obj));
+            }
 
         } else if (peek.type === 'LONGITUD' || peek.type === 'EMPUJAR' || peek.type === 'CORTAR_FINAL' || peek.type === 'CORTAR_PRINCIPIO' || peek.type === 'EMPUJAR_PRINCIPIO' || peek.type === 'CONCATENAR' || peek.type === 'INDEXAR' || peek.type === 'INCLUYE' || peek.type === 'ALGUNO' || peek.type === 'TODOS' || peek.type === 'BUSCAR' || peek.type === 'BUSCAR_INDEX' || peek.type === 'FILTRAR' || peek.type === 'CLASIFICAR') {
             const left = executeAST(Array.isArray(peek.left)? peek.left : [ peek.left ]);
