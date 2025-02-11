@@ -177,7 +177,8 @@ export function executeAST(ast: any): any {
             }
 
         } else if (peek.type === 'PORCADA') {
-            const var1 = executeAST([ peek.value[0] ]);
+            let var1 = executeAST([ peek.value[0] ]);
+            if( var1.startsWith('{') && var1.endsWith('}') ) var1 = Object.values(JSON.parse(var1));
             const varsInstanceCopy = varsInstance;
 
             var1.forEach((v: any) => {
