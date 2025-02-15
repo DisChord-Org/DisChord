@@ -325,7 +325,7 @@ export class Parser {
                                 const dependency = dependenciesWithStatements[0].module;
 
                                 if (typeof dependency.execParser !== 'function') {
-                                    throw new Error(`❌ La dependencia ${dependenciesWithStatements[0].name} no tiene execParser()`);
+                                    throw new Error(`La dependencia ${dependenciesWithStatements[0].name} no tiene execParser()`);
                                 }
 
                                 const dependencyExecution = dependency.execParser(this.peek());
@@ -341,7 +341,7 @@ export class Parser {
                                 this.current += Number(dependencyExecution.consumeCount) || 1;
                                 this.nodes.push(dependencyExecution.ast);
                             } else this.nodes.push(this.consume(this.peek().type)); // Consumir token normal
-                        } else this.nodes.push(this.consume(this.peek().type)); // Consumir token normal                        
+                        } else this.nodes.push(this.consume(this.peek().type)); // Consumir token normal
                     }
             }
         }

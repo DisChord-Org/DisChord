@@ -1,6 +1,8 @@
+import { readdirSync } from "fs";
 import { Lexer } from "../Lexer/lexer";
 import { parseArray } from "../Utils/arrays";
 import { interpolateString } from "../Utils/interpolateString";
+import path from "path";
 
 const varsInstance: any = {};
 const functionsInstance: any = [];
@@ -463,7 +465,38 @@ export function executeAST(ast: any): any {
             executeAST(peek.children);
 
         } else {
-            throw new Error(`${peek.type} no es una palabra reservada o no pertenece a este bloque.`);
+            const dependencies = readdirSync(path.join(__dirname, '../../dependencies')).map(dep => {
+                return {
+                    name: dep,
+                    module: require(path.join(__dirname, `../../dependencies/${dep}/main`))
+                };
+            });
+
+            if (dependencies.length > 0) {
+                const dependenciesWithStatements = dependencies.filter(({ module }) =>
+                    Object.keys(module.statements).includes(peek.type)
+                );
+
+                if (dependenciesWithStatements.length > 0) {
+                    const dependency = dependenciesWithStatements[0].module;
+
+                    if (typeof dependency.execInterpreter !== 'function') {
+                        throw new Error(`La dependencia ${dependenciesWithStatements[0].name} no tiene execInterpreter()`);
+                    }
+
+                    const dependencyExecution = dependency.execInterpreter(peek);
+
+                    /*
+                    Dependencias deben devolver el siguiente objeto:
+                    {
+                        requireReturn: Boolean // ¿Necesita retornar el valor?
+                        value: Any // Objeto a retornar.
+                    }
+                    */
+
+                    if (dependencyExecution.requireReturn) return dependencyExecution.value;
+                } else throw new Error(`${peek.type} no es una palabra reservada o no pertenece a este bloque.`);
+            } else throw new Error(`${peek.type} no es una palabra reservada o no pertenece a este bloque.`);
         }
 
         current++;
