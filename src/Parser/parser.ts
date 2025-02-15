@@ -1,5 +1,7 @@
 import { ASTNode, Token } from "src/Types/Token";
 import { array_operators, comparation_operators, object_operators, operators, statements, types } from "../Lexer/types"
+import { readdirSync } from "fs";
+import path from "path";
 
 const functions: string[] = [];
 
@@ -305,7 +307,42 @@ export class Parser {
                             type: functionName.value,
                             value: params?.length > 0 ? params : []
                         });
-                    } else this.nodes.push(this.consume(this.peek().type)); // Consumir token normal
+
+                    } else {
+                        const dependencies = readdirSync(path.join(__dirname, '../../dependencies')).map(dep => {
+                            return {
+                                name: dep,
+                                module: require(path.join(__dirname, `../../dependencies/${dep}/main`))
+                            };
+                        });
+
+                        if (dependencies.length > 0) {
+                            const dependenciesWithStatements = dependencies.filter(({ module }) =>
+                                Object.keys(module.statements).includes(this.peek().type)
+                            );
+
+                            if (dependenciesWithStatements.length > 0) {
+                                const dependency = dependenciesWithStatements[0].module;
+
+                                if (typeof dependency.execParser !== 'function') {
+                                    throw new Error(`❌ La dependencia ${dependenciesWithStatements[0].name} no tiene execParser()`);
+                                }
+
+                                const dependencyExecution = dependency.execParser(this.peek());
+
+                                /*
+                                Dependencias deben devolver el siguiente objeto:
+                                {
+                                    consumeCount: Number // La cantidad de consumiciones exactas empleadas
+                                    ast: Object // AST a interpretar.
+                                }
+                                */
+
+                                this.current += Number(dependencyExecution.consumeCount) || 1;
+                                this.nodes.push(dependencyExecution.ast);
+                            } else this.nodes.push(this.consume(this.peek().type)); // Consumir token normal
+                        } else this.nodes.push(this.consume(this.peek().type)); // Consumir token normal                        
+                    }
             }
         }
 
