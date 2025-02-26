@@ -473,9 +473,19 @@ export function executeAST(ast: any): any {
             });
 
             if (dependencies.length > 0) {
-                const dependenciesWithStatements = dependencies.filter(({ module }) =>
-                    Object.keys(module.statements).includes(peek.type)
-                );
+                const dependenciesWithStatements = dependencies.filter(({ module }) => {
+                    if (!module || typeof module !== 'object') {
+                        console.error('Dependencia corrupta:', { module });
+                        return false;
+                    }
+                    
+                    if (!module.statements) {
+                        console.warn(`La dependencia no tiene statements: ${module.constructor?.name || 'Módulo anónimo'}`);
+                        return false;
+                    }
+
+                    return Object.keys(module.statements).includes(peek.type);
+                });
 
                 if (dependenciesWithStatements.length > 0) {
                     const dependency = dependenciesWithStatements[0].module;
