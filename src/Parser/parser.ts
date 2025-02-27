@@ -338,7 +338,7 @@ export class Parser {
                                     throw new Error(`La dependencia ${dependenciesWithStatements[0].name} no tiene execParser()`);
                                 }
 
-                                const dependencyExecution = dependency.execParser(this.peek());
+                                const dependencyExecution = dependency.execParser(this.tokens, this.current);
 
                                 /*
                                 Dependencias deben devolver el siguiente objeto:

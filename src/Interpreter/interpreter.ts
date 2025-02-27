@@ -494,7 +494,7 @@ export function executeAST(ast: any): any {
                         throw new Error(`La dependencia ${dependenciesWithStatements[0].name} no tiene execInterpreter()`);
                     }
 
-                    const dependencyExecution = dependency.execInterpreter(peek);
+                    const dependencyExecution = dependency.execInterpreter(ast, current);
 
                     /*
                     Dependencias deben devolver el siguiente objeto:
