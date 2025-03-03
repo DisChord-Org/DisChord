@@ -488,7 +488,7 @@ export function executeAST(ast: any): any {
                 });
 
                 if (dependenciesWithStatements.length > 0) {
-                    const dependency = dependenciesWithStatements[0].module
+                    const dependency = dependenciesWithStatements[0].module;
 
                     if (typeof dependency.execInterpreter !== 'function') {
                         throw new Error(`La dependencia ${dependenciesWithStatements[0].name} no tiene execInterpreter()`);
