@@ -499,11 +499,19 @@ export function executeAST(ast: any): any {
                     /*
                     Dependencias deben devolver el siguiente objeto:
                     {
-                        requireReturn: Boolean // ¿Necesita retornar el valor?
-                        value: Any // Objeto a retornar.
+                        requireReturn: Boolean, // ¿Necesita retornar el valor?
+                        value: Any, // Objeto a retornar.
+                        newVarInstance: Object // Objeto con las nuevas variables, solo se agregan las variables que no existan (no afecta requireReturn). 
                     }
                     */
 
+                    if (dependencyExecution.newVarInstance) {
+                        Object.keys(dependencyExecution.newVarInstance).forEach(key => {
+                            if (!varsInstance.hasOwnProperty(key)) {
+                                varsInstance[key] = dependencyExecution.newVarInstance[key];
+                            }
+                        });
+                    }
                     if (dependencyExecution.requireReturn) return dependencyExecution.value;
                 } else throw new Error(`${peek.type} no es una palabra reservada o no pertenece a este bloque.`);
             } else throw new Error(`${peek.type} no es una palabra reservada o no pertenece a este bloque.`);
