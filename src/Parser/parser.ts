@@ -319,7 +319,7 @@ export class Parser {
                         if (dependencies.length > 0) {
                             const dependenciesWithStatements = dependencies.filter(({ module }) => {
                                 if (!module || typeof module !== 'object') {
-                                    console.error('Dependencia corrupta:', { module });
+                                    console.error('Dependencia corrupta:', { module })
                                     return false;
                                 }
                                 
