@@ -1,0 +1,26 @@
+export const symbols = {
+    "{": "L_BRACE",
+    "}": "R_BRACE",
+    "(": "L_EXPRESSION",
+    ")": "R_EXPRESSION",
+    "[": "L_SQUARE",
+    "]": "R_SQUARE",
+
+    "=": "igual",
+    "+": "mas",
+    "-": "menos",
+    "*": "por",
+    "/": "entre",
+    "**": "exp",
+    "%": "resto",
+    "?": "mayor",
+    "¿": "menor",
+    ">=": "mayor_igual",
+    "<=": "menor_igual",
+    "!": "no",
+    "==": "igual_tipado",
+    ";": "separador",
+    ":": ":",
+    ",": ",",
+    ".": ""
+} as any;
