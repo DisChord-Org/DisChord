@@ -22,5 +22,5 @@ export const symbols = {
     ";": "separador",
     ":": ":",
     ",": ",",
-    ".": ""
+    ".": "."
 } as any;

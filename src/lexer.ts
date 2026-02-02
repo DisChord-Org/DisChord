@@ -1,8 +1,4 @@
-export type Token = {
-    type: string;
-    value: string;
-};
-
+import { Token } from './types';
 import { symbols } from './symbols';
 import { keywords } from './keywords';
 
