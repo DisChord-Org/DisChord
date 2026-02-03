@@ -86,8 +86,8 @@ export class Lexer {
                 }
 
                 if (char === "n") {
-                    value += char;
-                    char = this.input[++current];
+                    value += "n";
+                    current++;
                 }
 
                 // Asegurar de agregar todo como un único token si es BIGINT
