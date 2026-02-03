@@ -11,3 +11,26 @@ export type ASTNode = {
     object?: ASTNode;
     property?: string;
 };
+
+export interface ClassNode extends ASTNode {
+    type: 'CLASE';
+    id: string;
+    superClass?: string;
+    body: ASTNode[];
+}
+
+export interface FunctionNode extends ASTNode {
+    type: 'FUNCION';
+    id: string;
+    isConstructor: boolean;
+    isStatic?: boolean;
+    params: string[];
+    body: ASTNode[];
+}
+
+export interface PropertyNode extends ASTNode {
+    type: 'PROPIEDAD';
+    id: string;
+    prop_value: ASTNode;
+    isStatic?: boolean;
+}

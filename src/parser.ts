@@ -1,4 +1,4 @@
-import { ASTNode, Token } from "./types";
+import { ASTNode, ClassNode, FunctionNode, PropertyNode, Token } from "./types";
 
 export class Parser {
     public nodes: ASTNode[] = [];
@@ -7,7 +7,7 @@ export class Parser {
 
     public parse(): ASTNode[] {
         while (this.current < this.tokens.length) {
-            this.nodes.push(this.parseExpression());
+            this.nodes.push(this.parseStatement());
         }
         return this.nodes;
     }
@@ -26,8 +26,160 @@ export class Parser {
         return this.tokens[this.current++];
     }
 
-    private parseExpression(): ASTNode {
+    private parseStatement(classContext?: string): ASTNode {
         const token = this.peek();
+
+        if (token.type === 'CLASE') {
+            return this.parseClassDeclaration();
+        }
+
+        if (token.type === 'FIJAR') {
+            this.consume('FIJAR');
+            const nextToken = this.peek();
+            
+            if (nextToken.type === 'PROP') {
+                const prop = this.parseProperty();
+                prop.isStatic = true;
+                return prop;
+            }
+            
+            if (nextToken.type === 'FUNCION') {
+                const func = this.parseFunctionDeclaration(false);
+                func.isStatic = true;
+                return func;
+            }
+        }
+
+        if (token.type === 'FUNCION') {
+            return this.parseFunctionDeclaration(false);
+        }
+
+        if (token.type === 'PROP') {
+            return this.parseProperty();
+        }
+
+        if (classContext && token.type === 'IDENTIFICADOR' && token.value === classContext) {
+            if (this.current + 1 < this.tokens.length && this.tokens[this.current + 1].type === 'L_EXPRESSION') {
+                return this.parseFunctionDeclaration(true);
+            }
+        }
+
+        return this.parseExpression();
+    }
+
+    private parseClassDeclaration(): ClassNode {
+        this.consume('CLASE');
+        
+        const id = this.consume('IDENTIFICADOR').value;
+        
+        let superClass = undefined;
+        if (this.current < this.tokens.length && this.peek().type === 'EXTIENDE') {
+            this.consume('EXTIENDE');
+            superClass = this.consume('IDENTIFICADOR').value;
+        }
+
+        this.consume('L_BRACE');
+
+        const body: ASTNode[] = [];
+        while (this.peek().type !== 'R_BRACE') {
+            body.push(this.parseStatement(id));
+        }
+
+        this.consume('R_BRACE');
+
+        return {
+            type: 'CLASE',
+            id,
+            superClass,
+            body
+        };
+    }
+
+    private parseFunctionDeclaration(isConstructor: boolean): FunctionNode {
+        let id: string;
+        
+        if (isConstructor) {
+            id = this.consume('IDENTIFICADOR').value;
+        } else {
+            this.consume('FUNCION');
+            id = this.consume('IDENTIFICADOR').value;
+        }
+
+        this.consume('L_EXPRESSION');
+
+        const params: string[] = [];
+        while (this.peek().type !== 'R_EXPRESSION') {
+            params.push(this.consume('IDENTIFICADOR').value);
+            if (this.peek().type === ',') this.consume(',');
+        }
+
+        this.consume('R_EXPRESSION');
+        this.consume('L_BRACE');
+
+        const body: ASTNode[] = [];
+        while (this.peek().type !== 'R_BRACE') {
+            body.push(this.parseStatement());
+        }
+
+        this.consume('R_BRACE');
+
+        return {
+            type: 'FUNCION',
+            id,
+            isConstructor,
+            params,
+            body
+        };
+    }
+
+    private parseProperty(): PropertyNode {
+        this.consume('PROP');
+        const id = this.consume('IDENTIFICADOR').value;
+        
+        let value: ASTNode = { type: 'IDENTIFICADOR', value: 'INDEFINIDO' };
+
+        if (this.peek().type === 'ES') {
+            this.consume('ES');
+            value = this.parseExpression();
+        }
+
+        return {
+            type: 'PROPIEDAD',
+            id,
+            prop_value: value
+        };
+    }
+
+    private parseExpression(): ASTNode {
+        let node = this.parsePrimary();
+
+        if (this.current < this.tokens.length && this.peek().type === 'ES') {
+            this.consume('ES');
+            const value = this.parseExpression();
+            
+            return {
+                type: 'ASIGNACION',
+                object: node,
+                value: value as any
+            };
+        }
+
+        return node;
+    }
+
+    private parsePrimary(): ASTNode {
+        const token = this.peek();
+
+        if (token.type === 'SUPER') {
+            this.current++;
+            return this.parseIdentifierOrCall({ type: 'SUPER', value: 'super' });
+        }
+
+        if (token.type === 'ESTA') {
+            const estaNode: ASTNode = { type: 'ESTA', value: 'this' };
+            this.current++;
+            return this.parseIdentifierOrCall(estaNode);
+        }
 
         if (token.type === 'IDENTIFICADOR') {
             return this.parseIdentifierOrCall();
@@ -39,24 +191,20 @@ export class Parser {
 
         if (token.type === 'L_SQUARE') {
             this.consume('L_SQUARE');
-
             const elements: ASTNode[] = [];
-
             while (this.peek().type !== 'R_SQUARE') {
                 elements.push(this.parseExpression());
                 if (this.peek().type === ',') this.consume(',');
             }
-
             this.consume('R_SQUARE');
-
             return { type: 'LISTA', children: elements };
         }
-
-        throw new Error(`Token inesperado en expresión: ${token.type}`);
+        
+        throw new Error(`Token inesperado en expresión: ${token.type} en la posición ${this.current}`);
     }
 
-    private parseIdentifierOrCall(): ASTNode {
-        let node: ASTNode = { type: 'IDENTIFICADOR', value: this.consume('IDENTIFICADOR').value };
+    private parseIdentifierOrCall(startNode?: ASTNode): ASTNode {
+        let node: ASTNode = startNode || { type: 'IDENTIFICADOR', value: this.consume('IDENTIFICADOR').value };
 
         while (this.current < this.tokens.length && this.peek().type === '.') {
             this.consume('.');
@@ -81,10 +229,10 @@ export class Parser {
             }
             this.consume('R_EXPRESSION');
 
-            return { 
-                type: 'LLAMADA', 
+            return {
+                type: 'LLAMADA',
                 value: node as any,
-                children: args 
+                children: args
             };
         }
 

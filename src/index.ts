@@ -32,4 +32,6 @@ const output = generator.generate(ast);
 
 if (process.argv.includes('--output')) printOutput("OUTPUT", [output]);
 
+fs.writeFileSync('output.js', output)
+
 eval(output);

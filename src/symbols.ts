@@ -6,7 +6,7 @@ export const symbols = {
     "[": "L_SQUARE",
     "]": "R_SQUARE",
 
-    "=": "igual",
+    "=": "ES",
     "+": "mas",
     "-": "menos",
     "*": "por",

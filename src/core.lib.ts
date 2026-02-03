@@ -2,11 +2,10 @@ export const corelib: Record<string, any> = {
     "classes": {
         "consola": {
             "static": true,
-            "mainMethod": "escribir",
             "methods": {
-                "escribir": "console.log",
+                "imprimir": "console.log",
                 "limpiar": "console.clear"
             }
         }
-    }
+    },
 } as const;
