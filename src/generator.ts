@@ -30,6 +30,8 @@ export class Generator {
                 return this.generateAssignation(node);
             case 'SUPER':
                 return 'super';
+            case 'OPERACION_BINARIA':
+                return this.generateBinaryOperation(node);
             default:
                 throw new Error(`Generador: Tipo de nodo desconocido: ${node.type}`);
         }
@@ -99,5 +101,20 @@ export class Generator {
 
     private generateAssignation(node: any): string {
         return `${this.visit(node.object)} = ${this.visit(node.value)}`;
+    }
+
+    private generateBinaryOperation(node: any): string {
+        const operatorsMap: any = {
+            'MAS': '+',
+            'MENOS': '-',
+            'POR': '*',
+            'ENTRE': '/',
+            'RESTO': '%',
+            'EXP': '**'
+        };
+
+        const op = operatorsMap[node.operator];
+        
+        return `${this.visit(node.left)} ${op} ${this.visit(node.right)}`;
     }
 }

@@ -151,7 +151,21 @@ export class Parser {
     }
 
     private parseExpression(): ASTNode {
-        let node = this.parsePrimary();
+        let left = this.parsePrimary();
+
+        const binaryExpressions = ['MAS', 'MENOS', 'POR', 'ENTRE', 'RESTO', 'EXP', 'INTRO', 'ESPACIO'];
+
+        while (this.current < this.tokens.length && binaryExpressions.includes(this.peek().type)) {
+            const operator = this.consume(this.peek().type);
+            const right = this.parsePrimary();
+            
+            left = {
+                type: 'OPERACION_BINARIA',
+                left,
+                operator: operator.type,
+                right
+            };
+        }
 
         if (this.current < this.tokens.length && this.peek().type === 'ES') {
             this.consume('ES');
@@ -159,16 +173,34 @@ export class Parser {
             
             return {
                 type: 'ASIGNACION',
-                object: node,
+                object: left,
                 value: value as any
             };
         }
 
-        return node;
+        return left;
     }
 
     private parsePrimary(): ASTNode {
         const token = this.peek();
+
+        if (token.type === 'ESPACIO') {
+            this.consume('ESPACIO');
+            return {
+                type: 'LITERAL',
+                value: ' ',
+                raw: ' '
+            }
+        }
+
+        if (token.type === 'INTRO') {
+            this.consume('INTRO');
+            return {
+                type: 'LITERAL',
+                value: '\\n',
+                raw: '\\n'
+            }
+        }
 
         if (token.type === 'SUPER') {
             this.current++;

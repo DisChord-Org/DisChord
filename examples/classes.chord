@@ -1,0 +1,25 @@
+clase HolaMundo {
+    prop hola es "hola"
+    prop adios = "adios"
+
+    HolaMundo() {
+        consola.imprimir("Clase iniciada")
+    }
+
+    funcion hola(nombre) {
+        consola.imprimir(nombre)
+    }
+}
+
+clase config extiende HolaMundo {
+    fijar prop version es "v1.0.0"
+
+    config() {
+        super()
+    }
+
+    fijar funcion mostrarVersion() {
+        consola.imprimir(version)
+        version es "v1.0.1"
+    }
+}

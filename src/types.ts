@@ -10,6 +10,9 @@ export type ASTNode = {
     children?: ASTNode[];
     object?: ASTNode;
     property?: string;
+    left?: ASTNode;
+    operator?: string;
+    right?: ASTNode;
 };
 
 export interface ClassNode extends ASTNode {
