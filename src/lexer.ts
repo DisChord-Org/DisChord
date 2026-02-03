@@ -70,12 +70,18 @@ export class Lexer {
                         char = this.input[++current];
                     }
                 } else {
-                    while ((/[0-9]/.test(char) || char === ".") && current < this.input.length) {
-                        if (char === "." && value.includes(".")) { // Validar que no haya más de un punto decimal
-                            throw new Error("Número inválido: múltiples puntos decimales.");
-                        }
-                        value += char;
-                        char = this.input[++current];
+                    while (current < this.input.length) {
+                        char = this.input[current];
+                        
+                        if (/[0-9]/.test(char)) {
+                            value += char;
+                        } else if (char === ".") {
+                            const nextChar = this.input[current + 1];
+                            if (/[0-9]/.test(nextChar) && !value.includes(".")) {
+                                value += char;
+                            } else break; 
+                        } else break;
+                        current++;
                     }
                 }
 
