@@ -44,14 +44,14 @@ export class Parser {
             }
             
             if (nextToken.type === 'FUNCION') {
-                const func = this.parseFunctionDeclaration(false);
+                const func = this.parseFunctionDeclaration(false, true);
                 func.isStatic = true;
                 return func;
             }
         }
 
         if (token.type === 'FUNCION') {
-            return this.parseFunctionDeclaration(false);
+            return this.parseFunctionDeclaration(false, !!classContext);
         }
 
         if (token.type === 'PROP') {
@@ -99,7 +99,7 @@ export class Parser {
         };
     }
 
-    private parseFunctionDeclaration(isConstructor: boolean): FunctionNode {
+    private parseFunctionDeclaration(isConstructor: boolean, isMethod: boolean = true): FunctionNode {
         let id: string;
         
         if (isConstructor) {
@@ -131,6 +131,7 @@ export class Parser {
             type: 'FUNCION',
             id,
             isConstructor,
+            isMethod,
             params,
             body
         };

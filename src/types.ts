@@ -27,6 +27,7 @@ export interface FunctionNode extends ASTNode {
     id: string;
     isConstructor: boolean;
     isStatic?: boolean;
+    isMethod?: boolean;
     params: string[];
     body: ASTNode[];
 }

@@ -104,12 +104,19 @@ export class Generator {
     }
 
     private generateFunction(node: any): string {
-        const isStatic = node.isStatic ? 'static ' : '';
-        const name = node.isConstructor ? 'constructor' : node.id;
         const params = node.params.join(', ');
-        const body = node.body.map((n: any) => '  ' + this.visit(n) + ";").join('\n');
+        const body = node.body.map((n: any) => '    ' + this.visit(n) + ";").join('\n');
 
-        return `${isStatic}${name}(${params}) {\n    ${body}\n  }`;
+        if (node.isConstructor) {
+            return `constructor(${params}) {\n${body}\n  }`;
+        }
+
+        if (node.isMethod) {
+            const isStatic = node.isStatic ? 'static ' : '';
+            return `${isStatic}${node.id}(${params}) {\n${body}\n  }`;
+        }
+
+        return `function ${node.id}(${params}) {\n${body}\n}`;
     }
 
     private generateProperty(node: any): string {
