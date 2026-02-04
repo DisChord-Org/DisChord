@@ -21,6 +21,22 @@ export const corelib: Record<string, any> = {
                 "imprimir": "console.log",
                 "limpiar": "console.clear"
             }
+        },
+        "Texto": {
+            methods: {
+                "limpiar": "trim",
+                "partir": "split",
+                "reemplazar": "replace",
+                "longitud": "length"
+            }
+        },
+        "Lista": {
+            methods: {
+                "agregar": "push",
+                "quitarUltimo": "pop",
+                "unir": "join",
+                "mapear": "map"
+            }
         }
     },
 } as const;

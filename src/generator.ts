@@ -62,6 +62,13 @@ export class Generator {
             return corelib.classes[objName].methods[propName];
         }
 
+        for (const className in corelib.classes) {
+            const methods = corelib.classes[className].methods;
+            if (methods && methods[propName]) {
+                return `${this.visit(node.object)}.${methods[propName]}`;
+            }
+        }
+
         return `${this.visit(node.object)}.${propName}`;
     }
 
