@@ -19,7 +19,7 @@ export const keywords = [
     "devolver", // por hacer
     "porcada", // por hacer
     "importar", // por hacer
-    "typeof", // por hacer
+    "tipode", // por hacer
 
     "verdadero",
     "falso",
@@ -34,13 +34,13 @@ export const keywords = [
     "intro",
     "espacio",
 
-    "mayor", // por hacer
-    "menor", // por hacer
-    "mayor_igual", // por hacer
-    "menor_igual", // por hacer
-    "no", // por hacer
-    "igual_tipado", // por hacer
-    "igual", // por hacer
-    "y", // por hacer
-    "o" // por hacer
+    "mayor",
+    "menor",
+    "mayor_igual",
+    "menor_igual",
+    "no",
+    "igual_tipado",
+    "igual",
+    "y",
+    "o"
 ] as const;

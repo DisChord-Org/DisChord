@@ -35,9 +35,11 @@ export class Generator {
             case 'VAR':
                 return this.generateVariableDeclaration(node);
             case 'NUEVO':
-                if (!node || !('object' in node)) throw new Error('Generator: NUEVO without object');
-
-                return `new ${this.visit(node.object ?? node)}`;
+                return `new ${this.visit(node.object!)}`;
+            case 'NO_UNARIA':
+                return this.generateUnaryOperation(node);
+            case 'AGRUPACION':
+                return `(${this.visit(node.value as any)})`;
             default:
                 throw new Error(`Generador: Tipo de nodo desconocido: ${node.type}`);
         }
@@ -120,7 +122,15 @@ export class Generator {
             'POR': '*',
             'ENTRE': '/',
             'RESTO': '%',
-            'EXP': '**'
+            'EXP': '**',
+            'MAYOR': '>',
+            'MENOR': '<',
+            'MAYOR_IGUAL': '>=',
+            'MENOR_IGUAL': '<=',
+            'IGUAL': '==',
+            'IGUAL_TIPADO': '===',
+            'Y': '&&',
+            'O': '||'
         };
 
         const op = operatorsMap[node.operator];
@@ -130,5 +140,10 @@ export class Generator {
 
     private generateVariableDeclaration(node: any): string {
         return `let ${node.id} = ${this.visit(node.prop_value)}`;
+    }
+
+    private generateUnaryOperation(node: ASTNode): string {
+        if (node.operator === 'NO') return `!(${this.visit(node.object!)})`;
+        return '';
     }
 }

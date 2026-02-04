@@ -157,7 +157,10 @@ export class Parser {
     private parseExpression(): ASTNode {
         let left = this.parsePrimary();
 
-        const binaryExpressions = ['MAS', 'MENOS', 'POR', 'ENTRE', 'RESTO', 'EXP', 'INTRO', 'ESPACIO'];
+        const binaryExpressions = [
+            'MAS', 'MENOS', 'POR', 'ENTRE', 'RESTO', 'EXP', 'INTRO', 'ESPACIO',
+            'MAYOR', 'MENOR', 'MAYOR_IGUAL', 'MENOR_IGUAL', 'IGUAL', 'IGUAL_TIPADO', 'Y', 'O'
+        ];
 
         while (this.current < this.tokens.length && binaryExpressions.includes(this.peek().type)) {
             const operator = this.consume(this.peek().type);
@@ -234,6 +237,17 @@ export class Parser {
             };
         }
 
+        if (token.type === 'NO') {
+            this.consume('NO');
+            const argument = this.parsePrimary();
+
+            return {
+                type: 'NO_UNARIA',
+                operator: 'NO',
+                object: argument
+            };
+        }
+
         if (token.type === 'L_SQUARE') {
             this.consume('L_SQUARE');
             const elements: ASTNode[] = [];
@@ -243,6 +257,19 @@ export class Parser {
             }
             this.consume('R_SQUARE');
             return { type: 'LISTA', children: elements };
+        }
+
+        if (token.type === 'L_EXPRESSION') {
+            this.consume('L_EXPRESSION');
+            
+            const node = this.parseExpression(); 
+            
+            this.consume('R_EXPRESSION');
+
+            return {
+                type: 'AGRUPACION',
+                value: node as any,
+            };
         }
         
         throw new Error(`Token inesperado en expresión: ${token.type} en la posición ${this.current}`);

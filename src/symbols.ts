@@ -17,10 +17,13 @@ export const symbols = {
     "¿": "MENOR",
     ">=": "MAYOR_IGUAL",
     "<=": "MENOR_IGUAL",
-    "!": "no",
-    "==": "igual_tipado",
-    ";": "separador",
+    "!": "NO",
+    "==": "IGUAL",
+    "===": "IGUAL_TIPADO",
+    // ";": "separador",
     ":": ":",
     ",": ",",
-    ".": "."
+    ".": ".",
+    "&&": "&&",
+    "||": "||"
 } as any;
