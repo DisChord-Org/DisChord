@@ -221,7 +221,7 @@ export class Parser {
             return this.parseIdentifierOrCall();
         }
 
-        if (token.type === 'NUMERO' || token.type === 'TEXTO') {
+        if (token.type === 'NUMERO' || token.type === 'TEXTO' || token.type === 'BOOL' || token.type === 'INDEFINIDO') {
             return this.parseLiteral();
         }
 
@@ -285,11 +285,25 @@ export class Parser {
     }
 
     private parseLiteral(): ASTNode {
-        const token = this.consume(['NUMERO', 'TEXTO', 'BOOL', 'NULO']);
+        const token = this.consume(['NUMERO', 'TEXTO', 'BOOL', 'INDEFINIDO']);
+
+        let value: boolean | number | string | undefined = token.value;
+
+        switch (token.type) {
+            case 'BOOL':
+                value = token.value === 'verdadero';
+                break;
+            case 'NUMERO':
+                value = Number(token.value);
+                break;
+            case 'INDEFINIDO':
+                value = undefined;
+                break;
+        }
 
         return {
             type: 'LITERAL',
-            value: token.type === 'NUMERO' ? Number(token.value) : token.value,
+            value,
             raw: token.value
         };
     }

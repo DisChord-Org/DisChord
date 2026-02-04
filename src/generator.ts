@@ -78,6 +78,10 @@ export class Generator {
     }
 
     private generateLiteral(node: any): string {
+        if (typeof node.value === 'boolean') {
+            return node.value ? 'true' : 'false';
+        }
+
         if (typeof node.value === 'string') {
             return `"${node.value}"`;
         }

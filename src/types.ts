@@ -5,7 +5,7 @@ export type Token = {
 
 export type ASTNode = {
     type: string;
-    value?: string | number;
+    value?: string | number | boolean | undefined;
     raw?: string;
     children?: ASTNode[];
     object?: ASTNode;

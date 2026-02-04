@@ -107,7 +107,9 @@ export class Lexer {
                     char = this.input[++current];
                 }
 
-                if (keywords.includes(value as any)) tokens.push({ type: value.toUpperCase(), value });
+                if (value === "verdadero" || value === "falso") tokens.push({ type: "BOOL", value });
+                else if (value === "indefinido") tokens.push({ type: "INDEFINIDO", value });
+                else if (keywords.includes(value as any)) tokens.push({ type: value.toUpperCase(), value });
                 else tokens.push({ type: "IDENTIFICADOR", value });
 
                 continue;

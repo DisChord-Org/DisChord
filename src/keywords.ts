@@ -2,34 +2,37 @@ export const keywords = [
     "clase",
     "extiende",
     "prop",
-    "es",
     "fijar",
     "esta",
     "super",
-    "var",
     "nuevo",
+
+    "var",
+    "es",
+
+    "funcion",
 
     "si", // por hacer
     "sino", // por hacer
     "ademas", // por hacer
     "mientras", // por hacer
-    "funcion", // por hacer
     "devolver", // por hacer
     "porcada", // por hacer
     "importar", // por hacer
+    "typeof", // por hacer
 
-    "verdadero", // por hacer
-    "falso", // por hacer
-    "indefinido", // por hacer
+    "verdadero",
+    "falso",
+    "indefinido",
 
-    "mas", // por hacer
-    "menos", // por hacer
-    "por", // por hacer
-    "entre", // por hacer
-    "resto", // por hacer
-    "exp", // por hacer
-    "intro", // por hacer
-    "espacio", // por hacer
+    "mas",
+    "menos",
+    "por",
+    "entre",
+    "resto",
+    "exp",
+    "intro",
+    "espacio",
 
     "mayor", // por hacer
     "menor", // por hacer
