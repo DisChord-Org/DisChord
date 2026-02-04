@@ -7,6 +7,7 @@ export const keywords = [
     "esta",
     "super",
     "var",
+    "nuevo",
 
     "si", // por hacer
     "sino", // por hacer
@@ -15,7 +16,6 @@ export const keywords = [
     "funcion", // por hacer
     "devolver", // por hacer
     "porcada", // por hacer
-    "nuevo", // por hacer
     "importar", // por hacer
 
     "verdadero", // por hacer

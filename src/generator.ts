@@ -34,6 +34,10 @@ export class Generator {
                 return this.generateBinaryOperation(node);
             case 'VAR':
                 return this.generateVariableDeclaration(node);
+            case 'NUEVO':
+                if (!node || !('object' in node)) throw new Error('Generator: NUEVO without object');
+
+                return `new ${this.visit(node.object ?? node)}`;
             default:
                 throw new Error(`Generador: Tipo de nodo desconocido: ${node.type}`);
         }

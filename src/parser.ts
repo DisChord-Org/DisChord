@@ -225,6 +225,15 @@ export class Parser {
             return this.parseLiteral();
         }
 
+        if (token.type === 'NUEVO') {
+            this.consume('NUEVO');
+            const call = this.parseIdentifierOrCall(); 
+            return {
+                type: 'NUEVO',
+                object: call
+            };
+        }
+
         if (token.type === 'L_SQUARE') {
             this.consume('L_SQUARE');
             const elements: ASTNode[] = [];
