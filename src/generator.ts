@@ -32,6 +32,8 @@ export class Generator {
                 return 'super';
             case 'OPERACION_BINARIA':
                 return this.generateBinaryOperation(node);
+            case 'VAR':
+                return this.generateVariableDeclaration(node);
             default:
                 throw new Error(`Generador: Tipo de nodo desconocido: ${node.type}`);
         }
@@ -116,5 +118,9 @@ export class Generator {
         const op = operatorsMap[node.operator];
         
         return `${this.visit(node.left)} ${op} ${this.visit(node.right)}`;
+    }
+
+    private generateVariableDeclaration(node: any): string {
+        return `let ${node.id} = ${this.visit(node.prop_value)}`;
     }
 }

@@ -6,12 +6,11 @@ export const keywords = [
     "fijar",
     "esta",
     "super",
+    "var",
 
     "si", // por hacer
     "sino", // por hacer
     "ademas", // por hacer
-    "var", // por hacer
-    "const", // por hacer
     "mientras", // por hacer
     "funcion", // por hacer
     "devolver", // por hacer

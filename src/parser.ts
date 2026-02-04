@@ -1,4 +1,4 @@
-import { ASTNode, ClassNode, FunctionNode, PropertyNode, Token } from "./types";
+import { ASTNode, ClassNode, FunctionNode, PropertyNode, Token, VarNode } from "./types";
 
 export class Parser {
     public nodes: ASTNode[] = [];
@@ -56,6 +56,10 @@ export class Parser {
 
         if (token.type === 'PROP') {
             return this.parseProperty();
+        }
+
+        if (token.type === 'VAR') {
+            return this.parseVariableDeclaration();
         }
 
         if (classContext && token.type === 'IDENTIFICADOR' && token.value === classContext) {
@@ -278,6 +282,24 @@ export class Parser {
             type: 'LITERAL',
             value: token.type === 'NUMERO' ? Number(token.value) : token.value,
             raw: token.value
+        };
+    }
+
+    private parseVariableDeclaration(): VarNode {
+        this.consume('VAR');
+        const id = this.consume('IDENTIFICADOR').value;
+        
+        let value: ASTNode = { type: 'LITERAL', value: "indefinido", raw: 'indefinido' };
+
+        if (this.current < this.tokens.length && this.peek().type === 'ES') {
+            this.consume('ES');
+            value = this.parseExpression();
+        }
+
+        return {
+            type: 'VAR',
+            id,
+            prop_value: value
         };
     }
 }

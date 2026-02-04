@@ -37,3 +37,10 @@ export interface PropertyNode extends ASTNode {
     prop_value: ASTNode;
     isStatic?: boolean;
 }
+
+export interface VarNode extends ASTNode {
+    type: 'VAR';
+    id: string;
+    prop_value: ASTNode;
+    isStatic?: boolean;
+}
