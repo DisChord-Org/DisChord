@@ -100,6 +100,22 @@ export class Lexer {
                 continue;
             }
 
+            // Decoradores
+            if (char === '@') {
+                let value = "@";
+                current++;
+                char = this.input[current];
+
+                while (current < this.input.length && /[a-zA-Z0-9_]/.test(char)) {
+                    value += char;
+                    current++;
+                    char = this.input[current];
+                }
+
+                tokens.push({ type: "DECORADOR", value });
+                continue;
+            }
+
             if (/[a-zA-Z]/.test(char)) { // Keywords, identificadores, booleanos, undefined
                 let value = "";
                 while (/[a-zA-Z0-9_]/.test(char) && current < this.input.length) {

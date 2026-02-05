@@ -29,6 +29,13 @@ export class Parser {
     private parseStatement(classContext?: string): ASTNode {
         const token = this.peek();
 
+        if (token.type === 'DECORADOR' && token.value === '@asincrono') {
+            this.consume('DECORADOR');
+            const func = this.parseFunctionDeclaration(false, !!classContext);
+            func.isAsync = true;
+            return func;
+        }
+
         if (token.type === 'SI') {
             return this.parseIfStatement();
         }

@@ -11,6 +11,7 @@ export const keywords = [
     "var",
     "es",
 
+    "@asincrono",
     "funcion",
 
     "si",

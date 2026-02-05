@@ -139,16 +139,18 @@ export class Generator {
         const params = node.params.join(', ');
         const body = node.body.map((n: any) => '    ' + this.visit(n) + ";").join('\n');
 
+        const asyncPrefix = node.isAsync ? 'async ' : '';
+
         if (node.isConstructor) {
             return `constructor(${params}) {\n${body}\n  }`;
         }
 
         if (node.isMethod) {
             const isStatic = node.isStatic ? 'static ' : '';
-            return `${isStatic}${node.id}(${params}) {\n${body}\n  }`;
+            return `${isStatic}${asyncPrefix}${node.id}(${params}) {\n${body}\n  }`;
         }
 
-        return `function ${node.id}(${params}) {\n${body}\n}`;
+        return `${asyncPrefix}function ${node.id}(${params}) {\n${body}\n}`;
     }
 
     private generateProperty(node: any): string {
