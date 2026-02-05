@@ -28,6 +28,7 @@ const parser = new Parser(tokens);
 const ast = parser.parse();
 
 if (process.argv.includes('--ast')) printOutput("AST", ast as any[]);
+if (process.argv.includes('--table')) printOutput("TABLE", Array.from(parser.symbols.values()) as any[]);
 
 const generator = new Generator(parser.symbols);
 const output = generator.generate(ast);

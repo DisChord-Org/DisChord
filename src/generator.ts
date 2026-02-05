@@ -117,6 +117,9 @@ export class Generator {
 
         if (node.value.type === 'ACCESO') {
             translation = this.generateAccess(node.value);
+
+            const symbol = this.SymbolsTable.get(node.value.property);
+            if (symbol && symbol.isAsync) isAsyncCall = true;
         } else {
             const name = node.value.value;
             translation = name;

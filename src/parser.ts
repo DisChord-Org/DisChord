@@ -42,6 +42,14 @@ export class Parser {
 
         if (token.type === 'DECORADOR' && token.value === '@asincrono') {
             this.consume('DECORADOR');
+            
+            if (this.peek().type === 'FIJAR') {
+                this.consume('FIJAR');
+                const func = this.parseFunctionDeclaration(false, true, true);
+                func.isStatic = true;
+                return func;
+            }
+
             const func = this.parseFunctionDeclaration(false, !!classContext, true);
             return func;
         }
