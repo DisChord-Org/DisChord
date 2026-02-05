@@ -52,3 +52,9 @@ export interface ConditionNode extends ASTNode {
     consequent: ASTNode[];
     alternate?: ASTNode[] | ConditionNode;
 }
+
+export interface ForNode extends ASTNode {
+    type: 'BUCLE';
+    var: string;
+    iterable: ASTNode;
+}

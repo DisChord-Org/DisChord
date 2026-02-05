@@ -1,5 +1,5 @@
 import { corelib } from "./core.lib";
-import { ASTNode, ClassNode, PropertyNode } from "./types";
+import { ASTNode, ClassNode, ForNode, PropertyNode } from "./types";
 
 export class Generator {
     public generate(nodes: ASTNode[]): string {
@@ -44,6 +44,8 @@ export class Generator {
                 return this.generateCondition(node);
             case 'UNARIO':
                 return this.generateUnaryOperation(node);
+            case 'BUCLE':
+                return this.generateFor(node);
             default:
                 throw new Error(`Generador: Tipo de nodo desconocido: ${node.type}`);
         }
@@ -191,5 +193,26 @@ export class Generator {
         }
 
         return result;
+    }
+
+    private generateFor(node: any): string {
+        const varName = node.var;
+        const body = node.children.map((n: any) => "    " + this.visit(n) + ";").join('\n');
+
+        if (node.iterable.type === 'LLAMADA' && node.iterable.value.value === 'rango') {
+            const args = node.iterable.children;
+            let start = "0", end = "0";
+            
+            if (args.length === 1) {
+                end = this.visit(args[0]);
+            } else if (args.length === 2) {
+                start = this.visit(args[0]);
+                end = this.visit(args[1]);
+            }
+            
+            return `for (let ${varName} = ${start}; ${varName} < ${end}; ${varName}++) {\n${body}\n}`;
+        }
+
+        return `for (let ${varName} of ${this.visit(node.iterable)}) {\n${body}\n}`;
     }
 }

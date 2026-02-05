@@ -1,4 +1,4 @@
-import { ASTNode, ClassNode, ConditionNode, FunctionNode, PropertyNode, Token, VarNode } from "./types";
+import { ASTNode, ClassNode, ConditionNode, ForNode, FunctionNode, PropertyNode, Token, VarNode } from "./types";
 
 export class Parser {
     public nodes: ASTNode[] = [];
@@ -31,6 +31,10 @@ export class Parser {
 
         if (token.type === 'SI') {
             return this.parseIfStatement();
+        }
+
+        if (token.type === 'PARA') {
+            return this.parseForStatement();
         }
 
         if (token.type === 'CLASE') {
@@ -412,6 +416,35 @@ export class Parser {
             test,
             consequent,
             alternate
+        };
+    }
+
+    private parseForStatement(): ForNode {
+        this.consume('PARA');
+        this.consume('L_EXPRESSION');
+        
+        const variable = this.consume('IDENTIFICADOR').value;
+
+        this.consume('EN');
+        
+        const iterable = this.parseExpression();
+        
+        this.consume('R_EXPRESSION');
+        this.consume('L_BRACE');
+
+        const children: ASTNode[] = [];
+
+        while (this.peek().type !== 'R_BRACE') {
+            children.push(this.parseStatement());
+        }
+
+        this.consume('R_BRACE');
+
+        return {
+            type: 'BUCLE',
+            var: variable,
+            iterable,
+            children
         };
     }
 }
