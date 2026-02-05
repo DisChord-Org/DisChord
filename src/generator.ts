@@ -3,7 +3,12 @@ import { ASTNode, ClassNode, ForNode, PropertyNode } from "./types";
 
 export class Generator {
     public generate(nodes: ASTNode[]): string {
-        return nodes.map(node => this.visit(node) + ";").join('\n');
+        return nodes.map(node => {
+            const code = this.visit(node);
+            const noSemicolon = ['CONDICION', 'BUCLE', 'CLASE', 'FUNCION'];
+
+            return noSemicolon.includes(node.type) ? code : code + ";";
+        }).join('\n');
     }
 
     private visit(node: ASTNode): string {
