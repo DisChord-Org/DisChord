@@ -12,8 +12,8 @@ export const keywords = [
 
     "funcion",
 
-    "si", // por hacer
-    "sino", // por hacer
+    "si",
+    "sino",
     "ademas", // por hacer
     "mientras", // por hacer
     "devolver", // por hacer

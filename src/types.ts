@@ -45,3 +45,10 @@ export interface VarNode extends ASTNode {
     prop_value: ASTNode;
     isStatic?: boolean;
 }
+
+export interface ConditionNode extends ASTNode {
+    type: 'CONDICION';
+    test: ASTNode;
+    consequent: ASTNode[];
+    alternate?: ASTNode[] | ConditionNode;
+}

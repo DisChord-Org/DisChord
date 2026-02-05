@@ -1,4 +1,4 @@
-import { ASTNode, ClassNode, FunctionNode, PropertyNode, Token, VarNode } from "./types";
+import { ASTNode, ClassNode, ConditionNode, FunctionNode, PropertyNode, Token, VarNode } from "./types";
 
 export class Parser {
     public nodes: ASTNode[] = [];
@@ -28,6 +28,10 @@ export class Parser {
 
     private parseStatement(classContext?: string): ASTNode {
         const token = this.peek();
+
+        if (token.type === 'SI') {
+            return this.parseIfStatement();
+        }
 
         if (token.type === 'CLASE') {
             return this.parseClassDeclaration();
@@ -351,6 +355,52 @@ export class Parser {
             type: 'VAR',
             id,
             prop_value: value
+        };
+    }
+
+    private parseIfStatement(): ConditionNode {
+        this.consume('SI');
+        this.consume('L_EXPRESSION');
+
+        const test = this.parseExpression();
+
+        this.consume('R_EXPRESSION');
+        this.consume('L_BRACE');
+
+        const consequent: ASTNode[] = [];
+
+        while (this.peek().type !== 'R_BRACE') {
+            consequent.push(this.parseStatement());
+        }
+
+        this.consume('R_BRACE');
+
+        let alternate: ASTNode[] | ConditionNode | undefined = undefined;
+
+        if (this.current < this.tokens.length && (this.peek().type === 'SINO' || this.peek().type === 'ADEMAS')) {
+            const next = this.consume(this.peek().type);
+
+            if (next.type === 'ADEMAS') {
+                alternate = this.parseIfStatement();
+            } else {
+                this.consume('L_BRACE');
+
+                const elseBody: ASTNode[] = [];
+
+                while (this.peek().type !== 'R_BRACE') {
+                    elseBody.push(this.parseStatement());
+                }
+
+                this.consume('R_BRACE');
+                alternate = elseBody;
+            }
+        }
+
+        return {
+            type: 'CONDICION',
+            test,
+            consequent,
+            alternate
         };
     }
 }

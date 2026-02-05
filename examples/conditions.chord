@@ -1,0 +1,9 @@
+var a es 2
+
+si (a igual 1) {
+    consola.imprimir("a es 1")
+} ademas si (a igual 2) {
+    consola.imprimir("a es 2")
+} sino {
+    consola.imprimir("a no es 1")
+}

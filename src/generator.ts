@@ -40,6 +40,8 @@ export class Generator {
                 return this.generateUnaryOperation(node);
             case 'AGRUPACION':
                 return `(${this.visit(node.value as any)})`;
+            case 'CONDICION':
+                return this.generateCondition(node);
             default:
                 throw new Error(`Generador: Tipo de nodo desconocido: ${node.type}`);
         }
@@ -54,8 +56,8 @@ export class Generator {
         return `class ${node.id}${inheritance} {\n  ${body}\n}`;
     }
 
-    private generateAccess(node: any): string {
-        const objName = node.object.value;
+    private generateAccess(node: any): string { 
+        const objName = node.object.type === 'IDENTIFICADOR' ? node.object.value : null;
         const propName = node.property;
 
         if (corelib.classes[objName] && corelib.classes[objName].methods[propName]) {
@@ -159,5 +161,27 @@ export class Generator {
     private generateUnaryOperation(node: ASTNode): string {
         if (node.operator === 'NO') return `!(${this.visit(node.object!)})`;
         return '';
+    }
+
+    private generateCondition(node: any): string {
+        const test = this.visit(node.test);
+        const consequent = node.consequent
+            .map((n: any) => "    " + this.visit(n) + ";")
+            .join('\n');
+        
+        let result = `if (${test}) {\n${consequent}\n}`;
+
+        if (node.alternate) {
+            if (!Array.isArray(node.alternate) && node.alternate.type === 'CONDICION') {
+                result += ` else ${this.generateCondition(node.alternate)}`;
+            } else {
+                const alternate = (node.alternate as any[])
+                    .map((n: any) => "    " + this.visit(n) + ";")
+                    .join('\n');
+                result += ` else {\n${alternate}\n}`;
+            }
+        }
+
+        return result;
     }
 }
