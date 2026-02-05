@@ -46,6 +46,8 @@ export class Generator {
                 return this.generateUnaryOperation(node);
             case 'BUCLE':
                 return this.generateFor(node);
+            case 'OBJETO':
+                return this.generateObject(node);
             default:
                 throw new Error(`Generador: Tipo de nodo desconocido: ${node.type}`);
         }
@@ -198,21 +200,26 @@ export class Generator {
     private generateFor(node: any): string {
         const varName = node.var;
         const body = node.children.map((n: any) => "    " + this.visit(n) + ";").join('\n');
+        const iterable = this.visit(node.iterable);
 
         if (node.iterable.type === 'LLAMADA' && node.iterable.value.value === 'rango') {
             const args = node.iterable.children;
-            let start = "0", end = "0";
-            
-            if (args.length === 1) {
-                end = this.visit(args[0]);
-            } else if (args.length === 2) {
+            let start = "0", end = this.visit(args[0]);
+
+            if (args.length === 2) {
                 start = this.visit(args[0]);
                 end = this.visit(args[1]);
             }
-            
             return `for (let ${varName} = ${start}; ${varName} < ${end}; ${varName}++) {\n${body}\n}`;
         }
 
-        return `for (let ${varName} of ${this.visit(node.iterable)}) {\n${body}\n}`;
+        return `for (let ${varName} of (Array.isArray(${iterable}) ? ${iterable} : Object.keys(${iterable}))) {\n${body}\n}`;
+    }
+
+    private generateObject(node: any): string {
+        const props = node.children
+            .map((p: any) => `${p.key}: ${this.visit(p.value)}`)
+            .join(', ');
+        return `{ ${props} }`;
     }
 }

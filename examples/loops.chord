@@ -1,0 +1,19 @@
+para (x en rango(10)) {
+    consola.imprimir(x)
+}
+
+var a es {
+    "uno": 1,
+    "dos": 2,
+    "tres": 3
+}
+
+para (x en a) {
+    consola.imprimir(x)
+}
+
+var b es [ 1, 2, 3, 4, 5 ]
+
+para (x en b) {
+    consola.imprimir(x)
+}

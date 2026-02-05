@@ -291,6 +291,32 @@ export class Parser {
                 value: node as any,
             };
         }
+
+        if (token.type === 'L_BRACE') {
+            this.consume('L_BRACE');
+            const properties: any[] = [];
+
+            while (this.peek().type !== 'R_BRACE') {
+                const keyToken = this.consume(['TEXTO', 'IDENTIFICADOR']);
+                const key = keyToken.type === 'TEXTO' ? `"${keyToken.value}"` : keyToken.value;
+                
+                this.consume(':');
+                const value = this.parseExpression();
+                
+                properties.push({ key, value });
+
+                if (this.peek().type === ',') {
+                    this.consume(',');
+                }
+            }
+
+            this.consume('R_BRACE');
+
+            return {
+                type: 'OBJETO',
+                children: properties
+            };
+        }
         
         throw new Error(`Token inesperado en expresión: ${token.type} en la posición ${this.current}`);
     }
