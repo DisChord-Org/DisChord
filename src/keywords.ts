@@ -18,6 +18,8 @@ export const keywords = [
 
     "para",
     "en",
+    "pasar",
+    "salir",
 
     "devolver", // por hacer
     "importar", // por hacer

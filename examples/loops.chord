@@ -1,4 +1,12 @@
 para (x en rango(10)) {
+    si (x igual 5) {
+        pasar
+    }
+
+    si (x igual 7) {
+        salir
+    }
+
     consola.imprimir(x)
 }
 

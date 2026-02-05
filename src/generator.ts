@@ -53,6 +53,10 @@ export class Generator {
                 return this.generateFor(node);
             case 'OBJETO':
                 return this.generateObject(node);
+            case 'SALIR':
+                return 'break';
+            case 'PASAR':
+                return 'continue';
             default:
                 throw new Error(`Generador: Tipo de nodo desconocido: ${node.type}`);
         }
