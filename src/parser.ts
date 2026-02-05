@@ -253,6 +253,17 @@ export class Parser {
             };
         }
 
+        if (token.type === 'TIPO') {
+            this.consume('TIPO');
+            const argument = this.parsePrimary();
+
+            return {
+                type: 'UNARIO',
+                operator: 'TIPO',
+                object: argument
+            };
+        }
+
         if (token.type === 'L_SQUARE') {
             this.consume('L_SQUARE');
             const elements: ASTNode[] = [];
@@ -344,7 +355,7 @@ export class Parser {
         this.consume('VAR');
         const id = this.consume('IDENTIFICADOR').value;
         
-        let value: ASTNode = { type: 'LITERAL', value: "indefinido", raw: 'indefinido' };
+        let value: ASTNode = { type: 'LITERAL', value: undefined, raw: 'indefinido' };
 
         if (this.current < this.tokens.length && this.peek().type === 'ES') {
             this.consume('ES');

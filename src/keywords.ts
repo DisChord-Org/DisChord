@@ -14,13 +14,14 @@ export const keywords = [
 
     "si",
     "sino",
-    "ademas", // por hacer
+    "ademas",
+
     "mientras", // por hacer
     "devolver", // por hacer
     "porcada", // por hacer
     "importar", // por hacer
-    "tipode", // por hacer
-
+    
+    "tipo",
     "verdadero",
     "falso",
     "indefinido",

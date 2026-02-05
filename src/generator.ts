@@ -42,6 +42,8 @@ export class Generator {
                 return `(${this.visit(node.value as any)})`;
             case 'CONDICION':
                 return this.generateCondition(node);
+            case 'UNARIO':
+                return this.generateUnaryOperation(node);
             default:
                 throw new Error(`Generador: Tipo de nodo desconocido: ${node.type}`);
         }
@@ -160,6 +162,12 @@ export class Generator {
 
     private generateUnaryOperation(node: ASTNode): string {
         if (node.operator === 'NO') return `!(${this.visit(node.object!)})`;
+
+        if (node.operator === 'TIPO') {
+            const mapping = `{ "number": "numero", "string": "texto", "boolean": "booleano", "undefined": "indefinido", "object": "objeto" }`;
+            return `${mapping}[typeof (${this.visit(node.object!)})]`;
+        }
+
         return '';
     }
 

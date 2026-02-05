@@ -4,8 +4,7 @@ console.log = (...args) => {
     const translatedArgs = args.map((arg: any) => {
         if (arg === true) return 'verdadero';
         if (arg === false) return 'falso';
-        if (arg === null) return 'nulo';
-        if (arg === undefined) return 'indefinido';
+        if (arg === null || arg === undefined) return 'indefinido';
 
         return arg;
     });
