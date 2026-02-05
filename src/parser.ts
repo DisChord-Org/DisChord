@@ -96,6 +96,16 @@ export class Parser {
             };
         }
 
+        if (token.type === 'EXPORTAR') {
+            this.consume('EXPORTAR');
+            const declaration = this.parseStatement();
+            
+            return {
+                type: 'EXPORTAR',
+                object: declaration
+            };
+        }
+
         if (classContext && token.type === 'IDENTIFICADOR' && token.value === classContext) {
             if (this.current + 1 < this.tokens.length && this.tokens[this.current + 1].type === 'L_EXPRESSION') {
                 return this.parseFunctionDeclaration(true);

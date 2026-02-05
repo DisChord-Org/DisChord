@@ -23,7 +23,7 @@ export const keywords = [
     "salir",
 
     "importar", // por hacer
-    "exportar", // por hacer
+    "exportar",
     "__js__", // por hacer
     
     "tipo",

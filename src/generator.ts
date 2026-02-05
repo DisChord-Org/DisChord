@@ -59,6 +59,8 @@ export class Generator {
                 return 'continue';
             case 'DEVOLVER':
                 return node.object ? `return ${this.visit(node.object)}` : 'return';
+            case 'EXPORTAR':
+                return this.generateExport(node);
             default:
                 throw new Error(`Generador: Tipo de nodo desconocido: ${node.type}`);
         }
@@ -232,5 +234,19 @@ export class Generator {
             .map((p: any) => `${p.key}: ${this.visit(p.value)}`)
             .join(', ');
         return `{ ${props} }`;
+    }
+
+    private generateExport(node: any): string {
+        const innerNode = node.object;
+
+        if (innerNode.type === 'VAR' || innerNode.type === 'FUNCION' || innerNode.type === 'CLASE') {
+            return `export ${this.visit(innerNode)}`;
+        }
+
+        if (innerNode.type === 'IDENTIFICADOR') {
+            return `export { ${this.visit(innerNode)} }`;
+        }
+
+        return `export ${this.visit(innerNode)}`;
     }
 }

@@ -1,4 +1,6 @@
 import * as fs from 'fs';
+import path from 'path';
+import { pathToFileURL } from 'url';
 import { Lexer } from './lexer';
 import { Parser } from './parser';
 import { Generator } from './generator';
@@ -32,6 +34,10 @@ const output = generator.generate(ast);
 
 if (process.argv.includes('--output')) printOutput("OUTPUT", [output]);
 
-fs.writeFileSync('output.js', output)
+fs.writeFileSync('output.mjs', output);
 
-eval(output);
+const fileUrl = pathToFileURL(path.join(process.cwd(), 'output.mjs')).href;
+
+import(`${fileUrl}?update=${Date.now()}`).catch(err => {
+    console.error("Error:", err);
+});
