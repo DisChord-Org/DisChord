@@ -29,7 +29,7 @@ const ast = parser.parse();
 
 if (process.argv.includes('--ast')) printOutput("AST", ast as any[]);
 
-const generator = new Generator();
+const generator = new Generator(parser.symbols);
 const output = generator.generate(ast);
 
 if (process.argv.includes('--output')) printOutput("OUTPUT", [output]);

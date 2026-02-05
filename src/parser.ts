@@ -1,9 +1,20 @@
-import { ASTNode, ClassNode, ConditionNode, ForNode, FunctionNode, PropertyNode, Token, VarNode } from "./types";
+import { ASTNode, ClassNode, ConditionNode, ForNode, FunctionNode, PropertyNode, Token, VarNode, Symbol } from "./types";
 
 export class Parser {
+    public symbols: Map<string, Symbol> = new Map();
     public nodes: ASTNode[] = [];
 
     constructor(private tokens: Token[], private current: number = 0) {}
+
+    private registerSymbol(name: string, info: Partial<Symbol>) {
+        this.symbols.set(name, {
+            name,
+            type: info.type || 'var',
+            isAsync: info.isAsync || false,
+            isExported: info.isExported || false,
+            scope: 'global',
+        });
+    }
 
     public parse(): ASTNode[] {
         while (this.current < this.tokens.length) {
@@ -31,8 +42,7 @@ export class Parser {
 
         if (token.type === 'DECORADOR' && token.value === '@asincrono') {
             this.consume('DECORADOR');
-            const func = this.parseFunctionDeclaration(false, !!classContext);
-            func.isAsync = true;
+            const func = this.parseFunctionDeclaration(false, !!classContext, true);
             return func;
         }
 
@@ -165,6 +175,11 @@ export class Parser {
 
         this.consume('R_BRACE');
 
+        this.registerSymbol(id, {
+            name: id,
+            type: 'class'
+        });
+
         return {
             type: 'CLASE',
             id,
@@ -173,7 +188,7 @@ export class Parser {
         };
     }
 
-    private parseFunctionDeclaration(isConstructor: boolean, isMethod: boolean = true): FunctionNode {
+    private parseFunctionDeclaration(isConstructor: boolean, isMethod: boolean = true, isAsync: boolean = false): FunctionNode {
         let id: string;
         
         if (isConstructor) {
@@ -201,11 +216,18 @@ export class Parser {
 
         this.consume('R_BRACE');
 
+        this.registerSymbol(id, {
+            name: id,
+            type: 'func',
+            isAsync
+        });
+
         return {
             type: 'FUNCION',
             id,
             isConstructor,
             isMethod,
+            isAsync,
             params,
             body
         };
@@ -221,6 +243,11 @@ export class Parser {
             this.consume('ES');
             value = this.parseExpression();
         }
+
+        this.registerSymbol(id, {
+            name: id,
+            type: 'prop'
+        });
 
         return {
             type: 'PROPIEDAD',
@@ -471,6 +498,11 @@ export class Parser {
             this.consume('ES');
             value = this.parseExpression();
         }
+
+        this.registerSymbol(id, {
+            name: id,
+            type: 'var'
+        });
 
         return {
             type: 'VAR',
