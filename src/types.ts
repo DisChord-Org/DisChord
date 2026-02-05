@@ -1,3 +1,11 @@
+export interface Symbol { // para la tabla de símbolos
+    name: string;
+    type: 'var' | 'func' | 'class' | 'prop';
+    isAsync?: boolean;
+    isExported?: boolean;
+    scope: 'global' | 'local';
+}
+
 export type Token = {
     type: string;
     value: string;

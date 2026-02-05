@@ -1,7 +1,13 @@
 import { corelib } from "./core.lib";
-import { ASTNode, ClassNode, ForNode, PropertyNode } from "./types";
+import { ASTNode, ClassNode, ForNode, PropertyNode, Symbol } from "./types";
 
 export class Generator {
+    private SymbolsTable: Map<string, Symbol>;
+
+    constructor (private symbols: Map<string, Symbol>) {
+        this.SymbolsTable = symbols;
+    }
+
     public generate(nodes: ASTNode[]): string {
         return nodes.map(node => {
             const code = this.visit(node);
@@ -105,17 +111,22 @@ export class Generator {
     }
 
     private generateCall(node: any): string {
-        let translation: string;
         const args = node.children.map((arg: any) => this.visit(arg)).join(', ');
+        let translation: string;
+        let isAsyncCall = false;
 
         if (node.value.type === 'ACCESO') {
             translation = this.generateAccess(node.value);
         } else {
             const name = node.value.value;
             translation = name;
+
+            const symbol = this.SymbolsTable.get(name);
+            if (symbol && symbol.isAsync) isAsyncCall = true;
         }
 
-        return `${translation}(${args})`;
+        const awaitPrefix = isAsyncCall? 'await ' : '';
+        return `${awaitPrefix}${translation}(${args})`;
     }
 
     private generateLiteral(node: any): string {
