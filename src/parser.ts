@@ -80,6 +80,22 @@ export class Parser {
             return { type: 'PASAR' };
         }
 
+        if (token.type === 'DEVOLVER') {
+            this.consume('DEVOLVER');
+            
+            const next = this.peek();
+            let value = undefined;
+            
+            if (next.type !== 'R_BRACE' && next.type !== 'SINO' && next.type !== 'ADEMAS') {
+                value = this.parseExpression();
+            }
+
+            return {
+                type: 'DEVOLVER',
+                object: value
+            };
+        }
+
         if (classContext && token.type === 'IDENTIFICADOR' && token.value === classContext) {
             if (this.current + 1 < this.tokens.length && this.tokens[this.current + 1].type === 'L_EXPRESSION') {
                 return this.parseFunctionDeclaration(true);

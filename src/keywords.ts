@@ -6,6 +6,7 @@ export const keywords = [
     "esta",
     "super",
     "nuevo",
+    "devolver",
 
     "var",
     "es",
@@ -21,8 +22,9 @@ export const keywords = [
     "pasar",
     "salir",
 
-    "devolver", // por hacer
     "importar", // por hacer
+    "exportar", // por hacer
+    "__js__", // por hacer
     
     "tipo",
     "verdadero",

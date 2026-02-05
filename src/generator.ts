@@ -57,6 +57,8 @@ export class Generator {
                 return 'break';
             case 'PASAR':
                 return 'continue';
+            case 'DEVOLVER':
+                return node.object ? `return ${this.visit(node.object)}` : 'return';
             default:
                 throw new Error(`Generador: Tipo de nodo desconocido: ${node.type}`);
         }
