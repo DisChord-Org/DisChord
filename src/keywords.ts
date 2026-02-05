@@ -25,7 +25,7 @@ export const keywords = [
     "importar",
     "exportar",
     "desde",
-    "__js__",
+    "js",
     
     "tipo",
     "verdadero",
