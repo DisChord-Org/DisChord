@@ -70,6 +70,8 @@ export class Generator {
                 }
 
                 return `import { ${ids} } from "${path}"`;
+            case 'JS_NATIVO':
+                return `${node.value}`;
             default:
                 throw new Error(`Generador: Tipo de nodo desconocido: ${node.type}`);
         }

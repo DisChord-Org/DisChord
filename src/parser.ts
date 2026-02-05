@@ -259,6 +259,20 @@ export class Parser {
     private parsePrimary(): ASTNode {
         const token = this.peek();
 
+        if (token.type === 'IDENTIFICADOR' && token.value === 'js') {
+            this.consume('IDENTIFICADOR');
+            this.consume('L_EXPRESSION');
+            
+            const content = this.consume('TEXTO').value; 
+            
+            this.consume('R_EXPRESSION');
+            
+            return {
+                type: 'JS_NATIVO',
+                value: content
+            };
+        }
+
         if (token.type === 'ESPACIO') {
             this.consume('ESPACIO');
             return {
