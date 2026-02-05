@@ -106,6 +106,29 @@ export class Parser {
             };
         }
 
+        if (token.type === 'IMPORTAR') {
+            this.consume('IMPORTAR');
+            this.consume('L_BRACE');
+
+            const ids: string[] = [];
+            while (this.peek().type !== 'R_BRACE') {
+                ids.push(this.consume('IDENTIFICADOR').value);
+                if (this.peek().type === ',') this.consume(',');
+            }
+
+            this.consume('R_BRACE');
+            this.consume('DESDE');
+            
+            const pathToken = this.consume('TEXTO'); 
+            const modulePath = pathToken.value;
+
+            return {
+                type: 'IMPORTAR',
+                object: ids as any,
+                value: modulePath
+            };
+        }
+
         if (classContext && token.type === 'IDENTIFICADOR' && token.value === classContext) {
             if (this.current + 1 < this.tokens.length && this.tokens[this.current + 1].type === 'L_EXPRESSION') {
                 return this.parseFunctionDeclaration(true);

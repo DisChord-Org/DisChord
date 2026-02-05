@@ -61,6 +61,15 @@ export class Generator {
                 return node.object ? `return ${this.visit(node.object)}` : 'return';
             case 'EXPORTAR':
                 return this.generateExport(node);
+            case 'IMPORTAR':
+                const ids = (node as unknown as any).object.join(', ');
+                let path = node.value as string;
+                
+                if (!path.endsWith('.mjs') && (path.startsWith('./') || path.startsWith('../'))) {
+                    path += '.mjs';
+                }
+
+                return `import { ${ids} } from "${path}"`;
             default:
                 throw new Error(`Generador: Tipo de nodo desconocido: ${node.type}`);
         }
