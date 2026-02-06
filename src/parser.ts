@@ -301,8 +301,8 @@ export class Parser {
     private parsePrimary(): ASTNode {
         const token = this.peek();
 
-        if (token.type === 'IDENTIFICADOR' && token.value === 'js') {
-            this.consume('IDENTIFICADOR');
+        if (token.value === 'js') {
+            this.consume('JS');
             this.consume('L_EXPRESSION');
             
             const content = this.consume('TEXTO').value; 
