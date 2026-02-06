@@ -49,6 +49,8 @@ try {
 
     if (!args.includes('--no-run')) {
         const fileUrl = pathToFileURL(outputPath).href;
+        process.chdir(path.dirname(path.join(outputPath, '..')));
+        console.log(`Ejecutando desde: ${process.cwd()}`);
         import(`${fileUrl}?update=${Date.now()}`);
     }
 
