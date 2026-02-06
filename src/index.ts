@@ -5,40 +5,55 @@ import { Lexer } from './lexer';
 import { Parser } from './parser';
 import { Generator } from './generator';
 
-const filePath = process.argv[2];
+const inputPath = process.argv[2];
+const args = process.argv.slice(3);
 
-if (!filePath) {
-    console.error("Uso: npx tsx index.ts <archivo.chord>");
+if (!inputPath) {
+    console.log("Error: No se proporcionó un archivo de entrada.");
+    console.log("Uso: chord <archivo.chord> [opciones]");
     process.exit(1);
 }
 
-const printOutput = (name: string, output: string[]) => {
-    console.log("-------- " + name +" --------")
-    console.log(output);
-    console.log(`------------------${"-".repeat(name.length)}\n`)
+try {
+    const fullPath = path.resolve(inputPath);
+    const fileName = path.basename(fullPath, '.chord');
+
+    const inputDir = path.dirname(fullPath);
+    const inputDirName = path.basename(inputDir);
+
+    const projectRoot = inputDirName === 'src' ? path.join(inputDir, '..') : inputDir;
+    const distDir = path.join(projectRoot, 'dist');
+    
+    const outputPath = path.join(distDir, `${fileName}.mjs`);
+
+    if (!fs.existsSync(fullPath)) throw new Error(`El archivo no existe: ${fullPath}`);
+    const code = fs.readFileSync(fullPath, 'utf-8');
+
+    console.log(`Compilando ${fileName}.chord...`);
+
+    const lexer = new Lexer(code);
+    const tokens = lexer.tokenize();
+    if (args.includes('--lexer')) console.dir(tokens, { depth: null });
+
+    const parser = new Parser(tokens);
+    const ast = parser.parse();
+    if (args.includes('--ast')) console.dir(ast, { depth: null });
+
+    const generator = new Generator(parser.symbols);
+    const output = generator.generate(ast);
+
+    if (!fs.existsSync(distDir)) fs.mkdirSync(distDir, { recursive: true });
+    fs.writeFileSync(outputPath, output);
+    
+    console.log(`Compilado con éxito: ${outputPath}`);
+
+    if (!args.includes('--no-run')) {
+        const fileUrl = pathToFileURL(outputPath).href;
+        import(`${fileUrl}?update=${Date.now()}`);
+    }
+
+} catch (error: any) {
+    console.log("\nERROR DE COMPILACIÓN");
+    console.log(error.message);
+    process.exit(1);
 }
-
-const code = fs.readFileSync(filePath, 'utf-8');
-const lexer = new Lexer(code);
-const tokens = lexer.tokenize();
-
-if (process.argv.includes('--lexer')) printOutput("LEXER", tokens as any[]);
-
-const parser = new Parser(tokens);
-const ast = parser.parse();
-
-if (process.argv.includes('--ast')) printOutput("AST", ast as any[]);
-if (process.argv.includes('--table')) printOutput("TABLE", Array.from(parser.symbols.values()) as any[]);
-
-const generator = new Generator(parser.symbols);
-const output = generator.generate(ast);
-
-if (process.argv.includes('--output')) printOutput("OUTPUT", [output]);
-
-fs.writeFileSync('output.mjs', output);
-
-const fileUrl = pathToFileURL(path.join(process.cwd(), 'output.mjs')).href;
-
-import(`${fileUrl}?update=${Date.now()}`).catch(err => {
-    console.error("Error:", err);
-});
