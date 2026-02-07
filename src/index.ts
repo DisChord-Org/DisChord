@@ -1,9 +1,10 @@
 import * as fs from 'fs';
 import path from 'path';
 import { pathToFileURL } from 'url';
-import { Lexer } from './lexer';
-import { Parser } from './parser';
-import { Generator } from './generator';
+import { Lexer } from './chord/lexer';
+import { Generator } from './chord/generator';
+import { DisChordParser } from './dischord/parser';
+import { ASTNode, Token } from './chord/types';
 
 const inputPath = process.argv[2];
 const args = process.argv.slice(3);
@@ -12,6 +13,12 @@ if (!inputPath) {
     console.log("Error: No se proporcionó un archivo de entrada.");
     console.log("Uso: chord <archivo.chord> [opciones]");
     process.exit(1);
+}
+
+function outputLog(name: string, message: Token[] | ASTNode[] | string) {
+    console.log("--- " + name + " ---");
+    console.log(message);
+    console.log("--- " + "-".repeat(name.length) + " ---");
 }
 
 function getFiles(dir: string): string[] {
@@ -36,10 +43,15 @@ async function compileFile(fullPath: string, projectRoot: string, distDir: strin
     
     const lexer = new Lexer(code);
     const tokens = lexer.tokenize();
-    const parser = new Parser(tokens);
+    if (args[0] === '--lexer') outputLog("LEXER", tokens);
+
+    const parser = new DisChordParser(tokens);
     const ast = parser.parse();
+    if (args[0] === '--ast') outputLog("AST", ast);
+    
     const generator = new Generator(parser.symbols);
     const output = generator.generate(ast);
+    if (args[0] === '--tokens') outputLog("OUTPUT", output);
 
     if (!fs.existsSync(targetDir)) fs.mkdirSync(targetDir, { recursive: true });
     fs.writeFileSync(outputPath, output);
@@ -79,7 +91,7 @@ async function start () {
         }
         
     } catch (error: any) {
-        console.log("\n\x1b[31mERROR DE COMPILACIÓN\x1b[0m");
+        console.log("ERROR DE COMPILACIÓN");
         console.log(error.message);
         process.exit(1);
     }
