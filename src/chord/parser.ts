@@ -305,7 +305,7 @@ export class Parser {
         return left;
     }
 
-    private parsePrimary(): ASTNode {
+    parsePrimary(): ASTNode {
         const token = this.peek();
 
         if (token.value === 'js') {
