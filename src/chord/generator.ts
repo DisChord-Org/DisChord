@@ -92,7 +92,7 @@ export class Generator {
         return `class ${node.id}${inheritance} {\n  ${body}\n}`;
     }
 
-    private generateAccess(node: any): string { 
+    generateAccess(node: any): string { 
         const objName = node.object.type === 'IDENTIFICADOR' ? node.object.value : null;
         const propName = node.property;
 
@@ -110,7 +110,7 @@ export class Generator {
         return `${this.visit(node.object)}.${propName}`;
     }
 
-    private generateCall(node: any): string {
+    generateCall(node: any): string {
         const args = node.children.map((arg: any) => this.visit(arg)).join(', ');
         let translation: string;
         let isAsyncCall = false;
