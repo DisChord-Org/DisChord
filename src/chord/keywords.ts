@@ -54,8 +54,8 @@ export class KeyWords {
         "o"
     ];
 
-    public static addStatement (statement: string) {
-        this.statements.push(statement);
+    public static addStatements (statements: string[]) {
+        this.statements.push(...statements);
     }
 
     public static getStatements (): string[] {

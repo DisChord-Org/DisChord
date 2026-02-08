@@ -44,6 +44,9 @@ export class Parser {
     parseStatement(classContext?: string): ASTNode {
         const token = this.peek();
 
+        const custom = this.parseCustomStatement();
+        if (custom) return custom;
+
         if (token.type === 'DECORADOR' && token.value === '@asincrono') {
             this.consume('DECORADOR');
             
@@ -163,9 +166,6 @@ export class Parser {
                 return this.parseFunctionDeclaration(true);
             }
         }
-
-        const custom = this.parseCustomStatement();
-        if (custom) return custom;
 
         return this.parseExpression();
     }

@@ -17,7 +17,7 @@ export class Generator {
         }).join('\n');
     }
 
-    private visit(node: ASTNode): string {
+    public visit(node: ASTNode): string {
         switch (node.type) {
             case 'CLASE':
                 return this.generateClass(node as ClassNode);
