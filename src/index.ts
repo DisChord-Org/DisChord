@@ -51,7 +51,7 @@ async function compileFile(fullPath: string, projectRoot: string, distDir: strin
     const ast = parser.parse();
     if (args[0] === '--ast') outputLog("AST", ast);
     
-    const generator = new DisChordGenerator(parser.symbols);
+    const generator = new DisChordGenerator(parser.symbols, projectRoot);
     const output = generator.generate(ast);
     if (args[0] === '--output') outputLog("OUTPUT", output);
 
