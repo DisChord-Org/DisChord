@@ -1,6 +1,6 @@
 import { Token } from './types';
 import { symbols } from './symbols';
-import { keywords } from './keywords';
+import { KeyWords } from './keywords';
 
 export class Lexer {
     constructor(private input: string) {}
@@ -125,7 +125,7 @@ export class Lexer {
 
                 if (value === "verdadero" || value === "falso") tokens.push({ type: "BOOL", value });
                 else if (value === "indefinido") tokens.push({ type: "INDEFINIDO", value });
-                else if (keywords.includes(value as any)) tokens.push({ type: value.toUpperCase(), value });
+                else if (KeyWords.getStatements().includes(value)) tokens.push({ type: value.toUpperCase(), value });
                 else tokens.push({ type: "IDENTIFICADOR", value });
 
                 continue;
