@@ -1,3 +1,4 @@
+import { KeyWords } from '../chord/keywords';
 import { Parser } from '../chord/parser';
 import { ASTNode, Token } from '../chord/types';
 
@@ -5,6 +6,10 @@ export class DisChordParser extends Parser {
 
     constructor (tokens: Token[], current: number = 0) {
         super(tokens, current);
+    }
+    
+    public static injectStatements() {
+        KeyWords.addStatements([ "encender", "evento" ]);
     }
 
     protected parseCustomStatement(): ASTNode | null {
@@ -27,18 +32,11 @@ export class DisChordParser extends Parser {
             throw new Error(`Se esperaba 'bot' después de 'encender', se encontró '${id.value}'`);
         }
 
-        this.consume('L_BRACE');
-
-        const configBody: ASTNode[] = [];
-        while (this.peek().type !== 'R_BRACE') {
-            configBody.push(this.parseStatement());
-        }
-
-        this.consume('R_BRACE');
+        const configBody = this.parsePrimary();
 
         return {
             type: 'ENCENDER_BOT',
-            children: configBody
+            object: configBody
         };
     }
 
