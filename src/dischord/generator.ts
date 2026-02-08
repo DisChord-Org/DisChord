@@ -2,6 +2,7 @@ import fs from "node:fs";
 import { Generator } from "../chord/generator";
 import { ASTNode } from "../chord/types";
 import { join } from "node:path";
+import { corelib } from "./core.lib";
 
 const INTENT_MAP: Record<string, string> = {
     "Servidores": "GatewayIntentBits.Guilds",
@@ -27,6 +28,40 @@ export class DisChordGenerator extends Generator {
             default:
                 return super.visit(node);
         }
+    }
+
+    override generateAccess(node: any): string {
+        const objName = node.object.type === 'IDENTIFICADOR' ? node.object.value : null;
+        const propName = node.property;
+
+        if (objName && corelib[objName]) {
+            const mapping = corelib[objName];
+            
+            if (typeof mapping === 'object' && mapping[propName]) {
+                const translation = mapping[propName];
+                
+                if (translation.startsWith(objName + '.')) {
+                    return translation;
+                }
+                return `${objName}.${translation}`;
+            }
+        }
+
+        return super.generateAccess(node);
+    }
+
+    override generateCall(node: any): string {
+        if (node.value.type === 'IDENTIFICADOR') {
+            const name = node.value.value;
+            
+            if (typeof corelib[name] === 'string') {
+                const translation = corelib[name] as string;
+                const args = node.children.map((arg: any) => this.visit(arg)).join(', ');
+                return `${translation}(${args})`;
+            }
+        }
+
+        return super.generateCall(node);
     }
 
     private generateBotInit(node: any): string {
@@ -98,18 +133,35 @@ export class DisChordGenerator extends Generator {
     }
 
     private generateDiscordEvent(node: any): string {
-        const eventMap: Record<string, string> = {
-            'encendido': 'botReady',
-            'mensaje': 'messageCreate',
-            'interaccion': 'interactionCreate'
+        const eventMap: Record<string, any> = {
+            'encendido': {
+                "name": 'ready',
+                "params": [ 'usuario', 'cliente' ]
+            },
+            // 'mensaje': 'messageCreate',
+            // 'interaccion': 'interactionCreate'
         };
 
-        const eventName = eventMap[node.nombre] || node.nombre;
-        
+        const eventName = eventMap[node.value]?.name;
+        if (!eventName) throw new Error(`El evento ${node.value} no existe`);
+
         const body = node.children
             .map((n: any) => "    " + this.visit(n) + ";")
             .join('\n');
 
-        return `client.on('${eventName}', async (context) => {\n${body}\n});`;
+        const eventBody: string = `
+            import { createEvent } from 'seyfert';
+
+            export default createEvent({
+                data: { name: '${eventName}' },
+                async run(${eventMap[node.value].params.join(', ')}) {
+                ${body}
+                }
+            });
+        `;
+
+        fs.writeFileSync(join(this.projectRooth, 'dist', 'events', `${eventName}.js`), eventBody, 'utf-8');
+
+        return '';
     }
 }
