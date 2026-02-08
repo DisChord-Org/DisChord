@@ -41,6 +41,8 @@ async function compileFile(fullPath: string, projectRoot: string, distDir: strin
 
     const code = fs.readFileSync(fullPath, 'utf-8');
     
+    DisChordParser.injectStatements();
+
     const lexer = new Lexer(code);
     const tokens = lexer.tokenize();
     if (args[0] === '--lexer') outputLog("LEXER", tokens);
