@@ -2,9 +2,9 @@ import * as fs from 'fs';
 import path from 'path';
 import { pathToFileURL } from 'url';
 import { Lexer } from './chord/lexer';
-import { Generator } from './chord/generator';
 import { DisChordParser } from './dischord/parser';
 import { ASTNode, Token } from './chord/types';
+import { DisChordGenerator } from './dischord/generator';
 
 const inputPath = process.argv[2];
 const args = process.argv.slice(3);
@@ -49,9 +49,9 @@ async function compileFile(fullPath: string, projectRoot: string, distDir: strin
     const ast = parser.parse();
     if (args[0] === '--ast') outputLog("AST", ast);
     
-    const generator = new Generator(parser.symbols);
+    const generator = new DisChordGenerator(parser.symbols);
     const output = generator.generate(ast);
-    if (args[0] === '--tokens') outputLog("OUTPUT", output);
+    if (args[0] === '--output') outputLog("OUTPUT", output);
 
     if (!fs.existsSync(targetDir)) fs.mkdirSync(targetDir, { recursive: true });
     fs.writeFileSync(outputPath, output);
