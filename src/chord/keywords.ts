@@ -1,54 +1,64 @@
-export const keywords = [
-    "clase",
-    "extiende",
-    "prop",
-    "fijar",
-    "esta",
-    "super",
-    "nuevo",
-    "devolver",
+export class KeyWords {
+    private static statements: string[] = [
+        "clase",
+        "extiende",
+        "prop",
+        "fijar",
+        "esta",
+        "super",
+        "nuevo",
+        "devolver",
 
-    "var",
-    "es",
+        "var",
+        "es",
 
-    "@asincrono",
-    "funcion",
+        "@asincrono",
+        "funcion",
 
-    "si",
-    "sino",
-    "ademas",
+        "si",
+        "sino",
+        "ademas",
 
-    "para",
-    "en",
-    "pasar",
-    "salir",
+        "para",
+        "en",
+        "pasar",
+        "salir",
 
-    "importar",
-    "exportar",
-    "desde",
-    "js",
-    
-    "tipo",
-    "verdadero",
-    "falso",
-    "indefinido",
+        "importar",
+        "exportar",
+        "desde",
+        "js",
+        
+        "tipo",
+        "verdadero",
+        "falso",
+        "indefinido",
 
-    "mas",
-    "menos",
-    "por",
-    "entre",
-    "resto",
-    "exp",
-    "intro",
-    "espacio",
+        "mas",
+        "menos",
+        "por",
+        "entre",
+        "resto",
+        "exp",
+        "intro",
+        "espacio",
 
-    "mayor",
-    "menor",
-    "mayor_igual",
-    "menor_igual",
-    "no",
-    "igual_tipado",
-    "igual",
-    "y",
-    "o"
-] as const;
+        "mayor",
+        "menor",
+        "mayor_igual",
+        "menor_igual",
+        "no",
+        "igual_tipado",
+        "igual",
+        "y",
+        "o"
+    ];
+
+    public static addStatement (statement: string) {
+        this.statements.push(statement);
+    }
+
+    public static getStatements (): string[] {
+        return this.statements;
+    }
+}
