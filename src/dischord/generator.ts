@@ -4,13 +4,6 @@ import { ASTNode } from "../chord/types";
 import { join } from "node:path";
 import { corelib } from "./core.lib";
 
-const INTENT_MAP: Record<string, string> = {
-    "Servidores": "GatewayIntentBits.Guilds",
-    "Mensajes": "GatewayIntentBits.GuildMessages",
-    "ContenidoMensajes": "GatewayIntentBits.MessageContent",
-    "Miembros": "GatewayIntentBits.GuildMembers",
-};
-
 export class DisChordGenerator extends Generator {
     projectRooth: string = '';
 
@@ -101,6 +94,13 @@ export class DisChordGenerator extends Generator {
     }
 
     public generateSeyfertConfig(node: any): string {
+        const INTENT_MAP: Record<string, string> = {
+            "Servidores": "GatewayIntentBits.Guilds",
+            "Mensajes": "GatewayIntentBits.GuildMessages",
+            "ContenidoMensajes": "GatewayIntentBits.MessageContent",
+            "Miembros": "GatewayIntentBits.GuildMembers",
+        };
+
         const tokenNode = node.object.children.find((p: any) => p.key === 'token');
         const intentsNode = node.object.children.find((p: any) => p.key === 'intenciones');
         const token = tokenNode ? this.visit(tokenNode.value) : '""';

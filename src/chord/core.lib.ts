@@ -26,7 +26,13 @@ export const corelib: Record<string, any> = {
                 "limpiar": "trim",
                 "partir": "split",
                 "reemplazar": "replace",
-                "longitud": "length"
+                "longitud": "length",
+                "terminaCon": "endsWith",
+                "empiezaCon": "startsWith",
+                "repetir": "repeat",
+                "cortar": "slice",
+                "minusculas": "toLowerCase",
+                "mayusculas": "toUpperCase"
             }
         },
         "Lista": {
@@ -34,7 +40,14 @@ export const corelib: Record<string, any> = {
                 "agregar": "push",
                 "quitarUltimo": "pop",
                 "unir": "join",
-                "mapear": "map"
+                "mapear": "map",
+                "llenar": "fill",
+                "todos": "every",
+                "filtrar": "filter",
+                "encontrar": "find",
+                "tiene": "includes",
+                "longitud": "length",
+                "cortar": "slice"
             }
         }
     },
