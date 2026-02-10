@@ -18,6 +18,8 @@ export class DisChordGenerator extends Generator {
                 return this.generateBotInit(node);
             case 'EVENTO_DISCORD':
                 return this.generateDiscordEvent(node);
+            case 'CREAR_MENSAJE':
+                return this.generateMessage(node);
             default:
                 return super.visit(node);
         }
@@ -163,5 +165,15 @@ export class DisChordGenerator extends Generator {
         fs.writeFileSync(join(this.projectRooth, 'dist', 'events', `${eventName}.js`), eventBody, 'utf-8');
 
         return '';
+    }
+
+    private generateMessage(node: any): string {
+        const channelNode = node.object.children.find((p: any) => p.key === 'canal');
+        const channel: string | undefined = channelNode ? this.visit(channelNode.value) : undefined;
+        const contentNode = node.object.children.find((p: any) => p.key === 'contenido');
+        const content: string | undefined = contentNode ? this.visit(contentNode.value) : undefined;
+
+        if (!channel) throw new Error(`No se ha especificado el canal.`);
+        return `cliente.messages.write(${channel}, { content: ${content} })`;
     }
 }

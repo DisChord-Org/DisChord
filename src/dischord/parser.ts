@@ -9,19 +9,20 @@ export class DisChordParser extends Parser {
     }
     
     public static injectStatements() {
-        KeyWords.addStatements([ "encender", "evento" ]);
+        KeyWords.addStatements([ "encender", "evento", "crear" ]);
     }
 
     protected parseCustomStatement(): ASTNode | null {
-        if (this.peek().type === 'ENCENDER') {
-            return this.parseBotDeclaration();
+        switch (this.peek().type) {
+            case 'ENCENDER':
+                return this.parseBotDeclaration();
+            case 'EVENTO':
+                return this.parseEventDeclaration();
+            case 'CREAR':
+                return this.parseMessageCreation();
+            default:
+                return null;
         }
-
-        if (this.peek().type === 'EVENTO') {
-            return this.parseEventDeclaration();
-        }
-
-        return null;
     }
 
     private parseBotDeclaration(): ASTNode {
@@ -60,5 +61,22 @@ export class DisChordParser extends Parser {
             value: eventName,
             children: body
         };
+    }
+
+    private parseMessageCreation(): ASTNode {
+        this.consume('CREAR');
+
+        const id = this.consume('IDENTIFICADOR');
+        if (id.value != 'mensaje') {
+            throw new Error(`Se esperaba 'mensaje' después de 'crear', se encontró '${id.value}'`);
+        }
+
+        const configBody = this.parsePrimary();
+
+        return {
+            type: 'CREAR_MENSAJE',
+            object: configBody
+        };
+
     }
 }
