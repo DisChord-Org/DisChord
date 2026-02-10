@@ -2,7 +2,7 @@ import fs from "node:fs";
 import { Generator } from "../chord/generator";
 import { ASTNode } from "../chord/types";
 import { join } from "node:path";
-import { corelib } from "./core.lib";
+import { corelib, eventsMap, intentsMap } from "./core.lib";
 
 export class DisChordGenerator extends Generator {
     projectRooth: string = '';
@@ -96,23 +96,17 @@ export class DisChordGenerator extends Generator {
     }
 
     public generateSeyfertConfig(node: any): string {
-        const INTENT_MAP: Record<string, string> = {
-            "Servidores": "GatewayIntentBits.Guilds",
-            "Mensajes": "GatewayIntentBits.GuildMessages",
-            "ContenidoMensajes": "GatewayIntentBits.MessageContent",
-            "Miembros": "GatewayIntentBits.GuildMembers",
-        };
-
         const tokenNode = node.object.children.find((p: any) => p.key === 'token');
         const intentsNode = node.object.children.find((p: any) => p.key === 'intenciones');
         const token = tokenNode ? this.visit(tokenNode.value) : '""';
         
         let intents = "[]";
 
+        
         if (intentsNode && intentsNode.value.type === 'LISTA') {
             const list = intentsNode.value.children.map((item: any) => {
                 const val = item.value.replace(/"/g, '');
-                return INTENT_MAP[val] || "GatewayIntentBits.Guilds";
+                return `"${intentsMap[val]}"`;
             });
             intents = `[\n        ${list.join(',\n        ')}\n    ]`;
         }
@@ -135,16 +129,7 @@ export class DisChordGenerator extends Generator {
     }
 
     private generateDiscordEvent(node: any): string {
-        const eventMap: Record<string, any> = {
-            'encendido': {
-                "name": 'ready',
-                "params": [ 'usuario', 'cliente' ]
-            },
-            // 'mensaje': 'messageCreate',
-            // 'interaccion': 'interactionCreate'
-        };
-
-        const eventName = eventMap[node.value]?.name;
+        const eventName = eventsMap[node.value]?.name;
         if (!eventName) throw new Error(`El evento ${node.value} no existe`);
 
         const body = node.children
@@ -156,7 +141,7 @@ export class DisChordGenerator extends Generator {
 
             export default createEvent({
                 data: { name: '${eventName}' },
-                async run(${eventMap[node.value].params.join(', ')}) {
+                async run(${eventsMap[node.value].params.join(', ')}) {
                 ${body}
                 }
             });
