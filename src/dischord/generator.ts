@@ -20,6 +20,8 @@ export class DisChordGenerator extends Generator {
                 return this.generateDiscordEvent(node);
             case 'CREAR_MENSAJE':
                 return this.generateMessage(node);
+            case 'CREAR_EMBED':
+                return this.generateEmbed(node);
             default:
                 return super.visit(node);
         }
@@ -137,7 +139,7 @@ export class DisChordGenerator extends Generator {
             .join('\n');
 
         const eventBody: string = `
-            import { createEvent } from 'seyfert';
+            import { createEvent, Embed } from 'seyfert';
 
             export default createEvent({
                 data: { name: '${eventName}' },
@@ -159,6 +161,28 @@ export class DisChordGenerator extends Generator {
         const content: string | undefined = contentNode ? this.visit(contentNode.value) : undefined;
 
         if (!channel) throw new Error(`No se ha especificado el canal.`);
-        return `cliente.messages.write(${channel}, { content: ${content} })`;
+        return `cliente.messages.write(${channel}, { content: ${content} });`;
+    }
+
+    private generateEmbed(node: any): string {
+        const channelNode = node.children.find((p: any) => p.type.toLowerCase() === 'canal');
+        const channel: string | undefined = channelNode ? this.visit(channelNode.object) : undefined;
+        const descriptionNode = node.children.find((p: any) => p.type.toLowerCase() === 'descripcion');
+        const description: string | undefined = descriptionNode ? this.visit(descriptionNode.object) : undefined;
+        const colorNode = node.children.find((p: any) => p.type.toLowerCase() === 'color');
+        const color: string | undefined = colorNode ? this.visit(colorNode.object) : undefined;
+
+        if (!channel) throw new Error(`No se ha especificado el canal.`);
+        return `
+            cliente.messages.write(${channel}, {
+                embeds: [
+                    new Embed()
+                        ${description? `.setDescription(${description})` : ''}
+                        ${color? `.setColor(${color})` : ''}
+                ]
+            });
+        `;
+
+        return '';
     }
 }

@@ -67,7 +67,22 @@ export class DisChordParser extends Parser {
         this.consume('CREAR');
 
         const id = this.consume('IDENTIFICADOR');
-        if (id.value != 'mensaje') {
+        if (id.value == 'embed') {
+            this.consume('L_BRACE');
+
+            const body: ASTNode[] = [];
+            
+            while (this.peek().type !== 'R_BRACE') {
+                body.push(this.parseEmbedCreation());
+            }
+            
+            this.consume('R_BRACE');
+
+            return {
+                type: "CREAR_EMBED",
+                children: body
+            }
+        } else if (id.value != 'mensaje') {
             throw new Error(`Se esperaba 'mensaje' después de 'crear', se encontró '${id.value}'`);
         }
 
@@ -78,5 +93,36 @@ export class DisChordParser extends Parser {
             object: configBody
         };
 
+    }
+
+    private parseEmbedCreation(): ASTNode {
+        const token = this.peek();
+
+        switch (token.value) {
+            case 'canal':
+                this.consume('IDENTIFICADOR');
+
+                return {
+                    type: 'CANAL',
+                    object: this.parsePrimary()
+                }
+            case 'descripcion':
+                this.consume('IDENTIFICADOR');
+
+                return {
+                    type: 'DESCRIPCION',
+                    object: this.parsePrimary()
+                }
+            
+            case 'color':
+                this.consume('IDENTIFICADOR');
+
+                return {
+                    type: 'COLOR',
+                    object: this.parsePrimary()
+                }
+        }
+
+        throw new Error(`No se esperaba encontrar '${this.peek().type}' dentro de un embed`);
     }
 }
