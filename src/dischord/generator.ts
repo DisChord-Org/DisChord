@@ -182,7 +182,5 @@ export class DisChordGenerator extends Generator {
                 ]
             });
         `;
-
-        return '';
     }
 }

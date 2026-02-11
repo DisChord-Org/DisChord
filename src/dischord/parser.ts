@@ -106,6 +106,13 @@ export class DisChordParser extends Parser {
                     type: 'CANAL',
                     object: this.parsePrimary()
                 }
+            case 'titulo':
+                this.consume('IDENTIFICADOR');
+
+                return {
+                    type: 'TITULO',
+                    object: this.parsePrimary()
+                }
             case 'descripcion':
                 this.consume('IDENTIFICADOR');
 
@@ -113,13 +120,108 @@ export class DisChordParser extends Parser {
                     type: 'DESCRIPCION',
                     object: this.parsePrimary()
                 }
-            
             case 'color':
                 this.consume('IDENTIFICADOR');
 
                 return {
                     type: 'COLOR',
                     object: this.parsePrimary()
+                }
+            case 'hora':
+                this.consume('IDENTIFICADOR');
+
+                return {
+                    type: 'HORA'
+                }
+            case 'imagen':
+                this.consume('IDENTIFICADOR');
+
+                return {
+                    type: 'IMAGEN',
+                    object: this.parsePrimary()
+                }
+            case 'cartel':
+                this.consume('IDENTIFICADOR');
+
+                return {
+                    type: 'CARTEL',
+                    object: this.parsePrimary()
+                }
+            case 'autor':
+                this.consume('IDENTIFICADOR');
+
+                if (this.peek().type === 'L_BRACE') {
+                    this.consume('L_BRACE');
+                    
+                    let name: ASTNode,
+                    iconUrl: ASTNode;
+                    
+                    if (this.peek().value === 'nombre') {
+                        name = this.consume('TEXTO');
+                    } else name = { type: 'TEXTO', value: '$CLIENTNAME' };
+                    
+                    if (this.peek().value === 'icono') {
+                        iconUrl = this.consume('TEXTO');
+                    } else iconUrl = { type: 'TEXTO', value: '$CLIENTURL' };
+                    
+                    this.consume('R_BRACE');
+
+                    return {
+                        type: 'AUTOR',
+                        children: [ name, iconUrl ]
+                    }
+                }
+                
+                return {
+                    type: 'AUTOR'
+                }
+            case 'pie':
+                this.consume('IDENTIFICADOR');
+
+                if (this.peek().type === 'L_BRACE') {
+                    this.consume('L_BRACE');
+                    
+                    let text: ASTNode,
+                        iconUrl: ASTNode | undefined = undefined;
+                    
+                    if (this.peek().value === 'nombre') {
+                        text = this.consume('TEXTO');
+
+                        if (this.peek().value === 'icono') {
+                            iconUrl = this.consume('TEXTO');
+                        }
+                    } else text = { type: 'TEXTO', value: '$CLIENTNAME' };
+                    
+                    
+                    this.consume('R_BRACE');
+
+                    return {
+                        type: 'PIE',
+                        children: iconUrl? [ text, iconUrl ] : [ text ]
+                    }
+                }
+                
+                return {
+                    type: 'PIE'
+                }
+            case 'agregarCampo':
+                this.consume('IDENTIFICADOR');
+
+                this.consume('L_BRACE');
+                
+                let text: ASTNode,
+                    value: ASTNode,
+                    inline: ASTNode;
+
+                text = this.consume('TEXTO');
+                value = this.consume('TEXTO');
+                inline = this.consume('BOOL');
+                
+                this.consume('R_BRACE');
+
+                return {
+                    type: 'CAMPO',
+                    children: [ text, value, inline ]
                 }
         }
 
