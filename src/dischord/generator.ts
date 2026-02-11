@@ -161,16 +161,38 @@ export class DisChordGenerator extends Generator {
         const content: string | undefined = contentNode ? this.visit(contentNode.value) : undefined;
 
         if (!channel) throw new Error(`No se ha especificado el canal.`);
-        return `cliente.messages.write(${channel}, { content: ${content} });`;
+        return `cliente.messages.write(${channel}, { content: ${content} })`;
     }
 
     private generateEmbed(node: any): string {
+        // this will be refactor, insult me
         const channelNode = node.children.find((p: any) => p.type.toLowerCase() === 'canal');
         const channel: string | undefined = channelNode ? this.visit(channelNode.object) : undefined;
         const descriptionNode = node.children.find((p: any) => p.type.toLowerCase() === 'descripcion');
         const description: string | undefined = descriptionNode ? this.visit(descriptionNode.object) : undefined;
         const colorNode = node.children.find((p: any) => p.type.toLowerCase() === 'color');
         const color: string | undefined = colorNode ? this.visit(colorNode.object) : undefined;
+        const titleNode = node.children.find((p: any) => p.type.toLowerCase() === 'titulo');
+        const title: string | undefined = titleNode ? this.visit(titleNode.object) : undefined;
+        const timestampNode = node.children.find((p: any) => p.type.toLowerCase() === 'hora');
+        const imageNode = node.children.find((p: any) => p.type.toLowerCase() === 'imagen');
+        const image: string | undefined = imageNode ? this.visit(imageNode.object) : undefined;
+        const thumbnailNode = node.children.find((p: any) => p.type.toLowerCase() === 'cartel');
+        const thumbnail: string | undefined = thumbnailNode ? this.visit(thumbnailNode.object) : undefined;
+        const authorNode = node.children.find((p: any) => p.type.toLowerCase() === 'autor');
+        const authorText: string = authorNode ? authorNode.children.find((primaryNode: ASTNode) => primaryNode.raw === 'nombre').value : '';
+        const authorIcon: string = authorNode ? authorNode.children.find((primaryNode: ASTNode) => primaryNode.raw === 'icono').value : '';
+        const footerNode = node.children.find((p: any) => p.type.toLowerCase() === 'pie');
+        const footerText: string = footerNode ? footerNode.children.find((primaryNode: ASTNode) => primaryNode.raw === 'texto').value : '';
+        const footerIcon: ASTNode | undefined = footerNode ? footerNode.children.find((primaryNode: ASTNode) => primaryNode.raw === 'icono') : undefined;
+        const fieldNodes = node.children.filter((p: any) => p.type === 'CAMPO');
+        const fields = fieldNodes.map((field: any) => {
+            const name = this.visit(field.children[0]);
+            const value = this.visit(field.children[1]);
+            const isInline = this.visit(field.children[2]);
+
+            return `.addFields({ name: ${name}, value: ${value}, inline: ${isInline} })`;
+        }).join('\n');
 
         if (!channel) throw new Error(`No se ha especificado el canal.`);
         return `
@@ -179,8 +201,15 @@ export class DisChordGenerator extends Generator {
                     new Embed()
                         ${description? `.setDescription(${description})` : ''}
                         ${color? `.setColor(${Object.keys(EmbedColors).includes(color.slice(1, -1))? `"${EmbedColors[color.slice(1, -1)]}"` : color})` : ''}
+                        ${title? `.setTitle(${title})` : ''}
+                        ${timestampNode? '.setTimestamp()' : ''}
+                        ${image? `.setImage(${image})` : ''}
+                        ${thumbnail? `.setThumbnail(${thumbnail})` : ''}
+                        ${authorNode? `.setAuthor({ name: ${authorText === '$CLIENTNAME'? `usuario.username` : `"${authorText}"`}, iconUrl: ${authorIcon === '$CLIENTURL'? `usuario.avatarURL()` : `"${authorIcon}"`} })` : ''}
+                        ${footerNode? `.setFooter({ text: ${footerText === '$CLIENTNAME'? `usuario.username` : `"${footerText}"`} ${footerIcon? `, iconUrl: "${footerIcon.value}"` : ''} })` : ''}
+                        ${fields}
                 ]
-            });
+            })
         `;
     }
 }

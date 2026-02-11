@@ -157,12 +157,16 @@ export class DisChordParser extends Parser {
                     iconUrl: ASTNode;
                     
                     if (this.peek().value === 'nombre') {
+                        this.consume('IDENTIFICADOR');
                         name = this.consume('TEXTO');
-                    } else name = { type: 'TEXTO', value: '$CLIENTNAME' };
+                        name.raw = 'nombre';
+                    } else name = { type: 'TEXTO', value: '$CLIENTNAME', raw: 'nombre' };
                     
                     if (this.peek().value === 'icono') {
+                        this.consume('IDENTIFICADOR');
                         iconUrl = this.consume('TEXTO');
-                    } else iconUrl = { type: 'TEXTO', value: '$CLIENTURL' };
+                        iconUrl.raw = 'icono';
+                    } else iconUrl = { type: 'TEXTO', value: '$CLIENTURL', raw: 'icono' };
                     
                     this.consume('R_BRACE');
 
@@ -173,7 +177,11 @@ export class DisChordParser extends Parser {
                 }
                 
                 return {
-                    type: 'AUTOR'
+                    type: 'AUTOR',
+                    children: [
+                        { type: 'TEXTO', value: '$CLIENTNAME', raw: 'nombre' },
+                        { type: 'TEXTO', value: '$CLIENTURL', raw: 'icono' }
+                    ]
                 }
             case 'pie':
                 this.consume('IDENTIFICADOR');
@@ -184,14 +192,17 @@ export class DisChordParser extends Parser {
                     let text: ASTNode,
                         iconUrl: ASTNode | undefined = undefined;
                     
-                    if (this.peek().value === 'nombre') {
+                    if (this.peek().value === 'texto') {
+                        this.consume('IDENTIFICADOR');
                         text = this.consume('TEXTO');
+                        text.raw = 'texto';
 
                         if (this.peek().value === 'icono') {
+                            this.consume('IDENTIFICADOR');
                             iconUrl = this.consume('TEXTO');
+                            iconUrl.raw = 'icono';
                         }
-                    } else text = { type: 'TEXTO', value: '$CLIENTNAME' };
-                    
+                    } else text = { type: 'TEXTO', value: '$CLIENTNAME', raw: 'texto' };
                     
                     this.consume('R_BRACE');
 
@@ -201,9 +212,7 @@ export class DisChordParser extends Parser {
                     }
                 }
                 
-                return {
-                    type: 'PIE'
-                }
+                throw new Error(`En 'pie' se esperaba 'L_BRACE', se encontró '${this.peek().type}'`);
             case 'agregarCampo':
                 this.consume('IDENTIFICADOR');
 
@@ -213,8 +222,11 @@ export class DisChordParser extends Parser {
                     value: ASTNode,
                     inline: ASTNode;
 
+                this.consume('IDENTIFICADOR');
                 text = this.consume('TEXTO');
+                this.consume('IDENTIFICADOR');
                 value = this.consume('TEXTO');
+                this.consume('IDENTIFICADOR');
                 inline = this.consume('BOOL');
                 
                 this.consume('R_BRACE');
