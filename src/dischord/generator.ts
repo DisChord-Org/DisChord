@@ -2,7 +2,7 @@ import fs from "node:fs";
 import { Generator } from "../chord/generator";
 import { ASTNode } from "../chord/types";
 import { join } from "node:path";
-import { corelib, eventsMap, intentsMap } from "./core.lib";
+import { corelib, EmbedColors, eventsMap, intentsMap } from "./core.lib";
 
 export class DisChordGenerator extends Generator {
     projectRooth: string = '';
@@ -178,7 +178,7 @@ export class DisChordGenerator extends Generator {
                 embeds: [
                     new Embed()
                         ${description? `.setDescription(${description})` : ''}
-                        ${color? `.setColor(${color})` : ''}
+                        ${color? `.setColor(${Object.keys(EmbedColors).includes(color.slice(1, -1))? `"${EmbedColors[color.slice(1, -1)]}"` : color})` : ''}
                 ]
             });
         `;
