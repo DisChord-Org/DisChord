@@ -19,7 +19,7 @@ export class DisChordParser extends Parser {
             case 'EVENTO':
                 return this.parseEventDeclaration();
             case 'CREAR':
-                return this.parseMessageCreation();
+                return this.parseCreation();
             default:
                 return null;
         }
@@ -63,28 +63,21 @@ export class DisChordParser extends Parser {
         };
     }
 
-    private parseMessageCreation(): ASTNode {
+    private parseCreation(): ASTNode {
         this.consume('CREAR');
 
-        const id = this.consume('IDENTIFICADOR');
-        if (id.value == 'embed') {
-            this.consume('L_BRACE');
-
-            const body: ASTNode[] = [];
-            
-            while (this.peek().type !== 'R_BRACE') {
-                body.push(this.parseEmbedCreation());
-            }
-            
-            this.consume('R_BRACE');
-
-            return {
-                type: "CREAR_EMBED",
-                children: body
-            }
-        } else if (id.value != 'mensaje') {
-            throw new Error(`Se esperaba 'mensaje' después de 'crear', se encontró '${id.value}'`);
+        switch(this.peek().value) {
+            case 'mensaje':
+                return this.parseMessageCreation();
+            case 'embed':
+                return this.parseEmbedCreation();
         }
+
+        throw new Error(`Se esperaba la creación de un comando o mensaje, se encontró '${this.peek().value}'`);
+    }
+
+    private parseMessageCreation(): ASTNode {
+        this.consume('IDENTIFICADOR');
 
         const configBody = this.parsePrimary();
 
@@ -94,8 +87,26 @@ export class DisChordParser extends Parser {
         };
 
     }
-
+    
     private parseEmbedCreation(): ASTNode {
+        this.consume('IDENTIFICADOR');
+        this.consume('L_BRACE');
+
+        const body: ASTNode[] = [];
+        
+        while (this.peek().type !== 'R_BRACE') {
+            body.push(this.parseEmbedComponent());
+        }
+        
+        this.consume('R_BRACE');
+
+        return {
+            type: "CREAR_EMBED",
+            children: body
+        }
+    }
+
+    private parseEmbedComponent(): ASTNode {
         const token = this.peek();
 
         switch (token.value) {
