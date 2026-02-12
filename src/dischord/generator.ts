@@ -22,6 +22,8 @@ export class DisChordGenerator extends Generator {
                 return this.generateMessage(node);
             case 'CREAR_EMBED':
                 return this.generateEmbed(node);
+            case 'COMANDO':
+                return this.generateCommand(node);
             default:
                 return super.visit(node);
         }
@@ -151,6 +153,33 @@ export class DisChordGenerator extends Generator {
 
         fs.writeFileSync(join(this.projectRooth, 'dist', 'events', `${eventName}.js`), eventBody, 'utf-8');
 
+        return '';
+    }
+
+    private generateCommand(node: any): string {
+        const commandName = node.value;
+
+        const body = node.children
+            .map((n: any) => "    " + this.visit(n) + ";")
+            .join('\n');
+
+        const commandBody: string = `
+            import { Command, IgnoreCommand, Embed } from 'seyfert';
+
+            export default class ${commandName}Command extends Command {
+                name = "${commandName.toLowerCase()}";
+                description = "Obtén la velocidad del bot";
+                ignore = IgnoreCommand.Message;
+                integrationTypes = [ 0 ];
+                contexts = [ 0 ];
+                async run(ctx) {
+                    const cliente = ctx.client;
+                    ${body}
+                }
+            }
+        `;
+
+        fs.writeFileSync(join(this.projectRooth, 'dist', 'commands', `${commandName}.js`), commandBody, 'utf-8');
         return '';
     }
 

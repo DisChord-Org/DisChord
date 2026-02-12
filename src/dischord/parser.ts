@@ -71,6 +71,8 @@ export class DisChordParser extends Parser {
                 return this.parseMessageCreation();
             case 'embed':
                 return this.parseEmbedCreation();
+            case 'comando':
+                return this.parseCommandCreation();
         }
 
         throw new Error(`Se esperaba la creación de un comando o mensaje, se encontró '${this.peek().value}'`);
@@ -249,5 +251,25 @@ export class DisChordParser extends Parser {
         }
 
         throw new Error(`No se esperaba encontrar '${this.peek().type}' dentro de un embed`);
+    }
+
+    private parseCommandCreation(): ASTNode {
+        this.consume('IDENTIFICADOR');
+        const commandName = this.consume('IDENTIFICADOR').value;
+
+        this.consume('L_BRACE');
+
+        const body: ASTNode[] = [];
+        
+        while (this.peek().type !== 'R_BRACE') {
+            body.push(this.parseStatement());
+        }
+
+        this.consume('R_BRACE');
+        return {
+            type: 'COMANDO',
+            value: commandName,
+            children: body
+        }
     }
 }
