@@ -80,12 +80,34 @@ export class DisChordParser extends Parser {
 
     private parseMessageCreation(): ASTNode {
         this.consume('IDENTIFICADOR');
+        this.consume('L_BRACE');
+        
+        const body: ASTNode[] = [];
+        
+        while (this.peek().type !== 'R_BRACE') {
+            const token = this.peek();
 
-        const configBody = this.parsePrimary();
+            switch (token.value) {
+                case 'contenido':
+                    this.consume('IDENTIFICADOR');
+                    let content = this.parsePrimary();
+                    content.property = 'contenido';
+                    body.push(content);
+                    break;
+                case 'canal':
+                    this.consume('IDENTIFICADOR');
+                    let channel = this.parsePrimary();
+                    channel.property = 'canal';
+                    body.push(channel);
+                    break;
+            }
+        }
+        
+        this.consume('R_BRACE');
 
         return {
             type: 'CREAR_MENSAJE',
-            object: configBody
+            children: body
         };
 
     }

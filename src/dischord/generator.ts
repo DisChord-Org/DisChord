@@ -192,10 +192,10 @@ export class DisChordGenerator extends Generator {
     }
 
     private generateMessage(node: any): string {
-        const channelNode = node.object.children.find((p: any) => p.key === 'canal');
-        const channel: string | undefined = channelNode ? this.visit(channelNode.value) : 'null';
-        const contentNode = node.object.children.find((p: any) => p.key === 'contenido');
-        const content: string | undefined = contentNode ? this.visit(contentNode.value) : undefined;
+        const channelNode = node.children.find((p: any) => p.property === 'canal');
+        const channel: string | undefined = channelNode ? this.visit(channelNode) : 'null';
+        const contentNode = node.children.find((p: any) => p.property === 'contenido');
+        const content: string | undefined = contentNode ? this.visit(contentNode) : undefined;
 
         return `createMessage(${channel}, { content: ${content} })`;
     }
