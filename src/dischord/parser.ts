@@ -260,16 +260,29 @@ export class DisChordParser extends Parser {
         this.consume('L_BRACE');
 
         const body: ASTNode[] = [];
+        const params: ASTNode[] = [];
         
         while (this.peek().type !== 'R_BRACE') {
-            body.push(this.parseStatement());
+            switch (this.peek().value) {
+                case 'descripcion':
+                    this.consume('IDENTIFICADOR');
+                    let param: ASTNode = this.parsePrimary();
+                    param.property = 'DESCRIPCION';
+                    params.push(param);
+                default:
+                    body.push(this.parseStatement());
+            }
         }
 
         this.consume('R_BRACE');
         return {
             type: 'COMANDO',
             value: commandName,
-            children: body
+            children: body,
+            object: {
+                type: 'CONFIGURACION',
+                children: params
+            }
         }
     }
 }

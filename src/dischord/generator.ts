@@ -158,7 +158,8 @@ export class DisChordGenerator extends Generator {
 
     private generateCommand(node: any): string {
         const commandName = node.value;
-
+        const params = node.object.children;
+        const commandDescription = params.find((param: ASTNode) => param.property === 'DESCRIPCION');
         const body = node.children
             .map((n: any) => "    " + this.visit(n) + ";")
             .join('\n');
@@ -168,7 +169,7 @@ export class DisChordGenerator extends Generator {
 
             export default class ${commandName}Command extends Command {
                 name = "${commandName.toLowerCase()}";
-                description = "Obtén la velocidad del bot";
+                description = "${commandDescription.value ?? 'Un comando genial'}";
                 ignore = IgnoreCommand.Message;
                 integrationTypes = [ 0 ];
                 contexts = [ 0 ];
