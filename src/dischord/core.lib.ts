@@ -2,6 +2,9 @@ export const corelib: Record<string, Record<string, string> | string> = {
     'usuario': {
         'nombre': 'usuario.username'
     },
+    'contexto': {
+        'IdCanal': 'contexto.channelId'
+    },
     'imprimir': 'cliente.logger.info'
 } as const;
 
@@ -84,6 +87,31 @@ export const eventsMap: Record<string, EventType> = {
         'params': [ 'interaccion', 'cliente' ]
     }
 } as const;
+
+export const createMessageFunctionInjection = `
+    const createMessage = async (channel, options) => {
+
+        // if channel
+        if (channel) {
+            return await cliente.messages.write(channel, options);
+        }
+
+        // if we're inside a command
+        if (typeof contexto !== 'undefined' && contexto.editOrReply) {
+            if (!contexto.deferred) {
+                await contexto.deferReply().catch(() => {});
+            }
+            return await contexto.editOrReply(options);
+        }
+
+        // if we're inside a command events
+        if (typeof mensaje !== 'undefined' && mensaje.write) {
+            return await mensaje.write(opciones);
+        }
+
+        throw new Error("DisChord Error: No se pudo enviar el mensaje. Falta el parámetro 'canal' o no hay un contexto de respuesta (comando/mensaje).");
+    };
+`;
 
 export const intentsMap: Record<string, string> = {
     'ConfiguracionDelAutomoderador': 'AutoModeratorConfiguration',

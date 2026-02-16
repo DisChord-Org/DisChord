@@ -2,7 +2,7 @@ import fs from "node:fs";
 import { Generator } from "../chord/generator";
 import { ASTNode } from "../chord/types";
 import { join } from "node:path";
-import { corelib, EmbedColors, eventsMap, intentsMap } from "./core.lib";
+import { corelib, createMessageFunctionInjection, EmbedColors, eventsMap, intentsMap } from "./core.lib";
 
 export class DisChordGenerator extends Generator {
     projectRooth: string = '';
@@ -146,6 +146,7 @@ export class DisChordGenerator extends Generator {
             export default createEvent({
                 data: { name: '${eventName}' },
                 async run(${eventsMap[node.value].params.join(', ')}) {
+                ${createMessageFunctionInjection}
                 ${body}
                 }
             });
@@ -174,7 +175,12 @@ export class DisChordGenerator extends Generator {
                 integrationTypes = [ 0 ];
                 contexts = [ 0 ];
                 async run(ctx) {
-                    const cliente = ctx.client;
+                    const contexto = ctx;
+                    const cliente = contexto.client;
+                    const usuario = ctx.author;
+
+                    ${createMessageFunctionInjection}
+
                     ${body}
                 }
             }
@@ -186,18 +192,17 @@ export class DisChordGenerator extends Generator {
 
     private generateMessage(node: any): string {
         const channelNode = node.object.children.find((p: any) => p.key === 'canal');
-        const channel: string | undefined = channelNode ? this.visit(channelNode.value) : undefined;
+        const channel: string | undefined = channelNode ? this.visit(channelNode.value) : 'null';
         const contentNode = node.object.children.find((p: any) => p.key === 'contenido');
         const content: string | undefined = contentNode ? this.visit(contentNode.value) : undefined;
 
-        if (!channel) throw new Error(`No se ha especificado el canal.`);
-        return `cliente.messages.write(${channel}, { content: ${content} })`;
+        return `createMessage(${channel}, { content: ${content} })`;
     }
 
     private generateEmbed(node: any): string {
         // this will be refactor, insult me
         const channelNode = node.children.find((p: any) => p.type.toLowerCase() === 'canal');
-        const channel: string | undefined = channelNode ? this.visit(channelNode.object) : undefined;
+        const channel: string | undefined = channelNode ? this.visit(channelNode.object) : 'null';
         const descriptionNode = node.children.find((p: any) => p.type.toLowerCase() === 'descripcion');
         const description: string | undefined = descriptionNode ? this.visit(descriptionNode.object) : undefined;
         const colorNode = node.children.find((p: any) => p.type.toLowerCase() === 'color');
@@ -224,9 +229,8 @@ export class DisChordGenerator extends Generator {
             return `.addFields({ name: ${name}, value: ${value}, inline: ${isInline} })`;
         }).join('\n');
 
-        if (!channel) throw new Error(`No se ha especificado el canal.`);
         return `
-            cliente.messages.write(${channel}, {
+            createMessage(${channel}, {
                 embeds: [
                     new Embed()
                         ${description? `.setDescription(${description})` : ''}
