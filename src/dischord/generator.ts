@@ -178,6 +178,7 @@ export class DisChordGenerator extends Generator {
                     const contexto = ctx;
                     const cliente = contexto.client;
                     const usuario = ctx.author;
+                    const canal = ctx.interaction.channel;
 
                     ${createMessageFunctionInjection}
 

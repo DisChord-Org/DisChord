@@ -1,9 +1,22 @@
 export const corelib: Record<string, Record<string, string> | string> = {
     'usuario': {
-        'nombre': 'usuario.username'
+        'nombre': 'usuario.username',
+        'flags': 'usuario.publicFlags',
+        'nombreGlobal': 'usuario.globalName'
     },
-    'contexto': {
-        'IdCanal': 'contexto.channelId'
+    'cliente': {
+        'id': 'cliente.me.id',
+        'nombre': 'cliente.me.username',
+        'avatar': 'cliente.me.avatar',
+        'avatarUrl': 'cliente.me.avatarUrl'
+    },
+    'canal': {
+        'topico': 'canal.topic',
+        'ratelimit': 'canal.rateLimitPerUser',
+        'posicion': 'canal.position',
+        'categoria': 'canal.parentId',
+        'nombre': 'canal.name',
+        'ultimoMensaje': 'canal.lastMessageId'
     },
     'imprimir': 'cliente.logger.info'
 } as const;
