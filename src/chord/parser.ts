@@ -1,4 +1,4 @@
-import { ASTNode, ClassNode, ConditionNode, ForNode, FunctionNode, PropertyNode, Token, VariableNode, Symbol, SymbolKind } from "./types";
+import { ASTNode, ClassNode, ConditionNode, LoopNode, FunctionNode, PropertyNode, Token, VariableNode, Symbol, SymbolKind, LiteralNode } from "./types";
 
 export class Parser {
     public symbols: Map<string, Symbol> = new Map();
@@ -134,7 +134,7 @@ export class Parser {
             const declaration = this.parseStatement();
             
             return {
-                type: 'EXPORTAR',
+                type: 'Exportar',
                 object: declaration
             };
         }
@@ -143,9 +143,9 @@ export class Parser {
             this.consume('IMPORTAR');
             this.consume('L_BRACE');
 
-            const ids: string[] = [];
+            const identificators: string[] = [];
             while (this.peek().type !== 'R_BRACE') {
-                ids.push(this.consume('IDENTIFICADOR').value);
+                identificators.push(this.consume('IDENTIFICADOR').value);
                 if (this.peek().type === ',') this.consume(',');
             }
 
@@ -156,9 +156,9 @@ export class Parser {
             const modulePath = pathToken.value;
 
             return {
-                type: 'IMPORTAR',
-                object: ids as any,
-                value: modulePath
+                type: 'Importar',
+                identificators,
+                path: modulePath
             };
         }
 
@@ -193,11 +193,11 @@ export class Parser {
 
         this.registerSymbol(id, {
             name: id,
-            type: 'class'
+            kind: SymbolKind.Class
         });
 
         return {
-            type: 'CLASE',
+            type: 'Clase',
             id,
             superClass,
             body
@@ -234,16 +234,20 @@ export class Parser {
 
         this.registerSymbol(id, {
             name: id,
-            type: 'func',
-            isAsync
+            kind: SymbolKind.Function,
+            metadata: {
+                isAsync
+            }
         });
 
         return {
-            type: 'FUNCION',
+            type: 'Funcion',
             id,
-            isConstructor,
-            isMethod,
-            isAsync,
+            metadata: {
+                isConstructor,
+                isMethod,
+                isAsync
+            },
             params,
             body
         };
@@ -253,7 +257,11 @@ export class Parser {
         this.consume('PROP');
         const id = this.consume('IDENTIFICADOR').value;
         
-        let value: ASTNode = { type: 'LITERAL', value: undefined, raw: 'indefinido' };
+        let value: ASTNode = {
+            type: 'Literal',
+            value: undefined,
+            raw: 'indefinido'
+        };
 
         if (this.peek().type === 'ES') {
             this.consume('ES');
@@ -262,13 +270,13 @@ export class Parser {
 
         this.registerSymbol(id, {
             name: id,
-            type: 'prop'
+            kind: SymbolKind.Property
         });
 
         return {
-            type: 'PROPIEDAD',
+            type: 'Propiedad',
             id,
-            prop_value: value
+            value
         };
     }
 
@@ -285,7 +293,7 @@ export class Parser {
             const right = this.parsePrimary();
             
             left = {
-                type: 'OPERACION_BINARIA',
+                type: 'ExpresionBinaria',
                 left,
                 operator: operator.type,
                 right
@@ -297,9 +305,9 @@ export class Parser {
             const value = this.parseExpression();
             
             return {
-                type: 'ASIGNACION',
-                object: left,
-                value: value as any
+                type: 'Asignacion',
+                left,
+                assignment: value
             };
         }
 
@@ -318,7 +326,7 @@ export class Parser {
             this.consume('R_EXPRESSION');
             
             return {
-                type: 'JS_NATIVO',
+                type: 'JS',
                 value: content
             };
         }
@@ -326,7 +334,7 @@ export class Parser {
         if (token.type === 'ESPACIO') {
             this.consume('ESPACIO');
             return {
-                type: 'LITERAL',
+                type: 'Literal',
                 value: ' ',
                 raw: ' '
             }
@@ -335,7 +343,7 @@ export class Parser {
         if (token.type === 'INTRO') {
             this.consume('INTRO');
             return {
-                type: 'LITERAL',
+                type: 'Literal',
                 value: '\\n',
                 raw: '\\n'
             }
@@ -343,11 +351,11 @@ export class Parser {
 
         if (token.type === 'SUPER') {
             this.current++;
-            return this.parseIdentifierOrCall({ type: 'SUPER', value: 'super' });
+            return this.parseIdentifierOrCall({ type: 'Super', value: 'super' });
         }
 
         if (token.type === 'ESTA') {
-            const estaNode: ASTNode = { type: 'ESTA', value: 'this' };
+            const estaNode: ASTNode = { type: 'Esta', value: 'this' };
             this.current++;
             return this.parseIdentifierOrCall(estaNode);
         }
@@ -364,7 +372,7 @@ export class Parser {
             this.consume('NUEVO');
             const call = this.parseIdentifierOrCall(); 
             return {
-                type: 'NUEVO',
+                type: 'Nuevo',
                 object: call
             };
         }
@@ -374,7 +382,7 @@ export class Parser {
             const argument = this.parsePrimary();
 
             return {
-                type: 'NO_UNARIA',
+                type: 'NoUnario',
                 operator: 'NO',
                 object: argument
             };
@@ -385,7 +393,7 @@ export class Parser {
             const argument = this.parsePrimary();
 
             return {
-                type: 'UNARIO',
+                type: 'Unario',
                 operator: 'TIPO',
                 object: argument
             };
@@ -399,7 +407,10 @@ export class Parser {
                 if (this.peek().type === ',') this.consume(',');
             }
             this.consume('R_SQUARE');
-            return { type: 'LISTA', children: elements };
+            return {
+                type: 'Lista',
+                body: elements
+            };
         }
 
         if (token.type === 'L_EXPRESSION') {
@@ -410,14 +421,14 @@ export class Parser {
             this.consume('R_EXPRESSION');
 
             return {
-                type: 'AGRUPACION',
-                value: node as any,
+                type: 'Expresion',
+                object: node,
             };
         }
 
         if (token.type === 'L_BRACE') {
             this.consume('L_BRACE');
-            const properties: any[] = [];
+            const properties: (Record<'key', string> | Record<'value', ASTNode>)[] = [];
 
             while (this.peek().type !== 'R_BRACE') {
                 const keyToken = this.consume(['TEXTO', 'IDENTIFICADOR']);
@@ -436,8 +447,8 @@ export class Parser {
             this.consume('R_BRACE');
 
             return {
-                type: 'OBJETO',
-                children: properties
+                type: 'Objeto',
+                properties
             };
         }
         
@@ -445,14 +456,14 @@ export class Parser {
     }
 
     private parseIdentifierOrCall(startNode?: ASTNode): ASTNode {
-        let node: ASTNode = startNode || { type: 'IDENTIFICADOR', value: this.consume('IDENTIFICADOR').value };
+        let node: ASTNode = startNode || { type: 'Identificador', value: this.consume('IDENTIFICADOR').value };
 
         while (this.current < this.tokens.length && this.peek().type === '.') {
             this.consume('.');
             const property = this.consume('IDENTIFICADOR');
             
             node = {
-                type: 'ACCESO',
+                type: 'Acceso',
                 object: node,
                 property: property.value
             };
@@ -471,9 +482,9 @@ export class Parser {
             this.consume('R_EXPRESSION');
 
             return {
-                type: 'LLAMADA',
-                value: node as any,
-                children: args
+                type: 'Llamada',
+                object: node,
+                params: args
             };
         }
 
@@ -498,17 +509,17 @@ export class Parser {
         }
 
         return {
-            type: 'LITERAL',
+            type: 'Literal',
             value,
             raw: token.value
         };
     }
 
-    private parseVariableDeclaration(): VarNode {
+    private parseVariableDeclaration(): VariableNode {
         this.consume('VAR');
         const id = this.consume('IDENTIFICADOR').value;
         
-        let value: ASTNode = { type: 'LITERAL', value: undefined, raw: 'indefinido' };
+        let value: ASTNode = { type: 'Literal', value: undefined, raw: 'indefinido' };
 
         if (this.current < this.tokens.length && this.peek().type === 'ES') {
             this.consume('ES');
@@ -517,13 +528,13 @@ export class Parser {
 
         this.registerSymbol(id, {
             name: id,
-            type: 'var'
+            kind: SymbolKind.Variable
         });
 
         return {
-            type: 'VAR',
+            type: 'Variable',
             id,
-            prop_value: value
+            value
         };
     }
 
@@ -566,14 +577,14 @@ export class Parser {
         }
 
         return {
-            type: 'CONDICION',
+            type: 'Condicion',
             test,
             consequent,
             alternate
         };
     }
 
-    private parseForStatement(): ForNode {
+    private parseForStatement(): LoopNode {
         this.consume('PARA');
         this.consume('L_EXPRESSION');
         
@@ -586,19 +597,19 @@ export class Parser {
         this.consume('R_EXPRESSION');
         this.consume('L_BRACE');
 
-        const children: ASTNode[] = [];
+        const body: ASTNode[] = [];
 
         while (this.peek().type !== 'R_BRACE') {
-            children.push(this.parseStatement());
+            body.push(this.parseStatement());
         }
 
         this.consume('R_BRACE');
 
         return {
-            type: 'BUCLE',
+            type: 'Bucle',
             var: variable,
             iterable,
-            children
+            body
         };
     }
 }

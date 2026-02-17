@@ -20,7 +20,12 @@ export type Token = {
     value: string;
 };
 
-export type NodeType = 'Clase' | 'Funcion' | 'Bucle' | 'Propiedad' | 'Variable' | 'Condicion' | 'ExpresionBinaria' | 'Literal' | 'Salir' | 'Pasar' | 'Devolver';
+export type NodeType = 'Clase' | 'Funcion' | 'Bucle' | 'Propiedad' | 'Variable'
+                    | 'Condicion' | 'ExpresionBinaria' | 'Literal' | 'Salir'
+                    | 'Pasar' | 'Devolver' | 'Nuevo' | 'NoUnario' | 'Unario'
+                    | 'Lista' | 'Expresion' | 'Objeto' | 'Identificador'
+                    | 'Acceso' | 'Llamada' | 'Exportar' | 'Importar'
+                    | 'Asignacion' | 'JS' | 'Super' | 'Esta';
 
 interface BaseNode {
     type: NodeType;
@@ -46,10 +51,11 @@ export interface FunctionNode extends BaseNode {
     body: ASTNode[];
 }
 
-export interface ForNode extends BaseNode {
+export interface LoopNode extends BaseNode {
     type: 'Bucle';
     var: string;
     iterable: ASTNode;
+    body: ASTNode[];
 }
 
 export interface PropertyNode extends BaseNode {
@@ -99,4 +105,91 @@ export interface ReturnNode extends BaseNode {
     object: LiteralNode['value'];
 }
 
-export type ASTNode = LiteralNode | BinaryExpressionNode | ConditionNode | VariableNode | PropertyNode | ForNode | FunctionNode | ClassNode | ExitLoopNode | PassLoopNode | ReturnNode;
+export interface NewNode extends BaseNode {
+    type: 'Nuevo';
+    object: ASTNode;
+}
+
+export interface NoUnaryNode extends BaseNode {
+    type: 'NoUnario';
+    operator: string;
+    object: ASTNode;
+}
+
+export interface UnaryNode extends BaseNode {
+    type: 'Unario';
+    operator: string;
+    object: ASTNode;
+}
+
+export interface ListNode extends BaseNode {
+    type: 'Lista';
+    body: ASTNode[];
+}
+
+export interface ExpressionNode extends BaseNode {
+    type: 'Expresion';
+    object: ASTNode;
+}
+
+export interface ObjectNode extends BaseNode {
+    type: 'Objeto';
+    properties: (Record<'key', string> | Record<'value', ASTNode>)[];
+}
+
+export interface IdentificatorNode extends BaseNode {
+    type: 'Identificador';
+    value: string;
+}
+
+export interface AccessNode extends BaseNode {
+    type: 'Acceso';
+    object: ASTNode;
+    property: string;
+}
+
+export interface CallNode extends BaseNode {
+    type: 'Llamada';
+    object: ASTNode;
+    params: ASTNode[];
+}
+
+export interface ExportNode extends BaseNode {
+    type: 'Exportar';
+    object: ASTNode;
+}
+
+export interface ImportNode extends BaseNode {
+    type: 'Importar';
+    identificators: string[];
+    path: string;
+}
+
+export interface AssignmentNode extends BaseNode {
+    type: 'Asignacion';
+    left: ASTNode;
+    assignment: ASTNode;
+}
+
+export interface JSNode extends BaseNode {
+    type: 'JS',
+    value: string
+}
+
+export interface SuperNode extends BaseNode {
+    type: 'Super';
+    value: 'super';
+}
+
+export interface ThisNode extends BaseNode {
+    type: 'Esta';
+    value: 'this';
+}
+
+export type ASTNode = LiteralNode | BinaryExpressionNode | ConditionNode
+                    | VariableNode | PropertyNode | LoopNode | FunctionNode
+                    | ClassNode | ExitLoopNode | PassLoopNode | ReturnNode
+                    | NewNode | NoUnaryNode | UnaryNode | ListNode
+                    | ExpressionNode | ObjectNode | IdentificatorNode
+                    | AccessNode | CallNode | ExportNode | ImportNode
+                    | AssignmentNode | JSNode | SuperNode | ThisNode;
