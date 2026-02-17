@@ -1,4 +1,4 @@
-import { ASTNode, ClassNode, ConditionNode, LoopNode, FunctionNode, PropertyNode, Token, VariableNode, Symbol, SymbolKind, LiteralNode } from "./types";
+import { ASTNode, ClassNode, ConditionNode, LoopNode, FunctionNode, PropertyNode, Token, VariableNode, Symbol, SymbolKind, LiteralNode, IdentificatorNode, AccessNode, NewNode, ThisNode, SuperNode } from "./types";
 
 export class Parser {
     public symbols: Map<string, Symbol> = new Map();
@@ -428,7 +428,7 @@ export class Parser {
 
         if (token.type === 'L_BRACE') {
             this.consume('L_BRACE');
-            const properties: (Record<'key', string> | Record<'value', ASTNode>)[] = [];
+            const properties: (Record<'key', string> & Record<'value', ASTNode>)[] = [];
 
             while (this.peek().type !== 'R_BRACE') {
                 const keyToken = this.consume(['TEXTO', 'IDENTIFICADOR']);
@@ -455,8 +455,8 @@ export class Parser {
         throw new Error(`Token inesperado en expresión: ${token.type} en la posición ${this.current}`);
     }
 
-    private parseIdentifierOrCall(startNode?: ASTNode): ASTNode {
-        let node: ASTNode = startNode || { type: 'Identificador', value: this.consume('IDENTIFICADOR').value };
+    private parseIdentifierOrCall(startNode?: IdentificatorNode | NewNode | ThisNode | SuperNode): ASTNode {
+        let node: IdentificatorNode | NewNode | ThisNode | SuperNode | AccessNode = startNode || { type: 'Identificador', value: this.consume('IDENTIFICADOR').value };
 
         while (this.current < this.tokens.length && this.peek().type === '.') {
             this.consume('.');

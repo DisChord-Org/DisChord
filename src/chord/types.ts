@@ -102,7 +102,7 @@ export interface PassLoopNode extends BaseNode {
 
 export interface ReturnNode extends BaseNode {
     type: 'Devolver';
-    object: LiteralNode['value'];
+    object: ASTNode | undefined;
 }
 
 export interface NewNode extends BaseNode {
@@ -134,7 +134,7 @@ export interface ExpressionNode extends BaseNode {
 
 export interface ObjectNode extends BaseNode {
     type: 'Objeto';
-    properties: (Record<'key', string> | Record<'value', ASTNode>)[];
+    properties: (Record<'key', string> & Record<'value', ASTNode>)[];
 }
 
 export interface IdentificatorNode extends BaseNode {
@@ -150,7 +150,7 @@ export interface AccessNode extends BaseNode {
 
 export interface CallNode extends BaseNode {
     type: 'Llamada';
-    object: ASTNode;
+    object: IdentificatorNode | NewNode | ThisNode | SuperNode | AccessNode;
     params: ASTNode[];
 }
 

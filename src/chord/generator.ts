@@ -1,5 +1,5 @@
 import { corelib } from "./core.lib";
-import { ASTNode, ClassNode, PropertyNode, Symbol } from "./types";
+import { AccessNode, AssignmentNode, ASTNode, BinaryExpressionNode, CallNode, ClassNode, ConditionNode, ExportNode, FunctionNode, ListNode, LiteralNode, LoopNode, NoUnaryNode, ObjectNode, PropertyNode, Symbol, UnaryNode, VariableNode } from "./types";
 
 export class Generator {
     private SymbolsTable: Map<string, Symbol>;
@@ -19,67 +19,67 @@ export class Generator {
 
     public visit(node: ASTNode): string {
         switch (node.type) {
-            case 'CLASE':
-                return this.generateClass(node as ClassNode);
-            case 'LLAMADA':
+            case 'Clase':
+                return this.generateClass(node);
+            case 'Llamada':
                 return this.generateCall(node);
-            case 'LITERAL':
+            case 'Literal':
                 return this.generateLiteral(node);
-            case 'IDENTIFICADOR':
-                return node.value as string;
-            case 'LISTA':
+            case 'Identificador':
+                return node.value;
+            case 'Lista':
                 return this.generateArray(node);
-            case 'ACCESO':
+            case 'Acceso':
                 return this.generateAccess(node);
-            case 'FUNCION':
+            case 'Funcion':
                 return this.generateFunction(node);
-            case 'PROPIEDAD':
-                return this.generateProperty(node as PropertyNode);
-            case 'ESTA':
+            case 'Propiedad':
+                return this.generateProperty(node);
+            case 'Esta':
                 return 'this';
-            case 'ASIGNACION':
+            case 'Asignacion':
                 return this.generateAssignation(node);
-            case 'SUPER':
+            case 'Super':
                 return 'super';
-            case 'OPERACION_BINARIA':
+            case 'ExpresionBinaria':
                 return this.generateBinaryOperation(node);
-            case 'VAR':
+            case 'Variable':
                 return this.generateVariableDeclaration(node);
-            case 'NUEVO':
-                return `new ${this.visit(node.object!)}`;
-            case 'NO_UNARIA':
+            case 'Nuevo':
+                return `new ${this.visit(node.object)}`;
+            case 'NoUnario':
                 return this.generateUnaryOperation(node);
-            case 'AGRUPACION':
-                return `(${this.visit(node.value as any)})`;
-            case 'CONDICION':
+            case 'Expresion':
+                return `(${this.visit(node.object)})`;
+            case 'Condicion':
                 return this.generateCondition(node);
-            case 'UNARIO':
+            case 'Unario':
                 return this.generateUnaryOperation(node);
-            case 'BUCLE':
+            case 'Bucle':
                 return this.generateFor(node);
-            case 'OBJETO':
+            case 'Objeto':
                 return this.generateObject(node);
-            case 'SALIR':
+            case 'Salir':
                 return 'break';
-            case 'PASAR':
+            case 'Pasar':
                 return 'continue';
-            case 'DEVOLVER':
+            case 'Devolver':
                 return node.object ? `return ${this.visit(node.object)}` : 'return';
-            case 'EXPORTAR':
+            case 'Exportar':
                 return this.generateExport(node);
-            case 'IMPORTAR':
-                const ids = (node as unknown as any).object.join(', ');
-                let path = node.value as string;
+            case 'Importar':
+                const ids = node.identificators.join(', ');
+                let path = node.path;
                 
                 if (!path.endsWith('.mjs') && (path.startsWith('./') || path.startsWith('../'))) {
                     path += '.mjs';
                 }
 
                 return `import { ${ids} } from "${path}"`;
-            case 'JS_NATIVO':
+            case 'JS':
                 return `${node.value}`;
             default:
-                throw new Error(`Generador: Tipo de nodo desconocido: ${node.type}`);
+                throw new Error(`Generador: Tipo de nodo desconocido: ${(node as { type: string }).type}`);
         }
     }
 
@@ -92,11 +92,11 @@ export class Generator {
         return `class ${node.id}${inheritance} {\n  ${body}\n}`;
     }
 
-    generateAccess(node: any): string { 
-        const objName = node.object.type === 'IDENTIFICADOR' ? node.object.value : null;
+    generateAccess(node: AccessNode): string { 
+        const objName = node.object.type === 'Identificador' ? node.object.value : null;
         const propName = node.property;
 
-        if (corelib.classes[objName] && corelib.classes[objName].methods[propName]) {
+        if (objName && corelib.classes[objName] && corelib.classes[objName].methods[propName]) {
             return corelib.classes[objName].methods[propName];
         }
 
@@ -110,29 +110,30 @@ export class Generator {
         return `${this.visit(node.object)}.${propName}`;
     }
 
-    generateCall(node: any): string {
-        const args = node.children.map((arg: any) => this.visit(arg)).join(', ');
+    generateCall(node: CallNode): string {
+        const args = node.params.map((arg: any) => this.visit(arg)).join(', ');
         let translation: string;
         let isAsyncCall = false;
 
-        if (node.value.type === 'ACCESO') {
-            translation = this.generateAccess(node.value);
+        if (node.object.type === 'Acceso') {
+            translation = this.generateAccess(node.object);
 
-            const symbol = this.SymbolsTable.get(node.value.property);
-            if (symbol && symbol.isAsync) isAsyncCall = true;
+            const symbol = this.SymbolsTable.get(node.object.property);
+            if (symbol && symbol.metadata.isAsync) isAsyncCall = true;
         } else {
-            const name = node.value.value;
+            if (!('value' in node.object)) throw new Error(`Se esperaba una llamada con valor en su objeto.`);
+            const name = node.object.value;
             translation = name;
 
             const symbol = this.SymbolsTable.get(name);
-            if (symbol && symbol.isAsync) isAsyncCall = true;
+            if (symbol && symbol.metadata.isAsync) isAsyncCall = true;
         }
 
         const awaitPrefix = isAsyncCall? 'await ' : '';
         return `${awaitPrefix}${translation}(${args})`;
     }
 
-    private generateLiteral(node: any): string {
+    private generateLiteral(node: LiteralNode): string {
         if (typeof node.value === 'boolean') {
             return node.value ? 'true' : 'false';
         }
@@ -144,41 +145,41 @@ export class Generator {
         return String(node.value);
     }
 
-    private generateArray(node: any): string {
-        const elements = node.children.map((el: any) => this.visit(el)).join(', ');
+    private generateArray(node: ListNode): string {
+        const elements = node.body.map((el: any) => this.visit(el)).join(', ');
         return `[${elements}]`;
     }
 
-    private generateFunction(node: any): string {
+    private generateFunction(node: FunctionNode): string {
         const params = node.params.join(', ');
         const body = node.body.map((n: any) => '    ' + this.visit(n) + ";").join('\n');
 
-        const asyncPrefix = node.isAsync ? 'async ' : '';
+        const asyncPrefix = node.metadata.isAsync ? 'async ' : '';
 
-        if (node.isConstructor) {
+        if (node.metadata.isConstructor) {
             return `constructor(${params}) {\n${body}\n  }`;
         }
 
-        if (node.isMethod) {
-            const isStatic = node.isStatic ? 'static ' : '';
+        if (node.metadata.isMethod) {
+            const isStatic = node.metadata.isStatic ? 'static ' : '';
             return `${isStatic}${asyncPrefix}${node.id}(${params}) {\n${body}\n  }`;
         }
 
         return `${asyncPrefix}function ${node.id}(${params}) {\n${body}\n}`;
     }
 
-    private generateProperty(node: any): string {
+    private generateProperty(node: PropertyNode): string {
         const isStatic = node.isStatic ? 'static ' : '';
-        const init = node.prop_value ? ` = ${this.visit(node.prop_value)}` : '';
+        const init = node.value ? ` = ${this.visit(node.value)}` : '';
         return `${isStatic}${node.id}${init}`;
     }
 
-    private generateAssignation(node: any): string {
-        return `${this.visit(node.object)} = ${this.visit(node.value)}`;
+    private generateAssignation(node: AssignmentNode): string {
+        return `${this.visit(node.left)} = ${this.visit(node.assignment)}`;
     }
 
-    private generateBinaryOperation(node: any): string {
-        const operatorsMap: any = {
+    private generateBinaryOperation(node: BinaryExpressionNode): string {
+        const operatorsMap: Record<string, string> = {
             'MAS': '+',
             'MENOS': '-',
             'POR': '*',
@@ -200,35 +201,35 @@ export class Generator {
         return `${this.visit(node.left)} ${op} ${this.visit(node.right)}`;
     }
 
-    private generateVariableDeclaration(node: any): string {
-        return `let ${node.id} = ${this.visit(node.prop_value)}`;
+    private generateVariableDeclaration(node: VariableNode): string {
+        return `let ${node.id} = ${this.visit(node.value)}`;
     }
 
-    private generateUnaryOperation(node: ASTNode): string {
-        if (node.operator === 'NO') return `!(${this.visit(node.object!)})`;
+    private generateUnaryOperation(node: UnaryNode | NoUnaryNode): string {
+        if (node.operator === 'NO') return `!(${this.visit(node.object)})`;
 
         if (node.operator === 'TIPO') {
             const mapping = `{ "number": "numero", "string": "texto", "boolean": "booleano", "undefined": "indefinido", "object": "objeto" }`;
-            return `${mapping}[typeof (${this.visit(node.object!)})]`;
+            return `${mapping}[typeof (${this.visit(node.object)})]`;
         }
 
         return '';
     }
 
-    private generateCondition(node: any): string {
+    private generateCondition(node: ConditionNode): string {
         const test = this.visit(node.test);
         const consequent = node.consequent
-            .map((n: any) => "    " + this.visit(n) + ";")
+            .map((n: ASTNode) => "    " + this.visit(n) + ";")
             .join('\n');
         
         let result = `if (${test}) {\n${consequent}\n}`;
 
         if (node.alternate) {
-            if (!Array.isArray(node.alternate) && node.alternate.type === 'CONDICION') {
+            if (!Array.isArray(node.alternate) && node.alternate.type === 'Condicion') {
                 result += ` else ${this.generateCondition(node.alternate)}`;
             } else {
-                const alternate = (node.alternate as any[])
-                    .map((n: any) => "    " + this.visit(n) + ";")
+                const alternate = (node.alternate as ASTNode[])
+                    .map((n: ASTNode) => "    " + this.visit(n) + ";")
                     .join('\n');
                 result += ` else {\n${alternate}\n}`;
             }
@@ -237,13 +238,13 @@ export class Generator {
         return result;
     }
 
-    private generateFor(node: any): string {
+    private generateFor(node: LoopNode): string {
         const varName = node.var;
-        const body = node.children.map((n: any) => "    " + this.visit(n) + ";").join('\n');
+        const body = node.body.map((n: ASTNode) => "    " + this.visit(n) + ";").join('\n');
         const iterable = this.visit(node.iterable);
 
-        if (node.iterable.type === 'LLAMADA' && node.iterable.value.value === 'rango') {
-            const args = node.iterable.children;
+        if (node.iterable.type === 'Llamada' && 'value' in node.iterable.object && node.iterable.object.value === 'rango') {
+            const args = node.iterable.params;
             let start = "0", end = this.visit(args[0]);
 
             if (args.length === 2) {
@@ -256,21 +257,21 @@ export class Generator {
         return `for (let ${varName} of (Array.isArray(${iterable}) ? ${iterable} : Object.keys(${iterable}))) {\n${body}\n}`;
     }
 
-    private generateObject(node: any): string {
-        const props = node.children
-            .map((p: any) => `${p.key}: ${this.visit(p.value)}`)
+    private generateObject(node: ObjectNode): string {
+        const props = node.properties
+            .map((p: Record<'key', string> & Record<'value', ASTNode>) => `${p.key}: ${this.visit(p.value)}`)
             .join(', ');
         return `{ ${props} }`;
     }
 
-    private generateExport(node: any): string {
+    private generateExport(node: ExportNode): string {
         const innerNode = node.object;
 
-        if (innerNode.type === 'VAR' || innerNode.type === 'FUNCION' || innerNode.type === 'CLASE') {
+        if (innerNode.type === 'Variable' || innerNode.type === 'Funcion' || innerNode.type === 'Clase') {
             return `export ${this.visit(innerNode)}`;
         }
 
-        if (innerNode.type === 'IDENTIFICADOR') {
+        if (innerNode.type === 'Identificador') {
             return `export { ${this.visit(innerNode)} }`;
         }
 
