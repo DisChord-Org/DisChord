@@ -20,7 +20,7 @@ export type Token = {
     value: string;
 };
 
-export type NodeType = 'Clase' | 'Funcion' | 'Bucle' | 'Propiedad' | 'Variable' | 'Condicion' | 'ExpresionBinaria' | 'Literal';
+export type NodeType = 'Clase' | 'Funcion' | 'Bucle' | 'Propiedad' | 'Variable' | 'Condicion' | 'ExpresionBinaria' | 'Literal' | 'Salir' | 'Pasar' | 'Devolver';
 
 interface BaseNode {
     type: NodeType;
@@ -86,4 +86,17 @@ export interface LiteralNode extends BaseNode {
     raw: string;
 }
 
-export type ASTNode = LiteralNode | BinaryExpressionNode | ClassNode | FunctionNode | ConditionNode | ForNode;
+export interface ExitLoopNode extends BaseNode {
+    type: 'Salir';
+}
+
+export interface PassLoopNode extends BaseNode {
+    type: 'Pasar';
+}
+
+export interface ReturnNode extends BaseNode {
+    type: 'Devolver';
+    object: LiteralNode['value'];
+}
+
+export type ASTNode = LiteralNode | BinaryExpressionNode | ConditionNode | VariableNode | PropertyNode | ForNode | FunctionNode | ClassNode | ExitLoopNode | PassLoopNode | ReturnNode;

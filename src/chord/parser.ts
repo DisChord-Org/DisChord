@@ -1,4 +1,4 @@
-import { ASTNode, ClassNode, ConditionNode, ForNode, FunctionNode, PropertyNode, Token, VarNode, Symbol } from "./types";
+import { ASTNode, ClassNode, ConditionNode, ForNode, FunctionNode, PropertyNode, Token, VariableNode, Symbol, SymbolKind } from "./types";
 
 export class Parser {
     public symbols: Map<string, Symbol> = new Map();
@@ -9,10 +9,11 @@ export class Parser {
     private registerSymbol(name: string, info: Partial<Symbol>) {
         this.symbols.set(name, {
             name,
-            type: info.type || 'var',
-            isAsync: info.isAsync || false,
-            isExported: info.isExported || false,
-            scope: 'global',
+            kind: info.kind || SymbolKind.Variable,
+            metadata: {
+                isAsync: info.metadata?.isAsync || false,
+                isExported: info.metadata?.isExported || false,
+            }
         });
     }
 
@@ -28,7 +29,7 @@ export class Parser {
         return this.tokens[this.current];
     }
 
-    consume(expectedTypes: any): Token {
+    consume(expectedTypes: string | string[]): Token {
         const token = this.tokens[this.current];
         const expected = Array.isArray(expectedTypes) ? expectedTypes : [ expectedTypes ];
 
@@ -53,7 +54,7 @@ export class Parser {
             if (this.peek().type === 'FIJAR') {
                 this.consume('FIJAR');
                 const func = this.parseFunctionDeclaration(false, true, true);
-                func.isStatic = true;
+                func.metadata.isStatic = true;
                 return func;
             }
 
@@ -85,7 +86,7 @@ export class Parser {
             
             if (nextToken.type === 'FUNCION') {
                 const func = this.parseFunctionDeclaration(false, true);
-                func.isStatic = true;
+                func.metadata.isStatic = true;
                 return func;
             }
         }
@@ -104,12 +105,12 @@ export class Parser {
 
         if (token.type === 'SALIR') {
             this.consume('SALIR');
-            return { type: 'SALIR' };
+            return { type: 'Salir' };
         }
 
         if (token.type === 'PASAR') {
             this.consume('PASAR');
-            return { type: 'PASAR' };
+            return { type: 'Pasar' };
         }
 
         if (token.type === 'DEVOLVER') {
@@ -123,7 +124,7 @@ export class Parser {
             }
 
             return {
-                type: 'DEVOLVER',
+                type: 'Devolver',
                 object: value
             };
         }
