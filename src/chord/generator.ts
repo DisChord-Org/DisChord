@@ -86,7 +86,7 @@ export class Generator {
     private generateClass(node: ClassNode): string {
         const inheritance = node.superClass ? ` extends ${node.superClass}` : '';
         const body = node.body
-            .map((n: any) => "  " + this.visit(n) + ";")
+            .map((n: ASTNode) => "  " + this.visit(n) + ";")
             .join('\n\n');
         
         return `class ${node.id}${inheritance} {\n  ${body}\n}`;
@@ -111,7 +111,7 @@ export class Generator {
     }
 
     generateCall(node: CallNode): string {
-        const args = node.params.map((arg: any) => this.visit(arg)).join(', ');
+        const args = node.params.map((arg: ASTNode) => this.visit(arg)).join(', ');
         let translation: string;
         let isAsyncCall = false;
 
@@ -146,13 +146,13 @@ export class Generator {
     }
 
     private generateArray(node: ListNode): string {
-        const elements = node.body.map((el: any) => this.visit(el)).join(', ');
+        const elements = node.body.map((element: ASTNode) => this.visit(element)).join(', ');
         return `[${elements}]`;
     }
 
     private generateFunction(node: FunctionNode): string {
         const params = node.params.join(', ');
-        const body = node.body.map((n: any) => '    ' + this.visit(n) + ";").join('\n');
+        const body = node.body.map((n: ASTNode) => '    ' + this.visit(n) + ";").join('\n');
 
         const asyncPrefix = node.metadata.isAsync ? 'async ' : '';
 
