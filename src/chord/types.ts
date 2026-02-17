@@ -1,9 +1,18 @@
-export interface Symbol { // para la tabla de símbolos
+export enum SymbolKind {
+    Variable,
+    Function,
+    Class,
+    Property
+}
+
+export interface Symbol { // symbols table
     name: string;
-    type: 'var' | 'func' | 'class' | 'prop';
-    isAsync?: boolean;
-    isExported?: boolean;
-    scope: 'global' | 'local';
+    kind: SymbolKind;
+    metadata: {
+        isAsync?: boolean;
+        isExported?: boolean;
+        isStatic?: boolean;
+    };
 }
 
 export type Token = {
@@ -11,59 +20,70 @@ export type Token = {
     value: string;
 };
 
-export type ASTNode = {
-    type: string;
-    value?: string | number | boolean | undefined;
-    raw?: string;
-    children?: ASTNode[];
-    object?: ASTNode;
-    property?: string;
-    left?: ASTNode;
-    operator?: string;
-    right?: ASTNode;
+export type NodeType = 'Clase' | 'Funcion' | 'Bucle' | 'Propiedad' | 'Variable' | 'Condicion' | 'ExpresionBinaria' | 'Literal';
+
+interface BaseNode {
+    type: NodeType;
 };
 
-export interface ClassNode extends ASTNode {
-    type: 'CLASE';
+export interface ClassNode extends BaseNode {
+    type: 'Clase';
     id: string;
     superClass?: string;
     body: ASTNode[];
 }
 
-export interface FunctionNode extends ASTNode {
-    type: 'FUNCION';
+export interface FunctionNode extends BaseNode {
+    type: 'Funcion';
     id: string;
-    isConstructor: boolean;
-    isStatic?: boolean;
-    isMethod?: boolean;
-    isAsync?: boolean;
+    metadata: {
+        isConstructor: boolean;
+        isStatic?: boolean;
+        isMethod?: boolean;
+        isAsync?: boolean;
+    };
     params: string[];
     body: ASTNode[];
 }
 
-export interface PropertyNode extends ASTNode {
-    type: 'PROPIEDAD';
+export interface ForNode extends BaseNode {
+    type: 'Bucle';
+    var: string;
+    iterable: ASTNode;
+}
+
+export interface PropertyNode extends BaseNode {
+    type: 'Propiedad';
     id: string;
-    prop_value: ASTNode;
+    value: ASTNode;
     isStatic?: boolean;
 }
 
-export interface VarNode extends ASTNode {
-    type: 'VAR';
+export interface VariableNode extends BaseNode {
+    type: 'Variable';
     id: string;
-    prop_value: ASTNode;
+    value: ASTNode;
     isStatic?: boolean;
 }
 
-export interface ConditionNode extends ASTNode {
-    type: 'CONDICION';
+export interface ConditionNode extends BaseNode {
+    type: 'Condicion';
     test: ASTNode;
     consequent: ASTNode[];
     alternate?: ASTNode[] | ConditionNode;
 }
 
-export interface ForNode extends ASTNode {
-    type: 'BUCLE';
-    var: string;
-    iterable: ASTNode;
+export interface BinaryExpressionNode extends BaseNode {
+    type: 'ExpresionBinaria';
+    left: ASTNode;
+    operator: string;
+    right: ASTNode;
 }
+
+export interface LiteralNode extends BaseNode {
+    type: 'Literal';
+    value: string | number | boolean | undefined | ASTNode;
+    raw: string;
+}
+
+export type ASTNode = LiteralNode | BinaryExpressionNode | ClassNode | FunctionNode | ConditionNode | ForNode;
