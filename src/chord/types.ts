@@ -20,15 +20,15 @@ export type Token = {
     value: string;
 };
 
-export type NodeType = 'Clase' | 'Funcion' | 'Bucle' | 'Propiedad' | 'Variable'
+export type NodeType<T = never> = 'Clase' | 'Funcion' | 'Bucle' | 'Propiedad' | 'Variable'
                     | 'Condicion' | 'ExpresionBinaria' | 'Literal' | 'Salir'
                     | 'Pasar' | 'Devolver' | 'Nuevo' | 'NoUnario' | 'Unario'
                     | 'Lista' | 'Expresion' | 'Objeto' | 'Identificador'
                     | 'Acceso' | 'Llamada' | 'Exportar' | 'Importar'
-                    | 'Asignacion' | 'JS' | 'Super' | 'Esta';
+                    | 'Asignacion' | 'JS' | 'Super' | 'Esta' | T;
 
-interface BaseNode {
-    type: NodeType;
+interface BaseNode<T = never> {
+    type: NodeType<T>;
 };
 
 export interface ClassNode extends BaseNode {
@@ -186,10 +186,10 @@ export interface ThisNode extends BaseNode {
     value: 'this';
 }
 
-export type ASTNode = LiteralNode | BinaryExpressionNode | ConditionNode
+export type ASTNode<T = never, N = never> = LiteralNode | BinaryExpressionNode | ConditionNode
                     | VariableNode | PropertyNode | LoopNode | FunctionNode
                     | ClassNode | ExitLoopNode | PassLoopNode | ReturnNode
                     | NewNode | NoUnaryNode | UnaryNode | ListNode
                     | ExpressionNode | ObjectNode | IdentificatorNode
                     | AccessNode | CallNode | ExportNode | ImportNode
-                    | AssignmentNode | JSNode | SuperNode | ThisNode;
+                    | AssignmentNode | JSNode | SuperNode | ThisNode | N;
