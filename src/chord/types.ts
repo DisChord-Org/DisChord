@@ -27,7 +27,7 @@ export type NodeType<T = never> = 'Clase' | 'Funcion' | 'Bucle' | 'Propiedad' | 
                     | 'Acceso' | 'Llamada' | 'Exportar' | 'Importar'
                     | 'Asignacion' | 'JS' | 'Super' | 'Esta' | T;
 
-interface BaseNode<T = never> {
+export interface BaseNode<T = never> {
     type: NodeType<T>;
 };
 

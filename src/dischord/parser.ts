@@ -1,6 +1,7 @@
 import { KeyWords } from '../chord/keywords';
 import { Parser } from '../chord/parser';
 import { ASTNode, Token } from '../chord/types';
+import { CommandNode, CommandParam, EmbedAuthor, EmbedBody, EmbedColor, EmbedComponents, EmbedDescription, EmbedField, EmbedFooter, EmbedImage, EmbedThumbnail, EmbedTimestamp, EmbedTitle, EventNode, MessageBodyNode, MessageNode, StartBotNode } from './types';
 
 export class DisChordParser extends Parser {
 
@@ -13,19 +14,26 @@ export class DisChordParser extends Parser {
     }
 
     protected parseCustomStatement(): ASTNode | null {
-        switch (this.peek().type) {
+        const token = this.peek();
+        
+        let node: any = null; // this will save me work, sorry
+
+        switch (token.type) {
             case 'ENCENDER':
-                return this.parseBotDeclaration();
+                node = this.parseBotDeclaration();
+                break;
             case 'EVENTO':
-                return this.parseEventDeclaration();
+                node = this.parseEventDeclaration();
+                break;
             case 'CREAR':
-                return this.parseCreation();
-            default:
-                return null;
+                node = this.parseCreation();
+                break;
         }
+
+        return node as unknown as ASTNode;
     }
 
-    private parseBotDeclaration(): ASTNode {
+    private parseBotDeclaration(): StartBotNode {
         this.consume('ENCENDER');
         
         const id = this.consume('IDENTIFICADOR');
@@ -36,12 +44,12 @@ export class DisChordParser extends Parser {
         const configBody = this.parsePrimary();
 
         return {
-            type: 'ENCENDER_BOT',
+            type: 'EncenderBot',
             object: configBody
         };
     }
 
-    private parseEventDeclaration(): ASTNode {
+    private parseEventDeclaration(): EventNode {
         this.consume('EVENTO');
         
         const eventName = this.consume('IDENTIFICADOR').value;
@@ -57,20 +65,18 @@ export class DisChordParser extends Parser {
         this.consume('R_BRACE');
 
         return {
-            type: 'EVENTO_DISCORD',
-            value: eventName,
-            children: body
+            type: 'Evento',
+            name: eventName,
+            body
         };
     }
 
-    private parseCreation(): ASTNode {
+    private parseCreation(): MessageNode | CommandNode {
         this.consume('CREAR');
 
         switch(this.peek().value) {
             case 'mensaje':
                 return this.parseMessageCreation();
-            case 'embed':
-                return this.parseEmbedCreation();
             case 'comando':
                 return this.parseCommandCreation();
         }
@@ -78,11 +84,11 @@ export class DisChordParser extends Parser {
         throw new Error(`Se esperaba la creación de un comando o mensaje, se encontró '${this.peek().value}'`);
     }
 
-    private parseMessageCreation(): ASTNode {
+    private parseMessageCreation(): MessageNode {
         this.consume('IDENTIFICADOR');
         this.consume('L_BRACE');
         
-        const body: ASTNode[] = [];
+        const body: MessageBodyNode[] = [];
         
         while (this.peek().type !== 'R_BRACE') {
             const token = this.peek();
@@ -91,14 +97,38 @@ export class DisChordParser extends Parser {
                 case 'contenido':
                     this.consume('IDENTIFICADOR');
                     let content = this.parsePrimary();
-                    content.property = 'contenido';
-                    body.push(content);
+
+                    const contentNode: MessageBodyNode = {
+                        type: 'CuerpoDelMensaje',
+                        property: 'contenido',
+                        content
+                    };
+
+                    body.push(contentNode);
                     break;
                 case 'canal':
                     this.consume('IDENTIFICADOR');
                     let channel = this.parsePrimary();
-                    channel.property = 'canal';
-                    body.push(channel);
+
+                    const channelNode: MessageBodyNode = {
+                        type: 'CuerpoDelMensaje',
+                        property: 'canal',
+                        channel
+                    };
+
+                    body.push(channelNode);
+                    break;
+                case 'embed':
+                    this.consume('IDENTIFICADOR');
+                    let embed = this.parseEmbedCreation();
+
+                    const embedNode: MessageBodyNode = {
+                        type: 'CuerpoDelMensaje',
+                        property: 'embed',
+                        embed
+                    };
+
+                    body.push(embedNode);
                     break;
             }
         }
@@ -106,119 +136,157 @@ export class DisChordParser extends Parser {
         this.consume('R_BRACE');
 
         return {
-            type: 'CREAR_MENSAJE',
-            children: body
+            type: 'CrearMensaje',
+            body
         };
 
     }
     
-    private parseEmbedCreation(): ASTNode {
-        this.consume('IDENTIFICADOR');
+    private parseEmbedCreation(): EmbedBody {
         this.consume('L_BRACE');
 
-        const body: ASTNode[] = [];
+        const body: EmbedBody = {
+            campos: []
+        };
         
         while (this.peek().type !== 'R_BRACE') {
-            body.push(this.parseEmbedComponent());
+            const embedComponent = this.parseEmbedComponent();
+
+            switch (embedComponent.type) {
+                case 'titulo':
+                    body.titulo = embedComponent;
+                    break;
+                case 'descripcion':
+                    body.descripcion = embedComponent;
+                    break;
+                case 'color':
+                    body.color = embedComponent;
+                    break
+                case 'hora':
+                    body.hora = embedComponent;
+                    break;
+                case 'imagen':
+                    body.imagen = embedComponent;
+                    break;
+                case 'cartel':
+                    body.cartel = embedComponent;
+                    break;
+                case 'autor':
+                    body.autor = embedComponent;
+                    break;
+                case 'pie':
+                    body.pie = embedComponent;
+                    break;
+                case 'campo':
+                    body.campos.push(embedComponent);
+                    break;
+            }
         }
         
         this.consume('R_BRACE');
 
-        return {
-            type: "CREAR_EMBED",
-            children: body
-        }
+        return body;
     }
 
-    private parseEmbedComponent(): ASTNode {
+    private parseEmbedComponent(): EmbedTitle | EmbedDescription | EmbedColor | EmbedTimestamp | EmbedImage | EmbedThumbnail | EmbedAuthor | EmbedFooter | EmbedField {
         const token = this.peek();
 
         switch (token.value) {
-            case 'canal':
-                this.consume('IDENTIFICADOR');
-
-                return {
-                    type: 'CANAL',
-                    object: this.parsePrimary()
-                }
             case 'titulo':
                 this.consume('IDENTIFICADOR');
 
                 return {
-                    type: 'TITULO',
+                    type: 'titulo',
                     object: this.parsePrimary()
                 }
             case 'descripcion':
                 this.consume('IDENTIFICADOR');
 
                 return {
-                    type: 'DESCRIPCION',
+                    type: 'descripcion',
                     object: this.parsePrimary()
                 }
             case 'color':
                 this.consume('IDENTIFICADOR');
 
                 return {
-                    type: 'COLOR',
+                    type: 'color',
                     object: this.parsePrimary()
                 }
             case 'hora':
                 this.consume('IDENTIFICADOR');
 
                 return {
-                    type: 'HORA'
+                    type: 'hora'
                 }
             case 'imagen':
                 this.consume('IDENTIFICADOR');
 
                 return {
-                    type: 'IMAGEN',
+                    type: 'imagen',
                     object: this.parsePrimary()
                 }
             case 'cartel':
                 this.consume('IDENTIFICADOR');
 
                 return {
-                    type: 'CARTEL',
+                    type: 'cartel',
                     object: this.parsePrimary()
                 }
             case 'autor':
+                // this needs to be refactor
                 this.consume('IDENTIFICADOR');
 
                 if (this.peek().type === 'L_BRACE') {
                     this.consume('L_BRACE');
                     
                     let name: ASTNode,
-                    iconUrl: ASTNode;
+                        iconUrl: ASTNode;
                     
                     if (this.peek().value === 'nombre') {
-                        this.consume('IDENTIFICADOR');
-                        name = this.consume('TEXTO');
-                        name.raw = 'nombre';
-                    } else name = { type: 'TEXTO', value: '$CLIENTNAME', raw: 'nombre' };
+                        name = this.parsePrimary();
+                    } else {
+                        name = {
+                            type: 'Literal',
+                            value: '$CLIENTNAME',
+                            raw: 'nombre'
+                        }
+                    }
                     
                     if (this.peek().value === 'icono') {
-                        this.consume('IDENTIFICADOR');
-                        iconUrl = this.consume('TEXTO');
-                        iconUrl.raw = 'icono';
-                    } else iconUrl = { type: 'TEXTO', value: '$CLIENTURL', raw: 'icono' };
+                        iconUrl = this.parsePrimary();
+                    } else {
+                        iconUrl = {
+                            type: 'Literal',
+                            value: '$CLIENTURL',
+                            raw: 'icono'
+                        }
+                    }
                     
                     this.consume('R_BRACE');
 
                     return {
-                        type: 'AUTOR',
-                        children: [ name, iconUrl ]
+                        type: 'autor',
+                        name,
+                        iconUrl
                     }
                 }
                 
                 return {
-                    type: 'AUTOR',
-                    children: [
-                        { type: 'TEXTO', value: '$CLIENTNAME', raw: 'nombre' },
-                        { type: 'TEXTO', value: '$CLIENTURL', raw: 'icono' }
-                    ]
+                    type: 'autor',
+                    name: {
+                        type: 'Literal',
+                        value: '$CLIENTNAME',
+                        raw: 'nombre'
+                    },
+                    iconUrl: {
+                        type: 'Literal',
+                        value: '$CLIENTURL',
+                        raw: 'icono'
+                    }
                 }
             case 'pie':
+                // needs to be refactor
                 this.consume('IDENTIFICADOR');
 
                 if (this.peek().type === 'L_BRACE') {
@@ -228,22 +296,25 @@ export class DisChordParser extends Parser {
                         iconUrl: ASTNode | undefined = undefined;
                     
                     if (this.peek().value === 'texto') {
-                        this.consume('IDENTIFICADOR');
-                        text = this.consume('TEXTO');
-                        text.raw = 'texto';
+                        text = this.parsePrimary();
 
                         if (this.peek().value === 'icono') {
-                            this.consume('IDENTIFICADOR');
-                            iconUrl = this.consume('TEXTO');
-                            iconUrl.raw = 'icono';
+                            iconUrl = this.parsePrimary();
                         }
-                    } else text = { type: 'TEXTO', value: '$CLIENTNAME', raw: 'texto' };
+                    } else {
+                        text = {
+                            type: 'Literal',
+                            value: '$CLIENTNAME',
+                            raw: 'texto'
+                        };
+                    }
                     
                     this.consume('R_BRACE');
 
                     return {
-                        type: 'PIE',
-                        children: iconUrl? [ text, iconUrl ] : [ text ]
+                        type: 'pie',
+                        text,
+                        iconUrl
                     }
                 }
                 
@@ -253,43 +324,44 @@ export class DisChordParser extends Parser {
 
                 this.consume('L_BRACE');
                 
-                let text: ASTNode,
-                    value: ASTNode,
-                    inline: ASTNode;
-
-                this.consume('IDENTIFICADOR');
-                text = this.consume('TEXTO');
-                this.consume('IDENTIFICADOR');
-                value = this.consume('TEXTO');
-                this.consume('IDENTIFICADOR');
-                inline = this.consume('BOOL');
+                let text: ASTNode = this.parsePrimary(),
+                    value: ASTNode = this.parsePrimary(),
+                    inline: ASTNode = this.parsePrimary();
                 
                 this.consume('R_BRACE');
 
                 return {
-                    type: 'CAMPO',
-                    children: [ text, value, inline ]
+                    type: 'campo',
+                    text,
+                    value,
+                    inline
                 }
         }
 
         throw new Error(`No se esperaba encontrar '${this.peek().type}' dentro de un embed`);
     }
 
-    private parseCommandCreation(): ASTNode {
+    private parseCommandCreation(): CommandNode {
         this.consume('IDENTIFICADOR');
         const commandName = this.consume('IDENTIFICADOR').value;
 
         this.consume('L_BRACE');
 
         const body: ASTNode[] = [];
-        const params: ASTNode[] = [];
+        const params: CommandParam[] = [];
         
         while (this.peek().type !== 'R_BRACE') {
             switch (this.peek().value) {
                 case 'descripcion':
                     this.consume('IDENTIFICADOR');
-                    let param: ASTNode = this.parsePrimary();
-                    param.property = 'DESCRIPCION';
+                    let value: ASTNode = this.parsePrimary();
+
+                    const param: CommandParam = {
+                        type: 'ParametroDeComando',
+                        property: 'descripcion',
+                        value
+                    };
+
                     params.push(param);
                 default:
                     body.push(this.parseStatement());
@@ -298,13 +370,10 @@ export class DisChordParser extends Parser {
 
         this.consume('R_BRACE');
         return {
-            type: 'COMANDO',
+            type: 'CrearComando',
             value: commandName,
-            children: body,
-            object: {
-                type: 'CONFIGURACION',
-                children: params
-            }
+            body,
+            params
         }
     }
 }
