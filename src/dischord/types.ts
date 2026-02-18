@@ -52,6 +52,24 @@ export interface MessageEmbedNode extends BaseNode<DisChordNodeType> {
     embed: EmbedBody;
 }
 
+export interface MessageButtonNode extends BaseNode<DisChordNodeType> {
+    type: 'CuerpoDelMensaje';
+    property: 'boton';
+    id: ASTNode;
+    label: ASTNode;
+    emoji?: ASTNode;
+    style: ASTNode;
+}
+
+export type ButtonDataKeys = Extract<keyof MessageButtonNode, 'id' | 'label' | 'emoji' | 'style'>;
+export const ButtonPropMap: Record<string, ButtonDataKeys> = {
+    'id': 'id',
+    'etiqueta': 'label',
+    'emoji': 'emoji',
+    'estilo': 'style'
+};
+
+export type ButtonKeys = keyof typeof ButtonPropMap;
 export type EmbedComponents = 'titulo' | 'descripcion' | 'color' | 'hora' | 'imagen' | 'cartel' | 'autor' | 'pie' | 'campo';
 export interface EmbedTitle extends BaseNode<EmbedComponents> {
     type: 'titulo';
@@ -113,5 +131,5 @@ export interface EmbedBody {
     campos: EmbedField[]
 }
 
-export type MessageBodyNode = MessageContentNode | MessageChannelNode | MessageEmbedNode;
+export type MessageBodyNode = MessageContentNode | MessageChannelNode | MessageEmbedNode | MessageButtonNode;
 // export type DisChordASTNode = ASTNode<DisChordNodeType, StartBotNode | EventNode | MessageNode | MessageBodyNode | CommandNode | CommandParam>;

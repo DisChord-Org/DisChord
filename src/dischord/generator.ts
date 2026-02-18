@@ -165,7 +165,7 @@ export class DisChordGenerator extends Generator {
     private generateCommand(node: CommandNode): string {
         const commandName = node.value;
         const commandDescription = node.params.find((param: CommandParam) => param.property === 'descripcion');
-        if (!commandDescription) throw new Error('');
+        if (!commandDescription) throw new Error('Se requiere descripción para el comando.');
         const body = node.body
             .map((n: ASTNode): string => "    " + this.visit(n) + ";")
             .join('\n');

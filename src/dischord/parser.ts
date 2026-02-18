@@ -1,7 +1,7 @@
 import { KeyWords } from '../chord/keywords';
 import { Parser } from '../chord/parser';
 import { ASTNode, Token } from '../chord/types';
-import { CommandNode, CommandParam, EmbedAuthor, EmbedBody, EmbedColor, EmbedDescription, EmbedField, EmbedFooter, EmbedImage, EmbedThumbnail, EmbedTimestamp, EmbedTitle, EventNode, MessageBodyNode, MessageNode, StartBotNode } from './types';
+import { ButtonKeys, ButtonPropMap, CommandNode, CommandParam, EmbedAuthor, EmbedBody, EmbedColor, EmbedDescription, EmbedField, EmbedFooter, EmbedImage, EmbedThumbnail, EmbedTimestamp, EmbedTitle, EventNode, MessageBodyNode, MessageButtonNode, MessageNode, StartBotNode } from './types';
 
 export class DisChordParser extends Parser {
 
@@ -96,7 +96,7 @@ export class DisChordParser extends Parser {
             switch (token.value) {
                 case 'contenido':
                     this.consume('IDENTIFICADOR');
-                    let content = this.parsePrimary();
+                    const content = this.parsePrimary();
 
                     const contentNode: MessageBodyNode = {
                         type: 'CuerpoDelMensaje',
@@ -108,7 +108,7 @@ export class DisChordParser extends Parser {
                     break;
                 case 'canal':
                     this.consume('IDENTIFICADOR');
-                    let channel = this.parsePrimary();
+                    const channel = this.parsePrimary();
 
                     const channelNode: MessageBodyNode = {
                         type: 'CuerpoDelMensaje',
@@ -120,7 +120,7 @@ export class DisChordParser extends Parser {
                     break;
                 case 'embed':
                     this.consume('IDENTIFICADOR');
-                    let embed = this.parseEmbedCreation();
+                    const embed = this.parseEmbedCreation();
 
                     const embedNode: MessageBodyNode = {
                         type: 'CuerpoDelMensaje',
@@ -129,6 +129,11 @@ export class DisChordParser extends Parser {
                     };
 
                     body.push(embedNode);
+                    break;
+                case 'boton':
+                    this.consume('IDENTIFICADOR');
+                    const ButtonNode: MessageBodyNode = this.parseButtonCreation();
+                    body.push(ButtonNode);
                     break;
             }
         }
@@ -376,4 +381,30 @@ export class DisChordParser extends Parser {
             params
         }
     }
+
+    private parseButtonCreation(): MessageButtonNode {
+        this.consume('L_BRACE');
+
+        const button = {
+            type: 'CuerpoDelMensaje',
+            property: 'boton',
+        } as MessageButtonNode;
+
+        while (this.peek().type !== 'R_BRACE') {
+            const token = this.peek();
+            const ButtonKey = token.value as ButtonKeys;
+
+            if (ButtonPropMap[ButtonKey]) {
+                this.consume('IDENTIFICADOR');
+
+                const propName = ButtonPropMap[ButtonKey];
+                const value = this.parsePrimary();
+
+                button[propName] = value;
+            } else throw new Error(`Propiedad de botón desconocida: '${token.value}'`);
+    }
+
+    this.consume('R_BRACE');
+    return button;
+}
 }
