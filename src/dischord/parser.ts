@@ -1,7 +1,7 @@
 import { KeyWords } from '../chord/keywords';
 import { Parser } from '../chord/parser';
 import { ASTNode, Token } from '../chord/types';
-import { CommandNode, CommandParam, EmbedAuthor, EmbedBody, EmbedColor, EmbedComponents, EmbedDescription, EmbedField, EmbedFooter, EmbedImage, EmbedThumbnail, EmbedTimestamp, EmbedTitle, EventNode, MessageBodyNode, MessageNode, StartBotNode } from './types';
+import { CommandNode, CommandParam, EmbedAuthor, EmbedBody, EmbedColor, EmbedDescription, EmbedField, EmbedFooter, EmbedImage, EmbedThumbnail, EmbedTimestamp, EmbedTitle, EventNode, MessageBodyNode, MessageNode, StartBotNode } from './types';
 
 export class DisChordParser extends Parser {
 

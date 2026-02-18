@@ -1,4 +1,4 @@
-import { ASTNode, ClassNode, ConditionNode, LoopNode, FunctionNode, PropertyNode, Token, VariableNode, Symbol, SymbolKind, LiteralNode, IdentificatorNode, AccessNode, NewNode, ThisNode, SuperNode } from "./types";
+import { ASTNode, ClassNode, ConditionNode, LoopNode, FunctionNode, PropertyNode, Token, VariableNode, Symbol, SymbolKind, LiteralNode, IdentificatorNode, AccessNode, NewNode, ThisNode, SuperNode, ObjectPropertyType } from "./types";
 
 export class Parser {
     public symbols: Map<string, Symbol> = new Map();
@@ -428,7 +428,7 @@ export class Parser {
 
         if (token.type === 'L_BRACE') {
             this.consume('L_BRACE');
-            const properties: (Record<'key', string> & Record<'value', ASTNode>)[] = [];
+            const properties: ObjectPropertyType[] = [];
 
             while (this.peek().type !== 'R_BRACE') {
                 const keyToken = this.consume(['TEXTO', 'IDENTIFICADOR']);

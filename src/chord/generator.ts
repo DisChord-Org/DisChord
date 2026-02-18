@@ -1,5 +1,5 @@
 import { corelib } from "./core.lib";
-import { AccessNode, AssignmentNode, ASTNode, BinaryExpressionNode, CallNode, ClassNode, ConditionNode, ExportNode, FunctionNode, ListNode, LiteralNode, LoopNode, NoUnaryNode, ObjectNode, PropertyNode, Symbol, UnaryNode, VariableNode } from "./types";
+import { AccessNode, AssignmentNode, ASTNode, BinaryExpressionNode, CallNode, ClassNode, ConditionNode, ExportNode, FunctionNode, ListNode, LiteralNode, LoopNode, NoUnaryNode, ObjectNode, ObjectPropertyType, PropertyNode, Symbol, UnaryNode, VariableNode } from "./types";
 
 export class Generator {
     private SymbolsTable: Map<string, Symbol>;
@@ -259,7 +259,7 @@ export class Generator {
 
     private generateObject(node: ObjectNode): string {
         const props = node.properties
-            .map((p: Record<'key', string> & Record<'value', ASTNode>) => `${p.key}: ${this.visit(p.value)}`)
+            .map((p: ObjectPropertyType) => `${p.key}: ${this.visit(p.value)}`)
             .join(', ');
         return `{ ${props} }`;
     }

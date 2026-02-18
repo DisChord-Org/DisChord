@@ -1,8 +1,9 @@
 import fs from "node:fs";
 import { Generator } from "../chord/generator";
-import { ASTNode } from "../chord/types";
+import { AccessNode, ASTNode, CallNode, ObjectPropertyType } from "../chord/types";
 import { join } from "node:path";
 import { corelib, createMessageFunctionInjection, EmbedColors, eventsMap, intentsMap } from "./core.lib";
+import { CommandNode, CommandParam, DisChordNodeType, EmbedBody, EmbedField, EventNode, MessageBodyNode, MessageChannelNode, MessageContentNode, MessageEmbedNode, MessageNode, StartBotNode } from "./types";
 
 export class DisChordGenerator extends Generator {
     projectRooth: string = '';
@@ -13,24 +14,22 @@ export class DisChordGenerator extends Generator {
     }
 
     override visit(node: ASTNode): string {
-        switch (node.type) {
-            case 'ENCENDER_BOT':
-                return this.generateBotInit(node);
-            case 'EVENTO_DISCORD':
-                return this.generateDiscordEvent(node);
-            case 'CREAR_MENSAJE':
-                return this.generateMessage(node);
-            case 'CREAR_EMBED':
-                return this.generateEmbed(node);
-            case 'COMANDO':
-                return this.generateCommand(node);
+        switch (node.type as DisChordNodeType) {
+            case 'EncenderBot':
+                return this.generateBotInit(node as unknown as StartBotNode);
+            case 'Evento':
+                return this.generateDiscordEvent(node as unknown as EventNode);
+            case 'CrearMensaje':
+                return this.generateMessage(node as unknown as MessageNode);
+            case 'CrearComando':
+                return this.generateCommand(node as unknown as CommandNode);
             default:
                 return super.visit(node);
         }
     }
 
-    override generateAccess(node: any): string {
-        const objName = node.object.type === 'IDENTIFICADOR' ? node.object.value : null;
+    override generateAccess(node: AccessNode): string {
+        const objName = node.object.type === 'Identificador' ? node.object.value : null;
         const propName = node.property;
 
         if (objName && corelib[objName]) {
@@ -49,13 +48,13 @@ export class DisChordGenerator extends Generator {
         return super.generateAccess(node);
     }
 
-    override generateCall(node: any): string {
-        if (node.value.type === 'IDENTIFICADOR') {
-            const name = node.value.value;
+    override generateCall(node: CallNode): string {
+        if (node.object.type === 'Identificador') {
+            const name = node.object.value;
             
             if (typeof corelib[name] === 'string') {
                 const translation = corelib[name] as string;
-                const args = node.children.map((arg: any) => this.visit(arg)).join(', ');
+                const args = node.params.map((arg: ASTNode) => this.visit(arg)).join(', ');
                 return `${translation}(${args})`;
             }
         }
@@ -63,8 +62,10 @@ export class DisChordGenerator extends Generator {
         return super.generateCall(node);
     }
 
-    private generateBotInit(node: any): string {
-        const prefixNode = node.object.children.find((p: any) => p.key === 'prefijo');
+    private generateBotInit(node: StartBotNode): string {
+        if (node.object.type != 'Objeto') throw new Error(`Se encontró '${node.object.type}', se esperaba 'Objeto'`);
+
+        const prefixNode = node.object.properties.find((p: ObjectPropertyType) => p.key === 'prefijo');
         const prefix = prefixNode ? this.visit(prefixNode.value) : '"!"';
 
         const seyfertConfig = this.generateSeyfertConfig(node);
@@ -99,17 +100,21 @@ export class DisChordGenerator extends Generator {
         `;
     }
 
-    public generateSeyfertConfig(node: any): string {
-        const tokenNode = node.object.children.find((p: any) => p.key === 'token');
-        const intentsNode = node.object.children.find((p: any) => p.key === 'intenciones');
+    public generateSeyfertConfig(node: StartBotNode): string {
+        if (node.object.type != 'Objeto') throw new Error(`Se encontró '${node.object.type}', se esperaba 'Objeto'`);
+        const tokenNode = node.object.properties.find((property: ObjectPropertyType) => property.key === 'token');
+        const intentsNode = node.object.properties.find((property: ObjectPropertyType) => property.key === 'intenciones');
         const token = tokenNode ? this.visit(tokenNode.value) : '""';
         
         let intents = "[]";
 
         
-        if (intentsNode && intentsNode.value.type === 'LISTA') {
-            const list = intentsNode.value.children.map((item: any) => {
-                const val = item.value.replace(/"/g, '');
+        if (intentsNode && intentsNode.value.type === 'Lista') {
+            const list = intentsNode.value.body.map((item: ASTNode): string => {
+                if (!('value' in item)) return '';
+                if (!item.value) return '';
+
+                const val = item.value.toString().replace(/"/g, '');
                 return `"${intentsMap[val]}"`;
             });
             intents = `[\n        ${list.join(',\n        ')}\n    ]`;
@@ -132,12 +137,12 @@ export class DisChordGenerator extends Generator {
         `;
     }
 
-    private generateDiscordEvent(node: any): string {
-        const eventName = eventsMap[node.value]?.name;
-        if (!eventName) throw new Error(`El evento ${node.value} no existe`);
+    private generateDiscordEvent(node: EventNode): string {
+        const eventName = eventsMap[node.name]?.name;
+        if (!eventName) throw new Error(`El evento ${node.name} no existe`);
 
-        const body = node.children
-            .map((n: any) => "    " + this.visit(n) + ";")
+        const body = node.body
+            .map((n: ASTNode): string => "    " + this.visit(n) + ";")
             .join('\n');
 
         const eventBody: string = `
@@ -145,7 +150,7 @@ export class DisChordGenerator extends Generator {
 
             export default createEvent({
                 data: { name: '${eventName}' },
-                async run(${eventsMap[node.value].params.join(', ')}) {
+                async run(${eventsMap[node.name].params.join(', ')}) {
                 ${createMessageFunctionInjection}
                 ${body}
                 }
@@ -157,12 +162,12 @@ export class DisChordGenerator extends Generator {
         return '';
     }
 
-    private generateCommand(node: any): string {
+    private generateCommand(node: CommandNode): string {
         const commandName = node.value;
-        const params = node.object.children;
-        const commandDescription = params.find((param: ASTNode) => param.property === 'DESCRIPCION');
-        const body = node.children
-            .map((n: any) => "    " + this.visit(n) + ";")
+        const commandDescription = node.params.find((param: CommandParam) => param.property === 'descripcion');
+        if (!commandDescription) throw new Error('');
+        const body = node.body
+            .map((n: ASTNode): string => "    " + this.visit(n) + ";")
             .join('\n');
 
         const commandBody: string = `
@@ -191,60 +196,59 @@ export class DisChordGenerator extends Generator {
         return '';
     }
 
-    private generateMessage(node: any): string {
-        const channelNode = node.children.find((p: any) => p.property === 'canal');
-        const channel: string | undefined = channelNode ? this.visit(channelNode) : 'null';
-        const contentNode = node.children.find((p: any) => p.property === 'contenido');
-        const content: string | undefined = contentNode ? this.visit(contentNode) : undefined;
+    private generateMessage(node: MessageNode): string {
+        const channelNode: MessageChannelNode | undefined = node.body.find((BodyNode: MessageBodyNode) => BodyNode.property === 'canal');
+        const channel: string | undefined = channelNode ? this.visit(channelNode.channel) : undefined;
+        const contentNode: MessageContentNode | undefined = node.body.find((BodyNode: MessageBodyNode) => BodyNode.property === 'contenido');
+        const content: string | undefined = contentNode ? this.visit(contentNode.content) : undefined;
+        const EmbedsNode: MessageEmbedNode | undefined = node.body.find((BodyNode: MessageBodyNode) => BodyNode.property === 'embed');
+        const embed: string = EmbedsNode? `, embeds: [ ${this.generateEmbed(EmbedsNode.embed)} ] ` : '';
 
-        return `createMessage(${channel}, { content: ${content} })`;
+        return `createMessage(${channel}, { content: ${content} ${embed}})`;
     }
 
-    private generateEmbed(node: any): string {
-        // this will be refactor, insult me
-        const channelNode = node.children.find((p: any) => p.type.toLowerCase() === 'canal');
-        const channel: string | undefined = channelNode ? this.visit(channelNode.object) : 'null';
-        const descriptionNode = node.children.find((p: any) => p.type.toLowerCase() === 'descripcion');
-        const description: string | undefined = descriptionNode ? this.visit(descriptionNode.object) : undefined;
-        const colorNode = node.children.find((p: any) => p.type.toLowerCase() === 'color');
-        const color: string | undefined = colorNode ? this.visit(colorNode.object) : undefined;
-        const titleNode = node.children.find((p: any) => p.type.toLowerCase() === 'titulo');
-        const title: string | undefined = titleNode ? this.visit(titleNode.object) : undefined;
-        const timestampNode = node.children.find((p: any) => p.type.toLowerCase() === 'hora');
-        const imageNode = node.children.find((p: any) => p.type.toLowerCase() === 'imagen');
-        const image: string | undefined = imageNode ? this.visit(imageNode.object) : undefined;
-        const thumbnailNode = node.children.find((p: any) => p.type.toLowerCase() === 'cartel');
-        const thumbnail: string | undefined = thumbnailNode ? this.visit(thumbnailNode.object) : undefined;
-        const authorNode = node.children.find((p: any) => p.type.toLowerCase() === 'autor');
-        const authorText: string = authorNode ? authorNode.children.find((primaryNode: ASTNode) => primaryNode.raw === 'nombre').value : '';
-        const authorIcon: string = authorNode ? authorNode.children.find((primaryNode: ASTNode) => primaryNode.raw === 'icono').value : '';
-        const footerNode = node.children.find((p: any) => p.type.toLowerCase() === 'pie');
-        const footerText: string = footerNode ? footerNode.children.find((primaryNode: ASTNode) => primaryNode.raw === 'texto').value : '';
-        const footerIcon: ASTNode | undefined = footerNode ? footerNode.children.find((primaryNode: ASTNode) => primaryNode.raw === 'icono') : undefined;
-        const fieldNodes = node.children.filter((p: any) => p.type === 'CAMPO');
-        const fields = fieldNodes.map((field: any) => {
-            const name = this.visit(field.children[0]);
-            const value = this.visit(field.children[1]);
-            const isInline = this.visit(field.children[2]);
+    private generateEmbed(node: EmbedBody): string {
+        const ColorVisit: string | undefined = node.color? this.visit(node.color.object) : '""';
+        const ResolvingColors: string | undefined = Object.keys(EmbedColors).includes(ColorVisit.slice(1, -1))? `"${EmbedColors[ColorVisit.slice(1, -1)]}"` : undefined;
+        const ColorResolved = ResolvingColors? `.setColor(${ResolvingColors})` : '';
+        
+        const TitleResolved: string = node.titulo? `.setTitle(${this.visit(node.titulo.object)})` : '';
 
-            return `.addFields({ name: ${name}, value: ${value}, inline: ${isInline} })`;
-        }).join('\n');
+        const ResolvingAuthor: Record<'name', string> & Record<'iconUrl', string> | undefined = node.autor? {
+            name: this.visit(node.autor.name),
+            iconUrl: this.visit(node.autor.iconUrl)
+        } : undefined;
+        const AuthorResolved: string = ResolvingAuthor? `.setAuthor({ text: ${ResolvingAuthor.name === '$CLIENTNAME'? 'usuario.username' : ResolvingAuthor.name}, iconUrl: ${ResolvingAuthor.iconUrl === '$CLIENTURL'? 'usuario.avatarURL()' : ResolvingAuthor.iconUrl} })` : '';
+
+        const DescriptionResolved: string = node.descripcion? `.setDescription(${this.visit(node.descripcion.object)})` : '';
+        const TimestampResolved: string = node.hora? `.setTimestamp()` : '';
+        const ImageResolved: string = node.imagen? `.setImage(${this.visit(node.imagen.object)})` : '';
+        const ThumbnailResolved: string = node.cartel? `.setThumbnail${this.visit(node.cartel.object)})` : '';
+
+       const FieldsResolved: string = node.campos.length > 0?
+            node.campos.map((Field: EmbedField): string => {
+                return `.addFields({ text: ${this.visit(Field.text)}, value: ${this.visit(Field.value)}, inline: ${this.visit(Field.inline)} })`;
+            })
+            .join('\n')
+        : '';
+
+        const ResolvingFooter: Record<'text', string> & Record<'iconUrl', string | undefined> | undefined = node.pie? {
+            text: this.visit(node.pie.text),
+            iconUrl: node.pie.iconUrl? this.visit(node.pie.iconUrl): undefined
+        } : undefined;
+        const FooterResolved: string = ResolvingFooter? `.setFooter({ text: ${ResolvingFooter.text === '$CLIENTNAME'? 'usuario.username' : ResolvingFooter.text}, iconUrl: ${ResolvingFooter.iconUrl})` : '';
 
         return `
-            createMessage(${channel}, {
-                embeds: [
-                    new Embed()
-                        ${description? `.setDescription(${description})` : ''}
-                        ${color? `.setColor(${Object.keys(EmbedColors).includes(color.slice(1, -1))? `"${EmbedColors[color.slice(1, -1)]}"` : color})` : ''}
-                        ${title? `.setTitle(${title})` : ''}
-                        ${timestampNode? '.setTimestamp()' : ''}
-                        ${image? `.setImage(${image})` : ''}
-                        ${thumbnail? `.setThumbnail(${thumbnail})` : ''}
-                        ${authorNode? `.setAuthor({ name: ${authorText === '$CLIENTNAME'? `usuario.username` : `"${authorText}"`}, iconUrl: ${authorIcon === '$CLIENTURL'? `usuario.avatarURL()` : `"${authorIcon}"`} })` : ''}
-                        ${footerNode? `.setFooter({ text: ${footerText === '$CLIENTNAME'? `usuario.username` : `"${footerText}"`} ${footerIcon? `, iconUrl: "${footerIcon.value}"` : ''} })` : ''}
-                        ${fields}
-                ]
-            })
+            new Embed()
+                ${ColorResolved}
+                ${TitleResolved}
+                ${AuthorResolved}
+                ${DescriptionResolved}
+                ${TimestampResolved}
+                ${ImageResolved}
+                ${ThumbnailResolved}
+                ${FieldsResolved}
+                ${FooterResolved}
         `;
     }
 }

@@ -132,9 +132,10 @@ export interface ExpressionNode extends BaseNode {
     object: ASTNode;
 }
 
+export type ObjectPropertyType = Record<'key', string> & Record<'value', ASTNode>;
 export interface ObjectNode extends BaseNode {
     type: 'Objeto';
-    properties: (Record<'key', string> & Record<'value', ASTNode>)[];
+    properties: ObjectPropertyType[];
 }
 
 export interface IdentificatorNode extends BaseNode {
