@@ -171,7 +171,7 @@ export class DisChordGenerator extends Generator {
             .join('\n');
 
         const commandBody: string = `
-            import { Command, IgnoreCommand, Embed, ActionRow } from 'seyfert';
+            import { Command, IgnoreCommand, Embed, ActionRow, Button } from 'seyfert';
 
             export default class ${commandName}Command extends Command {
                 name = "${commandName.toLowerCase()}";
@@ -206,7 +206,7 @@ export class DisChordGenerator extends Generator {
         const ButtonsNode: MessageButtonNode | undefined = node.body.find((BodyNode: MessageBodyNode) => BodyNode.property === 'boton');
         const button: string = ButtonsNode? `, components: [ new ActionRow().setComponents([ ${this.generateButtonRow(ButtonsNode)} ]) ]` : '';
 
-        return `createMessage(${channel}, { content: ${content} ${embed}${button})`;
+        return `createMessage(${channel}, { content: ${content} ${embed}${button} })`;
     }
 
     private generateEmbed(node: EmbedBody): string {
@@ -255,7 +255,7 @@ export class DisChordGenerator extends Generator {
     }
 
     private generateButtonRow(node: MessageButtonNode): string {
-        const StyleString: string = this.visit(node.style);
+        const StyleString: string = this.visit(node.style).slice(1, -1);
         if (!(StyleString in ButtonStyles)) throw new Error(`Estilo inválido: '${StyleString}'`);
         const ButtonStyle = ButtonStyles[StyleString as keyof typeof ButtonStyles];
 
@@ -264,7 +264,7 @@ export class DisChordGenerator extends Generator {
                 .setCustomId(${this.visit(node.id)})
                 .setLabel(${this.visit(node.label)})
                 .setStyle(${ButtonStyle})
-                ${node.emoji? this.visit(node.emoji) : ''}
+                ${node.emoji? `.setEmoji(${this.visit(node.emoji)})` : ''}
         `;
     }
 }

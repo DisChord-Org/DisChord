@@ -402,9 +402,9 @@ export class DisChordParser extends Parser {
 
                 button[propName] = value;
             } else throw new Error(`Propiedad de botón desconocida: '${token.value}'`);
-    }
+        }
 
-    this.consume('R_BRACE');
-    return button;
-}
+        this.consume('R_BRACE');
+        return button;
+    }
 }
