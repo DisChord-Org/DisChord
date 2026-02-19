@@ -3,7 +3,7 @@ import { Generator } from "../chord/generator";
 import { AccessNode, ASTNode, CallNode, ObjectPropertyType } from "../chord/types";
 import { join } from "node:path";
 import { corelib, createMessageFunctionInjection, EmbedColors, eventsMap, intentsMap } from "./core.lib";
-import { CommandNode, CommandParam, DisChordNodeType, EmbedBody, EmbedField, EventNode, MessageBodyNode, MessageChannelNode, MessageContentNode, MessageEmbedNode, MessageNode, StartBotNode } from "./types";
+import { ButtonStyles, CommandNode, CommandParam, DisChordNodeType, EmbedBody, EmbedField, EventNode, MessageBodyNode, MessageButtonNode, MessageChannelNode, MessageContentNode, MessageEmbedNode, MessageNode, StartBotNode } from "./types";
 
 export class DisChordGenerator extends Generator {
     projectRooth: string = '';
@@ -203,8 +203,10 @@ export class DisChordGenerator extends Generator {
         const content: string | undefined = contentNode ? this.visit(contentNode.content) : undefined;
         const EmbedsNode: MessageEmbedNode | undefined = node.body.find((BodyNode: MessageBodyNode) => BodyNode.property === 'embed');
         const embed: string = EmbedsNode? `, embeds: [ ${this.generateEmbed(EmbedsNode.embed)} ] ` : '';
+        const ButtonsNode: MessageButtonNode | undefined = node.body.find((BodyNode: MessageBodyNode) => BodyNode.property === 'boton');
+        const button: string = ButtonsNode? `, components: [ new ActionRow().setComponents([ ${this.generateButtonRow(ButtonsNode)} ]) ]` : '';
 
-        return `createMessage(${channel}, { content: ${content} ${embed}})`;
+        return `createMessage(${channel}, { content: ${content} ${embed}${button})`;
     }
 
     private generateEmbed(node: EmbedBody): string {
@@ -249,6 +251,20 @@ export class DisChordGenerator extends Generator {
                 ${ThumbnailResolved}
                 ${FieldsResolved}
                 ${FooterResolved}
+        `;
+    }
+
+    private generateButtonRow(node: MessageButtonNode): string {
+        const StyleString: string = this.visit(node.style);
+        if (!(StyleString in ButtonStyles)) throw new Error(`Estilo inválido: '${StyleString}'`);
+        const ButtonStyle = ButtonStyles[StyleString as keyof typeof ButtonStyles];
+
+        return `
+            new Button()
+                .setCustomId(${this.visit(node.id)})
+                .setLabel(${this.visit(node.label)})
+                .setStyle(${ButtonStyle})
+                ${node.emoji? this.visit(node.emoji) : ''}
         `;
     }
 }

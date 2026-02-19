@@ -69,6 +69,15 @@ export const ButtonPropMap: Record<string, ButtonDataKeys> = {
     'estilo': 'style'
 };
 
+export enum ButtonStyles {
+    azul = 1,
+    gris,
+    verde,
+    rojo,
+    enlace,
+    premium
+}
+
 export type ButtonKeys = keyof typeof ButtonPropMap;
 export type EmbedComponents = 'titulo' | 'descripcion' | 'color' | 'hora' | 'imagen' | 'cartel' | 'autor' | 'pie' | 'campo';
 export interface EmbedTitle extends BaseNode<EmbedComponents> {
