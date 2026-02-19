@@ -171,7 +171,7 @@ export class DisChordGenerator extends Generator {
             .join('\n');
 
         const commandBody: string = `
-            import { Command, IgnoreCommand, Embed } from 'seyfert';
+            import { Command, IgnoreCommand, Embed, ActionRow } from 'seyfert';
 
             export default class ${commandName}Command extends Command {
                 name = "${commandName.toLowerCase()}";
