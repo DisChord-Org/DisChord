@@ -176,7 +176,7 @@ export class DisChordGenerator extends Generator {
             import { Command, IgnoreCommand, Embed, ActionRow, Button } from 'seyfert';
 
             export default class ${commandName}Command extends Command {
-                name = "${commandName.toLowerCase()}";
+                name = "${commandName.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase() /*slugified*/}";
                 description = ${this.visit(commandDescription.value) ?? '"Un comando genial"'};
                 ignore = IgnoreCommand.Message;
                 integrationTypes = [ 0 ];
