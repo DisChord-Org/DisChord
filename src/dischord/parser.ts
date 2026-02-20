@@ -13,7 +13,7 @@ export class DisChordParser extends Parser {
         KeyWords.addStatements([ "encender", "evento", "crear" ]);
     }
 
-    protected parseCustomStatement(): ASTNode | null {
+    override parseCustomStatement(): ASTNode | null {
         const token = this.peek();
         
         let node: any = null; // this will save me work, sorry
@@ -31,6 +31,17 @@ export class DisChordParser extends Parser {
         }
 
         return node as unknown as ASTNode;
+    }
+
+    override parsePrimary(): ASTNode {
+        const token = this.peek();
+
+        switch (token.type) {
+            case 'CREAR':
+                return this.parseCreation() as unknown as ASTNode;
+            default:
+                return super.parsePrimary();
+        }
     }
 
     private parseBotDeclaration(): StartBotNode {
