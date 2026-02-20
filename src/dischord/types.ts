@@ -1,7 +1,8 @@
-import { ASTNode, BaseNode } from "../chord/types";
+import { ASTNode, BaseNode, VariableNode } from "../chord/types";
 
 export type DisChordNodeType = 'EncenderBot' | 'Evento' | 'CrearComando'
-                            | 'ParametroDeComando' | 'CrearMensaje' | 'CuerpoDelMensaje';
+                            | 'ParametroDeComando' | 'CrearMensaje' | 'CuerpoDelMensaje'
+                            | 'CrearRecolector';
 
 export interface StartBotNode extends BaseNode<DisChordNodeType> {
     type: 'EncenderBot';
@@ -141,4 +142,9 @@ export interface EmbedBody {
 }
 
 export type MessageBodyNode = MessageContentNode | MessageChannelNode | MessageEmbedNode | MessageButtonNode;
+
+export interface CollectorNode {
+    type: 'CrearRecolector';
+    variable: VariableNode['value'];
+}
 // export type DisChordASTNode = ASTNode<DisChordNodeType, StartBotNode | EventNode | MessageNode | MessageBodyNode | CommandNode | CommandParam>;

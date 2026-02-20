@@ -3,7 +3,7 @@ import { Generator } from "../chord/generator";
 import { AccessNode, ASTNode, CallNode, ObjectPropertyType } from "../chord/types";
 import { join } from "node:path";
 import { corelib, createMessageFunctionInjection, EmbedColors, eventsMap, intentsMap } from "./core.lib";
-import { ButtonStyles, CommandNode, CommandParam, DisChordNodeType, EmbedBody, EmbedField, EventNode, MessageBodyNode, MessageButtonNode, MessageChannelNode, MessageContentNode, MessageEmbedNode, MessageNode, StartBotNode } from "./types";
+import { ButtonStyles, CollectorNode, CommandNode, CommandParam, DisChordNodeType, EmbedBody, EmbedField, EventNode, MessageBodyNode, MessageButtonNode, MessageChannelNode, MessageContentNode, MessageEmbedNode, MessageNode, StartBotNode } from "./types";
 
 export class DisChordGenerator extends Generator {
     projectRooth: string = '';
@@ -23,6 +23,8 @@ export class DisChordGenerator extends Generator {
                 return this.generateMessage(node as unknown as MessageNode);
             case 'CrearComando':
                 return this.generateCommand(node as unknown as CommandNode);
+            case 'CrearRecolector':
+                return this.generateCollector(node as unknown as CollectorNode);
             default:
                 return super.visit(node);
         }
@@ -266,5 +268,9 @@ export class DisChordGenerator extends Generator {
                 .setStyle(${ButtonStyle})
                 ${node.emoji? `.setEmoji(${this.visit(node.emoji)})` : ''}
         `;
+    }
+
+    private generateCollector(node: CollectorNode): string {
+        return `${this.visit(node.variable)}.createComponentCollector()`;
     }
 }

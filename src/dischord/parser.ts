@@ -1,7 +1,7 @@
 import { KeyWords } from '../chord/keywords';
 import { Parser } from '../chord/parser';
 import { ASTNode, Token } from '../chord/types';
-import { ButtonKeys, ButtonPropMap, CommandNode, CommandParam, EmbedAuthor, EmbedBody, EmbedColor, EmbedDescription, EmbedField, EmbedFooter, EmbedImage, EmbedThumbnail, EmbedTimestamp, EmbedTitle, EventNode, MessageBodyNode, MessageButtonNode, MessageNode, StartBotNode } from './types';
+import { ButtonKeys, ButtonPropMap, CollectorNode, CommandNode, CommandParam, EmbedAuthor, EmbedBody, EmbedColor, EmbedDescription, EmbedField, EmbedFooter, EmbedImage, EmbedThumbnail, EmbedTimestamp, EmbedTitle, EventNode, MessageBodyNode, MessageButtonNode, MessageNode, StartBotNode } from './types';
 
 export class DisChordParser extends Parser {
 
@@ -82,7 +82,7 @@ export class DisChordParser extends Parser {
         };
     }
 
-    private parseCreation(): MessageNode | CommandNode {
+    private parseCreation(): MessageNode | CommandNode | CollectorNode {
         this.consume('CREAR');
 
         switch(this.peek().value) {
@@ -90,6 +90,8 @@ export class DisChordParser extends Parser {
                 return this.parseMessageCreation();
             case 'comando':
                 return this.parseCommandCreation();
+            case 'recolector':
+                return this.parseCollectorCreation();
         }
 
         throw new Error(`Se esperaba la creación de un comando o mensaje, se encontró '${this.peek().value}'`);
@@ -417,5 +419,14 @@ export class DisChordParser extends Parser {
 
         this.consume('R_BRACE');
         return button;
+    }
+
+    private parseCollectorCreation(): CollectorNode {
+        this.consume('IDENTIFICADOR');
+
+        return {
+            type: 'CrearRecolector',
+            variable: this.parsePrimary()
+        };
     }
 }
