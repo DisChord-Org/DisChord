@@ -3,7 +3,7 @@ import { Generator } from "../chord/generator";
 import { AccessNode, ASTNode, CallNode, ObjectPropertyType } from "../chord/types";
 import { join } from "node:path";
 import { corelib, createMessageFunctionInjection, EmbedColors, eventsMap, intentsMap } from "./core.lib";
-import { ButtonStyles, CollectorNode, CollectorPulseBody, CommandNode, CommandParam, DisChordNodeType, EmbedBody, EmbedField, EventNode, MessageBodyNode, MessageButtonNode, MessageChannelNode, MessageContentNode, MessageEmbedNode, MessageNode, StartBotNode } from "./types";
+import { ButtonStyles, CollectorNode, CollectorPulseBody, CommandNode, CommandOptionNode, CommandParam, DisChordNodeType, EmbedBody, EmbedField, EventNode, MessageBodyNode, MessageButtonNode, MessageChannelNode, MessageContentNode, MessageEmbedNode, MessageNode, StartBotNode } from "./types";
 
 export class DisChordGenerator extends Generator {
     projectRooth: string = '';
@@ -150,7 +150,7 @@ export class DisChordGenerator extends Generator {
             .join('\n');
 
         const eventBody: string = `
-            import { createEvent, Embed } from 'seyfert';
+            import { createEvent, Embed, ActionRow, Button } from 'seyfert';
 
             export default createEvent({
                 data: { name: '${eventName}' },
@@ -168,14 +168,22 @@ export class DisChordGenerator extends Generator {
 
     private generateCommand(node: CommandNode): string {
         const commandName = node.value;
-        const commandDescription = node.params.find((param: CommandParam) => param.property === 'descripcion');
+        const commandDescription = node.params.find((param: CommandParam) => param.property === 'Descripcion');
         if (!commandDescription) throw new Error('Se requiere descripción para el comando.');
+        
+        const OptionsNode: CommandOptionNode[] | undefined = node.params.find((param: CommandParam) => param.property === 'Opciones')?.options;
+        const OptionsString: string = OptionsNode? `const options = [${OptionsNode.map((option: CommandOptionNode) => this.generateOption(option)).join(',')}];` : '';
+        const OptionsConstDeclaration: string = OptionsNode? 'options = options;' : '';
+        const OptionsConstExtraction: string = OptionsNode? OptionsNode.map((option: CommandOptionNode) => `const ${option.name} = ctx.options.${option.name};`).join('\n') : '';
+
         const body = node.body
             .map((n: ASTNode): string => "    " + this.visit(n) + ";")
             .join('\n');
 
         const commandBody: string = `
-            import { Command, IgnoreCommand, Embed, ActionRow, Button } from 'seyfert';
+            import { Command, IgnoreCommand, Embed, ActionRow, Button, createStringOption } from 'seyfert';
+
+            ${OptionsString}
 
             export default class ${commandName}Command extends Command {
                 name = "${commandName.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase() /*slugified*/}";
@@ -183,11 +191,13 @@ export class DisChordGenerator extends Generator {
                 ignore = IgnoreCommand.Message;
                 integrationTypes = [ 0 ];
                 contexts = [ 0 ];
+                ${OptionsConstDeclaration}
                 async run(ctx) {
                     const contexto = ctx;
                     const cliente = contexto.client;
                     const usuario = contexto.author;
                     const canal = contexto.interaction.channel;
+                    ${OptionsConstExtraction}
 
                     ${createMessageFunctionInjection}
 
@@ -198,6 +208,22 @@ export class DisChordGenerator extends Generator {
 
         fs.writeFileSync(join(this.projectRooth, 'dist', 'commands', `${commandName}.js`), commandBody, 'utf-8');
         return '';
+    }
+
+    private generateOption(option: CommandOptionNode): string {
+        const name = option.name;
+        const description = this.visit(option.description);
+        const required = option.required ? 'true' : 'false';
+
+        // Currently, only string options are supported. This can be expanded in the future to support more types.
+        return `
+            {
+                name: "${name}",
+                description: ${description},
+                required: ${required},
+                type: 3
+            }
+        `;
     }
 
     private generateMessage(node: MessageNode): string {

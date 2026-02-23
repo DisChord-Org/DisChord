@@ -24,11 +24,26 @@ export interface CommandNode extends BaseNode<DisChordNodeType> {
 
 export interface CommandDescriptionParam extends BaseNode<DisChordNodeType> {
     type: 'ParametroDeComando';
-    property: 'descripcion';
+    property: 'Descripcion';
     value: ASTNode;
 }
 
-export type CommandParam = CommandDescriptionParam;
+export interface CommandOptionsParam extends BaseNode<DisChordNodeType> {
+    type: 'ParametroDeComando';
+    property: 'Opciones';
+    options: CommandOptionNode[];
+}
+
+export interface CommandStringOptionParam extends BaseNode<DisChordNodeType> {
+    type: 'ParametroDeComando';
+    name: string;
+    property: 'Texto';
+    description: ASTNode;
+    required: ASTNode;
+}
+
+export type CommandOptionNode = CommandStringOptionParam;
+export type CommandParam = CommandDescriptionParam | CommandOptionsParam;
 
 export interface MessageNode extends BaseNode<DisChordNodeType> {
     type: 'CrearMensaje';
