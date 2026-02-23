@@ -184,8 +184,8 @@ export class DisChordGenerator extends Generator {
                 async run(ctx) {
                     const contexto = ctx;
                     const cliente = contexto.client;
-                    const usuario = ctx.author;
-                    const canal = ctx.interaction.channel;
+                    const usuario = contexto.author;
+                    const canal = contexto.interaction.channel;
 
                     ${createMessageFunctionInjection}
 
@@ -271,6 +271,6 @@ export class DisChordGenerator extends Generator {
     }
 
     private generateCollector(node: CollectorNode): string {
-        return `${this.visit(node.variable)}.createComponentCollector()`;
+        return `let collector = ${this.visit(node.variable)}.createComponentCollector()`;
     }
 }

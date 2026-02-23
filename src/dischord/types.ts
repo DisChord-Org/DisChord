@@ -146,5 +146,12 @@ export type MessageBodyNode = MessageContentNode | MessageChannelNode | MessageE
 export interface CollectorNode {
     type: 'CrearRecolector';
     variable: VariableNode['value'];
+    body: CollectorPulseBody[];
+}
+
+export interface CollectorPulseBody {
+    method: 'run';
+    id: ASTNode;
+    body: ASTNode[];
 }
 // export type DisChordASTNode = ASTNode<DisChordNodeType, StartBotNode | EventNode | MessageNode | MessageBodyNode | CommandNode | CommandParam>;

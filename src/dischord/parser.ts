@@ -1,7 +1,7 @@
 import { KeyWords } from '../chord/keywords';
 import { Parser } from '../chord/parser';
 import { ASTNode, Token } from '../chord/types';
-import { ButtonKeys, ButtonPropMap, CollectorNode, CommandNode, CommandParam, EmbedAuthor, EmbedBody, EmbedColor, EmbedDescription, EmbedField, EmbedFooter, EmbedImage, EmbedThumbnail, EmbedTimestamp, EmbedTitle, EventNode, MessageBodyNode, MessageButtonNode, MessageNode, StartBotNode } from './types';
+import { ButtonKeys, ButtonPropMap, CollectorNode, CollectorPulseBody, CommandNode, CommandParam, EmbedAuthor, EmbedBody, EmbedColor, EmbedDescription, EmbedField, EmbedFooter, EmbedImage, EmbedThumbnail, EmbedTimestamp, EmbedTitle, EventNode, MessageBodyNode, MessageButtonNode, MessageNode, StartBotNode } from './types';
 
 export class DisChordParser extends Parser {
 
@@ -424,9 +424,45 @@ export class DisChordParser extends Parser {
     private parseCollectorCreation(): CollectorNode {
         this.consume('IDENTIFICADOR');
 
+        const variable = this.parsePrimary();
+        const body: CollectorPulseBody[] = [];
+
+        this.consume('L_BRACE');
+        while (this.peek().type !== 'R_BRACE') {
+            const token = this.peek();
+
+            switch (token.value) {
+                case 'alPulsarId':
+                    body.push(this.parseCollectorPulseBody());
+                    break;
+                default:
+                    throw new Error(`Dentro del recolector se esperaba 'alPulsarId', se encontró '${token.value}'`);
+            }
+        }
+        this.consume('R_BRACE');
+
         return {
             type: 'CrearRecolector',
-            variable: this.parsePrimary()
+            variable,
+            body
         };
+    }
+
+    private parseCollectorPulseBody(): CollectorPulseBody {
+        this.consume('IDENTIFICADOR'); // alPulsarId
+        const id = this.parsePrimary();
+        const body: ASTNode[] = [];
+
+        this.consume('L_BRACE');
+        while (this.peek().type !== 'R_BRACE') {
+            body.push(this.parseStatement());
+        }
+        this.consume('R_BRACE');
+
+        return {
+            method: 'run',
+            id,
+            body
+        }
     }
 }
