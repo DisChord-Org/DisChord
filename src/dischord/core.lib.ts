@@ -114,12 +114,12 @@ export const createMessageFunctionInjection = `
             if (!contexto.deferred) {
                 await contexto.deferReply().catch(() => {});
             }
-            return await contexto.editOrReply(options);
+            return await contexto.editOrReply(options, true);
         }
 
         // if we're inside a command events
         if (typeof mensaje !== 'undefined' && mensaje.write) {
-            return await mensaje.write(opciones);
+            return await mensaje.write(options, true);
         }
 
         throw new Error("DisChord Error: No se pudo enviar el mensaje. Falta el parámetro 'canal' o no hay un contexto de respuesta (comando/mensaje).");
