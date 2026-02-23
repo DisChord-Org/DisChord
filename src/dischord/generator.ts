@@ -3,10 +3,12 @@ import { Generator } from "../chord/generator";
 import { AccessNode, ASTNode, CallNode, ObjectPropertyType } from "../chord/types";
 import { join } from "node:path";
 import { corelib, createMessageFunctionInjection, EmbedColors, eventsMap, intentsMap } from "./core.lib";
-import { ButtonStyles, CollectorNode, CommandNode, CommandParam, DisChordNodeType, EmbedBody, EmbedField, EventNode, MessageBodyNode, MessageButtonNode, MessageChannelNode, MessageContentNode, MessageEmbedNode, MessageNode, StartBotNode } from "./types";
+import { ButtonStyles, CollectorNode, CollectorPulseBody, CommandNode, CommandParam, DisChordNodeType, EmbedBody, EmbedField, EventNode, MessageBodyNode, MessageButtonNode, MessageChannelNode, MessageContentNode, MessageEmbedNode, MessageNode, StartBotNode } from "./types";
 
 export class DisChordGenerator extends Generator {
     projectRooth: string = '';
+
+    private currentInteraction: string | null = null; // context
 
     constructor(symbols: Map<string, any>, projectRoot: string) {
         super(symbols);
@@ -207,8 +209,9 @@ export class DisChordGenerator extends Generator {
         const embed: string = EmbedsNode? `, embeds: [ ${this.generateEmbed(EmbedsNode.embed)} ] ` : '';
         const ButtonsNode: MessageButtonNode | undefined = node.body.find((BodyNode: MessageBodyNode) => BodyNode.property === 'boton');
         const button: string = ButtonsNode? `, components: [ new ActionRow().setComponents([ ${this.generateButtonRow(ButtonsNode)} ]) ]` : '';
+        const interactionContext: string = this.currentInteraction === 'interaccion' ? 'interaccion' : 'null';
 
-        return `createMessage(${channel}, { content: ${content} ${embed}${button} })`;
+        return `await createMessage(${channel}, { content: ${content} ${embed}${button} }, ${interactionContext})`;
     }
 
     private generateEmbed(node: EmbedBody): string {
@@ -271,6 +274,26 @@ export class DisChordGenerator extends Generator {
     }
 
     private generateCollector(node: CollectorNode): string {
-        return `let collector = ${this.visit(node.variable)}.createComponentCollector()`;
+        const body: string = node.body.map((PulseBody: CollectorPulseBody) => {
+            const previousContext = this.currentInteraction;
+            this.currentInteraction = 'interaccion';
+            const PulseBodyStr: string = PulseBody.body.map((n: ASTNode): string => this.visit(n)).join('\n');
+            this.currentInteraction = previousContext;
+
+            return `
+                collector.${PulseBody.method}(${this.visit(PulseBody.id)}, async (interaccion) => {
+                    ${PulseBodyStr}
+                })
+            `;
+        }).join('\n');
+
+        return `
+            let collector = ${this.visit(node.variable)}.createComponentCollector({
+                filter: (i) => i.user.id === contexto.author.id,
+                timeout: 60000
+            });
+
+            ${body}
+        `;
     }
 }

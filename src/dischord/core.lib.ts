@@ -102,11 +102,19 @@ export const eventsMap: Record<string, EventType> = {
 } as const;
 
 export const createMessageFunctionInjection = `
-    const createMessage = async (channel, options) => {
+    const createMessage = async (channel, options, interactionContext = null) => {
 
         // if channel
         if (channel) {
             return await cliente.messages.write(channel, options);
+        }
+
+        // if we're inside a component interaction
+        if (interactionContext && interactionContext.editOrReply) {
+            if (!interactionContext.deferred) {
+                await interactionContext.deferReply().catch(() => {});
+            }
+            return await interactionContext.editOrReply(options, true);
         }
 
         // if we're inside a command
