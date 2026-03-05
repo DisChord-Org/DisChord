@@ -6,9 +6,7 @@ on:
       - 'v*'
 
 jobs:
-  publish-compiler:
-    permissions:
-      contents: write
+  build-binaries:
     strategy:
       fail-fast: false
       matrix:
@@ -23,54 +21,45 @@ jobs:
     runs-on: ${{ matrix.platform }}
     steps:
       - uses: actions/checkout@v4
-
-      - name: install bun
-        uses: oven-sh/setup-bun@v1
+      - uses: oven-sh/setup-bun@v1
 
       - name: Build Binary
         shell: bash
         run: |
           mkdir -p dist
-          
           RAW_ARCH=$(uname -m)
-          if [ "$RAW_ARCH" = "arm64" ] || [ "$RAW_ARCH" = "aarch64" ]; then
-            ARCH_NAME="aarch64"
-          else
-            ARCH_NAME="x86_64"
-          fi
-
-          if [ "${{ matrix.platform }}" = "windows-latest" ]; then
-            EXT=".exe"
-          else
-            EXT=""
-          fi
-
-          FILENAME="dischord-compiler-$ARCH_NAME-${{ matrix.target-name }}$EXT"
+          [[ "$RAW_ARCH" == "arm64" || "$RAW_ARCH" == "aarch64" ]] && ARCH_NAME="aarch64" || ARCH_NAME="x86_64"
+          [ "${{ matrix.platform }}" = "windows-latest" ] && EXT=".exe" || EXT=""
           
+          FILENAME="dischord-compiler-$ARCH_NAME-${{ matrix.target-name }}$EXT"
           bun install
           bun build ./src/index.ts --compile --outfile "./dist/$FILENAME"
-        
-      - name: Wait for Release Slot (Anti-Collision)
-        shell: bash
-        run: |
-          if [ "${{ matrix.platform }}" = "ubuntu-latest" ]; then
-            echo "Ubuntu va primero, sin espera."
-          elif [ "${{ matrix.platform }}" = "macos-latest" ]; then
-            echo "Mac espera 30 segundos..."
-            sleep 30
-          else
-            echo "Windows espera 60 segundos..."
-            sleep 60
-          fi
 
-      - name: Upload to Release
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: binary-${{ matrix.platform }}
+          path: dist/*
+
+  publish-release:
+    needs: build-binaries
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download All Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: all-binaries
+          merge-multiple: true
+
+      - name: Create Release and Upload Assets
         uses: softprops/action-gh-release@v2
         with:
-          files: dist/*
+          files: all-binaries/*
           tag_name: ${{ github.ref_name }}
           name: "Compiler Release ${{ github.ref_name }}"
           draft: false
           prerelease: false
-          append_body: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
