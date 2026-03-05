@@ -49,6 +49,19 @@ jobs:
           
           bun install
           bun build ./src/index.ts --compile --outfile "./dist/$FILENAME"
+        
+      - name: Wait for Release Slot (Anti-Collision)
+        shell: bash
+        run: |
+          if [ "${{ matrix.platform }}" = "ubuntu-latest" ]; then
+            echo "Ubuntu va primero, sin espera."
+          elif [ "${{ matrix.platform }}" = "macos-latest" ]; then
+            echo "Mac espera 30 segundos..."
+            sleep 30
+          else
+            echo "Windows espera 60 segundos..."
+            sleep 60
+          fi
 
       - name: Upload to Release
         uses: softprops/action-gh-release@v2
@@ -58,5 +71,6 @@ jobs:
           name: "Compiler Release ${{ github.ref_name }}"
           draft: false
           prerelease: false
+          append_body: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
