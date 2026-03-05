@@ -1,0 +1,62 @@
+name: "Publish Compiler Release"
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  publish-compiler:
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: "macos-latest"
+            target-name: "apple-darwin"
+          - platform: "ubuntu-latest"
+            target-name: "unknown-linux-gnu"
+          - platform: "windows-latest"
+            target-name: "pc-windows-msvc"
+
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: install bun
+        uses: oven-sh/setup-bun@v1
+
+      - name: Build Binary
+        shell: bash
+        run: |
+          mkdir -p dist
+          
+          RAW_ARCH=$(uname -m)
+          if [ "$RAW_ARCH" = "arm64" ] || [ "$RAW_ARCH" = "aarch64" ]; then
+            ARCH_NAME="aarch64"
+          else
+            ARCH_NAME="x86_64"
+          fi
+
+          if [ "${{ matrix.platform }}" = "windows-latest" ]; then
+            EXT=".exe"
+          else
+            EXT=""
+          fi
+
+          FILENAME="dischord-compiler-$ARCH_NAME-${{ matrix.target-name }}$EXT"
+          
+          bun install
+          bun build ./src/index.ts --compile --outfile "./dist/$FILENAME"
+
+      - name: Upload to Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*
+          tag_name: ${{ github.ref_name }}
+          name: "Compiler Release ${{ github.ref_name }}"
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
