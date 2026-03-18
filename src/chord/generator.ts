@@ -31,6 +31,8 @@ export class Generator {
                 return this.generateArray(node);
             case 'Acceso':
                 return this.generateAccess(node);
+            case 'AccesoPorIndice':
+                return this.generateIndexAccess(node);
             case 'Funcion':
                 return this.generateFunction(node);
             case 'Propiedad':
@@ -110,6 +112,10 @@ export class Generator {
         return `${this.visit(node.object)}.${propName}`;
     }
 
+    private generateIndexAccess(node: any): string {
+        return `${this.visit(node.object)}[${this.visit(node.index)}]`;
+    }
+
     generateCall(node: CallNode): string {
         const args = node.params.map((arg: ASTNode) => this.visit(arg)).join(', ');
         let translation: string;
@@ -123,6 +129,7 @@ export class Generator {
         } else {
             if (!('value' in node.object)) throw new Error(`Se esperaba una llamada con valor en su objeto.`);
             const name = node.object.value;
+            if (typeof name != 'string') throw new Error(`Se esperaba un tipo 'string'. Se encontró '${typeof name}'`);
             translation = name;
 
             const symbol = this.SymbolsTable.get(name);

@@ -1,4 +1,4 @@
-import { ASTNode, ClassNode, ConditionNode, LoopNode, FunctionNode, PropertyNode, Token, VariableNode, Symbol, SymbolKind, LiteralNode, IdentificatorNode, AccessNode, NewNode, ThisNode, SuperNode, ObjectPropertyType } from "./types";
+import { ASTNode, ClassNode, ConditionNode, LoopNode, FunctionNode, PropertyNode, Token, VariableNode, Symbol, SymbolKind, LiteralNode, IdentificatorNode, AccessNode, NewNode, ThisNode, SuperNode, ObjectPropertyType, AccessNodeByIndex } from "./types";
 
 export class Parser {
     public symbols: Map<string, Symbol> = new Map();
@@ -456,17 +456,33 @@ export class Parser {
     }
 
     private parseIdentifierOrCall(startNode?: IdentificatorNode | NewNode | ThisNode | SuperNode): ASTNode {
-        let node: IdentificatorNode | NewNode | ThisNode | SuperNode | AccessNode = startNode || { type: 'Identificador', value: this.consume('IDENTIFICADOR').value };
+        let node: ASTNode = startNode || { type: 'Identificador', value: this.consume('IDENTIFICADOR').value };
 
-        while (this.current < this.tokens.length && this.peek().type === '.') {
-            this.consume('.');
-            const property = this.consume('IDENTIFICADOR');
-            
-            node = {
-                type: 'Acceso',
-                object: node,
-                property: property.value
-            };
+        while (this.current < this.tokens.length) {
+            const next = this.peek();
+
+            if (next.type === '.') {
+                this.consume('.');
+                const property = this.consume('IDENTIFICADOR');
+                
+                node = {
+                    type: 'Acceso',
+                    object: node,
+                    property: property.value
+                };
+            } else if (next.type === 'L_SQUARE') {
+                this.consume('L_SQUARE');
+                const index = this.parseExpression();
+                this.consume('R_SQUARE');
+
+                node = {
+                    type: 'AccesoPorIndice',
+                    object: node,
+                    index: index
+                };
+            } else {
+                break;
+            }
         }
 
         if (this.current < this.tokens.length && this.peek().type === 'L_EXPRESSION') {

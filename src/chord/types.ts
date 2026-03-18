@@ -25,7 +25,7 @@ export type NodeType<T = never> = 'Clase' | 'Funcion' | 'Bucle' | 'Propiedad' | 
                     | 'Pasar' | 'Devolver' | 'Nuevo' | 'NoUnario' | 'Unario'
                     | 'Lista' | 'Expresion' | 'Objeto' | 'Identificador'
                     | 'Acceso' | 'Llamada' | 'Exportar' | 'Importar'
-                    | 'Asignacion' | 'JS' | 'Super' | 'Esta' | T;
+                    | 'Asignacion' | 'JS' | 'Super' | 'Esta' | 'AccesoPorIndice' | T;
 
 export interface BaseNode<T = never> {
     type: NodeType<T>;
@@ -149,9 +149,15 @@ export interface AccessNode extends BaseNode {
     property: string;
 }
 
+export interface AccessNodeByIndex extends BaseNode {
+    type: 'AccesoPorIndice';
+    object: ASTNode;
+    index: ASTNode;
+}
+
 export interface CallNode extends BaseNode {
     type: 'Llamada';
-    object: IdentificatorNode | NewNode | ThisNode | SuperNode | AccessNode;
+    object: ASTNode;
     params: ASTNode[];
 }
 
@@ -193,4 +199,4 @@ export type ASTNode<T = never, N = never> = LiteralNode | BinaryExpressionNode |
                     | NewNode | NoUnaryNode | UnaryNode | ListNode
                     | ExpressionNode | ObjectNode | IdentificatorNode
                     | AccessNode | CallNode | ExportNode | ImportNode
-                    | AssignmentNode | JSNode | SuperNode | ThisNode | N;
+                    | AssignmentNode | JSNode | SuperNode | ThisNode | AccessNodeByIndex | N;
