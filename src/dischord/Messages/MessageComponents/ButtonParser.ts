@@ -1,9 +1,21 @@
 import { ButtonKeys, ButtonPropMap, MessageButtonNode } from "../../types";
 import MessageParser from "../MessageParser";
 
+/**
+ * The Button Parser.
+ * This class is responsible for parsing button definitions within message bodies, extracting their properties and values to construct a MessageButtonNode in the AST.
+ */
 export default class ButtonParser {
+    /**
+     * @param ctx - The main MessageParser context for token expression handling
+     */
     constructor (private ctx: MessageParser) {}
 
+    /**
+     * Parses a button definition.
+     * Expected structure: `{...}`
+     * @returns {MessageButtonNode} The AST node representing the button definition.
+     */
     parse (): MessageButtonNode {
         this.ctx.MessageParserContext.consume('L_BRACE');
         const button = {

@@ -2,9 +2,21 @@ import { ASTNode } from "../../../chord/types";
 import { EmbedAuthor, EmbedBody, EmbedColor, EmbedDescription, EmbedField, EmbedFooter, EmbedImage, EmbedThumbnail, EmbedTimestamp, EmbedTitle } from "../../types";
 import MessageParser from "../MessageParser";
 
+/**
+ * The Embed Parser.
+ * This class is responsible for parsing embed definitions within message bodies, extracting their properties and values to construct an EmbedBody in the AST.
+ */
 export default class EmbedParser {
+    /**
+     * @param ctx - The main MessageParser context for token expression handling
+     */
     constructor (private ctx: MessageParser) {}
 
+    /**
+     * Parses an embed definition.
+     * Expected structure: `{...}`
+     * @returns {EmbedBody} The AST node representing the embed definition.
+     */
     parse (): EmbedBody {
         this.ctx.MessageParserContext.consume('L_BRACE');
 
@@ -51,6 +63,10 @@ export default class EmbedParser {
         return body;
     }
     
+    /**
+     * Parses an individual embed component.
+     * @returns {EmbedTitle | EmbedDescription | EmbedColor | EmbedTimestamp | EmbedImage | EmbedThumbnail | EmbedAuthor | EmbedFooter | EmbedField} The parsed embed component.
+     */
     private parseEmbedComponent(): EmbedTitle | EmbedDescription | EmbedColor | EmbedTimestamp | EmbedImage | EmbedThumbnail | EmbedAuthor | EmbedFooter | EmbedField {
         const token = this.ctx.MessageParserContext.peek();
     

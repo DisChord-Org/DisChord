@@ -118,7 +118,4 @@ export default class CommandParser {
     
         return option as CommandOptionNode;
     }
-    consume(arg0: string) {
-        throw new Error("Method not implemented.");
-    }
 }

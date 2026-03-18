@@ -3,16 +3,32 @@ import { MessageBodyNode, MessageNode } from "../types";
 import ButtonParser from "./MessageComponents/ButtonParser";
 import EmbedParser from "./MessageComponents/EmbedParser";
 
+/**
+ * The Message Parser.
+ * This class is responsible for parsing message creation blocks, which include the message content, channel, embeds and buttons.
+ * It constructs a MessageNode in the AST that represents the entire message definition.
+ */
 export default class MessageParser {
+    // Parsers for message components
     private EmbedParser = new EmbedParser(this);
+    // The ButtonParser is initialized after the EmbedParser to ensure it has access to the MessageParser context if needed
     private ButtonParser = new ButtonParser(this);
-    
+
+    // Expose the MessageParser context to component parsers
     public MessageParserContext;
 
+    /**
+     * Initializes the MessageParser with the main DisChordParser context for token expression handling.
+     * @param ctx - The main DisChordParser context for token expression handling
+     */
     constructor (private ctx: DisChordParser) {
         this.MessageParserContext = ctx;
     }
 
+    /**
+     * Parses a message creation block.
+     * @returns {MessageNode} The AST node representing the message definition.
+     */
     parse (): MessageNode {
         this.ctx.consume('IDENTIFICADOR');
         this.ctx.consume('L_BRACE');
