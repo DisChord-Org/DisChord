@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import path from 'path';
 import { pathToFileURL } from 'url';
 import { Lexer } from './chord/lexer';
-import { DisChordParser } from './dischord/parser';
+import { DisChordParser } from './dischord/Parser/parser';
 import { ASTNode, Token } from './chord/types';
 import { DisChordGenerator } from './dischord/generator';
 

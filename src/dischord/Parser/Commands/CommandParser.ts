@@ -1,6 +1,6 @@
-import { ASTNode } from "../../chord/types";
+import { ASTNode } from "../../../chord/types";
 import { DisChordParser } from "../parser";
-import { CommandNode, CommandOptionNode, CommandParam } from "../types";
+import { CommandNode, CommandOptionNode, CommandParam } from "../../types";
 
 /**
  * The Commands Parser.

@@ -1,5 +1,5 @@
 import { DisChordParser } from "../parser";
-import { MessageBodyNode, MessageNode } from "../types";
+import { MessageBodyNode, MessageNode } from "../../types";
 import ButtonParser from "./MessageComponents/ButtonParser";
 import EmbedParser from "./MessageComponents/EmbedParser";
 

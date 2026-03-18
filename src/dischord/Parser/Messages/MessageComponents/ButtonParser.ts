@@ -1,4 +1,4 @@
-import { ButtonKeys, ButtonPropMap, MessageButtonNode } from "../../types";
+import { ButtonKeys, ButtonPropMap, MessageButtonNode } from "../../../types";
 import MessageParser from "../MessageParser";
 
 /**

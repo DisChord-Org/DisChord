@@ -1,6 +1,6 @@
-import { ASTNode } from "../../chord/types";
+import { ASTNode } from "../../../chord/types";
 import { DisChordParser } from "../parser";
-import { EventNode } from "../types";
+import { EventNode } from "../../types";
 
 /**
  * The Event Parser.

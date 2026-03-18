@@ -1,11 +1,11 @@
-import { KeyWords } from '../chord/keywords';
-import { Parser } from '../chord/parser';
-import { ASTNode, Token } from '../chord/types';
+import { KeyWords } from '../../chord/keywords';
+import { Parser } from '../../chord/parser';
+import { ASTNode, Token } from '../../chord/types';
 import CommandParser from './Commands/CommandParser';
 import MessageParser from './Messages/MessageParser';
 import CollectorParser from './Messages/CollectorParser';
-import { CollectorNode, CommandNode, MessageNode } from './types';
-import ClientParser from './Client/ClientParser';
+import { CollectorNode, CommandNode, MessageNode } from '../types';
+import ClientParser from '../Client/ClientParser';
 import EventParser from './Events/EventParser';
 
 /**

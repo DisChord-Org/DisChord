@@ -1,5 +1,5 @@
-import { ASTNode } from "../../../chord/types";
-import { EmbedAuthor, EmbedBody, EmbedColor, EmbedDescription, EmbedField, EmbedFooter, EmbedImage, EmbedThumbnail, EmbedTimestamp, EmbedTitle } from "../../types";
+import { ASTNode } from "../../../../chord/types";
+import { EmbedAuthor, EmbedBody, EmbedColor, EmbedDescription, EmbedField, EmbedFooter, EmbedImage, EmbedThumbnail, EmbedTimestamp, EmbedTitle } from "../../../types";
 import MessageParser from "../MessageParser";
 
 /**
