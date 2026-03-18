@@ -2,9 +2,21 @@ import { ASTNode } from "../../chord/types";
 import { DisChordParser } from "../parser";
 import { CommandNode, CommandOptionNode, CommandParam } from "../types";
 
+/**
+ * The Commands Parser.
+ * This class handles the extraction of command names, descriptions, options and executions.
+ */
 export default class CommandParser {
+    /**
+     * @param ctx - The main DisChordParser context for token expression handling
+     */
     constructor (private ctx: DisChordParser) {}
 
+    /**
+     * Parses a command creation block.
+     * Expected structure: `crear comando <nombre> {...}`
+     * @returns {CommandNode} The AST node representing the command definition.
+     */
     parse (): CommandNode {
         this.ctx.consume('IDENTIFICADOR');
         const commandName = this.ctx.consume('IDENTIFICADOR').value;
@@ -60,6 +72,13 @@ export default class CommandParser {
         }
     }
 
+    /**
+     * Parses individual command options
+     * Expected structure: `nameOption: {...}`
+     * @private
+     * @returns {CommandOptionNode} The parsed option configuration.
+     * @throws {Error} If required properties are missing or types are invalid.
+     */
     private parseCommandOption(): CommandOptionNode {
         const name = this.ctx.consume('IDENTIFICADOR').value;
         const option: Partial<CommandOptionNode> = {
@@ -93,7 +112,7 @@ export default class CommandParser {
                     throw new Error(`Dentro de las opciones de comando solo se permiten 'tipo', 'descripcion' y 'requerido', se encontró '${token.value}'`);
             }
         }
-        this.consume('R_BRACE');
+        this.ctx.consume('R_BRACE');
     
         if (!option.property || !option.description || option.required === undefined) throw new Error(`Faltan propiedades para la opción de comando '${name}'`);
     
