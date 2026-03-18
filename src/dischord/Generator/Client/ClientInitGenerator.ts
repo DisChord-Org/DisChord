@@ -6,9 +6,22 @@ import { StartBotNode } from "../../types";
 import { DisChordGenerator } from "../generator";
 import { intentsMap } from "../../core.lib";
 
+/**
+ * Generator class responsible for generating code related to starting the bot and setting up the client in DisChrod.
+ */
 export default class ClietInitGenerator {
+    /**
+     * Constructor for the ClientInitGenerator class.
+     * @param ctx The context of the DisChordGenerator.
+     */
     constructor (private ctx: DisChordGenerator) {}
 
+    /**
+     * Generates code for a StartBotNode, which represents the initialization of the bot in DisChord.
+     * It extracts the necessary configuration from the node, generates a Seyfert configuration file, and returns the code to start the client.
+     * @param node The StartBotNode representing the bot initialization to generate code for.
+     * @returns The generated code for starting the bot.
+     */
     generate (node: StartBotNode): string {
         if (node.object.type != 'Objeto') throw new Error(`Se encontró '${node.object.type}', se esperaba 'Objeto'`);
 
@@ -47,6 +60,11 @@ export default class ClietInitGenerator {
         `;
     }
 
+    /**
+     * Generates the Seyfert configuration file content based on the provided StartBotNode.
+     * @param node The StartBotNode containing the configuration for the bot, including the token and intents.
+     * @returns The generated Seyfert configuration file content.
+     */
     private generateSeyfertConfig(node: StartBotNode): string {
         if (node.object.type != 'Objeto') throw new Error(`Se encontró '${node.object.type}', se esperaba 'Objeto'`);
         const tokenNode = node.object.properties.find((property: ObjectPropertyType) => property.key === 'token');

@@ -2,9 +2,20 @@ import { EmbedColors } from "../../../core.lib";
 import { EmbedBody, EmbedField } from "../../../types";
 import MessageGenerator from "../MessageGenerator";
 
+/**
+ * Generator class responsible for generating code related to message embeds in DisChord.
+ */
 export default class EmbedGenerator {
+    /**
+     * @param ctx The context of the MessageGenerator.
+     */
     constructor (private ctx: MessageGenerator) {}
 
+    /**
+     * Generates code for an EmbedBody, which represents an Embed in DisChord.
+     * @param node The EmbedBody node representing the embed to generate code for.
+     * @returns The generated AST for the embed component.
+     */
     generate (node: EmbedBody): string {
         const ColorVisit: string | undefined = node.color? this.ctx.MessageGeneratorContext.visit(node.color.object) : '""';
         const ResolvingColors: string | undefined = Object.keys(EmbedColors).includes(ColorVisit.slice(1, -1))? `"${EmbedColors[ColorVisit.slice(1, -1)]}"` : undefined;

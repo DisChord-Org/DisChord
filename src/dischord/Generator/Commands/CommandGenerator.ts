@@ -6,9 +6,21 @@ import { createMessageFunctionInjection } from "../../core.lib";
 import { CommandNode, CommandOptionNode, CommandParam } from "../../types";
 import { DisChordGenerator } from "../generator";
 
+/**
+ * Generator class responsible for generating code related to command definitions in DisChord.
+ */
 export default class CommandGenerator {
+    /**
+     * Constructor for the CommandGenerator class.
+     * @param ctx The context of the DisChordGenerator.
+     */
     constructor (private ctx: DisChordGenerator) {}
 
+    /**
+     * Generates code for a CommandNode, which represents a command definition in DisChord.
+     * @param node The CommandNode representing the command definition to generate code for.
+     * @returns The generated AST for the command definition.
+     */
     generate (node: CommandNode): string {
         const commandName = node.value;
         const commandDescription = node.params.find((param: CommandParam) => param.property === 'Descripcion');
@@ -53,6 +65,11 @@ export default class CommandGenerator {
         return '';
     }
 
+    /**
+     * Generates the code for a command option based on the provided CommandOptionNode.
+     * @param option The CommandOptionNode representing the command option to generate code for.
+     * @returns The generated AST for the command option.
+     */
     private generateOption(option: CommandOptionNode): string {
         const name = option.name;
         const description = this.ctx.visit(option.description);
