@@ -2,9 +2,22 @@ import { ASTNode } from "../../chord/types";
 import { DisChordParser } from "../parser";
 import { CollectorNode, CollectorPulseBody } from "../types";
 
+/**
+ * The Collector Parser.
+ * This class is responsible for parsing interaction collector definitions,
+ * which include the collector variable and its pulse bodies (e.g., alPulsarId).
+ */
 export default class CollectorParser {
+    /**
+     * @param ctx - The main DisChordParser context for token expression handling
+     */
     constructor (private ctx: DisChordParser) {}
 
+    /**
+     * Parses a collector creation block.
+     * Expected structure: `crear recolector <variable> {...}`
+     * @returns The parsed collector node.
+     */
     parse (): CollectorNode {
         this.ctx.consume('IDENTIFICADOR');
 
@@ -32,6 +45,11 @@ export default class CollectorParser {
         };
     }
 
+    /**
+     * Parses the body of a collector pulse, which defines the behavior when a specific interaction occurs (e.g., button press).
+     * Expected structure: `alPulsarId <id> {...}`
+     * @returns The parsed collector pulse body.
+     */
     private parseCollectorPulseBody(): CollectorPulseBody {
         this.ctx.consume('IDENTIFICADOR'); // alPulsarId
         const id = this.ctx.parsePrimary();
