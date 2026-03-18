@@ -20,11 +20,13 @@ export const symbols = {
     "!": "NO",
     "==": "IGUAL",
     "===": "IGUAL_TIPADO",
+    "!=": "NO_IGUAL",
+    "!==": "NO_IGUAL_TIPADO",
     // ";": "separador",
     ":": ":",
     ",": ",",
     ".": ".",
-    "&&": "&&",
-    "||": "||",
+    "&&": "Y",
+    "||": "O",
     "@": "@"
 } as any;

@@ -285,7 +285,7 @@ export class Parser {
 
         const binaryExpressions = [
             'MAS', 'MENOS', 'POR', 'ENTRE', 'RESTO', 'EXP', 'INTRO', 'ESPACIO',
-            'MAYOR', 'MENOR', 'MAYOR_IGUAL', 'MENOR_IGUAL', 'IGUAL', 'IGUAL_TIPADO', 'Y', 'O'
+            'MAYOR', 'MENOR', 'MAYOR_IGUAL', 'MENOR_IGUAL', 'IGUAL', 'IGUAL_TIPADO', 'NO_IGUAL', 'NO_IGUAL_TIPADO', 'DIFERENTE', 'Y', 'O'
         ];
 
         while (this.current < this.tokens.length && binaryExpressions.includes(this.peek().type)) {
