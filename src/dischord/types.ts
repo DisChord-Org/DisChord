@@ -2,7 +2,7 @@ import { ASTNode, BaseNode, VariableNode } from "../chord/types";
 
 export type DisChordNodeType = 'EncenderBot' | 'Evento' | 'CrearComando'
                             | 'ParametroDeComando' | 'CrearMensaje' | 'CuerpoDelMensaje'
-                            | 'CrearRecolector';
+                            | 'CrearRecolector' | 'BDO';
 
 export interface StartBotNode extends BaseNode<DisChordNodeType> {
     type: 'EncenderBot';
@@ -158,7 +158,7 @@ export interface EmbedBody {
 
 export type MessageBodyNode = MessageContentNode | MessageChannelNode | MessageEmbedNode | MessageButtonNode;
 
-export interface CollectorNode {
+export interface CollectorNode extends BaseNode<DisChordNodeType> {
     type: 'CrearRecolector';
     variable: VariableNode['value'];
     body: CollectorPulseBody[];
@@ -169,4 +169,11 @@ export interface CollectorPulseBody {
     id: ASTNode;
     body: ASTNode[];
 }
+
+export interface ODBNode extends BaseNode<DisChordNodeType> {
+    type: 'BDO';
+    blocks: Record<string, ASTNode>;
+    body: ASTNode[];
+} 
+
 // export type DisChordASTNode = ASTNode<DisChordNodeType, StartBotNode | EventNode | MessageNode | MessageBodyNode | CommandNode | CommandParam>;

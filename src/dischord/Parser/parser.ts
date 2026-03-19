@@ -4,7 +4,7 @@ import { ASTNode, Token } from '../../chord/types';
 import CommandParser from './Commands/CommandParser';
 import MessageParser from './Messages/MessageParser';
 import CollectorParser from './CollectorParser';
-import { CollectorNode, CommandNode, MessageNode } from '../types';
+import { CollectorNode, CommandNode, MessageNode, ODBNode } from '../types';
 import ClientParser from './Client/ClientParser';
 import EventParser from './Events/EventParser';
 
@@ -104,5 +104,40 @@ export class DisChordParser extends Parser {
             default:
                 return super.parsePrimary();
         }
+    }
+
+    /**
+     * Parses an ODB.
+     * Distinguishes between property blocks (key-value pairs) and execution statements.
+     * @param properties Allowed keys for the blocks (e.g., ['descripcion', 'color']).
+     * @returns {ODBNode} A node containing organized blocks and an executable body.
+     * @protected
+     */
+    protected parseODB(properties: string[]): ODBNode {
+        this.consume('L_BRACE');
+
+        const blocks: Record<string, ASTNode> = {};
+        const body: ASTNode[] = [];
+
+        while (this.peek().type !== 'R_BRACE') {
+            const token = this.peek();
+
+            if (token.type === 'IDENTIFICADOR' && properties.includes(token.value)) {
+                const key = this.consume('IDENTIFICADOR').value;
+                const value = this.parsePrimary();
+                blocks[key] = value;
+            } else {
+                const statement = this.parseStatement();
+                if (statement) body.push(statement);
+            }
+        }
+
+        this.consume('R_BRACE');
+
+        return {
+            type: 'BDO',
+            blocks,
+            body
+        };
     }
 }
