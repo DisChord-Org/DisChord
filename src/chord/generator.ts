@@ -199,6 +199,9 @@ export class Generator {
             'MENOR_IGUAL': '<=',
             'IGUAL': '==',
             'IGUAL_TIPADO': '===',
+            'NO_IGUAL': '!=',
+            'NO_IGUAL_TIPADO': '!==',
+            'DIFERENTE': '!=',
             'Y': '&&',
             'O': '||'
         };

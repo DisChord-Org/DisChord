@@ -50,6 +50,8 @@ export class KeyWords {
         "no",
         "igual_tipado",
         "igual",
+        "no_igual",
+        "diferente",
         "y",
         "o"
     ];
