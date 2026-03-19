@@ -6,7 +6,7 @@ export type DisChordNodeType = 'EncenderBot' | 'Evento' | 'CrearComando'
 
 export interface StartBotNode extends BaseNode<DisChordNodeType> {
     type: 'EncenderBot';
-    object: ASTNode;
+    object: ODBNode;
 }
 
 export interface EventNode extends BaseNode<DisChordNodeType> {

@@ -111,9 +111,8 @@ export class DisChordParser extends Parser {
      * Distinguishes between property blocks (key-value pairs) and execution statements.
      * @param properties Allowed keys for the blocks (e.g., ['descripcion', 'color']).
      * @returns {ODBNode} A node containing organized blocks and an executable body.
-     * @protected
      */
-    protected parseODB(properties: string[]): ODBNode {
+    parseODB(properties: string[]): ODBNode {
         this.consume('L_BRACE');
 
         const blocks: Record<string, ASTNode> = {};
