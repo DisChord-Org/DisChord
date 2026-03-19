@@ -4,7 +4,7 @@ import { pathToFileURL } from 'url';
 import { Lexer } from './chord/lexer';
 import { DisChordParser } from './dischord/Parser/parser';
 import { ASTNode, Token } from './chord/types';
-import { DisChordGenerator } from './dischord/generator';
+import { DisChordGenerator } from './dischord/Generator/generator';
 
 const inputPath = process.argv[2];
 const args = process.argv.slice(3);

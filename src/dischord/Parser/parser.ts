@@ -3,7 +3,7 @@ import { Parser } from '../../chord/parser';
 import { ASTNode, Token } from '../../chord/types';
 import CommandParser from './Commands/CommandParser';
 import MessageParser from './Messages/MessageParser';
-import CollectorParser from './Messages/CollectorParser';
+import CollectorParser from './CollectorParser';
 import { CollectorNode, CommandNode, MessageNode } from '../types';
 import ClientParser from '../Client/ClientParser';
 import EventParser from './Events/EventParser';

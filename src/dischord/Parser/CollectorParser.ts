@@ -1,6 +1,6 @@
-import { ASTNode } from "../../../chord/types";
-import { DisChordParser } from "../parser";
-import { CollectorNode, CollectorPulseBody } from "../../types";
+import { ASTNode } from "../../chord/types";
+import { DisChordParser } from "./parser";
+import { CollectorNode, CollectorPulseBody } from "../types";
 
 /**
  * The Collector Parser.
