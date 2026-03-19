@@ -9,7 +9,7 @@ DisChord is a modern, intuitive, and human-friendly programming language designe
 
 ---
 
-## ✨ Features
+## Features
 
 - **Natural Operators**: Use `mas`, `menos`, `por`, and `entre` instead of `+`, `-`, `*`, and `/`.
 - **Expressive Logic**: Write logical conditions using `y`, `o`, `no`, `igual`, `mayor`, and `menor`.
@@ -19,7 +19,7 @@ DisChord is a modern, intuitive, and human-friendly programming language designe
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Installation
 
@@ -67,7 +67,7 @@ npm run dev hello.chord
 
 This will compile `hello.chord` to `dist/hello.mjs` and execute it automatically.
 
-## 🤖 Built for Discord Bots
+## Built for Discord Bots
 
 DisChord isn't just a general-purpose language; it's specifically optimized for building powerful Discord bots with almost zero boilerplate. Using the internal **Seyfert** integration, you can define commands and events using natural Spanish keywords.
 
@@ -86,7 +86,7 @@ CrearComando "ping" {
     consola.imprimir("Ejecutando ping...")
     
     CrearMensaje {
-        contenido: "¡Pong! 🏓"
+        contenido: "¡Pong!"
     }
 }
 
@@ -97,7 +97,7 @@ Evento "entradaMiembro" {
 
 ---
 
-## 🧩 Syntax Overview
+## Syntax Overview
 
 ### Primitives & Variables
 
@@ -129,7 +129,7 @@ Evento "entradaMiembro" {
 
 ---
 
-## 🛠️ Project Structure
+## Project Structure
 
 - `src/chord/`: Core language components (Base Lexer, Types).
 - `src/dischord/`: Discord-specific Parser extension and Code Generator.
@@ -139,10 +139,10 @@ Evento "entradaMiembro" {
 
 ---
 
-## 📄 License
+## License
 
 This project is licensed under the **ISC License**. See the [LICENSE](LICENSE) file for details.
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Whether it's adding a new natural language keyword or improving the Discord integration, check our [Contributing Guidelines](CONTRIBUTING.md).
