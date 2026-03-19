@@ -1,4 +1,4 @@
-import { corelib } from "./core.lib";
+import { corelib, runtimeInjections } from "./core.lib";
 import { AccessNode, AssignmentNode, ASTNode, BinaryExpressionNode, CallNode, ClassNode, ConditionNode, ExportNode, FunctionNode, ListNode, LiteralNode, LoopNode, NoUnaryNode, ObjectNode, ObjectPropertyType, PropertyNode, Symbol, UnaryNode, VariableNode } from "./types";
 
 export class Generator {
@@ -9,12 +9,17 @@ export class Generator {
     }
 
     public generate(nodes: ASTNode[]): string {
-        return nodes.map(node => {
+        const body = nodes.map(node => {
             const code = this.visit(node);
             const noSemicolon = ['CONDICION', 'BUCLE', 'CLASE', 'FUNCION'];
 
             return noSemicolon.includes(node.type) ? code : code + ";";
         }).join('\n');
+
+        return `
+            ${runtimeInjections}
+            ${body}
+        `;
     }
 
     public visit(node: ASTNode): string {
