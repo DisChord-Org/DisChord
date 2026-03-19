@@ -42,7 +42,7 @@ export default class EventGenerator {
             });
         `;
 
-        Prettifier.savePrettified(join(this.ctx.projectRooth, 'dist', 'events', `${eventName}.js`), eventBody);
+        Prettifier.savePrettified(join(this.ctx.projectRoot, 'dist', 'events', `${eventName}.js`), eventBody);
 
         return '';
     }

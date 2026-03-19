@@ -43,7 +43,7 @@ export default class ClietInitGenerator {
         }
 
         const seyfertConfig = this.generateSeyfertConfig(node);
-        Prettifier.savePrettified(join(this.ctx.projectRooth, 'seyfert.config.mjs'), seyfertConfig)
+        Prettifier.savePrettified(join(this.ctx.projectRoot, 'seyfert.config.mjs'), seyfertConfig)
 
         this.ensureDirectories();
 
@@ -123,7 +123,7 @@ export default class ClietInitGenerator {
     private ensureDirectories() {
         const dirs = ['commands', 'events', 'components'];
         dirs.forEach(dir => {
-            const path = join(this.ctx.projectRooth, 'dist', dir);
+            const path = join(this.ctx.projectRoot, 'dist', dir);
             if (!fs.existsSync(path)) fs.mkdirSync(path, { recursive: true });
         });
     }

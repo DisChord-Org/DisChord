@@ -61,7 +61,7 @@ export default class CommandGenerator {
             }
         `;
 
-        Prettifier.savePrettified(join(this.ctx.projectRooth, 'dist', 'commands', `${commandName}.js`), commandBody)
+        Prettifier.savePrettified(join(this.ctx.projectRoot, 'dist', 'commands', `${commandName}.js`), commandBody)
         return '';
     }
 
