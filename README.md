@@ -74,23 +74,24 @@ DisChord isn't just a general-purpose language; it's specifically optimized for 
 ### Example: A Simple Ping Command
 
 ```js
-EncenderBot({
+encender bot {
     token: "TU_TOKEN_AQUÍ",
     prefijo: "!",
     intenciones: [ "MensajesDelServidor", "ContenidoDelMensaje" ]
-})
+}
 
-CrearComando "ping" {
-    Descripcion: "¡Prueba la latencia del bot!"
+crear comando ping {
+    descripcion: "¡Prueba la latencia del bot!"
     
     consola.imprimir("Ejecutando ping...")
     
-    CrearMensaje {
+    var pingMensaje es "¡Pong " mas cliente.ping mas "ms!"
+    crear mensaje {
         contenido: "¡Pong!"
     }
 }
 
-Evento "entradaMiembro" {
+evento entradaMiembro {
     consola.imprimir("¡Un nuevo usuario ha entrado!")
 }
 ```
@@ -121,11 +122,11 @@ Evento "entradaMiembro" {
 
 ### Discord Specific Keywords
 
-- **EncenderBot**: Initializes the bot client with token and intents.
-- **CrearComando**: Defines a new slash or prefix command.
-- **CrearMensaje**: Sends a message to the current channel or interaction.
-- **Evento**: Listens to Discord gateway events (e.g., `entradaMiembro`, `mensajeCreado`).
-- **CrearEmbed**: (Internal) High-level construct for Discord Embeds.
+- **encender bot**: Initializes the bot client with token and intents.
+- **crear comando**: Defines a new slash or prefix command.
+- **crear mensaje**: Sends a message to the current channel or interaction.
+- **evento**: Listens to Discord gateway events (e.g., `entradaMiembro`, `mensajeCreado`).
+- **crear mensaje { embed { ... } }**: (Internal) High-level construct for Discord Embeds.
 
 ---
 
