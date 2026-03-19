@@ -2,7 +2,7 @@ import { join } from "node:path";
 import fs from "fs";
 import Prettifier from "../../../Prettifier";
 
-import { ASTNode, ObjectPropertyType } from "../../../chord/types";
+import { ASTNode, ListNode, LiteralNode, ObjectPropertyType } from "../../../chord/types";
 import { StartBotNode } from "../../types";
 import { DisChordGenerator } from "../generator";
 import { intentsMap } from "../../core.lib";
@@ -26,8 +26,22 @@ export default class ClietInitGenerator {
     generate (node: StartBotNode): string {
         if (node.object.type != 'Objeto') throw new Error(`Se encontró '${node.object.type}', se esperaba 'Objeto'`);
 
-        const prefixNode = node.object.properties.find((p: ObjectPropertyType) => p.key === 'prefijo');
+        const prefixNode = node.object.properties.find((p: ObjectPropertyType) => p.key === 'prefijo' || p.key === 'prefijos');
         const prefix = prefixNode ? this.ctx.visit(prefixNode.value) : '"!"';
+
+        const isArray = prefixNode?.value.type === 'Lista';
+
+        let includeSlash = false;
+        if (prefixNode) {
+            const value = prefixNode.value;
+            if (value.type === 'Lista') {
+                const list = value as ListNode;
+                includeSlash = list.body.some((p: ASTNode) => p.type === 'Literal' && (p as LiteralNode).value === '/');
+            } else if (value.type === 'Literal') {
+                const lit = value as LiteralNode;
+                includeSlash = lit.value === '/';
+            }
+        }
 
         const seyfertConfig = this.generateSeyfertConfig(node);
         Prettifier.savePrettified(join(this.ctx.projectRooth, 'seyfert.config.mjs'), seyfertConfig)
@@ -40,7 +54,7 @@ export default class ClietInitGenerator {
             import { Client } from "seyfert";
             const client = new Client({
                 commands: {
-                    prefix: () => [ ${prefix} ],
+                    prefix: () => ${isArray ? prefix : `[${prefix}]`},
                     reply: () => true
                 }
             });
@@ -52,7 +66,7 @@ export default class ClietInitGenerator {
             });
 
             client.start().then(async () => {
-                await client.uploadCommands().catch(error => console.log(error));
+                ${includeSlash ? 'await client.uploadCommands().catch(error => console.log(error));' : ''}
             });
 
             process.on('unhandledRejection', async (err) => {
