@@ -8,7 +8,8 @@ export const corelib: Record<string, Record<string, string> | string> = {
         'id': 'cliente.me.id',
         'nombre': 'cliente.me.username',
         'avatar': 'cliente.me.avatar',
-        'avatarUrl': 'cliente.me.avatarUrl'
+        'avatarUrl': 'cliente.me.avatarUrl',
+        'ping': 'cliente.gateway.latency'
     },
     'canal': {
         'topico': 'canal.topic',

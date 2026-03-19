@@ -96,7 +96,6 @@ export default class Init {
                 printWidth: 120
             });
         } catch (error) {
-            console.log(error)
             console.log("Aviso: No se pudo formatear el código, se guardará en bruto.");
         }
 
