@@ -1,5 +1,5 @@
-import fs from 'fs';
 import { join } from 'path';
+import Prettifier from '../../../Prettifier';
 
 import { ASTNode } from "../../../chord/types";
 import { createMessageFunctionInjection } from "../../core.lib";
@@ -61,7 +61,7 @@ export default class CommandGenerator {
             }
         `;
 
-        fs.writeFileSync(join(this.ctx.projectRooth, 'dist', 'commands', `${commandName}.js`), commandBody, 'utf-8');
+        Prettifier.savePrettified(join(this.ctx.projectRooth, 'dist', 'commands', `${commandName}.js`), commandBody)
         return '';
     }
 

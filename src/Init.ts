@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import path from 'path';
 import { pathToFileURL } from 'url';
-import prettier from 'prettier';
+import Prettifier from './Prettifier';
 import { Lexer } from './chord/lexer';
 import { DisChordParser } from './dischord/Parser/parser';
 import { ASTNode, Token } from './chord/types';
@@ -76,30 +76,12 @@ export default class Init {
     
         const generator = new DisChordGenerator(parser.symbols, this.projectRoot);
         let output = generator.generate(ast);
-        if (args[0] != '--no-prettify') output = await this.prettify(output);
         if (args[0] === '--output') this.log("OUTPUT", output);
 
         if (!fs.existsSync(targetDir)) fs.mkdirSync(targetDir, { recursive: true });
-        fs.writeFileSync(outputPath, output);
+        Prettifier.savePrettified(outputPath, output);
     
         return outputPath;
-    }
-
-    async prettify (code: string): Promise<string> {
-        try {
-            code = await prettier.format(code, {
-                parser: 'babel',
-                semi: true,
-                singleQuote: true,
-                tabWidth: 4,
-                trailingComma: "all",
-                printWidth: 120
-            });
-        } catch (error) {
-            console.log("Aviso: No se pudo formatear el código, se guardará en bruto.");
-        }
-
-        return code;
     }
 
     async start () {

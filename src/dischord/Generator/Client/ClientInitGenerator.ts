@@ -1,5 +1,6 @@
 import { join } from "node:path";
 import fs from "fs";
+import Prettifier from "../../../Prettifier";
 
 import { ASTNode, ObjectPropertyType } from "../../../chord/types";
 import { StartBotNode } from "../../types";
@@ -29,7 +30,7 @@ export default class ClietInitGenerator {
         const prefix = prefixNode ? this.ctx.visit(prefixNode.value) : '"!"';
 
         const seyfertConfig = this.generateSeyfertConfig(node);
-        fs.writeFileSync(join(this.ctx.projectRooth, 'seyfert.config.mjs'), seyfertConfig, 'utf-8');
+        Prettifier.savePrettified(join(this.ctx.projectRooth, 'seyfert.config.mjs'), seyfertConfig)
 
         if (!fs.existsSync(join(this.ctx.projectRooth, 'dist', 'commands'))) fs.mkdirSync(join(this.ctx.projectRooth, 'dist', 'commands'), { recursive: true });
         if (!fs.existsSync(join(this.ctx.projectRooth, 'dist', 'events'))) fs.mkdirSync(join(this.ctx.projectRooth, 'dist', 'events'), { recursive: true });

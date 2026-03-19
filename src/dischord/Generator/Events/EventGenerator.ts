@@ -1,5 +1,6 @@
 import { join } from 'path';
 import fs from 'fs';
+import Prettifier from '../../../Prettifier';
 
 import { ASTNode } from "../../../chord/types";
 import { createMessageFunctionInjection, eventsMap } from "../../core.lib";
@@ -41,7 +42,7 @@ export default class EventGenerator {
             });
         `;
 
-        fs.writeFileSync(join(this.ctx.projectRooth, 'dist', 'events', `${eventName}.js`), eventBody, 'utf-8');
+        Prettifier.savePrettified(join(this.ctx.projectRooth, 'dist', 'events', `${eventName}.js`), eventBody);
 
         return '';
     }
