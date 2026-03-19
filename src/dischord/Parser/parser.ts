@@ -5,7 +5,7 @@ import CommandParser from './Commands/CommandParser';
 import MessageParser from './Messages/MessageParser';
 import CollectorParser from './CollectorParser';
 import { CollectorNode, CommandNode, MessageNode } from '../types';
-import ClientParser from '../Client/ClientParser';
+import ClientParser from './Client/ClientParser';
 import EventParser from './Events/EventParser';
 
 /**

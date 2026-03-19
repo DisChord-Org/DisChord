@@ -1,5 +1,5 @@
 import { DisChordParser } from "../parser";
-import { StartBotNode } from "../types";
+import { StartBotNode } from "../../types";
 
 /**
  * Handles the initial bot declaration.
