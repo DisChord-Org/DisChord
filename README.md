@@ -75,9 +75,9 @@ DisChord isn't just a general-purpose language; it's specifically optimized for 
 
 ```js
 encender bot {
-    token: "TU_TOKEN_AQUÍ",
-    prefijo: "!",
-    intenciones: [ "MensajesDelServidor", "ContenidoDelMensaje" ]
+    token "TU_TOKEN_AQUÍ"
+    prefijo "!"
+    intenciones [ "MensajesDelServidor", "ContenidoDelMensaje" ]
 }
 
 crear comando ping {
