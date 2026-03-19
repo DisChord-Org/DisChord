@@ -24,31 +24,28 @@ export default class ClietInitGenerator {
      * @returns The generated code for starting the bot.
      */
     generate (node: StartBotNode): string {
-        if (node.object.type != 'Objeto') throw new Error(`Se encontró '${node.object.type}', se esperaba 'Objeto'`);
+        if (node.object.type != 'BDO') throw new Error(`Se encontró '${node.object.type}', se esperaba 'Objeto'`);
 
-        const prefixNode = node.object.properties.find((p: ObjectPropertyType) => p.key === 'prefijo' || p.key === 'prefijos');
-        const prefix = prefixNode ? this.ctx.visit(prefixNode.value) : '"!"';
+        const { blocks } = node.object;
+        const prefixNode = blocks['prefijo'] || blocks['prefijos'];
+        if (!prefixNode) throw new Error("No se ha especificado el prefijo en el bloque 'encender bot'.");
 
-        const isArray = prefixNode?.value.type === 'Lista';
+        const prefix = this.ctx.visit(prefixNode);
+        const isArray = prefixNode.type === 'Lista';
 
         let includeSlash = false;
-        if (prefixNode) {
-            const value = prefixNode.value;
-            if (value.type === 'Lista') {
-                const list = value as ListNode;
-                includeSlash = list.body.some((p: ASTNode) => p.type === 'Literal' && (p as LiteralNode).value === '/');
-            } else if (value.type === 'Literal') {
-                const lit = value as LiteralNode;
-                includeSlash = lit.value === '/';
-            }
+        if (isArray) {
+            includeSlash = (prefixNode as ListNode).body.some(
+                (p: any) => p.type === 'Literal' && p.value === '/'
+            );
+        } else if (prefixNode.type === 'Literal') {
+            includeSlash = (prefixNode as LiteralNode).value === '/';
         }
 
         const seyfertConfig = this.generateSeyfertConfig(node);
         Prettifier.savePrettified(join(this.ctx.projectRooth, 'seyfert.config.mjs'), seyfertConfig)
 
-        if (!fs.existsSync(join(this.ctx.projectRooth, 'dist', 'commands'))) fs.mkdirSync(join(this.ctx.projectRooth, 'dist', 'commands'), { recursive: true });
-        if (!fs.existsSync(join(this.ctx.projectRooth, 'dist', 'events'))) fs.mkdirSync(join(this.ctx.projectRooth, 'dist', 'events'), { recursive: true });
-        if (!fs.existsSync(join(this.ctx.projectRooth, 'dist', 'components'))) fs.mkdirSync(join(this.ctx.projectRooth, 'dist', 'components'), { recursive: true });
+        this.ensureDirectories();
 
         return `
             import { Client } from "seyfert";
@@ -81,22 +78,26 @@ export default class ClietInitGenerator {
      * @returns The generated Seyfert configuration file content.
      */
     private generateSeyfertConfig(node: StartBotNode): string {
-        if (node.object.type != 'Objeto') throw new Error(`Se encontró '${node.object.type}', se esperaba 'Objeto'`);
-        const tokenNode = node.object.properties.find((property: ObjectPropertyType) => property.key === 'token');
-        const intentsNode = node.object.properties.find((property: ObjectPropertyType) => property.key === 'intenciones');
-        const token = tokenNode ? this.ctx.visit(tokenNode.value) : '""';
+        if (node.object.type != 'BDO') throw new Error(`Se encontró '${node.object.type}', se esperaba 'BDO'`);
+
+        const { blocks } = node.object;
+
+        const tokenNode = blocks['token'];
+        const intentsNode = blocks['intenciones'];
+
+        if (!tokenNode) throw new Error("Falta el bloque 'token' en la configuración del bot.");
         
+        const token = this.ctx.visit(tokenNode);
         let intents = "[]";
         
-        if (intentsNode && intentsNode.value.type === 'Lista') {
-            const list = intentsNode.value.body.map((item: ASTNode): string => {
-                if (!('value' in item)) return '';
-                if (!item.value) return '';
-
-                const val = item.value.toString().replace(/"/g, '');
-                return `"${intentsMap[val]}"`;
+        if (intentsNode && intentsNode.type === 'Lista') {
+            const list = (intentsNode as ListNode).body.map((item: any) => {
+                const val = item.value?.toString().replace(/"/g, '');
+                const mapped = intentsMap[val];
+                if (!mapped) throw new Error(`Intención desconocida: ${val}`);
+                return `"${mapped}"`;
             });
-            intents = `[\n        ${list.join(',\n        ')}\n    ]`;
+            intents = `[ ${list.join(',')} ]`;
         }
 
         return `
@@ -114,5 +115,16 @@ export default class ClietInitGenerator {
                 }
             });
         `;
+    }
+
+    /**
+     * Helper to ensure the output directories exist.
+     */
+    private ensureDirectories() {
+        const dirs = ['commands', 'events', 'components'];
+        dirs.forEach(dir => {
+            const path = join(this.ctx.projectRooth, 'dist', dir);
+            if (!fs.existsSync(path)) fs.mkdirSync(path, { recursive: true });
+        });
     }
 }
