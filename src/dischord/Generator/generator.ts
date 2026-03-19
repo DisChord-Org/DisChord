@@ -1,10 +1,7 @@
-import fs from "node:fs";
-import { join } from "node:path";
-
 import { Generator } from "../../chord/generator";
-import { AccessNode, ASTNode, CallNode, ObjectPropertyType } from "../../chord/types";
-import { corelib, createMessageFunctionInjection, EmbedColors, eventsMap, intentsMap } from "./../core.lib";
-import { ButtonStyles, CollectorNode, CollectorPulseBody, CommandNode, CommandOptionNode, CommandParam, DisChordNodeType, EmbedBody, EmbedField, EventNode, MessageBodyNode, MessageButtonNode, MessageChannelNode, MessageContentNode, MessageEmbedNode, MessageNode, StartBotNode } from "./../types";
+import { AccessNode, ASTNode, CallNode } from "../../chord/types";
+import { corelib } from "./../core.lib";
+import { CollectorNode, CommandNode, DisChordNodeType, EventNode, MessageNode, StartBotNode } from "./../types";
 import ClietInitGenerator from "./Client/ClientInitGenerator";
 import EventGenerator from "./Events/EventGenerator";
 import CommandGenerator from "./Commands/CommandGenerator";
