@@ -5,7 +5,7 @@
 DisChord is a modern, intuitive, and human-friendly programming language designed to bridge the gap between human language and machine code. By replacing cold, symbolic operators with natural word-based keywords, DisChord offers a readable and expressive syntax that feels as natural as writing a sentence.
 
 [![License: ISC](https://img.shields.io/badge/License-ISC-blue.svg)](https://opensource.org/licenses/ISC)
-[![Version](https://img.shields.io/badge/version-0.1.1-green.svg)](package.json)
+[![Version](https://img.shields.io/badge/version-0.3.0-green.svg)](package.json)
 
 ---
 
