@@ -4,7 +4,7 @@ import { ASTNode, Token } from '../../chord/types';
 import CommandParser from './Commands/CommandParser';
 import MessageParser from './Messages/MessageParser';
 import CollectorParser from './CollectorParser';
-import { CollectorNode, CommandNode, MessageNode, ODBNode } from '../types';
+import { CollectorNode, CommandNode, EventNode, MessageNode, ODBNode, StartBotNode } from '../types';
 import ClientParser from './Client/ClientParser';
 import EventParser from './Events/EventParser';
 
@@ -61,7 +61,7 @@ export class DisChordParser extends Parser {
     override parseCustomStatement(): ASTNode | null {
         const token = this.peek();
 
-        let node: any = null;
+        let node: StartBotNode | EventNode | MessageNode | CommandNode | CollectorNode;
 
         switch (token.type) {
             case 'ENCENDER':
@@ -73,6 +73,8 @@ export class DisChordParser extends Parser {
             case 'CREAR':
                 node = this.parseCreation();
                 break;
+            default:
+                throw new Error(`${token.value} no es una palabra reservada.`);
         }
 
         return node as unknown as ASTNode;
