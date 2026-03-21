@@ -25,6 +25,15 @@ export class DisChordParser extends Parser {
     private MessageParser = new MessageParser(this);
     /** Specialist for interaction collector logic */
     private CollectorParser = new CollectorParser(this);
+    /**
+     * An object of creation statements.
+     * Runs and returns them.
+     */
+    private creationParsers: Record<string, () => MessageNode | CommandNode | CollectorNode> = {
+        'mensaje': () => this.MessageParser.parse(),
+        'comando': () => this.CommandParser.parse(),
+        'recolector': () => this.CollectorParser.parse(),
+    };
 
     /**
      * Initializes a new instance of the DisChordParser.
@@ -78,16 +87,12 @@ export class DisChordParser extends Parser {
     private parseCreation(): MessageNode | CommandNode | CollectorNode {
         this.consume('CREAR');
 
-        switch(this.peek().value) {
-            case 'mensaje':
-                return this.MessageParser.parse();
-            case 'comando':
-                return this.CommandParser.parse();
-            case 'recolector':
-                return this.CollectorParser.parse();
-        }
+        const type = this.peek().value;
+        const subParser = this.creationParsers[type];
 
-        throw new Error(`Se esperaba la creación de un comando o mensaje, se encontró '${this.peek().value}'`);
+        if (!subParser) throw new Error(`Entidad desconocida tras 'crear': ${type}`);
+
+        return subParser();
     }
 
     /**
