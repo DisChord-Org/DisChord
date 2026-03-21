@@ -24,8 +24,8 @@ export class Parser {
         return this.nodes;
     }
 
-    peek(): Token {
-        if (this.current >= this.tokens.length) throw new Error("Se acabaron los tokens");
+    peek(type: 'this' | 'next' = 'this'): Token {
+        if ((type === 'this'? this.current : this.current + 1) >= this.tokens.length) throw new Error("Se acabaron los tokens");
         return this.tokens[this.current];
     }
 

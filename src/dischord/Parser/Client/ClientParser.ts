@@ -26,7 +26,7 @@ export default class ClientParser {
             throw new Error(`Se esperaba 'bot' después de 'encender', se encontró '${id.value}'`);
         }
     
-        const configBody = this.ctx.parseODB([ 'token', 'prefijo', 'prefijos', 'intenciones' ]);
+        const configBody = this.ctx.parseODB(); // [ 'token', 'prefijo', 'prefijos', 'intenciones' ]
     
         return {
             type: 'EncenderBot',

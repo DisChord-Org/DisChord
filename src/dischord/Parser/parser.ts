@@ -61,23 +61,17 @@ export class DisChordParser extends Parser {
     override parseCustomStatement(): ASTNode | null {
         const token = this.peek();
 
-        let node: StartBotNode | EventNode | MessageNode | CommandNode | CollectorNode;
-
+        // I will improve the typing soon
         switch (token.type) {
             case 'ENCENDER':
-                node = this.ClientParser.parse();
-                break;
+                return this.ClientParser.parse() as unknown as ASTNode;
             case 'EVENTO':
-                node = this.EventParser.parse();
-                break;
+                return this.EventParser.parse() as unknown as ASTNode;
             case 'CREAR':
-                node = this.parseCreation();
-                break;
-            default:
-                throw new Error(`${token.value} no es una palabra reservada.`);
+                return this.parseCreation() as unknown as ASTNode;
         }
 
-        return node as unknown as ASTNode;
+        return null;
     }
 
     /**
@@ -116,20 +110,18 @@ export class DisChordParser extends Parser {
     /**
      * Parses an ODB.
      * Distinguishes between property blocks (key-value pairs) and execution statements.
-     * @param properties Allowed keys for the blocks (e.g., ['descripcion', 'color']).
      * @returns {ODBNode} A node containing organized blocks and an executable body.
      */
-    parseODB(properties: string[]): ODBNode {
+    parseODB(): ODBNode {
         this.consume('L_BRACE');
 
         const blocks: Record<string, ASTNode> = {};
         const body: ASTNode[] = [];
 
         while (this.peek().type !== 'R_BRACE') {
-            const token = this.peek();
-
-            if (token.type === 'IDENTIFICADOR' && properties.includes(token.value)) {
+            if (this.isPropertyAssignment()) {
                 const key = this.consume('IDENTIFICADOR').value;
+
                 const value = this.parsePrimary();
                 blocks[key] = value;
             } else {
@@ -145,5 +137,16 @@ export class DisChordParser extends Parser {
             blocks,
             body
         };
+    }
+
+    /**
+     * Predicate to distinguish between a property assignment and a statement.
+     * Looks a token forward to decide.
+     */
+    private isPropertyAssignment(): boolean {
+        const current = this.peek();
+        const next = this.peek('next');
+
+        return current.type === 'IDENTIFICADOR' && next.type !== 'L_EXPRESSION';
     }
 }
