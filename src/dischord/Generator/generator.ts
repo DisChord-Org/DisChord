@@ -11,7 +11,6 @@ import CollectorGenerator from "./CollectorGenerator";
 /**
  * Main generator class for DisChord.
  * It extends the base Generator class and overrides the visit method to handle DisChord-specific AST nodes.
-
  */
 export class DisChordGenerator extends Generator {
     // Root directory of the project, used for resolving imports and file paths.

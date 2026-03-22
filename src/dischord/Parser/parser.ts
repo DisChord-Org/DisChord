@@ -26,7 +26,7 @@ export class DisChordParser extends Parser {
     /** Specialist for interaction collector logic */
     private CollectorParser = new CollectorParser(this);
     /**
-     * An object of creation statements.
+     * An object of creation parsers.
      * Runs and returns them.
      */
     private creationParsers: Record<string, () => MessageNode | CommandNode | CollectorNode> = {
@@ -34,6 +34,15 @@ export class DisChordParser extends Parser {
         'comando': () => this.CommandParser.parse(),
         'recolector': () => this.CollectorParser.parse(),
     };
+    /**
+     * An object of custom parsers.
+     * Runs and returns them.
+     */
+    private customParsers: Record<string, () => StartBotNode | EventNode | MessageNode | CommandNode | CollectorNode> = {
+        'encender': () => this.ClientParser.parse(),
+        'evento': () => this.EventParser.parse(),
+        'crear': () => this.parseCreation()
+    }
 
     /**
      * Initializes a new instance of the DisChordParser.
@@ -60,18 +69,11 @@ export class DisChordParser extends Parser {
      */
     override parseCustomStatement(): ASTNode | null {
         const token = this.peek();
+        const subParser = this.customParsers[token.type];
 
-        // I will improve the typing soon
-        switch (token.type) {
-            case 'ENCENDER':
-                return this.ClientParser.parse() as unknown as ASTNode;
-            case 'EVENTO':
-                return this.EventParser.parse() as unknown as ASTNode;
-            case 'CREAR':
-                return this.parseCreation() as unknown as ASTNode;
-        }
+        if (!subParser) return null;
 
-        return null;
+        return subParser() as unknown as ASTNode;
     }
 
     /**
