@@ -4,7 +4,7 @@ import { ASTNode, Token } from '../../chord/types';
 import CommandParser from './Commands/CommandParser';
 import MessageParser from './Messages/MessageParser';
 import CollectorParser from './CollectorParser';
-import { CollectorNode, CommandNode, EventNode, MessageNode, ODBNode, StartBotNode } from '../types';
+import { CollectorNode, CommandNode, CreationNode, EventNode, MessageNode, ODBNode, StartBotNode } from '../types';
 import ClientParser from './Client/ClientParser';
 import EventParser from './Events/EventParser';
 
@@ -29,7 +29,7 @@ export class DisChordParser extends Parser {
      * An object of creation parsers.
      * Runs and returns them.
      */
-    private creationParsers: Record<string, () => MessageNode | CommandNode | CollectorNode> = {
+    private creationParsers: Record<string, () => CreationNode> = {
         'mensaje': () => this.MessageParser.parse(),
         'comando': () => this.CommandParser.parse(),
         'recolector': () => this.CollectorParser.parse(),
@@ -38,7 +38,7 @@ export class DisChordParser extends Parser {
      * An object of custom parsers.
      * Runs and returns them.
      */
-    private customParsers: Record<string, () => StartBotNode | EventNode | MessageNode | CommandNode | CollectorNode> = {
+    private customParsers: Record<string, () => StartBotNode | EventNode | CreationNode> = {
         'encender': () => this.ClientParser.parse(),
         'evento': () => this.EventParser.parse(),
         'crear': () => this.parseCreation()
@@ -82,7 +82,7 @@ export class DisChordParser extends Parser {
      * @private
      * @throws Error if the creation type is not recognized.
      */
-    private parseCreation(): MessageNode | CommandNode | CollectorNode {
+    private parseCreation(): CreationNode {
         this.consume('CREAR');
 
         const type = this.peek().value;
