@@ -176,4 +176,5 @@ export interface ODBNode extends BaseNode<DisChordNodeType> {
     body: ASTNode[];
 } 
 
+export type creationNode = CommandNode | MessageNode | CollectorNode;
 // export type DisChordASTNode = ASTNode<DisChordNodeType, StartBotNode | EventNode | MessageNode | MessageBodyNode | CommandNode | CommandParam>;
