@@ -16,15 +16,26 @@ import EventParser from './Events/EventParser';
  */
 export class DisChordParser extends Parser {
     /** Specialist for bot client initialization and configuration */
-    private ClientParser = new ClientParser(this);
+    private get ClientParser(): ClientParser {
+        return new ClientParser(this);
+    }
     /** Specialist for handling Discord gateway events */
-    private EventParser = new EventParser(this);
-    /** Specialist for defining application slash commands */
-    private CommandParser = new CommandParser(this);
+    private get EventParser(): EventParser {
+        return new EventParser(this);
+    }
     /** Specialist for constructing messages, embeds, and buttons */
-    private MessageParser = new MessageParser(this);
+    private get MessageParser(): MessageParser {
+        return new MessageParser(this);
+    }
+    /** Specialist for defining application slash commands */
+    private get CommandParser(): CommandParser {
+        return new CommandParser(this);
+    }
     /** Specialist for interaction collector logic */
-    private CollectorParser = new CollectorParser(this);
+    private get CollectorParser(): CollectorParser {
+        return new CollectorParser(this);
+    }
+    
     /**
      * An object of creation parsers.
      * Runs and returns them.
