@@ -33,6 +33,7 @@ export class Parser {
         const token = this.tokens[this.current];
         const expected = Array.isArray(expectedTypes) ? expectedTypes : [ expectedTypes ];
 
+        console.log(token)
         if (!expected.includes(token.type)) throw new Error(`Se esperaba uno de ${expected.join(', ')} pero se encontró ${token.type}`);
 
         return this.tokens[this.current++];

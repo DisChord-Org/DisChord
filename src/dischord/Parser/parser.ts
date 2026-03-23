@@ -53,18 +53,18 @@ export class DisChordParser extends Parser {
      * Runs and returns them.
      */
     private creationParsers: Record<string, () => CreationNode> = {
-        'mensaje': () => this.MessageParser.parse(),
-        'comando': () => this.CommandParser.parse(),
-        'recolector': () => this.CollectorParser.parse(),
+        'MENSAJE': () => this.MessageParser.parse(),
+        'COMANDO': () => this.CommandParser.parse(),
+        'RECOLECTOR': () => this.CollectorParser.parse(),
     };
     /**
      * An object of custom parsers.
      * Runs and returns them.
      */
     private customParsers: Record<string, () => StartBotNode | EventNode | CreationNode> = {
-        'encender': () => this.ClientParser.parse(),
-        'evento': () => this.EventParser.parse(),
-        'crear': () => this.parseCreation()
+        'ENCENDER': () => this.ClientParser.parse(),
+        'EVENTO': () => this.EventParser.parse(),
+        'CREAR': () => this.parseCreation()
     }
 
     /**
@@ -96,6 +96,7 @@ export class DisChordParser extends Parser {
      */
     override parseCustomStatement(): ASTNode | null {
         const token = this.peek();
+
         const subParser = this.customParsers[token.type];
 
         if (!subParser) return null;
@@ -112,10 +113,10 @@ export class DisChordParser extends Parser {
     private parseCreation(): CreationNode {
         this.consume('CREAR');
 
-        const type = this.peek().value;
-        const subParser = this.creationParsers[type];
+        const token = this.peek();
+        const subParser = this.creationParsers[token.type];
 
-        if (!subParser) throw new Error(`Entidad desconocida tras 'crear': ${type}`);
+        if (!subParser) throw new Error(`Entidad desconocida tras 'crear': ${token.value}`);
 
         return subParser();
     }
