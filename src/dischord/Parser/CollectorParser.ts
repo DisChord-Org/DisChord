@@ -1,6 +1,7 @@
 import { ASTNode } from "../../chord/types";
 import { DisChordParser } from "./parser";
 import { CollectorNode, CollectorPulseBody } from "../types";
+import { KeyWords } from "../../chord/keywords";
 
 /**
  * The Collector Parser.
@@ -14,12 +15,21 @@ export default class CollectorParser {
     constructor (private ctx: DisChordParser) {}
 
     /**
+     * Injects DisChord-specific keywords into the global system 
+     * so the Lexer can correctly identify them as tokens.
+     * This method is called by DisChordParser.
+     */
+    public static injectStatements () {
+        KeyWords.addStatements([ "recolector" ]);
+    }
+
+    /**
      * Parses a collector creation block.
      * Expected structure: `crear recolector <variable> {...}`
      * @returns The parsed collector node.
      */
     parse (): CollectorNode {
-        this.ctx.consume('IDENTIFICADOR');
+        this.ctx.consume('RECOLECTOR');
 
         const variable = this.ctx.parsePrimary();
         const body: CollectorPulseBody[] = [];

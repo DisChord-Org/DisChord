@@ -1,5 +1,6 @@
 import { DisChordParser } from "../parser";
 import { StartBotNode } from "../../types";
+import { KeyWords } from '../../../chord/keywords';
 
 /**
  * Handles the initial bot declaration.
@@ -13,6 +14,15 @@ export default class ClientParser {
     constructor (private ctx: DisChordParser) {}
 
     /**
+     * Injects DisChord-specific keywords into the global system 
+     * so the Lexer can correctly identify them as tokens.
+     * This method is called by DisChordParser.
+     */
+    public static injectStatements () {
+        KeyWords.addStatements([ "encender", "bot" ]);
+    }
+
+    /**
      * Starts the client declaration analysis.
      * Expected structure: `encender bot { ... }` or `encender bot <expression>`
      * @returns {StartBotNode} An AST node containing the configuration required to initialize the bot.
@@ -21,7 +31,7 @@ export default class ClientParser {
     parse (): StartBotNode {
         this.ctx.consume('ENCENDER');
 
-        const id = this.ctx.consume('IDENTIFICADOR');
+        const id = this.ctx.consume('BOT');
         if (id.value !== 'bot') {
             throw new Error(`Se esperaba 'bot' después de 'encender', se encontró '${id.value}'`);
         }

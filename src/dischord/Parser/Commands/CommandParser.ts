@@ -1,6 +1,7 @@
 import { ASTNode } from "../../../chord/types";
 import { DisChordParser } from "../parser";
 import { CommandNode, CommandOptionNode, CommandParam } from "../../types";
+import { KeyWords } from "../../../chord/keywords";
 
 /**
  * The Commands Parser.
@@ -13,12 +14,21 @@ export default class CommandParser {
     constructor (private ctx: DisChordParser) {}
 
     /**
+     * Injects DisChord-specific keywords into the global system 
+     * so the Lexer can correctly identify them as tokens.
+     * This method is called by DisChordParser.
+     */
+    public static injectStatements () {
+        KeyWords.addStatements([ "comando" ]);
+    }
+
+    /**
      * Parses a command creation block.
      * Expected structure: `crear comando <nombre> {...}`
      * @returns {CommandNode} The AST node representing the command definition.
      */
     parse (): CommandNode {
-        this.ctx.consume('IDENTIFICADOR');
+        this.ctx.consume('COMANDO');
         const commandName = this.ctx.consume('IDENTIFICADOR').value;
     
         this.ctx.consume('L_BRACE');

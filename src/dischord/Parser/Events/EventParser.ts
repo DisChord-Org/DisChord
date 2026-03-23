@@ -1,6 +1,7 @@
 import { ASTNode } from "../../../chord/types";
 import { DisChordParser } from "../parser";
 import { EventNode } from "../../types";
+import { KeyWords } from "../../../chord/keywords";
 
 /**
  * The Event Parser.
@@ -11,6 +12,15 @@ export default class EventParser {
      * @param ctx - The main DisChordParser context for token expression handling
      */
     constructor (private ctx: DisChordParser) {}
+
+    /**
+     * Injects DisChord-specific keywords into the global system 
+     * so the Lexer can correctly identify them as tokens.
+     * This method is called by DisChordParser.
+     */
+    public static injectStatements () {
+        KeyWords.addStatements([ "evento" ]);
+    }
 
     /**
      * Parses an event definition.

@@ -2,6 +2,7 @@ import { DisChordParser } from "../parser";
 import { MessageBodyNode, MessageNode } from "../../types";
 import ButtonParser from "./MessageComponents/ButtonParser";
 import EmbedParser from "./MessageComponents/EmbedParser";
+import { KeyWords } from "../../../chord/keywords";
 
 /**
  * The Message Parser.
@@ -26,11 +27,20 @@ export default class MessageParser {
     }
 
     /**
+     * Injects DisChord-specific keywords into the global system 
+     * so the Lexer can correctly identify them as tokens.
+     * This method is called by DisChordParser.
+     */
+    public static injectStatements () {
+        KeyWords.addStatements([ "mensaje" ]);
+    }
+
+    /**
      * Parses a message creation block.
      * @returns {MessageNode} The AST node representing the message definition.
      */
     parse (): MessageNode {
-        this.ctx.consume('IDENTIFICADOR');
+        this.ctx.consume('MENSAJE');
         this.ctx.consume('L_BRACE');
 
         const body: MessageBodyNode[] = [];

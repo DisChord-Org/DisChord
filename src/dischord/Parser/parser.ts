@@ -4,7 +4,7 @@ import { ASTNode, Token } from '../../chord/types';
 import CommandParser from './Commands/CommandParser';
 import MessageParser from './Messages/MessageParser';
 import CollectorParser from './CollectorParser';
-import { CollectorNode, CommandNode, CreationNode, EventNode, MessageNode, ODBNode, StartBotNode } from '../types';
+import { CreationNode, EventNode, ODBNode, StartBotNode } from '../types';
 import ClientParser from './Client/ClientParser';
 import EventParser from './Events/EventParser';
 
@@ -35,6 +35,18 @@ export class DisChordParser extends Parser {
     private get CollectorParser(): CollectorParser {
         return new CollectorParser(this);
     }
+
+    /**
+     * The inventory of specialists.
+     * Adding a class here will register it into the all system.
+     */
+    private static readonly SubParsers: any[] = [
+        ClientParser,
+        EventParser,
+        CommandParser,
+        MessageParser,
+        CollectorParser
+    ];
     
     /**
      * An object of creation parsers.
@@ -69,7 +81,11 @@ export class DisChordParser extends Parser {
      * so the Lexer can correctly identify them as tokens.
      */
     public static injectStatements() {
-        KeyWords.addStatements([ "encender", "evento", "crear" ]);
+        KeyWords.addStatements([ "crear" ]);
+
+        this.SubParsers.forEach(SubParser => {
+            SubParser.injectStatements();
+        });
     }
 
     /**
