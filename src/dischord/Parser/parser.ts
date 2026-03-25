@@ -7,7 +7,7 @@ import CollectorParser from './CollectorParser';
 import { CreationNode, EventNode, ODBNode, StartBotNode } from '../types';
 import ClientParser from './Client/ClientParser';
 import EventParser from './Events/EventParser';
-import { SubParserClass } from './subparser';
+import { SubParser, SubParserClass } from './subparser';
 
 /**
  * Main Orchestrator for DisChord's syntactic analysis.
@@ -16,27 +16,6 @@ import { SubParserClass } from './subparser';
  * using a composition-by-delegation pattern.
  */
 export class DisChordParser extends Parser {
-    /** Specialist for bot client initialization and configuration */
-    private get ClientParser(): ClientParser {
-        return new ClientParser(this);
-    }
-    /** Specialist for handling Discord gateway events */
-    private get EventParser(): EventParser {
-        return new EventParser(this);
-    }
-    /** Specialist for constructing messages, embeds, and buttons */
-    private get MessageParser(): MessageParser {
-        return new MessageParser(this);
-    }
-    /** Specialist for defining application slash commands */
-    private get CommandParser(): CommandParser {
-        return new CommandParser(this);
-    }
-    /** Specialist for interaction collector logic */
-    private get CollectorParser(): CollectorParser {
-        return new CollectorParser(this);
-    }
-
     /**
      * The inventory of specialists.
      * Adding a class here will register it into the all system.
@@ -48,25 +27,6 @@ export class DisChordParser extends Parser {
         MessageParser,
         CollectorParser
     ];
-    
-    /**
-     * An object of creation parsers.
-     * Runs and returns them.
-     */
-    private creationParsers: Record<string, () => CreationNode> = {
-        'MENSAJE': () => this.MessageParser.parse(),
-        'COMANDO': () => this.CommandParser.parse(),
-        'RECOLECTOR': () => this.CollectorParser.parse(),
-    };
-    /**
-     * An object of custom parsers.
-     * Runs and returns them.
-     */
-    private customParsers: Record<string, () => StartBotNode | EventNode | CreationNode> = {
-        'ENCENDER': () => this.ClientParser.parse(),
-        'EVENTO': () => this.EventParser.parse(),
-        'CREAR': () => this.parseCreation()
-    }
 
     /**
      * Initializes a new instance of the DisChordParser.
@@ -98,11 +58,17 @@ export class DisChordParser extends Parser {
     override parseCustomStatement(): ASTNode | null {
         const token = this.peek();
 
-        const subParser = this.customParsers[token.type];
+        const ParserClass = DisChordParser.SubParsers.find(SubParser =>
+            SubParser.triggerToken === token.type && !SubParser.triggerValue
+        );
 
-        if (!subParser) return null;
+        if (ParserClass) return new ParserClass(this).parse();
 
-        return subParser() as unknown as ASTNode;
+        if (token.type === 'CREAR') {
+            return this.parseCreation() as unknown as any;
+        }
+
+        return null;
     }
 
     /**
@@ -115,11 +81,13 @@ export class DisChordParser extends Parser {
         this.consume('CREAR');
 
         const token = this.peek();
-        const subParser = this.creationParsers[token.type];
+        const ParserClass = DisChordParser.SubParsers.find(SubParser => 
+            SubParser.triggerToken === 'CREAR' && SubParser.triggerValue === token.type
+        );
 
-        if (!subParser) throw new Error(`Entidad desconocida tras 'crear': ${token.value}`);
+        if (!ParserClass) throw new Error(`Entidad desconocida tras 'crear': ${token.value}`);
 
-        return subParser();
+        return new ParserClass(this).parse();
     }
 
     /**
