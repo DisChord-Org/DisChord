@@ -7,7 +7,7 @@ import CollectorParser from './CollectorParser';
 import { CreationNode, EventNode, ODBNode, StartBotNode } from '../types';
 import ClientParser from './Client/ClientParser';
 import EventParser from './Events/EventParser';
-import { SubParser, SubParserClass } from './subparser';
+import { SubParserClass } from './subparser';
 
 /**
  * Main Orchestrator for DisChord's syntactic analysis.
@@ -61,9 +61,9 @@ export class DisChordParser extends Parser {
         if (token.type === 'CREAR') {
             return this.parseCreation() as unknown as any;
         }
-        
+
         const ParserClass = DisChordParser.SubParsers.find(SubParser =>
-            SubParser.triggerToken === token.type
+            SubParser.triggerToken.toUpperCase() === token.type
         );
 
         if (ParserClass) return new ParserClass(this).parse();
@@ -82,7 +82,7 @@ export class DisChordParser extends Parser {
 
         const token = this.peek();
         const ParserClass = DisChordParser.SubParsers.find(SubParser => 
-            SubParser.triggerToken === token.type
+            SubParser.triggerToken.toUpperCase() === token.type
         );
 
         if (!ParserClass) throw new Error(`Entidad desconocida tras 'crear': ${token.value}`);
