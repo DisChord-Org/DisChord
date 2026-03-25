@@ -71,5 +71,4 @@ export interface SubParserClass {
 
     /** Optional: Trigger metadata to identify when this parser should be used */
     triggerToken: string;
-    triggerValue?: string;
 }

@@ -58,15 +58,15 @@ export class DisChordParser extends Parser {
     override parseCustomStatement(): ASTNode | null {
         const token = this.peek();
 
-        const ParserClass = DisChordParser.SubParsers.find(SubParser =>
-            SubParser.triggerToken === token.type && !SubParser.triggerValue
-        );
-
-        if (ParserClass) return new ParserClass(this).parse();
-
         if (token.type === 'CREAR') {
             return this.parseCreation() as unknown as any;
         }
+        
+        const ParserClass = DisChordParser.SubParsers.find(SubParser =>
+            SubParser.triggerToken === token.type
+        );
+
+        if (ParserClass) return new ParserClass(this).parse();
 
         return null;
     }
@@ -82,7 +82,7 @@ export class DisChordParser extends Parser {
 
         const token = this.peek();
         const ParserClass = DisChordParser.SubParsers.find(SubParser => 
-            SubParser.triggerToken === 'CREAR' && SubParser.triggerValue === token.type
+            SubParser.triggerToken === token.type
         );
 
         if (!ParserClass) throw new Error(`Entidad desconocida tras 'crear': ${token.value}`);
