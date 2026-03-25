@@ -20,23 +20,33 @@ export abstract class SubParser {
     
     /**
      * Consumes the next token if it matches the expected type(s).
+     * @param expectedTypes - THe expected token type to consume.
+     * @returns The consumed token.
      */
     protected consume(expectedTypes: string | string[]) {
         return this.parent.consume(expectedTypes);
     }
     
     /**
-     * Returns the current token without consuming it.
+     * @returns The current token without consuming it.
      */
     protected peek() {
         return this.parent.peek();
     }
 
     /**
-     * Helper to parse Object Data Blocks (BDO).
+     * Helper to parse ODB's.
      */
     protected parseODB(): ODBNode {
         return this.parent.parseODB();
+    }
+
+    /**
+     * Parses the current statement by chord's parser.
+     * @returns The AST of the parsed statement. 
+     */
+    protected parseStatement(): ASTNode {
+        return this.parent.parseStatement();
     }
 }
 
