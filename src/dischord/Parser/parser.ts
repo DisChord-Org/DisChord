@@ -4,7 +4,7 @@ import { ASTNode, Token } from '../../chord/types';
 import CommandParser from './Commands/CommandParser';
 import MessageParser from './Messages/MessageParser';
 import CollectorParser from './CollectorParser';
-import { CreationNode, EventNode, ODBNode, StartBotNode } from '../types';
+import { CreationNode, DisChordASTNode, EventNode, ODBNode, StartBotNode } from '../types';
 import ClientParser from './Client/ClientParser';
 import EventParser from './Events/EventParser';
 import { SubParserClass } from './subparser';
@@ -59,14 +59,14 @@ export class DisChordParser extends Parser {
         const token = this.peek();
 
         if (token.type === 'CREAR') {
-            return this.parseCreation() as unknown as any;
+            return this.parseCreation();
         }
 
         const ParserClass = DisChordParser.SubParsers.find(SubParser =>
             SubParser.triggerToken.toUpperCase() === token.type
         );
 
-        if (ParserClass) return new ParserClass(this).parse();
+        if (ParserClass) return new ParserClass(this).parse() as DisChordASTNode;
 
         return null;
     }

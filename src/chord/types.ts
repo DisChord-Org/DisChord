@@ -139,9 +139,9 @@ export interface ObjectProperty<T = never, N = never> {
     value: ASTNode<T, N>;
 }
 
-export interface ObjectNode<T = never> extends BaseNode<T> {
+export interface ObjectNode<T = never, N = never> extends BaseNode<T> {
     type: 'Objeto';
-    properties: ObjectProperty<T>[];
+    properties: ObjectProperty<T, N>[];
 }
 
 export interface IdentificatorNode<T = never> extends BaseNode<T> {
@@ -210,7 +210,7 @@ export type ASTNode<T = never, N = never> =
     | ClassNode<T, N>
     | ExitLoopNode<T>
     | PassLoopNode<T>
-    | ReturnNode<T>
+    | ReturnNode<T, N>
     | NewNode<T, N>
     | NoUnaryNode<T, N>
     | UnaryNode<T, N>
