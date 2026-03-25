@@ -1,8 +1,9 @@
 import { ASTNode, BaseNode, VariableNode } from "../chord/types";
 
-export type DisChordNodeType = 'EncenderBot' | 'Evento' | 'CrearComando'
-                            | 'ParametroDeComando' | 'CrearMensaje' | 'CuerpoDelMensaje'
-                            | 'CrearRecolector' | 'BDO';
+export type DisChordNodeType =
+        'EncenderBot' | 'Evento' | 'CrearComando'
+      | 'ParametroDeComando' | 'CrearMensaje' | 'CuerpoDelMensaje'
+      | 'CrearRecolector' | 'BDO';
 
 export interface StartBotNode extends BaseNode<DisChordNodeType> {
     type: 'EncenderBot';
@@ -12,20 +13,20 @@ export interface StartBotNode extends BaseNode<DisChordNodeType> {
 export interface EventNode extends BaseNode<DisChordNodeType> {
     type: 'Evento';
     name: string;
-    body: ASTNode[];
+    body: DisChordASTNode[];
 }
 
 export interface CommandNode extends BaseNode<DisChordNodeType> {
     type: 'CrearComando';
     value: string;
     params: CommandParam[];
-    body: ASTNode[];
+    body: DisChordASTNode[];
 }
 
 export interface CommandDescriptionParam extends BaseNode<DisChordNodeType> {
     type: 'ParametroDeComando';
     property: 'Descripcion';
-    value: ASTNode;
+    value: DisChordASTNode;
 }
 
 export interface CommandOptionsParam extends BaseNode<DisChordNodeType> {
@@ -38,8 +39,8 @@ export interface CommandStringOptionParam extends BaseNode<DisChordNodeType> {
     type: 'ParametroDeComando';
     name: string;
     property: 'Texto';
-    description: ASTNode;
-    required: ASTNode;
+    description: DisChordASTNode;
+    required: DisChordASTNode;
 }
 
 export type CommandOptionNode = CommandStringOptionParam;
@@ -53,13 +54,13 @@ export interface MessageNode extends BaseNode<DisChordNodeType> {
 export interface MessageContentNode extends BaseNode<DisChordNodeType> {
     type: 'CuerpoDelMensaje';
     property: 'contenido';
-    content: ASTNode;
+    content: DisChordASTNode;
 }
 
 export interface MessageChannelNode extends BaseNode<DisChordNodeType> {
     type: 'CuerpoDelMensaje';
     property: 'canal';
-    channel: ASTNode;
+    channel: DisChordASTNode;
 }
 
 export interface MessageEmbedNode extends BaseNode<DisChordNodeType> {
@@ -71,10 +72,10 @@ export interface MessageEmbedNode extends BaseNode<DisChordNodeType> {
 export interface MessageButtonNode extends BaseNode<DisChordNodeType> {
     type: 'CuerpoDelMensaje';
     property: 'boton';
-    id: ASTNode;
-    label: ASTNode;
-    emoji?: ASTNode;
-    style: ASTNode;
+    id: DisChordASTNode;
+    label: DisChordASTNode;
+    emoji?: DisChordASTNode;
+    style: DisChordASTNode;
 }
 
 export type ButtonDataKeys = Extract<keyof MessageButtonNode, 'id' | 'label' | 'emoji' | 'style'>;
@@ -98,17 +99,17 @@ export type ButtonKeys = keyof typeof ButtonPropMap;
 export type EmbedComponents = 'titulo' | 'descripcion' | 'color' | 'hora' | 'imagen' | 'cartel' | 'autor' | 'pie' | 'campo';
 export interface EmbedTitle extends BaseNode<EmbedComponents> {
     type: 'titulo';
-    object: ASTNode;
+    object: DisChordASTNode;
 }
 
 export interface EmbedDescription extends BaseNode<EmbedComponents> {
     type: 'descripcion';
-    object: ASTNode;
+    object: DisChordASTNode;
 }
 
 export interface EmbedColor extends BaseNode<EmbedComponents> {
     type: 'color';
-    object: ASTNode;
+    object: DisChordASTNode;
 }
 
 export interface EmbedTimestamp extends BaseNode<EmbedComponents> {
@@ -117,31 +118,31 @@ export interface EmbedTimestamp extends BaseNode<EmbedComponents> {
 
 export interface EmbedImage extends BaseNode<EmbedComponents> {
     type: 'imagen';
-    object: ASTNode;
+    object: DisChordASTNode;
 }
 
 export interface EmbedThumbnail extends BaseNode<EmbedComponents> {
     type: 'cartel';
-    object: ASTNode;
+    object: DisChordASTNode;
 }
 
 export interface EmbedAuthor extends BaseNode<EmbedComponents> {
     type: 'autor';
-    name: ASTNode;
-    iconUrl: ASTNode;
+    name: DisChordASTNode;
+    iconUrl: DisChordASTNode;
 }
 
 export interface EmbedFooter extends BaseNode<EmbedComponents> {
     type: 'pie';
-    text: ASTNode;
-    iconUrl?: ASTNode;
+    text: DisChordASTNode;
+    iconUrl?: DisChordASTNode;
 }
 
 export interface EmbedField extends BaseNode<EmbedComponents> {
     type: 'campo';
-    text: ASTNode;
-    value: ASTNode;
-    inline: ASTNode;
+    text: DisChordASTNode;
+    value: DisChordASTNode;
+    inline: DisChordASTNode;
 }
 
 export interface EmbedBody {
@@ -166,15 +167,24 @@ export interface CollectorNode extends BaseNode<DisChordNodeType> {
 
 export interface CollectorPulseBody {
     method: 'run';
-    id: ASTNode;
-    body: ASTNode[];
+    id: DisChordASTNode;
+    body: DisChordASTNode[];
 }
 
 export interface ODBNode extends BaseNode<DisChordNodeType> {
     type: 'BDO';
-    blocks: Record<string, ASTNode>;
-    body: ASTNode[];
+    blocks: Record<string, DisChordASTNode>;
+    body: DisChordASTNode[];
 } 
 
 export type CreationNode = CommandNode | MessageNode | CollectorNode;
-// export type DisChordASTNode = ASTNode<DisChordNodeType, StartBotNode | EventNode | MessageNode | MessageBodyNode | CommandNode | CommandParam>;
+export type DisChordNode =
+      StartBotNode
+    | EventNode
+    | CommandNode
+    | MessageNode
+    | CollectorNode
+    | ODBNode
+    | MessageBodyNode;
+
+export type DisChordASTNode = ASTNode<DisChordNodeType, DisChordNode>;
