@@ -1,4 +1,4 @@
-import { ASTNode, ClassNode, ConditionNode, LoopNode, FunctionNode, PropertyNode, Token, VariableNode, Symbol, SymbolKind, LiteralNode, IdentificatorNode, AccessNode, NewNode, ThisNode, SuperNode, ObjectPropertyType, AccessNodeByIndex } from "./types";
+import { ASTNode, ClassNode, ConditionNode, LoopNode, FunctionNode, PropertyNode, Token, VariableNode, Symbol, SymbolKind, IdentificatorNode, NewNode, ThisNode, SuperNode, ObjectProperty } from "./types";
 
 export class Parser {
     public symbols: Map<string, Symbol> = new Map();
@@ -33,7 +33,6 @@ export class Parser {
         const token = this.tokens[this.current];
         const expected = Array.isArray(expectedTypes) ? expectedTypes : [ expectedTypes ];
 
-        console.log(token)
         if (!expected.includes(token.type)) throw new Error(`Se esperaba uno de ${expected.join(', ')} pero se encontró ${token.type}`);
 
         return this.tokens[this.current++];
@@ -429,7 +428,7 @@ export class Parser {
 
         if (token.type === 'L_BRACE') {
             this.consume('L_BRACE');
-            const properties: ObjectPropertyType[] = [];
+            const properties: ObjectProperty[] = [];
 
             while (this.peek().type !== 'R_BRACE') {
                 const keyToken = this.consume(['TEXTO', 'IDENTIFICADOR']);

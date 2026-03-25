@@ -20,25 +20,27 @@ export type Token = {
     value: string;
 };
 
-export type NodeType<T = never> = 'Clase' | 'Funcion' | 'Bucle' | 'Propiedad' | 'Variable'
-                    | 'Condicion' | 'ExpresionBinaria' | 'Literal' | 'Salir'
-                    | 'Pasar' | 'Devolver' | 'Nuevo' | 'NoUnario' | 'Unario'
-                    | 'Lista' | 'Expresion' | 'Objeto' | 'Identificador'
-                    | 'Acceso' | 'Llamada' | 'Exportar' | 'Importar'
-                    | 'Asignacion' | 'JS' | 'Super' | 'Esta' | 'AccesoPorIndice' | T;
+export type CoreNodeType<T = never> =
+        'Clase' | 'Funcion' | 'Bucle' | 'Propiedad' | 'Variable'
+      | 'Condicion' | 'ExpresionBinaria' | 'Literal' | 'Salir'
+      | 'Pasar' | 'Devolver' | 'Nuevo' | 'NoUnario' | 'Unario'
+      | 'Lista' | 'Expresion' | 'Objeto' | 'Identificador'
+      | 'Acceso' | 'Llamada' | 'Exportar' | 'Importar'
+      | 'Asignacion' | 'JS' | 'Super' | 'Esta' | 'AccesoPorIndice' | T;
 
+export type NodeType<T = never> = CoreNodeType | T;
 export interface BaseNode<T = never> {
     type: NodeType<T>;
 };
 
-export interface ClassNode extends BaseNode {
+export interface ClassNode<T = never> extends BaseNode<T> {
     type: 'Clase';
     id: string;
     superClass?: string;
-    body: ASTNode[];
+    body: ASTNode<T>[];
 }
 
-export interface FunctionNode extends BaseNode {
+export interface FunctionNode<T = never> extends BaseNode<T> {
     type: 'Funcion';
     id: string;
     metadata: {
@@ -48,155 +50,181 @@ export interface FunctionNode extends BaseNode {
         isAsync?: boolean;
     };
     params: string[];
-    body: ASTNode[];
+    body: ASTNode<T>[];
 }
 
-export interface LoopNode extends BaseNode {
+export interface LoopNode<T = never> extends BaseNode<T> {
     type: 'Bucle';
     var: string;
-    iterable: ASTNode;
-    body: ASTNode[];
+    iterable: ASTNode<T>;
+    body: ASTNode<T>[];
 }
 
-export interface PropertyNode extends BaseNode {
+export interface PropertyNode<T = never> extends BaseNode<T> {
     type: 'Propiedad';
     id: string;
-    value: ASTNode;
+    value: ASTNode<T>;
     isStatic?: boolean;
 }
 
-export interface VariableNode extends BaseNode {
+export interface VariableNode<T = never> extends BaseNode<T> {
     type: 'Variable';
     id: string;
-    value: ASTNode;
+    value: ASTNode<T>;
     isStatic?: boolean;
 }
 
-export interface ConditionNode extends BaseNode {
+export interface ConditionNode<T = never> extends BaseNode<T> {
     type: 'Condicion';
-    test: ASTNode;
-    consequent: ASTNode[];
-    alternate?: ASTNode[] | ConditionNode;
+    test: ASTNode<T>;
+    consequent: ASTNode<T>[];
+    alternate?: ASTNode<T>[] | ConditionNode<T>;
 }
 
-export interface BinaryExpressionNode extends BaseNode {
+export interface BinaryExpressionNode<T = never> extends BaseNode<T> {
     type: 'ExpresionBinaria';
-    left: ASTNode;
+    left: ASTNode<T>;
     operator: string;
-    right: ASTNode;
+    right: ASTNode<T>;
 }
 
-export interface LiteralNode extends BaseNode {
+export interface LiteralNode<T = never> extends BaseNode<T> {
     type: 'Literal';
-    value: string | number | boolean | undefined | ASTNode;
+    value: string | number | boolean | undefined;
     raw: string;
 }
 
-export interface ExitLoopNode extends BaseNode {
+export interface ExitLoopNode<T = never> extends BaseNode<T> {
     type: 'Salir';
 }
 
-export interface PassLoopNode extends BaseNode {
+export interface PassLoopNode<T = never> extends BaseNode<T> {
     type: 'Pasar';
 }
 
-export interface ReturnNode extends BaseNode {
+export interface ReturnNode<T = never> extends BaseNode<T> {
     type: 'Devolver';
-    object: ASTNode | undefined;
+    object: ASTNode<T> | undefined;
 }
 
-export interface NewNode extends BaseNode {
+export interface NewNode<T = never> extends BaseNode<T> {
     type: 'Nuevo';
-    object: ASTNode;
+    object: ASTNode<T>;
 }
 
-export interface NoUnaryNode extends BaseNode {
+export interface NoUnaryNode<T = never> extends BaseNode<T> {
     type: 'NoUnario';
     operator: string;
-    object: ASTNode;
+    object: ASTNode<T>;
 }
 
-export interface UnaryNode extends BaseNode {
+export interface UnaryNode<T = never> extends BaseNode<T> {
     type: 'Unario';
     operator: string;
-    object: ASTNode;
+    object: ASTNode<T>;
 }
 
-export interface ListNode extends BaseNode {
+export interface ListNode<T = never> extends BaseNode<T> {
     type: 'Lista';
-    body: ASTNode[];
+    body: ASTNode<T>[];
 }
 
-export interface ExpressionNode extends BaseNode {
+export interface ExpressionNode<T = never> extends BaseNode<T> {
     type: 'Expresion';
-    object: ASTNode;
+    object: ASTNode<T>;
 }
 
-export type ObjectPropertyType = Record<'key', string> & Record<'value', ASTNode>;
-export interface ObjectNode extends BaseNode {
+export interface ObjectProperty<T = never> {
+    key: string;
+    value: ASTNode<T>;
+}
+
+export interface ObjectNode<T = never> extends BaseNode<T> {
     type: 'Objeto';
-    properties: ObjectPropertyType[];
+    properties: ObjectProperty<T>[];
 }
 
-export interface IdentificatorNode extends BaseNode {
+export interface IdentificatorNode<T = never> extends BaseNode<T> {
     type: 'Identificador';
     value: string;
 }
 
-export interface AccessNode extends BaseNode {
+export interface AccessNode<T = never> extends BaseNode<T> {
     type: 'Acceso';
-    object: ASTNode;
+    object: ASTNode<T>;
     property: string;
 }
 
-export interface AccessNodeByIndex extends BaseNode {
+export interface AccessNodeByIndex<T = never> extends BaseNode<T> {
     type: 'AccesoPorIndice';
-    object: ASTNode;
-    index: ASTNode;
+    object: ASTNode<T>;
+    index: ASTNode<T>;
 }
 
-export interface CallNode extends BaseNode {
+export interface CallNode<T = never> extends BaseNode<T> {
     type: 'Llamada';
-    object: ASTNode;
-    params: ASTNode[];
+    object: ASTNode<T>;
+    params: ASTNode<T>[];
 }
 
-export interface ExportNode extends BaseNode {
+export interface ExportNode<T = never> extends BaseNode<T> {
     type: 'Exportar';
-    object: ASTNode;
+    object: ASTNode<T>;
 }
 
-export interface ImportNode extends BaseNode {
+export interface ImportNode<T = never> extends BaseNode<T> {
     type: 'Importar';
     identificators: string[];
     path: string;
 }
 
-export interface AssignmentNode extends BaseNode {
+export interface AssignmentNode<T = never> extends BaseNode<T> {
     type: 'Asignacion';
-    left: ASTNode;
-    assignment: ASTNode;
+    left: ASTNode<T>;
+    assignment: ASTNode<T>;
 }
 
-export interface JSNode extends BaseNode {
+export interface JSNode<T = never> extends BaseNode<T> {
     type: 'JS',
     value: string
 }
 
-export interface SuperNode extends BaseNode {
+export interface SuperNode<T = never> extends BaseNode<T> {
     type: 'Super';
     value: 'super';
 }
 
-export interface ThisNode extends BaseNode {
+export interface ThisNode<T = never> extends BaseNode<T> {
     type: 'Esta';
     value: 'this';
 }
 
-export type ASTNode<T = never, N = never> = LiteralNode | BinaryExpressionNode | ConditionNode
-                    | VariableNode | PropertyNode | LoopNode | FunctionNode
-                    | ClassNode | ExitLoopNode | PassLoopNode | ReturnNode
-                    | NewNode | NoUnaryNode | UnaryNode | ListNode
-                    | ExpressionNode | ObjectNode | IdentificatorNode
-                    | AccessNode | CallNode | ExportNode | ImportNode
-                    | AssignmentNode | JSNode | SuperNode | ThisNode | AccessNodeByIndex | N;
+export type ASTNode<T = never, N = never> =
+      LiteralNode<T>
+    | BinaryExpressionNode<T>
+    | ConditionNode<T>
+    | VariableNode<T>
+    | PropertyNode<T>
+    | LoopNode<T>
+    | FunctionNode<T>
+    | ClassNode<T>
+    | ExitLoopNode<T>
+    | PassLoopNode<T>
+    | ReturnNode<T>
+    | NewNode<T>
+    | NoUnaryNode<T>
+    | UnaryNode<T>
+    | ListNode<T>
+    | ExpressionNode<T>
+    | ObjectNode<T>
+    | IdentificatorNode<T>
+    | AccessNode<T>
+    | CallNode<T>
+    | ExportNode<T>
+    | ImportNode<T>
+    | AssignmentNode<T>
+    | JSNode<T>
+    | SuperNode<T>
+    | ThisNode<T>
+    | AccessNodeByIndex<T>
+    | N;
