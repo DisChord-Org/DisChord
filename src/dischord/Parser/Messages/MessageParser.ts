@@ -3,13 +3,17 @@ import { MessageBodyNode, MessageNode } from "../../types";
 import ButtonParser from "./MessageComponents/ButtonParser";
 import EmbedParser from "./MessageComponents/EmbedParser";
 import { KeyWords } from "../../../chord/keywords";
+import { SubParser } from "../subparser";
 
 /**
  * The Message Parser.
  * This class is responsible for parsing message creation blocks, which include the message content, channel, embeds and buttons.
  * It constructs a MessageNode in the AST that represents the entire message definition.
  */
-export default class MessageParser {
+export default class MessageParser extends SubParser {
+    /** To identify when this parser should be used */
+    static triggerToken: string = "mensaje";
+
     // Parsers for message components
     private EmbedParser = new EmbedParser(this);
     // The ButtonParser is initialized after the EmbedParser to ensure it has access to the MessageParser context if needed
@@ -20,10 +24,11 @@ export default class MessageParser {
 
     /**
      * Initializes the MessageParser with the main DisChordParser context for token expression handling.
-     * @param ctx - The main DisChordParser context for token expression handling
+     * @param parent - The main DisChordParser context for token expression handling
      */
-    constructor (private ctx: DisChordParser) {
-        this.MessageParserContext = ctx;
+    constructor (protected parent: DisChordParser) {
+        super(parent);
+        this.MessageParserContext = parent;
     }
 
     /**
@@ -40,18 +45,18 @@ export default class MessageParser {
      * @returns {MessageNode} The AST node representing the message definition.
      */
     parse (): MessageNode {
-        this.ctx.consume('MENSAJE');
-        this.ctx.consume('L_BRACE');
+        this.consume('MENSAJE');
+        this.consume('L_BRACE');
 
         const body: MessageBodyNode[] = [];
 
-        while (this.ctx.peek().type !== 'R_BRACE') {
-            const token = this.ctx.peek();
+        while (this.peek().type !== 'R_BRACE') {
+            const token = this.peek();
 
             switch (token.value) {
                 case 'contenido':
-                    this.ctx.consume('IDENTIFICADOR');
-                    const content = this.ctx.parsePrimary();
+                    this.consume('IDENTIFICADOR');
+                    const content = this.parsePrimary();
 
                     const contentNode: MessageBodyNode = {
                         type: 'CuerpoDelMensaje',
@@ -62,8 +67,8 @@ export default class MessageParser {
                     body.push(contentNode);
                     break;
                 case 'canal':
-                    this.ctx.consume('IDENTIFICADOR');
-                    const channel = this.ctx.parsePrimary();
+                    this.consume('IDENTIFICADOR');
+                    const channel = this.parsePrimary();
 
                     const channelNode: MessageBodyNode = {
                         type: 'CuerpoDelMensaje',
@@ -74,7 +79,7 @@ export default class MessageParser {
                     body.push(channelNode);
                     break;
                 case 'embed':
-                    this.ctx.consume('IDENTIFICADOR');
+                    this.consume('IDENTIFICADOR');
                     const embed = this.EmbedParser.parse();
 
                     const embedNode: MessageBodyNode = {
@@ -86,14 +91,14 @@ export default class MessageParser {
                     body.push(embedNode);
                     break;
                 case 'boton':
-                    this.ctx.consume('IDENTIFICADOR');
+                    this.consume('IDENTIFICADOR');
                     const ButtonNode: MessageBodyNode = this.ButtonParser.parse();
                     body.push(ButtonNode);
                     break;
             }
         }
 
-        this.ctx.consume('R_BRACE');
+        this.consume('R_BRACE');
 
         return {
             type: 'CrearMensaje',

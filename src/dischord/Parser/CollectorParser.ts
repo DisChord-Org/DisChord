@@ -2,17 +2,22 @@ import { ASTNode } from "../../chord/types";
 import { DisChordParser } from "./parser";
 import { CollectorNode, CollectorPulseBody } from "../types";
 import { KeyWords } from "../../chord/keywords";
+import { SubParser } from "./subparser";
 
 /**
  * The Collector Parser.
  * This class is responsible for parsing interaction collector definitions,
  * which include the collector variable and its pulse bodies (e.g., alPulsarId).
  */
-export default class CollectorParser {
+export default class CollectorParser extends SubParser {
+    /** To identify when this parser should be used */
+    static triggerToken: string = "recolector";
     /**
-     * @param ctx - The main DisChordParser context for token expression handling
+     * @param parent - The main DisChordParser context for token expression handling
      */
-    constructor (private ctx: DisChordParser) {}
+    constructor (protected parent: DisChordParser) {
+        super(parent);
+    }
 
     /**
      * Injects DisChord-specific keywords into the global system 
@@ -29,14 +34,14 @@ export default class CollectorParser {
      * @returns The parsed collector node.
      */
     parse (): CollectorNode {
-        this.ctx.consume('RECOLECTOR');
+        this.consume('RECOLECTOR');
 
-        const variable = this.ctx.parsePrimary();
+        const variable = this.parsePrimary();
         const body: CollectorPulseBody[] = [];
 
-        this.ctx.consume('L_BRACE');
-        while (this.ctx.peek().type !== 'R_BRACE') {
-            const token = this.ctx.peek();
+        this.consume('L_BRACE');
+        while (this.peek().type !== 'R_BRACE') {
+            const token = this.peek();
 
             switch (token.value) {
                 case 'alPulsarId':
@@ -46,7 +51,7 @@ export default class CollectorParser {
                     throw new Error(`Dentro del recolector se esperaba 'alPulsarId', se encontró '${token.value}'`);
             }
         }
-        this.ctx.consume('R_BRACE');
+        this.consume('R_BRACE');
 
         return {
             type: 'CrearRecolector',
@@ -61,15 +66,15 @@ export default class CollectorParser {
      * @returns The parsed collector pulse body.
      */
     private parseCollectorPulseBody(): CollectorPulseBody {
-        this.ctx.consume('IDENTIFICADOR'); // alPulsarId
-        const id = this.ctx.parsePrimary();
+        this.consume('IDENTIFICADOR'); // alPulsarId
+        const id = this.parsePrimary();
         const body: ASTNode[] = [];
 
-        this.ctx.consume('L_BRACE');
-        while (this.ctx.peek().type !== 'R_BRACE') {
-            body.push(this.ctx.parseStatement());
+        this.consume('L_BRACE');
+        while (this.peek().type !== 'R_BRACE') {
+            body.push(this.parseStatement());
         }
-        this.ctx.consume('R_BRACE');
+        this.consume('R_BRACE');
 
         return {
             method: 'run',

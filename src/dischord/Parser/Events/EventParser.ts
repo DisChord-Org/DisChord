@@ -2,16 +2,22 @@ import { ASTNode } from "../../../chord/types";
 import { DisChordParser } from "../parser";
 import { EventNode } from "../../types";
 import { KeyWords } from "../../../chord/keywords";
+import { SubParser } from "../subparser";
 
 /**
  * The Event Parser.
  * This class is responsible for parsing event definitions, which include the event name and its body of statements to execute when the event is triggered.
  */
-export default class EventParser {
+export default class EventParser extends SubParser {
+    /** To identify when this parser should be used */
+    static triggerToken: string = "evento";
+
     /**
-     * @param ctx - The main DisChordParser context for token expression handling
+     * @param parent - The main DisChordParser context for token expression handling
      */
-    constructor (private ctx: DisChordParser) {}
+    constructor (protected parent: DisChordParser) {
+        super(parent);
+    }
 
     /**
      * Injects DisChord-specific keywords into the global system 
@@ -28,19 +34,19 @@ export default class EventParser {
      * @returns {EventNode} The AST node representing the event definition.
      */
     parse (): EventNode {
-        this.ctx.consume('EVENTO');
+        this.consume('EVENTO');
 
-        const eventName = this.ctx.consume('IDENTIFICADOR').value;
+        const eventName = this.consume('IDENTIFICADOR').value;
 
-        this.ctx.consume('L_BRACE');
+        this.consume('L_BRACE');
 
         const body: ASTNode[] = [];
 
-        while (this.ctx.peek().type !== 'R_BRACE') {
-            body.push(this.ctx.parseStatement());
+        while (this.peek().type !== 'R_BRACE') {
+            body.push(this.parseStatement());
         }
     
-        this.ctx.consume('R_BRACE');
+        this.consume('R_BRACE');
     
         return {
             type: 'Evento',

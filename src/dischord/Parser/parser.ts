@@ -7,6 +7,7 @@ import CollectorParser from './CollectorParser';
 import { CreationNode, EventNode, ODBNode, StartBotNode } from '../types';
 import ClientParser from './Client/ClientParser';
 import EventParser from './Events/EventParser';
+import { SubParserClass } from './subparser';
 
 /**
  * Main Orchestrator for DisChord's syntactic analysis.
@@ -40,7 +41,7 @@ export class DisChordParser extends Parser {
      * The inventory of specialists.
      * Adding a class here will register it into the all system.
      */
-    private static readonly SubParsers: any[] = [
+    private static readonly SubParsers: SubParserClass[] = [
         ClientParser,
         EventParser,
         CommandParser,
