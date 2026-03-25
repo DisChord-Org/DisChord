@@ -48,6 +48,14 @@ export abstract class SubParser {
     protected parseStatement(): ASTNode {
         return this.parent.parseStatement();
     }
+
+    /**
+     * Helper to parse primaries identificators.
+     * @returns The AST of the parsed identificator.
+     */
+    protected parsePrimary(): ASTNode {
+        return this.parent.parsePrimary();
+    }
 }
 
 /**
