@@ -4,7 +4,7 @@ import { Token } from '../../chord/types';
 import CommandParser from './Commands/CommandParser';
 import MessageParser from './Messages/MessageParser';
 import CollectorParser from './CollectorParser';
-import { CreationNode, DisChordASTNode, DisChordNode, DisChordNodeType, ODBNode } from '../types';
+import { DisChordASTNode, DisChordNode, DisChordNodeType, ODBNode } from '../types';
 import ClientParser from './Client/ClientParser';
 import EventParser from './Events/EventParser';
 import { SubParserClass } from './subparser';

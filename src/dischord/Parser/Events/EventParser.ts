@@ -1,4 +1,3 @@
-import { ASTNode } from "../../../chord/types";
 import { DisChordParser } from "../parser";
 import { DisChordASTNode, EventNode } from "../../types";
 import { KeyWords } from "../../../chord/keywords";

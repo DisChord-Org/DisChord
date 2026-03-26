@@ -1,4 +1,3 @@
-import { ASTNode } from "../../../chord/types";
 import { DisChordParser } from "../parser";
 import { CommandNode, CommandOptionNode, CommandParam, DisChordASTNode } from "../../types";
 import { KeyWords } from "../../../chord/keywords";

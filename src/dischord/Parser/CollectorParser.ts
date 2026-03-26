@@ -1,4 +1,3 @@
-import { ASTNode } from "../../chord/types";
 import { DisChordParser } from "./parser";
 import { CollectorNode, CollectorPulseBody, DisChordASTNode } from "../types";
 import { KeyWords } from "../../chord/keywords";

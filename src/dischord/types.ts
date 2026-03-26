@@ -1,4 +1,4 @@
-import { ASTNode, BaseNode, VariableNode } from "../chord/types";
+import { ASTNode, BaseNode } from "../chord/types";
 
 export type DisChordNodeType =
         'EncenderBot' | 'Evento' | 'CrearComando'
