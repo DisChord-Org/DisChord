@@ -1,5 +1,5 @@
 import { ASTNode } from "../../chord/types";
-import { ODBNode } from "../types";
+import { DisChordASTNode, ODBNode } from "../types";
 import { DisChordParser } from "./parser";
 
 /**
@@ -16,7 +16,7 @@ export abstract class SubParser {
      * Core logic to transform tokens into a specific AST node.
      * @returns A specialized ASTNode (e.g., MessageNode, CommandNode).
      */
-    abstract parse(): any;
+    abstract parse(): DisChordASTNode;
     
     /**
      * Consumes the next token if it matches the expected type(s).
@@ -45,7 +45,7 @@ export abstract class SubParser {
      * Parses the current statement by chord's parser.
      * @returns The AST of the parsed statement. 
      */
-    protected parseStatement(): ASTNode {
+    protected parseStatement(): DisChordASTNode {
         return this.parent.parseStatement();
     }
 
@@ -53,7 +53,7 @@ export abstract class SubParser {
      * Helper to parse primaries identificators.
      * @returns The AST of the parsed identificator.
      */
-    protected parsePrimary(): ASTNode {
+    protected parsePrimary(): DisChordASTNode {
         return this.parent.parsePrimary();
     }
 }

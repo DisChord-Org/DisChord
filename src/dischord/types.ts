@@ -161,7 +161,7 @@ export type MessageBodyNode = MessageContentNode | MessageChannelNode | MessageE
 
 export interface CollectorNode extends BaseNode<DisChordNodeType> {
     type: 'CrearRecolector';
-    variable: VariableNode['value'];
+    variable: DisChordASTNode;
     body: CollectorPulseBody[];
 }
 

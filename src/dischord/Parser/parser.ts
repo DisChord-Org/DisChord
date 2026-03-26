@@ -1,10 +1,10 @@
 import { KeyWords } from '../../chord/keywords';
 import { Parser } from '../../chord/parser';
-import { ASTNode, Token } from '../../chord/types';
+import { Token } from '../../chord/types';
 import CommandParser from './Commands/CommandParser';
 import MessageParser from './Messages/MessageParser';
 import CollectorParser from './CollectorParser';
-import { CreationNode, DisChordASTNode, DisChordNode, DisChordNodeType, EventNode, ODBNode, StartBotNode } from '../types';
+import { CreationNode, DisChordASTNode, DisChordNode, DisChordNodeType, ODBNode } from '../types';
 import ClientParser from './Client/ClientParser';
 import EventParser from './Events/EventParser';
 import { SubParserClass } from './subparser';
@@ -77,7 +77,7 @@ export class DisChordParser extends Parser<DisChordNodeType, DisChordNode> {
      * @private
      * @throws Error if the creation type is not recognized.
      */
-    private parseCreation(): CreationNode {
+    private parseCreation(): DisChordASTNode {
         this.consume('CREAR');
 
         const token = this.peek();

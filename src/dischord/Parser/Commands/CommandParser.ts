@@ -1,6 +1,6 @@
 import { ASTNode } from "../../../chord/types";
 import { DisChordParser } from "../parser";
-import { CommandNode, CommandOptionNode, CommandParam } from "../../types";
+import { CommandNode, CommandOptionNode, CommandParam, DisChordASTNode } from "../../types";
 import { KeyWords } from "../../../chord/keywords";
 import { SubParser } from "../subparser";
 
@@ -39,14 +39,14 @@ export default class CommandParser extends SubParser {
     
         this.consume('L_BRACE');
     
-        const body: ASTNode[] = [];
+        const body: DisChordASTNode[] = [];
         const params: CommandParam[] = [];
             
         while (this.peek().type !== 'R_BRACE') {
             switch (this.peek().value) {
                 case 'descripcion':
                     this.consume('IDENTIFICADOR');
-                    const value: ASTNode = this.parsePrimary();
+                    const value: DisChordASTNode = this.parsePrimary();
     
                     const param: CommandParam = {
                         type: 'ParametroDeComando',

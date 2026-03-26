@@ -1,6 +1,6 @@
 import { ASTNode } from "../../../chord/types";
 import { DisChordParser } from "../parser";
-import { EventNode } from "../../types";
+import { DisChordASTNode, EventNode } from "../../types";
 import { KeyWords } from "../../../chord/keywords";
 import { SubParser } from "../subparser";
 
@@ -40,7 +40,7 @@ export default class EventParser extends SubParser {
 
         this.consume('L_BRACE');
 
-        const body: ASTNode[] = [];
+        const body: DisChordASTNode[] = [];
 
         while (this.peek().type !== 'R_BRACE') {
             body.push(this.parseStatement());

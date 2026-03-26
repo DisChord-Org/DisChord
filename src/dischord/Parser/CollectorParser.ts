@@ -1,6 +1,6 @@
 import { ASTNode } from "../../chord/types";
 import { DisChordParser } from "./parser";
-import { CollectorNode, CollectorPulseBody } from "../types";
+import { CollectorNode, CollectorPulseBody, DisChordASTNode } from "../types";
 import { KeyWords } from "../../chord/keywords";
 import { SubParser } from "./subparser";
 
@@ -68,7 +68,7 @@ export default class CollectorParser extends SubParser {
     private parseCollectorPulseBody(): CollectorPulseBody {
         this.consume('IDENTIFICADOR'); // alPulsarId
         const id = this.parsePrimary();
-        const body: ASTNode[] = [];
+        const body: DisChordASTNode[] = [];
 
         this.consume('L_BRACE');
         while (this.peek().type !== 'R_BRACE') {
