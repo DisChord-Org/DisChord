@@ -4,7 +4,7 @@ import { ASTNode, Token } from '../../chord/types';
 import CommandParser from './Commands/CommandParser';
 import MessageParser from './Messages/MessageParser';
 import CollectorParser from './CollectorParser';
-import { CreationNode, DisChordASTNode, EventNode, ODBNode, StartBotNode } from '../types';
+import { CreationNode, DisChordASTNode, DisChordNode, DisChordNodeType, EventNode, ODBNode, StartBotNode } from '../types';
 import ClientParser from './Client/ClientParser';
 import EventParser from './Events/EventParser';
 import { SubParserClass } from './subparser';
@@ -15,7 +15,7 @@ import { SubParserClass } from './subparser';
  * specific structures (Messages, Commands, Events, etc.) to specialized sub-parsers 
  * using a composition-by-delegation pattern.
  */
-export class DisChordParser extends Parser {
+export class DisChordParser extends Parser<DisChordNodeType, DisChordNode> {
     /**
      * The inventory of specialists.
      * Adding a class here will register it into the all system.
@@ -55,7 +55,7 @@ export class DisChordParser extends Parser {
      * @override
      * @returns The generated ASTNode or null if no match is found.
      */
-    override parseCustomStatement(): ASTNode | null {
+    override parseCustomStatement(): DisChordASTNode | null {
         const token = this.peek();
 
         if (token.type === 'CREAR') {
@@ -66,7 +66,7 @@ export class DisChordParser extends Parser {
             SubParser.triggerToken.toUpperCase() === token.type
         );
 
-        if (ParserClass) return new ParserClass(this).parse() as DisChordASTNode;
+        if (ParserClass) return new ParserClass(this).parse();
 
         return null;
     }
@@ -95,12 +95,12 @@ export class DisChordParser extends Parser {
      * Allows the 'crear' (create) keyword to be treated as a primary expression.
      * @override
      */
-    override parsePrimary(): ASTNode {
+    override parsePrimary(): DisChordASTNode {
         const token = this.peek();
 
         switch (token.type) {
             case 'CREAR':
-                return this.parseCreation() as unknown as ASTNode;
+                return this.parseCreation();
             default:
                 return super.parsePrimary();
         }
@@ -114,8 +114,8 @@ export class DisChordParser extends Parser {
     parseODB(): ODBNode {
         this.consume('L_BRACE');
 
-        const blocks: Record<string, ASTNode> = {};
-        const body: ASTNode[] = [];
+        const blocks: Record<string, DisChordASTNode> = {};
+        const body: DisChordASTNode[] = [];
 
         while (this.peek().type !== 'R_BRACE') {
             if (this.isPropertyAssignment()) {
