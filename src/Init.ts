@@ -1,11 +1,16 @@
 import * as fs from 'fs';
 import path from 'path';
 import { pathToFileURL } from 'url';
+import util from 'util';
+
 import Prettifier from './Prettifier';
+import { ASTNode, Token } from './chord/types';
+import { DisChordNode, DisChordNodeType } from './dischord/types';
+
 import { Lexer } from './chord/lexer';
 import { DisChordParser } from './dischord/Parser/parser';
-import { ASTNode, Token } from './chord/types';
 import { DisChordGenerator } from './dischord/Generator/generator';
+
 
 /**
  * The Init class for DisChord.
@@ -36,9 +41,23 @@ export default class Init {
         this.start();
     }
 
-    log (name: string, message: Token[] | ASTNode[] | string) {
+    log (name: string, message: Token[] | ASTNode<DisChordNodeType, DisChordNode>[] | string) {
+        const depthIndex = this.args.findIndex(arg => arg === '-d' || arg === '--depth');
+        
+        let depthValue: number = 1;
+        if (depthIndex !== -1 && this.args[depthIndex + 1]) {
+            depthValue = parseInt(this.args[depthIndex + 1]);
+        }
+
         console.log("--- " + name + " ---");
-        console.log(message);
+        
+        console.log(util.inspect(message, {
+            showHidden: false,
+            depth: depthValue,
+            colors: true,
+            compact: false
+        }));
+
         console.log("--- " + "-".repeat(name.length) + " ---");
     }
 
@@ -68,15 +87,15 @@ export default class Init {
 
         const lexer = new Lexer(code);
         const tokens = lexer.tokenize();
-        if (args[0] === '--lexer') this.log("LEXER", tokens);
+        if (args.includes('--lexer')) this.log("LEXER", tokens);
 
         const parser = new DisChordParser(tokens);
         const ast = parser.parse();
-        if (args[0] === '--ast') this.log("AST", ast);
+        if (args.includes('--ast')) this.log("AST", ast);
     
         const generator = new DisChordGenerator(parser.symbols, this.projectRoot);
         let output = generator.generate(ast);
-        if (args[0] === '--output') this.log("OUTPUT", output);
+        if (args.includes('--output')) this.log("OUTPUT", output);
 
         if (!fs.existsSync(targetDir)) fs.mkdirSync(targetDir, { recursive: true });
         Prettifier.savePrettified(outputPath, output);
