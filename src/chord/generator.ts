@@ -1,14 +1,14 @@
 import { corelib, runtimeInjections } from "./core.lib";
 import { AccessNode, AssignmentNode, ASTNode, BinaryExpressionNode, CallNode, ClassNode, ConditionNode, ExportNode, FunctionNode, ListNode, LiteralNode, LoopNode, NoUnaryNode, ObjectNode, ObjectProperty, PropertyNode, Symbol, UnaryNode, VariableNode } from "./types";
 
-export class Generator {
+export class Generator<T = never, N = never> {
     private SymbolsTable: Map<string, Symbol>;
 
     constructor (private symbols: Map<string, Symbol>) {
         this.SymbolsTable = symbols;
     }
 
-    public generate(nodes: ASTNode[]): string {
+    public generate(nodes: ASTNode<T, N>[]): string {
         const body = nodes.map(node => {
             const code = this.visit(node);
             const noSemicolon = ['CONDICION', 'BUCLE', 'CLASE', 'FUNCION'];
@@ -22,7 +22,7 @@ export class Generator {
         `;
     }
 
-    public visit(node: ASTNode): string {
+    public visit(node: ASTNode<T, N>): string {
         switch (node.type) {
             case 'Clase':
                 return this.generateClass(node);

@@ -1,7 +1,7 @@
 import { Generator } from "../../chord/generator";
 import { AccessNode, ASTNode, CallNode } from "../../chord/types";
 import { corelib } from "./../core.lib";
-import { CollectorNode, CommandNode, DisChordNodeType, EventNode, MessageNode, StartBotNode } from "./../types";
+import { CollectorNode, CommandNode, DisChordNode, DisChordNodeType, EventNode, MessageNode, StartBotNode } from "./../types";
 import ClietInitGenerator from "./Client/ClientInitGenerator";
 import EventGenerator from "./Events/EventGenerator";
 import CommandGenerator from "./Commands/CommandGenerator";
@@ -12,7 +12,7 @@ import CollectorGenerator from "./CollectorGenerator";
  * Main generator class for DisChord.
  * It extends the base Generator class and overrides the visit method to handle DisChord-specific AST nodes.
  */
-export class DisChordGenerator extends Generator {
+export class DisChordGenerator extends Generator<DisChordNodeType, DisChordNode> {
     // Root directory of the project, used for resolving imports and file paths.
     projectRoot: string = '';
 
