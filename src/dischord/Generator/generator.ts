@@ -1,7 +1,7 @@
 import { Generator } from "../../chord/generator";
-import { AccessNode, ASTNode, CallNode } from "../../chord/types";
+import { AccessNode, CallNode } from "../../chord/types";
 import { corelib } from "./../core.lib";
-import { CollectorNode, CommandNode, DisChordNode, DisChordNodeType, EventNode, MessageNode, StartBotNode } from "./../types";
+import { CollectorNode, CommandNode, DisChordASTNode, DisChordNode, DisChordNodeType, EventNode, MessageNode, StartBotNode } from "./../types";
 import ClietInitGenerator from "./Client/ClientInitGenerator";
 import EventGenerator from "./Events/EventGenerator";
 import CommandGenerator from "./Commands/CommandGenerator";
@@ -47,18 +47,18 @@ export class DisChordGenerator extends Generator<DisChordNodeType, DisChordNode>
      * @param node The AST node to visit, which can be of various types defined in the DisChordNodeType enum.
      * @returns The generated code for the given node.
      */
-    override visit(node: ASTNode): string {
-        switch (node.type as DisChordNodeType) {
+    override visit(node: DisChordASTNode): string {
+        switch (node.type) {
             case 'EncenderBot':
-                return this.ClientInitGenerator.generate(node as unknown as StartBotNode);
+                return this.ClientInitGenerator.generate(node);
             case 'Evento':
-                return this.EventGenerator.generate(node as unknown as EventNode);
+                return this.EventGenerator.generate(node);
             case 'CrearMensaje':
-                return this.MessageGenerator.generate(node as unknown as MessageNode);
+                return this.MessageGenerator.generate(node);
             case 'CrearComando':
-                return this.CommandGenerator.generate(node as unknown as CommandNode);
+                return this.CommandGenerator.generate(node);
             case 'CrearRecolector':
-                return this.CollectorGenerator.generate(node as unknown as CollectorNode);
+                return this.CollectorGenerator.generate(node);
             default:
                 return super.visit(node);
         }
@@ -70,7 +70,7 @@ export class DisChordGenerator extends Generator<DisChordNodeType, DisChordNode>
      * @param node The AccessNode representing a property access in the AST, containing the object and property being accessed.
      * @returns The generated code for the property access, which may be translated based on the core library mappings or fall back to the default generation if no mapping is found.
      */
-    override generateAccess(node: AccessNode): string {
+    override generateAccess(node: AccessNode<DisChordNodeType, DisChordNode>): string {
         const objName = node.object.type === 'Identificador' ? node.object.value : null;
         const propName = node.property;
 
@@ -96,13 +96,13 @@ export class DisChordGenerator extends Generator<DisChordNodeType, DisChordNode>
      * @param node The CallNode representing a function call in the AST, containing the function being called and its parameters.
      * @returns The generated code for the function call, which may be translated based on the core library mappings or fall back to the default generation if no mapping is found.
      */
-    override generateCall(node: CallNode): string {
+    override generateCall(node: CallNode<DisChordNodeType, DisChordNode>): string {
         if (node.object.type === 'Identificador') {
             const name = node.object.value;
             
             if (typeof corelib[name] === 'string') {
                 const translation = corelib[name] as string;
-                const args = node.params.map((arg: ASTNode) => this.visit(arg)).join(', ');
+                const args = node.params.map((arg: DisChordASTNode) => this.visit(arg)).join(', ');
                 return `${translation}(${args})`;
             }
         }
