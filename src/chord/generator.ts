@@ -1,7 +1,7 @@
 import { corelib, runtimeInjections } from "./core.lib";
-import { AccessNode, AccessNodeByIndex, AssignmentNode, ASTNode, BaseNode, BinaryExpressionNode, CallNode, ClassNode, ConditionNode, ExportNode, FunctionNode, ListNode, LiteralNode, LoopNode, NodeType, NoUnaryNode, ObjectNode, ObjectProperty, PropertyNode, Symbol, UnaryNode, VariableNode } from "./types";
+import { AccessNode, AccessNodeByIndex, AssignmentNode, ASTNode, BinaryExpressionNode, CallNode, ClassNode, ConditionNode, ExportNode, FunctionNode, ListNode, LiteralNode, LoopNode, NodeType, NoUnaryNode, ObjectNode, ObjectProperty, PropertyNode, Symbol, UnaryNode, VariableNode } from "./types";
 
-export class Generator<T extends string = string, N extends BaseNode<T> = any> {
+export class Generator<T extends string = string, N = never> {
     private SymbolsTable: Map<string, Symbol>;
 
     constructor (private symbols: Map<string, Symbol>) {

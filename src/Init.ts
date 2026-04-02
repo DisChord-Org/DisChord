@@ -94,7 +94,7 @@ export default class Init {
         if (args.includes('--ast')) this.log("AST", ast);
     
         const generator = new DisChordGenerator(parser.symbols, this.projectRoot);
-        let output = generator.generate(ast);
+        let output = generator.generate(ast as ASTNode<DisChordNodeType>[]);
         if (args.includes('--output')) this.log("OUTPUT", output);
 
         if (!fs.existsSync(targetDir)) fs.mkdirSync(targetDir, { recursive: true });
