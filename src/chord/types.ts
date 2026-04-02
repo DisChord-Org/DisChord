@@ -20,7 +20,7 @@ export type Token = {
     value: string;
 };
 
-export type CoreNodeType<T = never> =
+export type CoreNodeType<T = string> =
         'Clase' | 'Funcion' | 'Bucle' | 'Propiedad' | 'Variable'
       | 'Condicion' | 'ExpresionBinaria' | 'Literal' | 'Salir'
       | 'Pasar' | 'Devolver' | 'Nuevo' | 'NoUnario' | 'Unario'
@@ -30,7 +30,7 @@ export type CoreNodeType<T = never> =
 
 export type NodeType<T = never> = CoreNodeType | T;
 export interface BaseNode<T = never> {
-    type: NodeType<T>;
+    readonly type: NodeType<T>;
 };
 
 export interface ClassNode<T = never, N = never> extends BaseNode<T> {

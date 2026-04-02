@@ -1,5 +1,5 @@
 import { Generator } from "../../chord/generator";
-import { AccessNode, CallNode } from "../../chord/types";
+import { AccessNode, ASTNode, CallNode } from "../../chord/types";
 import { corelib } from "./../core.lib";
 import { CollectorNode, CommandNode, DisChordASTNode, DisChordNode, DisChordNodeType, EventNode, MessageNode, StartBotNode } from "./../types";
 import ClietInitGenerator from "./Client/ClientInitGenerator";
@@ -60,7 +60,7 @@ export class DisChordGenerator extends Generator<DisChordNodeType, DisChordNode>
             case 'CrearRecolector':
                 return this.CollectorGenerator.generate(node);
             default:
-                return super.visit(node);
+                return super.visit(node as ASTNode<DisChordNodeType>);
         }
     }
 
@@ -87,7 +87,7 @@ export class DisChordGenerator extends Generator<DisChordNodeType, DisChordNode>
             }
         }
 
-        return super.generateAccess(node);
+        return super.generateAccess(node as AccessNode<DisChordNodeType>);
     }
 
     /**
@@ -107,6 +107,6 @@ export class DisChordGenerator extends Generator<DisChordNodeType, DisChordNode>
             }
         }
 
-        return super.generateCall(node);
+        return super.generateCall(node as CallNode<DisChordNode>);
     }
 }

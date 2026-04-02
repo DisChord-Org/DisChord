@@ -1,14 +1,14 @@
 import { corelib, runtimeInjections } from "./core.lib";
-import { AccessNode, AccessNodeByIndex, AssignmentNode, ASTNode, BinaryExpressionNode, CallNode, ClassNode, ConditionNode, ExportNode, FunctionNode, ListNode, LiteralNode, LoopNode, NoUnaryNode, ObjectNode, ObjectProperty, PropertyNode, Symbol, UnaryNode, VariableNode } from "./types";
+import { AccessNode, AccessNodeByIndex, AssignmentNode, ASTNode, BaseNode, BinaryExpressionNode, CallNode, ClassNode, ConditionNode, ExportNode, FunctionNode, ListNode, LiteralNode, LoopNode, NodeType, NoUnaryNode, ObjectNode, ObjectProperty, PropertyNode, Symbol, UnaryNode, VariableNode } from "./types";
 
-export class Generator<T = never, N = never> {
+export class Generator<T extends string = string, N extends BaseNode<T> = any> {
     private SymbolsTable: Map<string, Symbol>;
 
     constructor (private symbols: Map<string, Symbol>) {
         this.SymbolsTable = symbols;
     }
 
-    public generate(nodes: ASTNode<T, N>[]): string {
+    public generate(nodes: ASTNode<T>[]): string {
         const body = nodes.map(node => {
             const code = this.visit(node);
             const noSemicolon = ['CONDICION', 'BUCLE', 'CLASE', 'FUNCION'];
@@ -22,7 +22,7 @@ export class Generator<T = never, N = never> {
         `;
     }
 
-    public visit(node: ASTNode<T, N>): string {
+    public visit(node: ASTNode<T>): string {
         switch (node.type) {
             case 'Clase':
                 return this.generateClass(node);
@@ -31,7 +31,7 @@ export class Generator<T = never, N = never> {
             case 'Literal':
                 return this.generateLiteral(node);
             case 'Identificador':
-                return node.value;
+                return node.value as string;
             case 'Lista':
                 return this.generateArray(node);
             case 'Acceso':
@@ -90,16 +90,16 @@ export class Generator<T = never, N = never> {
         }
     }
 
-    private generateClass(node: ClassNode<T, N>): string {
+    private generateClass(node: ClassNode<T>): string {
         const inheritance = node.superClass ? ` extends ${node.superClass}` : '';
         const body = node.body
-            .map((n: ASTNode<T, N>) => "  " + this.visit(n) + ";")
+            .map((n: ASTNode<T>) => "  " + this.visit(n) + ";")
             .join('\n\n');
         
         return `class ${node.id}${inheritance} {\n  ${body}\n}`;
     }
 
-    generateAccess(node: AccessNode<T, N>): string { 
+    generateAccess(node: AccessNode<T>): string { 
         const objName = node.object.type === 'Identificador' ? node.object.value : null;
         const propName = node.property;
 
@@ -117,12 +117,12 @@ export class Generator<T = never, N = never> {
         return `${this.visit(node.object)}.${propName}`;
     }
 
-    private generateIndexAccess(node: AccessNodeByIndex<T, N>): string {
+    private generateIndexAccess(node: AccessNodeByIndex<T>): string {
         return `${this.visit(node.object)}[${this.visit(node.index)}]`;
     }
 
-    generateCall(node: CallNode<T, N>): string {
-        const args: string = node.params.map((arg: ASTNode<T, N>) => this.visit(arg)).join(', ');
+    generateCall(node: CallNode<T>): string {
+        const args: string = node.params.map((arg: ASTNode<T>) => this.visit(arg)).join(', ');
         let translation: string;
         let isAsyncCall = false;
 
@@ -157,14 +157,14 @@ export class Generator<T = never, N = never> {
         return String(node.value);
     }
 
-    private generateArray(node: ListNode<T, N>): string {
-        const elements = node.body.map((element: ASTNode<T, N>) => this.visit(element)).join(', ');
+    private generateArray(node: ListNode<T>): string {
+        const elements = node.body.map((element: ASTNode<T>) => this.visit(element)).join(', ');
         return `[${elements}]`;
     }
 
-    private generateFunction(node: FunctionNode<T, N>): string {
+    private generateFunction(node: FunctionNode<T>): string {
         const params = node.params.join(', ');
-        const body = node.body.map((n: ASTNode<T, N>) => '    ' + this.visit(n) + ";").join('\n');
+        const body = node.body.map((n: ASTNode<T>) => '    ' + this.visit(n) + ";").join('\n');
 
         const asyncPrefix = node.metadata.isAsync ? 'async ' : '';
 
@@ -180,17 +180,17 @@ export class Generator<T = never, N = never> {
         return `${asyncPrefix}function ${node.id}(${params}) {\n${body}\n}`;
     }
 
-    private generateProperty(node: PropertyNode<T, N>): string {
+    private generateProperty(node: PropertyNode<T>): string {
         const isStatic = node.isStatic ? 'static ' : '';
         const init = node.value ? ` = ${this.visit(node.value)}` : '';
         return `${isStatic}${node.id}${init}`;
     }
 
-    private generateAssignation(node: AssignmentNode<T, N>): string {
+    private generateAssignation(node: AssignmentNode<T>): string {
         return `${this.visit(node.left)} = ${this.visit(node.assignment)}`;
     }
 
-    private generateBinaryOperation(node: BinaryExpressionNode<T, N>): string {
+    private generateBinaryOperation(node: BinaryExpressionNode<T>): string {
         const operatorsMap: Record<string, string> = {
             'MAS': '+',
             'MENOS': '-',
@@ -216,11 +216,11 @@ export class Generator<T = never, N = never> {
         return `${this.visit(node.left)} ${op} ${this.visit(node.right)}`;
     }
 
-    private generateVariableDeclaration(node: VariableNode<T, N>): string {
+    private generateVariableDeclaration(node: VariableNode<T>): string {
         return `let ${node.id} = ${this.visit(node.value)}`;
     }
 
-    private generateUnaryOperation(node: UnaryNode<T, N> | NoUnaryNode<T, N>): string {
+    private generateUnaryOperation(node: UnaryNode<T> | NoUnaryNode<T>): string {
         if (node.operator === 'NO') return `!(${this.visit(node.object)})`;
 
         if (node.operator === 'TIPO') {
@@ -231,10 +231,10 @@ export class Generator<T = never, N = never> {
         return '';
     }
 
-    private generateCondition(node: ConditionNode<T, N>): string {
+    private generateCondition(node: ConditionNode<T>): string {
         const test = this.visit(node.test);
         const consequent = node.consequent
-            .map((n: ASTNode<T, N>) => "    " + this.visit(n) + ";")
+            .map((n: ASTNode<T>) => "    " + this.visit(n) + ";")
             .join('\n');
         
         let result = `if (${test}) {\n${consequent}\n}`;
@@ -243,8 +243,8 @@ export class Generator<T = never, N = never> {
             if (!Array.isArray(node.alternate) && node.alternate.type === 'Condicion') {
                 result += ` else ${this.generateCondition(node.alternate)}`;
             } else {
-                const alternate = node.alternate[]
-                    .map((n: ASTNode<T, N>) => "    " + this.visit(n) + ";")
+                const alternate = (node.alternate as ASTNode<T>[])
+                    .map((n: ASTNode<T>) => "    " + this.visit(n) + ";")
                     .join('\n');
                 result += ` else {\n${alternate}\n}`;
             }
@@ -253,9 +253,9 @@ export class Generator<T = never, N = never> {
         return result;
     }
 
-    private generateFor(node: LoopNode<T, N>): string {
+    private generateFor(node: LoopNode<T>): string {
         const varName = node.var;
-        const body = node.body.map((n: ASTNode<T, N>) => "    " + this.visit(n) + ";").join('\n');
+        const body = node.body.map((n: ASTNode<T>) => "    " + this.visit(n) + ";").join('\n');
         const iterable = this.visit(node.iterable);
 
         if (node.iterable.type === 'Llamada' && 'value' in node.iterable.object && node.iterable.object.value === 'rango') {
@@ -272,14 +272,14 @@ export class Generator<T = never, N = never> {
         return `for (let ${varName} of (Array.isArray(${iterable}) ? ${iterable} : Object.keys(${iterable}))) {\n${body}\n}`;
     }
 
-    private generateObject(node: ObjectNode<T, N>): string {
+    private generateObject(node: ObjectNode<T>): string {
         const props = node.properties
-            .map((p: ObjectProperty<T, N>) => `${p.key}: ${this.visit(p.value)}`)
+            .map((p: ObjectProperty<T>) => `${p.key}: ${this.visit(p.value)}`)
             .join(', ');
         return `{ ${props} }`;
     }
 
-    private generateExport(node: ExportNode<T, N>): string {
+    private generateExport(node: ExportNode<T>): string {
         const innerNode = node.object;
 
         if (innerNode.type === 'Variable' || innerNode.type === 'Funcion' || innerNode.type === 'Clase') {
