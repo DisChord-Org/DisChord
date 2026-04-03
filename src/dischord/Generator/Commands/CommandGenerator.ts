@@ -1,25 +1,30 @@
 import { join } from 'path';
 import Prettifier from '../../../Prettifier';
 
-import { ASTNode } from "../../../chord/types";
 import { createMessageFunctionInjection } from "../../core.lib";
-import { CommandNode, CommandOptionNode, CommandParam } from "../../types";
+import { CommandNode, CommandOptionNode, CommandParam, DisChordASTNode } from "../../types";
 import { DisChordGenerator } from "../generator";
+import { SubGenerator } from '../subgenerator';
 
 /**
  * Generator class responsible for generating code related to command definitions in DisChord.
  */
-export default class CommandGenerator {
+export default class CommandGenerator extends SubGenerator {
+    /** To identify when this generator should be used */
+    static triggerToken: string = "CrearComando";
+    
     /**
      * Constructor for the CommandGenerator class.
-     * @param ctx The context of the DisChordGenerator.
+     * @param parent The context of the DisChordGenerator.
      */
-    constructor (private ctx: DisChordGenerator) {}
+    constructor (protected parent: DisChordGenerator) {
+        super(parent);
+    }
 
     /**
      * Generates code for a CommandNode, which represents a command definition in DisChord.
      * @param node The CommandNode representing the command definition to generate code for.
-     * @returns The generated AST for the command definition.
+     * @returns The generated code for the command definition.
      */
     generate (node: CommandNode): string {
         const commandName = node.value;
@@ -32,7 +37,7 @@ export default class CommandGenerator {
         const OptionsConstExtraction: string = OptionsNode? OptionsNode.map((option: CommandOptionNode) => `const ${option.name} = ctx.options.${option.name};`).join('\n') : '';
 
         const body = node.body
-            .map((n: ASTNode): string => "    " + this.ctx.visit(n) + ";")
+            .map((n: DisChordASTNode): string => "    " + this.visit(n) + ";")
             .join('\n');
 
         const commandBody: string = `
@@ -42,7 +47,7 @@ export default class CommandGenerator {
 
             export default class ${commandName}Command extends Command {
                 name = "${commandName.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase() /*slugified*/}";
-                description = ${this.ctx.visit(commandDescription.value) ?? '"Un comando genial"'};
+                description = ${this.visit(commandDescription.value) ?? '"Un comando genial"'};
                 ignore = IgnoreCommand.Message;
                 integrationTypes = [ 0 ];
                 contexts = [ 0 ];
@@ -61,7 +66,7 @@ export default class CommandGenerator {
             }
         `;
 
-        Prettifier.savePrettified(join(this.ctx.projectRoot, 'dist', 'commands', `${commandName}.js`), commandBody)
+        Prettifier.savePrettified(join(this.parent.projectRoot, 'dist', 'commands', `${commandName}.js`), commandBody)
         return '';
     }
 
@@ -72,7 +77,7 @@ export default class CommandGenerator {
      */
     private generateOption(option: CommandOptionNode): string {
         const name = option.name;
-        const description = this.ctx.visit(option.description);
+        const description = this.visit(option.description);
         const required = option.required ? 'true' : 'false';
 
         // Currently, only string options are supported. This can be expanded in the future to support more types.

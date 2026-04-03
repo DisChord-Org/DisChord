@@ -2,7 +2,6 @@ import { join } from "node:path";
 import fs from "fs";
 import Prettifier from "../../../Prettifier";
 
-import { ListNode, LiteralNode } from "../../../chord/types";
 import { StartBotNode } from "../../types";
 import { DisChordGenerator } from "../generator";
 import { intentsMap } from "../../core.lib";
@@ -41,11 +40,11 @@ export default class ClietInitGenerator extends SubGenerator {
 
         let includeSlash = false;
         if (isArray) {
-            includeSlash = (prefixNode as ListNode).body.some(
-                (p: any) => p.type === 'Literal' && p.value === '/'
+            includeSlash = prefixNode.body.some(
+                (p) => p.type === 'Literal' && p.value === '/'
             );
         } else if (prefixNode.type === 'Literal') {
-            includeSlash = (prefixNode as LiteralNode).value === '/';
+            includeSlash = prefixNode.value === '/';
         }
 
         const seyfertConfig = this.generateSeyfertConfig(node);
@@ -97,7 +96,7 @@ export default class ClietInitGenerator extends SubGenerator {
         let intents = "[]";
         
         if (intentsNode && intentsNode.type === 'Lista') {
-            const list = (intentsNode as ListNode).body.map((item: any) => {
+            const list = intentsNode.body.map((item: any) => {
                 const val = item.value?.toString().replace(/"/g, '');
                 const mapped = intentsMap[val];
                 if (!mapped) throw new Error(`Intención desconocida: ${val}`);

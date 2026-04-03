@@ -1,33 +1,37 @@
 import { join } from 'path';
-import fs from 'fs';
 import Prettifier from '../../../Prettifier';
 
-import { ASTNode } from "../../../chord/types";
 import { createMessageFunctionInjection, eventsMap } from "../../core.lib";
-import { EventNode } from "../../types";
+import { DisChordASTNode, EventNode } from "../../types";
 import { DisChordGenerator } from "../generator";
+import { SubGenerator } from '../subgenerator';
 
 /**
  * Generator class responsible for generating code related to listeners in DisChord.
  */
-export default class EventGenerator {
+export default class EventGenerator extends SubGenerator {
+    /** To identify when this generator should be used */
+    static triggerToken: string = "Evento";
+    
     /**
      * Constructor for the EventGenerator class.
-     * @param ctx The context of the DisChordGenerator.
+     * @param parent The context of the DisChordGenerator.
      */
-    constructor (private ctx: DisChordGenerator) {}
+    constructor (protected parent: DisChordGenerator) {
+        super(parent);
+    }
 
     /**
      * Generates code for a EventNode, which represents a listener in DisChord.
      * @param node The EventNode representing the listener to generate code for.
-     * @returns The generated AST for the listener.
+     * @returns The generated code for the listener.
      */
     generate (node: EventNode): string {
         const eventName = eventsMap[node.name]?.name;
         if (!eventName) throw new Error(`El evento ${node.name} no existe`);
 
         const body = node.body
-            .map((n: ASTNode): string => "    " + this.ctx.visit(n) + ";")
+            .map((n: DisChordASTNode): string => "    " + this.visit(n) + ";")
             .join('\n');
 
         const eventBody: string = `
@@ -42,7 +46,7 @@ export default class EventGenerator {
             });
         `;
 
-        Prettifier.savePrettified(join(this.ctx.projectRoot, 'dist', 'events', `${eventName}.js`), eventBody);
+        Prettifier.savePrettified(join(this.parent.projectRoot, 'dist', 'events', `${eventName}.js`), eventBody);
 
         return '';
     }

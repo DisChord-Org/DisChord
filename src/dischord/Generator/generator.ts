@@ -56,7 +56,7 @@ export class DisChordGenerator extends Generator<DisChordNodeType, DisChordNode>
             SubGenerator.triggerToken.toUpperCase() === node.type
         );
 
-        if (GeneratorClass) return new GeneratorClass(this).generate();
+        if (GeneratorClass) return new GeneratorClass(this).generate(node);
 
         return super.visit(node as ASTNode<DisChordNodeType>);
     }

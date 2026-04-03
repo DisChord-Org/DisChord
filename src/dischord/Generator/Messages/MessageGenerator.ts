@@ -1,12 +1,17 @@
 import { MessageBodyNode, MessageButtonNode, MessageChannelNode, MessageContentNode, MessageEmbedNode, MessageNode } from "../../types";
 import { DisChordGenerator } from "../generator";
+import { SubGenerator } from "../subgenerator";
 import ButtonGenerator from "./MessageComponents/ButtonGenerator";
 import EmbedGenerator from "./MessageComponents/EmbedGenerator";
 
 /**
  * Generator class responsible for generating code related to message creation and interactions in DisChord.
  */
-export default class MessageGenerator {
+export default class MessageGenerator extends SubGenerator {
+    /** To identify when this generator should be used */
+    static triggerToken: string = "CrearMensaje";
+    
+    // THIS SHOULD BE REFACTOR
     // Embed generator, responsible for generating code related to message embeds.
     private EmbedGenerator = new EmbedGenerator(this);
     // Button generator, responsible for generating code related to message buttons.
@@ -16,27 +21,28 @@ export default class MessageGenerator {
     public MessageGeneratorContext: DisChordGenerator;
 
     /**
-     * @param ctx The context of the DisChordGenerator.
+     * @param parent The context of the DisChordGenerator.
      */
-    constructor (private ctx: DisChordGenerator) {
-        this.MessageGeneratorContext = ctx;
+    constructor (protected parent: DisChordGenerator) {
+        super(parent);
+        this.MessageGeneratorContext = parent;
     }
 
     /**
      * Generates code for a MessageNode, which represents a Message in DisChord.
      * @param node The MessageNode representing the message to generate code for.
-     * @returns The generated AST for message body.
+     * @returns The generated code for message body.
      */
     generate (node: MessageNode): string {
         const channelNode: MessageChannelNode | undefined = node.body.find((BodyNode: MessageBodyNode) => BodyNode.property === 'canal');
-        const channel: string | undefined = channelNode ? this.ctx.visit(channelNode.channel) : undefined;
+        const channel: string | undefined = channelNode ? this.visit(channelNode.channel) : undefined;
         const contentNode: MessageContentNode | undefined = node.body.find((BodyNode: MessageBodyNode) => BodyNode.property === 'contenido');
-        const content: string | undefined = contentNode ? this.ctx.visit(contentNode.content) : undefined;
+        const content: string | undefined = contentNode ? this.visit(contentNode.content) : undefined;
         const EmbedsNode: MessageEmbedNode | undefined = node.body.find((BodyNode: MessageBodyNode) => BodyNode.property === 'embed');
         const embed: string = EmbedsNode? `, embeds: [ ${this.EmbedGenerator.generate(EmbedsNode.embed)} ] ` : '';
         const ButtonsNode: MessageButtonNode | undefined = node.body.find((BodyNode: MessageBodyNode) => BodyNode.property === 'boton');
         const button: string = ButtonsNode? `, components: [ new ActionRow().setComponents([ ${this.ButtonGenerator.generate(ButtonsNode)} ]) ]` : '';
-        const interactionContext: string = this.ctx.currentInteraction === 'interaccion' ? 'interaccion' : 'null';
+        const interactionContext: string = this.parent.currentInteraction === 'interaccion' ? 'interaccion' : 'null';
 
         return `await createMessage(${channel}, { content: ${content} ${embed}${button} }, ${interactionContext})`;
     }
