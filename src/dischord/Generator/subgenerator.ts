@@ -1,3 +1,4 @@
+import { DisChordASTNode } from "../types";
 import { DisChordGenerator } from "./generator";
 
 /**
@@ -14,7 +15,17 @@ export abstract class SubGenerator {
      * Core logic to transform AST node into code string.
      * @returns The resulted code string.
      */
-    abstract generate(): string;
+    abstract generate(node: DisChordASTNode): string;
+
+    /**
+     * The visit method to handle DisChord-specific AST nodes.
+     * It checks the type of the node and delegates code generation to the appropriate generator class based on the node type.
+     * @param node The AST node to visit, which can be of various types defined in the DisChordNodeType enum.
+     * @returns The generated code for the given node.
+     */
+    protected visit(node: DisChordASTNode): string {
+        return this.parent.visit(node);
+    }
 }
 
 /**

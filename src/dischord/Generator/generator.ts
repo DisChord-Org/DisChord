@@ -17,7 +17,7 @@ import CollectorGenerator from "./CollectorGenerator";
  */
 export class DisChordGenerator extends Generator<DisChordNodeType, DisChordNode> {
     // Root directory of the project, used for resolving imports and file paths.
-    projectRoot: string = '';
+    public projectRoot: string = '';
 
     // Context variable to track the current interaction state, used for generating appropriate code in message interactions and collectors.
     public currentInteraction: string | null = null; // context
