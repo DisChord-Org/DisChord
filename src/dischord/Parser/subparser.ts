@@ -68,6 +68,6 @@ export interface SubParserClass {
     /** Static method to register specific keywords into the Lexer/Parser system */
     injectStatements(): void;
 
-    /** Optional: Trigger metadata to identify when this parser should be used */
+    /** Trigger metadata to identify when this parser should be used */
     triggerToken: string;
 }
