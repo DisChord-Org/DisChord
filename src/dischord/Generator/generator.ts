@@ -53,7 +53,7 @@ export class DisChordGenerator extends Generator<DisChordNodeType, DisChordNode>
      */
     override visit(node: DisChordASTNode): string {
         const GeneratorClass = DisChordGenerator.SubGenerators.find(SubGenerator =>
-            SubGenerator.triggerToken.toUpperCase() === node.type
+            SubGenerator.triggerToken === node.type
         );
 
         if (GeneratorClass) return new GeneratorClass(this).generate(node);
