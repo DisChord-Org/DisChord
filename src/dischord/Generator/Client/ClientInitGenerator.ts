@@ -2,20 +2,26 @@ import { join } from "node:path";
 import fs from "fs";
 import Prettifier from "../../../Prettifier";
 
-import { ASTNode, ListNode, LiteralNode } from "../../../chord/types";
+import { ListNode, LiteralNode } from "../../../chord/types";
 import { StartBotNode } from "../../types";
 import { DisChordGenerator } from "../generator";
 import { intentsMap } from "../../core.lib";
+import { SubGenerator } from "../subgenerator";
 
 /**
  * Generator class responsible for generating code related to starting the bot and setting up the client in DisChrod.
  */
-export default class ClietInitGenerator {
+export default class ClietInitGenerator extends SubGenerator {
+    /** To identify when this generator should be used */
+    static triggerToken: string = "EncenderBot";
+
     /**
      * Constructor for the ClientInitGenerator class.
-     * @param ctx The context of the DisChordGenerator.
+     * @param parent The context of the DisChordGenerator.
      */
-    constructor (private ctx: DisChordGenerator) {}
+    constructor (protected parent: DisChordGenerator) {
+        super(parent);
+    }
 
     /**
      * Generates code for a StartBotNode, which represents the initialization of the bot in DisChord.
@@ -30,7 +36,7 @@ export default class ClietInitGenerator {
         const prefixNode = blocks['prefijo'] || blocks['prefijos'];
         if (!prefixNode) throw new Error("No se ha especificado el prefijo en el bloque 'encender bot'.");
 
-        const prefix = this.ctx.visit(prefixNode);
+        const prefix = this.visit(prefixNode);
         const isArray = prefixNode.type === 'Lista';
 
         let includeSlash = false;
@@ -43,7 +49,7 @@ export default class ClietInitGenerator {
         }
 
         const seyfertConfig = this.generateSeyfertConfig(node);
-        Prettifier.savePrettified(join(this.ctx.projectRoot, 'seyfert.config.mjs'), seyfertConfig)
+        Prettifier.savePrettified(join(this.parent.projectRoot, 'seyfert.config.mjs'), seyfertConfig)
 
         this.ensureDirectories();
 
@@ -87,7 +93,7 @@ export default class ClietInitGenerator {
 
         if (!tokenNode) throw new Error("Falta el bloque 'token' en la configuración del bot.");
         
-        const token = this.ctx.visit(tokenNode);
+        const token = this.visit(tokenNode);
         let intents = "[]";
         
         if (intentsNode && intentsNode.type === 'Lista') {
@@ -123,7 +129,7 @@ export default class ClietInitGenerator {
     private ensureDirectories() {
         const dirs = ['commands', 'events', 'components'];
         dirs.forEach(dir => {
-            const path = join(this.ctx.projectRoot, 'dist', dir);
+            const path = join(this.parent.projectRoot, 'dist', dir);
             if (!fs.existsSync(path)) fs.mkdirSync(path, { recursive: true });
         });
     }
