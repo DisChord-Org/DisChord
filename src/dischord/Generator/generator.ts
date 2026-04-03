@@ -1,7 +1,10 @@
-import { Generator } from "../../chord/generator";
-import { AccessNode, ASTNode, CallNode } from "../../chord/types";
 import { corelib } from "./../core.lib";
-import { CollectorNode, CommandNode, DisChordASTNode, DisChordNode, DisChordNodeType, EventNode, MessageNode, StartBotNode } from "./../types";
+import { AccessNode, ASTNode, CallNode } from "../../chord/types";
+import { DisChordASTNode, DisChordNode, DisChordNodeType } from "./../types";
+
+import { Generator } from "../../chord/generator";
+import { SubGeneratorClass } from "./subgenerator";
+
 import ClietInitGenerator from "./Client/ClientInitGenerator";
 import EventGenerator from "./Events/EventGenerator";
 import CommandGenerator from "./Commands/CommandGenerator";
@@ -19,16 +22,17 @@ export class DisChordGenerator extends Generator<DisChordNodeType, DisChordNode>
     // Context variable to track the current interaction state, used for generating appropriate code in message interactions and collectors.
     public currentInteraction: string | null = null; // context
 
-    // Client initialization generator, responsible for generating code related to starting the bot and setting up the client.
-    private ClientInitGenerator = new ClietInitGenerator(this);
-    // Event generator, responsible for generating code related to listeners.
-    private EventGenerator = new EventGenerator(this);
-    // Command generator, responsible for generating code related to command definitions.
-    private CommandGenerator = new CommandGenerator(this);
-    // Message generator, responsible for generating code related to message creation and interactions.
-    private MessageGenerator = new MessageGenerator(this);
-    // Collector generator, responsible for generating code related to component collectors and their event handling.
-    private CollectorGenerator = new CollectorGenerator(this);
+    /**
+     * The inventory of specialists.
+     * Adding a class here will register it into the all system.
+     */
+        private static readonly SubGenerators: SubGeneratorClass[] = [
+            ClietInitGenerator,
+            EventGenerator,
+            CommandGenerator,
+            MessageGenerator,
+            CollectorGenerator
+        ];
 
     /**
      * Constructor for the DisChordGenerator class.
@@ -48,20 +52,13 @@ export class DisChordGenerator extends Generator<DisChordNodeType, DisChordNode>
      * @returns The generated code for the given node.
      */
     override visit(node: DisChordASTNode): string {
-        switch (node.type) {
-            case 'EncenderBot':
-                return this.ClientInitGenerator.generate(node);
-            case 'Evento':
-                return this.EventGenerator.generate(node);
-            case 'CrearMensaje':
-                return this.MessageGenerator.generate(node);
-            case 'CrearComando':
-                return this.CommandGenerator.generate(node);
-            case 'CrearRecolector':
-                return this.CollectorGenerator.generate(node);
-            default:
-                return super.visit(node as ASTNode<DisChordNodeType>);
-        }
+        const GeneratorClass = DisChordGenerator.SubGenerators.find(SubGenerator =>
+            SubGenerator.triggerToken.toUpperCase() === node.type
+        );
+
+        if (GeneratorClass) return new GeneratorClass(this).generate();
+
+        return super.visit(node as ASTNode<DisChordNodeType>);
     }
 
     /**

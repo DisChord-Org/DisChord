@@ -1,13 +1,15 @@
 import { KeyWords } from '../../chord/keywords';
-import { Parser } from '../../chord/parser';
 import { Token } from '../../chord/types';
+import { DisChordASTNode, DisChordNode, DisChordNodeType, ODBNode } from '../types';
+
+import { Parser } from '../../chord/parser';
+import { SubParserClass } from './subparser';
+
 import CommandParser from './Commands/CommandParser';
 import MessageParser from './Messages/MessageParser';
 import CollectorParser from './CollectorParser';
-import { DisChordASTNode, DisChordNode, DisChordNodeType, ODBNode } from '../types';
 import ClientParser from './Client/ClientParser';
 import EventParser from './Events/EventParser';
-import { SubParserClass } from './subparser';
 
 /**
  * Main Orchestrator for DisChord's syntactic analysis.

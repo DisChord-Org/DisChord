@@ -2,7 +2,7 @@ import { join } from "node:path";
 import fs from "fs";
 import Prettifier from "../../../Prettifier";
 
-import { ASTNode, ListNode, LiteralNode, ObjectPropertyType } from "../../../chord/types";
+import { ASTNode, ListNode, LiteralNode } from "../../../chord/types";
 import { StartBotNode } from "../../types";
 import { DisChordGenerator } from "../generator";
 import { intentsMap } from "../../core.lib";
