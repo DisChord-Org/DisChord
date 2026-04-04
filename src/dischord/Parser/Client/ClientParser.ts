@@ -42,7 +42,7 @@ export default class ClientParser extends SubParser {
             throw new Error(`Se esperaba 'bot' después de 'encender', se encontró '${id.value}'`);
         }
     
-        const configBody = this.parseODB(); // [ 'token', 'prefijo', 'prefijos', 'intenciones' ]
+        const configBody = this.parseODB();
     
         return {
             type: 'EncenderBot',

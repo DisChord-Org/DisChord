@@ -53,7 +53,7 @@ export class DisChordParser extends Parser<DisChordNodeType, DisChordNode> {
 
     /**
      * Entry point for custom DisChord statements.
-     * Analyzes top-level tokens such as 'encender', 'evento', or 'crear'.
+     * Analyzes top-level tokens such as 'encender', 'evento', 'crear', etc.
      * @override
      * @returns The generated ASTNode or null if no match is found.
      */
@@ -72,6 +72,7 @@ export class DisChordParser extends Parser<DisChordNodeType, DisChordNode> {
     /**
      * Extends the base language's primary expressions.
      * Allows the 'crear' (create) keyword to be treated as a primary expression.
+     * Allows 'L_BRACE' to create ODB's.
      * @override
      */
     override parsePrimary(): DisChordASTNode {
@@ -79,7 +80,14 @@ export class DisChordParser extends Parser<DisChordNodeType, DisChordNode> {
 
         switch (token.type) {
             case 'CREAR':
-                return this.parseStatement();
+                this.consume('CREAR');
+
+                const customStatement = this.parseCustomStatement();
+                if (!customStatement) throw new Error("Se esperaba una estructura válida después de 'crear'");
+
+                return customStatement;
+            case 'L_BRACE':
+                return this.parseODB();
             default:
                 return super.parsePrimary();
         }
@@ -123,14 +131,19 @@ export class DisChordParser extends Parser<DisChordNodeType, DisChordNode> {
      */
     private isPropertyAssignment(): boolean {
         const current = this.peek();
-        const next = this.peek();
+        const next = this.peek('next');
 
-        if (current.type !== 'IDENTIFICADOR') return false;
+        if (
+            current.type !== 'IDENTIFICADOR' ||
+            next.type === 'R_BRACE' ||
+            KeyWords.getStatements().includes(current.value)
+        ) return false;
 
-        if (next.type === 'R_BRACE') return false;
-
-        const reservedStatements = ['var', 'crear', 'si', 'bucle', 'esperar', 'retornar', 'encender'];
-        if (reservedStatements.includes(current.value)) return false;
+        /**
+         * If it is an IDENTIFIER followed by an L_BRACE,
+         * it is a block assignment (nested property).
+         */
+        if (next.type === 'L_BRACE') return true;
 
         return true; 
     }
