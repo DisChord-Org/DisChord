@@ -60,10 +60,6 @@ export class DisChordParser extends Parser<DisChordNodeType, DisChordNode> {
     override parseCustomStatement(): DisChordASTNode | null {
         const token = this.peek();
 
-        if (token.type === 'CREAR') {
-            return this.parseCreation();
-        }
-
         const ParserClass = DisChordParser.SubParsers.find(SubParser =>
             SubParser.triggerToken.toUpperCase() === token.type
         );
@@ -71,25 +67,6 @@ export class DisChordParser extends Parser<DisChordNodeType, DisChordNode> {
         if (ParserClass) return new ParserClass(this).parse();
 
         return null;
-    }
-
-    /**
-     * Handles the creation of complex entities.
-     * Evaluates whether the user is trying to create a message, a command, or a collector.
-     * @private
-     * @throws Error if the creation type is not recognized.
-     */
-    private parseCreation(): DisChordASTNode {
-        this.consume('CREAR');
-
-        const token = this.peek();
-        const ParserClass = DisChordParser.SubParsers.find(SubParser => 
-            SubParser.triggerToken.toUpperCase() === token.type
-        );
-
-        if (!ParserClass) throw new Error(`Entidad desconocida tras 'crear': ${token.value}`);
-
-        return new ParserClass(this).parse();
     }
 
     /**
@@ -102,7 +79,7 @@ export class DisChordParser extends Parser<DisChordNodeType, DisChordNode> {
 
         switch (token.type) {
             case 'CREAR':
-                return this.parseCreation();
+                return this.parseStatement();
             default:
                 return super.parsePrimary();
         }
