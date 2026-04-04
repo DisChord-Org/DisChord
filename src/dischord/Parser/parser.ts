@@ -98,7 +98,7 @@ export class DisChordParser extends Parser<DisChordNodeType, DisChordNode> {
      * Distinguishes between property blocks (key-value pairs) and execution statements.
      * @returns {ODBNode} A node containing organized blocks and an executable body.
      */
-    parseODB(): ODBNode {
+    parseODB(type: 'definition-only' | 'definition-code' = 'definition-code'): ODBNode {
         this.consume('L_BRACE');
 
         const blocks: Record<string, DisChordASTNode> = {};
@@ -112,6 +112,8 @@ export class DisChordParser extends Parser<DisChordNodeType, DisChordNode> {
                 const value = this.parsePrimary();
                 blocks[key] = value;
             } else {
+                if (type === 'definition-only') throw new Error("Se definió código en un BDO 'definition-only'");
+
                 definitionMode = false;
 
                 const statement = this.parseStatement();

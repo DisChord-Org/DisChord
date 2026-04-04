@@ -36,8 +36,8 @@ export abstract class SubParser {
     /**
      * Helper to parse ODB's.
      */
-    protected parseODB(): ODBNode {
-        return this.parent.parseODB();
+    protected parseODB(type: 'definition-only' | 'definition-code' = 'definition-code'): ODBNode {
+        return this.parent.parseODB(type);
     }
 
     /**
