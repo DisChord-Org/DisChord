@@ -146,8 +146,15 @@ export class DisChordParser extends Parser<DisChordNodeType, DisChordNode> {
      */
     private isPropertyAssignment(): boolean {
         const current = this.peek();
-        const next = this.peek('next');
+        const next = this.peek();
 
-        return current.type === 'IDENTIFICADOR' && next.type !== 'L_EXPRESSION';
+        if (current.type !== 'IDENTIFICADOR') return false;
+
+        if (next.type === 'R_BRACE') return false;
+
+        const reservedStatements = ['var', 'crear', 'si', 'bucle', 'esperar', 'retornar', 'encender'];
+        if (reservedStatements.includes(current.value)) return false;
+
+        return true; 
     }
 }
