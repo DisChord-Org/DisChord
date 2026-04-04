@@ -25,8 +25,9 @@ export class Parser<T = never, N = never> {
     }
 
     peek(type: 'this' | 'next' = 'this'): Token {
-        if ((type === 'this'? this.current : this.current + 1) >= this.tokens.length) throw new Error("Se acabaron los tokens");
-        return this.tokens[this.current];
+        const targetIndex = type === 'this' ? this.current : this.current + 1;
+        if (targetIndex >= this.tokens.length) throw new Error("Se acabaron los tokens");
+        return this.tokens[targetIndex];
     }
 
     consume(expectedTypes: string | string[]): Token {
