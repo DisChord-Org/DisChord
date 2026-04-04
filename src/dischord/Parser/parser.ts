@@ -103,14 +103,17 @@ export class DisChordParser extends Parser<DisChordNodeType, DisChordNode> {
 
         const blocks: Record<string, DisChordASTNode> = {};
         const body: DisChordASTNode[] = [];
+        let definitionMode: boolean = true;
 
         while (this.peek().type !== 'R_BRACE') {
-            if (this.isPropertyAssignment()) {
+            if (definitionMode && this.isPropertyAssignment()) {
                 const key = this.consume('IDENTIFICADOR').value;
 
                 const value = this.parsePrimary();
                 blocks[key] = value;
             } else {
+                definitionMode = false;
+
                 const statement = this.parseStatement();
                 if (statement) body.push(statement);
             }
