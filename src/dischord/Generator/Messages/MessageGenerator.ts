@@ -1,4 +1,4 @@
-import { MessageBodyNode, MessageButtonNode, MessageChannelNode, MessageContentNode, MessageEmbedNode, MessageNode } from "../../types";
+import { DisChordASTNode, MessageBodyNode, MessageButtonNode, MessageChannelNode, MessageContentNode, MessageEmbedNode, MessageNode } from "../../types";
 import { DisChordGenerator } from "../generator";
 import { SubGenerator } from "../subgenerator";
 import ButtonGenerator from "./MessageComponents/ButtonGenerator";
@@ -34,14 +34,18 @@ export default class MessageGenerator extends SubGenerator {
      * @returns The generated code for message body.
      */
     generate (node: MessageNode): string {
-        const channelNode: MessageChannelNode | undefined = node.body.find((BodyNode: MessageBodyNode) => BodyNode.property === 'canal');
-        const channel: string | undefined = channelNode ? this.visit(channelNode.channel) : undefined;
-        const contentNode: MessageContentNode | undefined = node.body.find((BodyNode: MessageBodyNode) => BodyNode.property === 'contenido');
-        const content: string | undefined = contentNode ? this.visit(contentNode.content) : undefined;
-        const EmbedsNode: MessageEmbedNode | undefined = node.body.find((BodyNode: MessageBodyNode) => BodyNode.property === 'embed');
-        const embed: string = EmbedsNode? `, embeds: [ ${this.EmbedGenerator.generate(EmbedsNode.embed)} ] ` : '';
-        const ButtonsNode: MessageButtonNode | undefined = node.body.find((BodyNode: MessageBodyNode) => BodyNode.property === 'boton');
+        const channelNode: DisChordASTNode | undefined = node.object.blocks['canal'];
+        const channel: string | undefined = channelNode ? this.visit(channelNode) : undefined;
+
+        const contentNode: DisChordASTNode | undefined = node.object.blocks['contenido'];
+        const content: string | undefined = contentNode ? this.visit(contentNode) : undefined;
+
+        const EmbedsNode: DisChordASTNode | undefined = node.object.blocks['embed'];
+        const embed: string = EmbedsNode? `, embeds: [ ${this.EmbedGenerator.generate(EmbedsNode)} ] ` : '';
+
+        const ButtonsNode: DisChordASTNode | undefined = node.object.blocks['boton'];
         const button: string = ButtonsNode? `, components: [ new ActionRow().setComponents([ ${this.ButtonGenerator.generate(ButtonsNode)} ]) ]` : '';
+
         const interactionContext: string = this.parent.currentInteraction === 'interaccion' ? 'interaccion' : 'null';
 
         return `await createMessage(${channel}, { content: ${content} ${embed}${button} }, ${interactionContext})`;

@@ -48,7 +48,7 @@ export type CommandParam = CommandDescriptionParam | CommandOptionsParam;
 
 export interface MessageNode extends BaseNode<DisChordNodeType> {
     type: 'CrearMensaje';
-    body: MessageBodyNode[];
+    object: ODBNode;
 }
 
 export interface MessageContentNode extends BaseNode<DisChordNodeType> {

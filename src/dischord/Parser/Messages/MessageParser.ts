@@ -46,63 +46,12 @@ export default class MessageParser extends SubParser {
      */
     parse (): MessageNode {
         this.consume('MENSAJE');
-        this.consume('L_BRACE');
 
-        const body: MessageBodyNode[] = [];
-
-        while (this.peek().type !== 'R_BRACE') {
-            const token = this.peek();
-
-            switch (token.value) {
-                case 'contenido':
-                    this.consume('IDENTIFICADOR');
-                    const content = this.parsePrimary();
-
-                    const contentNode: MessageBodyNode = {
-                        type: 'CuerpoDelMensaje',
-                        property: 'contenido',
-                        content
-                    };
-
-                    body.push(contentNode);
-                    break;
-                case 'canal':
-                    this.consume('IDENTIFICADOR');
-                    const channel = this.parsePrimary();
-
-                    const channelNode: MessageBodyNode = {
-                        type: 'CuerpoDelMensaje',
-                        property: 'canal',
-                        channel
-                    };
-
-                    body.push(channelNode);
-                    break;
-                case 'embed':
-                    this.consume('IDENTIFICADOR');
-                    const embed = this.EmbedParser.parse();
-
-                    const embedNode: MessageBodyNode = {
-                        type: 'CuerpoDelMensaje',
-                        property: 'embed',
-                        embed
-                    };
-
-                    body.push(embedNode);
-                    break;
-                case 'boton':
-                    this.consume('IDENTIFICADOR');
-                    const ButtonNode: MessageBodyNode = this.ButtonParser.parse();
-                    body.push(ButtonNode);
-                    break;
-            }
-        }
-
-        this.consume('R_BRACE');
+        const configBody = this.parseODB('definition-only');
 
         return {
             type: 'CrearMensaje',
-            body
+            object: configBody
         };
     }
 }
