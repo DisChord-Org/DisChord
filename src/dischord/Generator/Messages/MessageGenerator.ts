@@ -42,14 +42,13 @@ export default class MessageGenerator extends SubGenerator {
             this.getODBProperty(node.object, 'contenido')
         );
 
-        const EmbedsNode = this.getODBProperty(node.object, 'embed');
-        const embed: string = EmbedsNode? `, embeds: [ ${this.EmbedGenerator.generate(EmbedsNode)} ] ` : '';
+        const embeds = this.EmbedGenerator.generateIfNodeExists(node);
 
         const ButtonsNode = this.getODBProperty(node.object, 'boton');
         const button: string = ButtonsNode? `, components: [ new ActionRow().setComponents([ ${this.ButtonGenerator.generate(ButtonsNode)} ]) ]` : '';
 
         const interactionContext: string = this.parent.currentInteraction === 'interaccion' ? 'interaccion' : 'null';
 
-        return `await createMessage(${channel}, { content: ${content} ${embed}${button} }, ${interactionContext})`;
+        return `await createMessage(${channel}, { content: ${content} ${embeds}${button} }, ${interactionContext})`;
     }
 }
