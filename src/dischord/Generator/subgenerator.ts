@@ -1,4 +1,4 @@
-import { DisChordASTNode } from "../types";
+import { DisChordASTNode, ODBNode } from "../types";
 import { DisChordGenerator } from "./generator";
 
 /**
@@ -25,6 +25,18 @@ export abstract class SubGenerator {
      */
     protected visit(node: DisChordASTNode): string {
         return this.parent.visit(node);
+    }
+
+    /**
+     * Retrieves a specific property node from an ODB.
+     * This utility allows sub-generators to extract configuration values 
+     * or nested blocks defined within a BDO structure.
+     * * @param node The ODBNode containing the property blocks.
+     * @param property The key name of the property to retrieve.
+     * @returns The corresponding DisChordASTNode if the property exists, otherwise undefined.
+     */
+    protected getODBProperty(node: ODBNode, property: string): DisChordASTNode | undefined {
+        return node.blocks[property];
     }
 }
 
