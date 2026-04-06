@@ -90,6 +90,10 @@ export class Generator<T extends string = string, N = never> {
         }
     }
 
+    public visitIfExists (node: ASTNode<T> | undefined): string | undefined {
+        return node ? this.visit(node) : undefined;
+    }
+
     private generateClass(node: ClassNode<T>): string {
         const inheritance = node.superClass ? ` extends ${node.superClass}` : '';
         const body = node.body

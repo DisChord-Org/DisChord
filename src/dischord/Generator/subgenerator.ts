@@ -36,7 +36,20 @@ export abstract class SubGenerator {
      * @returns The corresponding DisChordASTNode if the property exists, otherwise undefined.
      */
     protected getODBProperty(node: ODBNode, property: string): DisChordASTNode | undefined {
-        return node.blocks[property];
+        return this.parent.getODBProperty(node, property);
+    }
+
+    /**
+     * Safely visits a DisChordASTNode if it is defined.
+     * This override ensures that optional nodes within DisChord-specific structures 
+     * (such as optional ODB properties) are processed only when present, 
+     * preventing null pointer exceptions during the generation phase.
+     * * @override
+     * @param node The DisChordASTNode to visit, or undefined.
+     * @returns The generated code string for the node, or undefined if the node is missing.
+     */
+    protected visitIfExists (node: DisChordASTNode | undefined): string | undefined {
+        return this.parent.visitIfExists(node);
     }
 }
 
