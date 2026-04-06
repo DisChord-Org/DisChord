@@ -1,4 +1,4 @@
-import { DisChordASTNode, MessageBodyNode, MessageButtonNode, MessageChannelNode, MessageContentNode, MessageEmbedNode, MessageNode } from "../../types";
+import { MessageNode } from "../../types";
 import { DisChordGenerator } from "../generator";
 import { SubGenerator } from "../subgenerator";
 import ButtonGenerator from "./MessageComponents/ButtonGenerator";
@@ -34,16 +34,18 @@ export default class MessageGenerator extends SubGenerator {
      * @returns The generated code for message body.
      */
     generate (node: MessageNode): string {
-        const channelNode: DisChordASTNode | undefined = node.object.blocks['canal'];
-        const channel: string | undefined = channelNode ? this.visit(channelNode) : undefined;
+        const channel: string | undefined = this.visitIfExists(
+            this.getODBProperty(node.object, 'canal')
+        );
 
-        const contentNode: DisChordASTNode | undefined = node.object.blocks['contenido'];
-        const content: string | undefined = contentNode ? this.visit(contentNode) : undefined;
+        const content: string | undefined = this.visitIfExists(
+            this.getODBProperty(node.object, 'contenido')
+        );
 
-        const EmbedsNode: DisChordASTNode | undefined = node.object.blocks['embed'];
+        const EmbedsNode = this.getODBProperty(node.object, 'embed');
         const embed: string = EmbedsNode? `, embeds: [ ${this.EmbedGenerator.generate(EmbedsNode)} ] ` : '';
 
-        const ButtonsNode: DisChordASTNode | undefined = node.object.blocks['boton'];
+        const ButtonsNode = this.getODBProperty(node.object, 'boton');
         const button: string = ButtonsNode? `, components: [ new ActionRow().setComponents([ ${this.ButtonGenerator.generate(ButtonsNode)} ]) ]` : '';
 
         const interactionContext: string = this.parent.currentInteraction === 'interaccion' ? 'interaccion' : 'null';

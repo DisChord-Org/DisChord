@@ -1,36 +1,38 @@
 import { EmbedColors } from "../../../core.lib";
-import { EmbedBody, EmbedField } from "../../../types";
+import { DisChordASTNode, EmbedField, ODBNode } from "../../../types";
+import { DisChordGenerator } from "../../generator";
+import { SubGenerator } from "../../subgenerator";
 import MessageGenerator from "../MessageGenerator";
 
 /**
  * Generator class responsible for generating code related to message embeds in DisChord.
  */
-export default class EmbedGenerator {
-    /**
-     * @param ctx The context of the MessageGenerator.
-     */
-    constructor (private ctx: MessageGenerator) {}
+export default class EmbedGenerator extends SubGenerator {
+    /** To identify when this generator should be used */
+    static triggerToken: string = "embed";
 
     /**
-     * Generates code for an EmbedBody, which represents an Embed in DisChord.
-     * @param node The EmbedBody node representing the embed to generate code for.
+     * @param parent The context of the MessageGenerator.
+     */
+    constructor (protected parent: DisChordGenerator) {
+        super(parent);
+    }
+
+    /**
+     * Generates code for an DisChordASTNode, which represents an Embed in DisChord.
+     * * @static
+     * @param node The DisChordASTNode representing the embed to generate code for.
      * @returns The generated AST for the embed component.
      */
-    generate (node: EmbedBody): string {
-        const ColorVisit: string | undefined = node.color? this.ctx.MessageGeneratorContext.visit(node.color.object) : '""';
-        const ResolvingColors: string | undefined = Object.keys(EmbedColors).includes(ColorVisit.slice(1, -1))? `"${EmbedColors[ColorVisit.slice(1, -1)]}"` : undefined;
-        const ColorResolved = ResolvingColors? `.setColor(${ResolvingColors})` : '';
+    generate (node: DisChordASTNode): string {
+        if (node.type != 'BDO') throw new Error(`Se esperaba un BDO, se recibió '${node.type}'`);
         
-        const TitleResolved: string = node.titulo? `.setTitle(${this.ctx.MessageGeneratorContext.visit(node.titulo.object)})` : '';
+        const ResolvedColor = this.resolveColors(node);
+        const ResolvedTitle = this.resolveTitle(node);
+        const ResolvedAuthor = this.resolveAuthor(node);
+        const ResolvedDescription = this.resolveDescription(node);
+        const ResolvedTimestamp = this.resolveTimestamp(node);
 
-        const ResolvingAuthor: Record<'name', string> & Record<'iconUrl', string> | undefined = node.autor? {
-            name: this.ctx.MessageGeneratorContext.visit(node.autor.name),
-            iconUrl: this.ctx.MessageGeneratorContext.visit(node.autor.iconUrl)
-        } : undefined;
-        const AuthorResolved: string = ResolvingAuthor? `.setAuthor({ text: ${ResolvingAuthor.name === '$CLIENTNAME'? 'usuario.username' : ResolvingAuthor.name}, iconUrl: ${ResolvingAuthor.iconUrl === '$CLIENTURL'? 'usuario.avatarURL()' : ResolvingAuthor.iconUrl} })` : '';
-
-        const DescriptionResolved: string = node.descripcion? `.setDescription(${this.ctx.MessageGeneratorContext.visit(node.descripcion.object)})` : '';
-        const TimestampResolved: string = node.hora? `.setTimestamp()` : '';
         const ImageResolved: string = node.imagen? `.setImage(${this.ctx.MessageGeneratorContext.visit(node.imagen.object)})` : '';
         const ThumbnailResolved: string = node.cartel? `.setThumbnail${this.ctx.MessageGeneratorContext.visit(node.cartel.object)})` : '';
 
@@ -49,15 +51,73 @@ export default class EmbedGenerator {
 
         return `
             new Embed()
-                ${ColorResolved}
-                ${TitleResolved}
-                ${AuthorResolved}
-                ${DescriptionResolved}
-                ${TimestampResolved}
+                ${ResolvedColor}
+                ${ResolvedTitle}
+                ${ResolvedAuthor}
+                ${ResolvedDescription}
+                ${ResolvedTimestamp}
                 ${ImageResolved}
                 ${ThumbnailResolved}
                 ${FieldsResolved}
                 ${FooterResolved}
         `;
+    }
+
+    private resolveColors (node: ODBNode): string {
+        const color = this.visitIfExists(
+            this.getODBProperty(node, 'color')
+        );
+
+        if (!color) return '';
+
+        const RawColor = color.slice(1, -1);
+        
+        if (!Object.keys(EmbedColors).includes(RawColor)) return '';
+
+        return `.setColor("${EmbedColors[RawColor]}")`;
+    }
+
+    private resolveTitle (node: ODBNode): string {
+        const title = this.visitIfExists(
+            this.getODBProperty(node, 'titulo')
+        );
+
+        if (!title) return '';
+
+        return `.setTitle(${title})`;
+    }
+
+    private resolveAuthor (node: ODBNode): string {
+        const author = this.getODBProperty(node, 'autor');
+
+        if (!author) return '';
+
+        const name = this.visitIfExists(
+            this.getODBProperty(node, 'nombre')
+        ) || 'usuario.username';
+
+        const iconUrl = this.visitIfExists(
+            this.getODBProperty(node, 'icono')
+        );
+
+        return `.setAuthor({ text: ${name}, iconUrl: ${iconUrl} })`
+    }
+
+    private resolveDescription (node: ODBNode): string {
+        const description = this.visitIfExists(
+            this.getODBProperty(node, 'descripcion')
+        );
+
+        if (!description) return '';
+        
+        return `.setDescription(${description})`;
+    }
+
+    private resolveTimestamp (node: ODBNode): string {
+        const timestamp = this.getODBProperty(node, 'hora');
+
+        if (!timestamp) return '';
+
+        return '.setTimestamp()';
     }
 }
