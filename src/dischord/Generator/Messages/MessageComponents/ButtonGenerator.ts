@@ -1,4 +1,4 @@
-import { ButtonStyles, MessageButtonNode, ODBNode } from "../../../types";
+import { ButtonStyles, ODBNode } from "../../../types";
 import { DisChordGenerator } from "../../generator";
 import { SubGenerator } from "../../subgenerator";
 
@@ -34,8 +34,8 @@ export default class ButtonGenerator extends SubGenerator {
             new Button()
                 ${ResolvedCustomId}
                 ${ResolvedLabel}
-                .setStyle(${ButtonStyle})
-                ${node.emoji? `.setEmoji(${this.ctx.MessageGeneratorContext.visit(node.emoji)})` : ''}
+                ${ResolvedStyle}
+                ${ResolvedEmoji}
         `;
     }
 
@@ -44,7 +44,7 @@ export default class ButtonGenerator extends SubGenerator {
             this.getODBProperty(node, 'id')
         );
 
-        if (!customId) throw new Error('La id de un botón no puede ser indefinido');
+        if (!customId) throw new Error('Se debe especificar una id en el botón');
 
         return `.setCustomId(${customId})`;
     }
@@ -64,13 +64,22 @@ export default class ButtonGenerator extends SubGenerator {
             this.getODBProperty(node, 'estilo')
         );
         
-        if (!label) throw new Error('Se debe especificar una etiqueta en el botón');
-        
-        const StyleString: string = this.visit(node.style).slice(1, -1);
-        if (!(StyleString in ButtonStyles)) throw new Error(`Estilo inválido: '${StyleString}'`);
-        const ButtonStyle = ButtonStyles[StyleString as keyof typeof ButtonStyles];
+        if (!style) throw new Error('Se debe especificar el estilo en el botón');
+        if (!(style in ButtonStyles)) throw new Error(`Estilo inválido: '${style}'`);
+
+        const ButtonStyle = ButtonStyles[style as keyof typeof ButtonStyles];
 
 
-        return `.setLabel(${label})`;
+        return `.setStyle(${ButtonStyle})`;
+    }
+
+    private resolveEmoji (node: ODBNode): string {
+        const emoji = this.visitIfExists(
+            this.getODBProperty(node, 'emoji')
+        );
+
+        if (!emoji) return '';
+
+        return `.setEmoji(${emoji})`;
     }
 }
