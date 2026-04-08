@@ -80,14 +80,14 @@ encender bot {
     intenciones [ "MensajesDelServidor", "ContenidoDelMensaje" ]
 }
 
-crear comando ping {
-    descripcion: "¡Prueba la latencia del bot!"
+crear comando Ping {
+    descripcion "¡Prueba la latencia del bot!"
     
     consola.imprimir("Ejecutando ping...")
     
     var pingMensaje es "¡Pong " mas cliente.ping mas "ms!"
     crear mensaje {
-        contenido: "¡Pong!"
+        contenido "¡Pong!"
     }
 }
 
