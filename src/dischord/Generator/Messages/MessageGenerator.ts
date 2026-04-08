@@ -42,7 +42,7 @@ export default class MessageGenerator extends SubGenerator {
             this.getODBProperty(node.object, 'contenido')
         );
 
-        const embeds = this.EmbedGenerator.generateIfNodeExists(node);
+        const embeds = this.EmbedGenerator.generateIfNodeExists(node.object);
 
         const ButtonsNode = this.getODBProperty(node.object, 'boton');
         const button: string = ButtonsNode? `, components: [ new ActionRow().setComponents([ ${this.ButtonGenerator.generate(ButtonsNode)} ]) ]` : '';
