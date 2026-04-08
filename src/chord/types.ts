@@ -15,9 +15,15 @@ export interface Symbol { // symbols table
     };
 }
 
+export type Location = {
+    line: number;
+    column: number;
+};
+
 export type Token = {
     type: string;
     value: string;
+    location: Location;
 };
 
 export type CoreNodeType<T = string> =
@@ -29,8 +35,10 @@ export type CoreNodeType<T = string> =
       | 'Asignacion' | 'JS' | 'Super' | 'Esta' | 'AccesoPorIndice' | T;
 
 export type NodeType<T = never> = CoreNodeType | T;
+
 export interface BaseNode<T = never> {
     readonly type: NodeType<T>;
+    location?: Location;
 };
 
 export interface ClassNode<T = never, N = never> extends BaseNode<T> {

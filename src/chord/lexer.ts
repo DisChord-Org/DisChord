@@ -3,146 +3,168 @@ import { symbols } from './symbols';
 import { KeyWords } from './keywords';
 
 export class Lexer {
+    private line = 1;
+    private column = 1;
+    private current = 0;
+
     constructor(private input: string) {}
+
+    private peek(): string {
+        return this.input[this.current] || '';
+    }
+
+    private advance(): string {
+        const char = this.input[this.current++];
+
+        if (char === '\n') {
+            this.line++;
+            this.column = 1;
+        } else {
+            this.column++;
+        }
+
+        return char;
+    }
+
+    private createToken (type: string, value: string, line: number, column: number): Token {
+        return {
+            type,
+            value,
+            location: {
+                line,
+                column
+            }
+        }
+    }
 
     public tokenize(): Token[] {
         const tokens: Token[] = [];
-        let current = 0;
 
-        while (current < this.input.length) {
-            let char = this.input[current];
+        while (this.current < this.input.length) {
+            const startLine = this.line;
+            const startCol = this.column;
+            let char = this.peek();
 
             if (/\s/.test(char)) { // Espacios en blanco
-                current++;
+                this.advance();
                 continue;
             }
 
             if (char === "/") {  // Comentarios
-                const nextChar = this.input[current + 1]; 
+                const nextChar = this.advance(); // Consume el primer "/"
             
                 if (nextChar === "/") { // Comentario de línea
-                    current += 2; // Consume "//"
-                    while (current < this.input.length && this.input[current] !== "\n") {
-                        current++;
+                    this.advance(); // Consume el segundo "/"
+                    while (this.current < this.input.length && this.peek() !== "\n") {
+                        this.advance();
                     }
                     continue;
                 } else if (nextChar === "*") { // Comentario de bloque
-                    current += 2; // Consume "/*"
-                    while (current < this.input.length) {
-                        if (this.input[current] === "*" && this.input[current + 1] === "/") {
-                            current += 2; // Consume "*/"
+                    this.advance(); // Consume "*"
+                    while (this.current < this.input.length) {
+                        if (this.peek() === "*" && this.input[this.current + 1] === "/") {
+                            this.advance(); // Consume "*"
+                            this.advance(); // Consume "/"
                             break;
                         }
-                        current++;
+                        this.advance();
                     }
                     continue;
                 } else {
                     // No es un comentario por lo que vamos a tratar "/" como operador "ENTRE"
-                    tokens.push({ type: symbols["/"], value: symbols["/"] });
-                    current++;
+                    tokens.push(this.createToken(symbols["/"], symbols["/"], startLine, startCol));
                     continue;
                 }
             }
 
             if (char === '"') { // Strings
+                this.advance();
                 let value = "";
-                char = this.input[++current];
-                while (char !== '"' && current < this.input.length) {
-                    value += char;
-                    char = this.input[++current];
+                while (this.current < this.input.length && this.peek() !== '"') {
+                    value += this.advance();
                 }
-                current++;
-                tokens.push({ type: "TEXTO", value });
+                this.advance();
+                tokens.push(this.createToken("TEXTO", value, startLine, startCol));
                 continue;
             }
 
             if (/[0-9]/.test(char) || char === "0") { // Números y BigInt
                 let value = "";
 
-                if (char === "0" && /[bBoOxX]/.test(this.input[current + 1])) { // bin, oct, hex
-                    value += char;
-                    char = this.input[++current];
-                    value += char;
-                    char = this.input[++current];
+                if (char === "0" && /[bBoOxX]/.test(this.input[this.current + 1])) { // bin, oct, hex
+                    value += this.advance();
+                    value += this.advance();
 
-                    while (/[0-9a-fA-F]/.test(char) && current < this.input.length) {
-                        value += char;
-                        char = this.input[++current];
+                    while (/[0-9a-fA-F]/.test(char) && this.current < this.input.length) {
+                        value += this.advance();
                     }
                 } else {
-                    while (current < this.input.length) {
-                        char = this.input[current];
+                    while (this.current < this.input.length) {
+                        const next = this.peek();
                         
-                        if (/[0-9]/.test(char)) {
-                            value += char;
+                        if (/[0-9]/.test(next)) {
+                            value += this.advance();
                         } else if (char === ".") {
-                            const nextChar = this.input[current + 1];
+                            const nextChar = this.input[this.current + 1];
                             if (/[0-9]/.test(nextChar) && !value.includes(".")) {
-                                value += char;
+                                value += this.advance();
                             } else break; 
                         } else break;
-                        current++;
                     }
                 }
 
                 if (char === "n") {
-                    value += "n";
-                    current++;
-                }
-
-                // Asegurar de agregar todo como un único token si es BIGINT
-                if (/^[0-9]+n$/.test(value) || /^0[bBoOxX][0-9a-fA-F]+n$/.test(value)) {
-                    tokens.push({ type: "BIGINT", value });
+                    value += this.advance();
+                    tokens.push(this.createToken("BIGINT", value, startLine, startCol));
                 } else {
-                    tokens.push({ type: "NUMERO", value });
+                    tokens.push(this.createToken("NUMERO", value, startLine, startCol));
                 }
-
                 continue;
             }
 
             // Decoradores
             if (char === '@') {
-                let value = "@";
-                current++;
-                char = this.input[current];
+                let value = this.advance();
 
-                while (current < this.input.length && /[a-zA-Z0-9_]/.test(char)) {
-                    value += char;
-                    current++;
-                    char = this.input[current];
+                while (this.current < this.input.length && /[a-zA-Z0-9_]/.test(char)) {
+                    value += this.advance();
                 }
 
-                tokens.push({ type: "DECORADOR", value });
+                tokens.push(this.createToken("DECORADOR", value, startLine, startCol));
                 continue;
             }
 
             if (/[a-zA-Z]/.test(char)) { // Keywords, identificadores, booleanos, undefined
                 let value = "";
-                while (/[a-zA-Z0-9_]/.test(char) && current < this.input.length) {
-                    value += char;
-                    char = this.input[++current];
+                while (/[a-zA-Z0-9_]/.test(char) && this.current < this.input.length) {
+                    value += this.advance();
                 }
 
-                if (value === "verdadero" || value === "falso") tokens.push({ type: "BOOL", value });
-                else if (value === "indefinido") tokens.push({ type: "INDEFINIDO", value });
-                else if (KeyWords.getStatements().includes(value)) tokens.push({ type: value.toUpperCase(), value });
-                else tokens.push({ type: "IDENTIFICADOR", value });
-
+                if (value === "verdadero" || value === "falso") {
+                    tokens.push(this.createToken("BOOL", value, startLine, startCol));
+                } else if (value === "indefinido") {
+                    tokens.push(this.createToken("INDEFINIDO", value, startLine, startCol));
+                } else if (KeyWords.getStatements().includes(value)) {
+                    tokens.push(this.createToken(value.toUpperCase(), value, startLine, startCol));
+                } else {
+                    tokens.push(this.createToken("IDENTIFICADOR", value, startLine, startCol));
+                }
                 continue;
             }
 
-            if (current < this.input.length - 1) {
-                const twoChar = char + this.input[current + 1];
-                if (Object.keys(symbols).includes(twoChar)) {
-                    tokens.push({ type: symbols[twoChar], value: twoChar });
-                    current += 2;
+            if (this.current < this.input.length - 1) {
+                const twoChar = char + this.input[this.current + 1];
+                if (symbols[twoChar]) {
+                    this.advance();
+                    this.advance();
+                    tokens.push(this.createToken(symbols[twoChar], twoChar, startLine, startCol));
                     continue;
                 }
             }
 
             if (symbols[char]) {
-                tokens.push({ type: symbols[char], value: char });
-                current++;
+                this.advance();
+                tokens.push(this.createToken(symbols[char], char, startLine, startCol));
                 continue;
             }
 
