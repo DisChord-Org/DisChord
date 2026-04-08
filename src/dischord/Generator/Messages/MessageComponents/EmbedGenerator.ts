@@ -28,9 +28,11 @@ export default class EmbedGenerator extends SubGenerator {
     }
 
     /**
-     * Generates code for an DisChordASTNode, which represents an Embed in DisChord.
-     * * @param node The DisChordASTNode representing the embed to generate code for.
-     * @returns The generated AST for the embed component.
+     * Entry point for embed code generation.
+     * Maps the BDO (Object Data Block) properties to their corresponding Embed builder methods.
+     * @param node The AST node (must be of type 'BDO') containing embed definitions.
+     * @throws Error if the node is not a BDO.
+     * @returns A string representing the instantiation and configuration of a new Embed.
      */
     generate (node: DisChordASTNode): string {
         if (node.type != 'BDO') throw new Error(`Se esperaba un BDO, se recibió '${node.type}'`);
