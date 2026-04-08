@@ -43,9 +43,7 @@ export default class MessageGenerator extends SubGenerator {
         );
 
         const embeds = this.EmbedGenerator.generateIfNodeExists(node.object);
-
-        const ButtonsNode = this.getODBProperty(node.object, 'boton');
-        const button: string = ButtonsNode? `, components: [ new ActionRow().setComponents([ ${this.ButtonGenerator.generate(ButtonsNode)} ]) ]` : '';
+        const button = this.ButtonGenerator.generateIfNodeExists(node.object);
 
         const interactionContext: string = this.parent.currentInteraction === 'interaccion' ? 'interaccion' : 'null';
 

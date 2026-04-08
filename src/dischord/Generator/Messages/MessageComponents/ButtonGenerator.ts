@@ -1,4 +1,4 @@
-import { ButtonStyles, ODBNode } from "../../../types";
+import { ButtonStyles, DisChordASTNode, ODBNode } from "../../../types";
 import { DisChordGenerator } from "../../generator";
 import { SubGenerator } from "../../subgenerator";
 
@@ -17,13 +17,27 @@ export default class ButtonGenerator extends SubGenerator {
     }
 
     /**
+     * Helper method to generate the ActionRow and Button structure by searching 
+     * for the 'boton' property within a given ODBNode.
+     * * @param node The parent ODBNode that may contain a 'boton' definition.
+     * @returns A string representing the 'components array or an empty string if no button property is defined.
+     */
+    generateIfNodeExists (node: ODBNode | undefined): string {
+        if (!node) return '';
+
+        const button = this.getODBProperty(node, 'boton');
+
+        return button ? `, components: [ new ActionRow().setComponents([ ${this.generate(button)} ]) ]` : '';
+    }
+
+    /**
      * Entry point for button code generation.
      * Maps the BDO (Object Data Block) properties to their corresponding Button builder methods.
      * @param node The ODBNode containing button definitions.
      * @throws {Error} If the node is not a BDO or if mandatory properties (id, etiqueta, estilo) are missing.
      * @returns A string representing the instantiation and configuration of a new Button.
      */
-    generate (node: ODBNode): string {
+    generate (node: DisChordASTNode): string {
         if (node.type != 'BDO') throw new Error(`Se esperaba un BDO, se recibió '${node.type}'`);
 
         const ResolvedCustomId = this.resolveCustomId(node);
