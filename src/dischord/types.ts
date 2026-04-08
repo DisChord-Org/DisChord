@@ -51,41 +51,6 @@ export interface MessageNode extends BaseNode<DisChordNodeType> {
     object: ODBNode;
 }
 
-export interface MessageContentNode extends BaseNode<DisChordNodeType> {
-    type: 'CuerpoDelMensaje';
-    property: 'contenido';
-    content: DisChordASTNode;
-}
-
-export interface MessageChannelNode extends BaseNode<DisChordNodeType> {
-    type: 'CuerpoDelMensaje';
-    property: 'canal';
-    channel: DisChordASTNode;
-}
-
-export interface MessageEmbedNode extends BaseNode<DisChordNodeType> {
-    type: 'CuerpoDelMensaje';
-    property: 'embed';
-    embed: EmbedBody;
-}
-
-export interface MessageButtonNode extends BaseNode<DisChordNodeType> {
-    type: 'CuerpoDelMensaje';
-    property: 'boton';
-    id: DisChordASTNode;
-    label: DisChordASTNode;
-    emoji?: DisChordASTNode;
-    style: DisChordASTNode;
-}
-
-export type ButtonDataKeys = Extract<keyof MessageButtonNode, 'id' | 'label' | 'emoji' | 'style'>;
-export const ButtonPropMap: Record<string, ButtonDataKeys> = {
-    'id': 'id',
-    'etiqueta': 'label',
-    'emoji': 'emoji',
-    'estilo': 'style'
-};
-
 export enum ButtonStyles {
     azul = 1,
     gris,
@@ -94,70 +59,6 @@ export enum ButtonStyles {
     enlace,
     premium
 }
-
-export type ButtonKeys = keyof typeof ButtonPropMap;
-export type EmbedComponents = 'titulo' | 'descripcion' | 'color' | 'hora' | 'imagen' | 'cartel' | 'autor' | 'pie' | 'campo';
-export interface EmbedTitle extends BaseNode<EmbedComponents> {
-    type: 'titulo';
-    object: DisChordASTNode;
-}
-
-export interface EmbedDescription extends BaseNode<EmbedComponents> {
-    type: 'descripcion';
-    object: DisChordASTNode;
-}
-
-export interface EmbedColor extends BaseNode<EmbedComponents> {
-    type: 'color';
-    object: DisChordASTNode;
-}
-
-export interface EmbedTimestamp extends BaseNode<EmbedComponents> {
-    type: 'hora';
-}
-
-export interface EmbedImage extends BaseNode<EmbedComponents> {
-    type: 'imagen';
-    object: DisChordASTNode;
-}
-
-export interface EmbedThumbnail extends BaseNode<EmbedComponents> {
-    type: 'cartel';
-    object: DisChordASTNode;
-}
-
-export interface EmbedAuthor extends BaseNode<EmbedComponents> {
-    type: 'autor';
-    name: DisChordASTNode;
-    iconUrl: DisChordASTNode;
-}
-
-export interface EmbedFooter extends BaseNode<EmbedComponents> {
-    type: 'pie';
-    text: DisChordASTNode;
-    iconUrl?: DisChordASTNode;
-}
-
-export interface EmbedField extends BaseNode<EmbedComponents> {
-    type: 'campo';
-    text: DisChordASTNode;
-    value: DisChordASTNode;
-    inline: DisChordASTNode;
-}
-
-export interface EmbedBody {
-    titulo?: EmbedTitle;
-    descripcion?: EmbedDescription;
-    color?: EmbedColor;
-    hora?: EmbedTimestamp;
-    imagen?: EmbedImage;
-    cartel?: EmbedThumbnail;
-    autor?: EmbedAuthor;
-    pie?: EmbedFooter;
-    campos: EmbedField[]
-}
-
-export type MessageBodyNode = MessageContentNode | MessageChannelNode | MessageEmbedNode | MessageButtonNode;
 
 export interface CollectorNode extends BaseNode<DisChordNodeType> {
     type: 'CrearRecolector';
@@ -184,7 +85,6 @@ export type DisChordNode =
     | CommandNode
     | MessageNode
     | CollectorNode
-    | ODBNode
-    | MessageBodyNode;
+    | ODBNode;
 
 export type DisChordASTNode = ASTNode<DisChordNodeType, DisChordNode>;
