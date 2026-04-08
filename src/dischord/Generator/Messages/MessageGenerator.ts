@@ -1,6 +1,6 @@
 import { MessageNode } from "../../types";
 import { DisChordGenerator } from "../generator";
-import { SubGenerator } from "../subgenerator";
+import { SubGenerator, SubGeneratorClass } from "../subgenerator";
 import ButtonGenerator from "./MessageComponents/ButtonGenerator";
 import EmbedGenerator from "./MessageComponents/EmbedGenerator";
 
@@ -11,11 +11,14 @@ export default class MessageGenerator extends SubGenerator {
     /** To identify when this generator should be used */
     static triggerToken: string = "CrearMensaje";
     
-    // THIS SHOULD BE REFACTOR
-    // Embed generator, responsible for generating code related to message embeds.
-    private EmbedGenerator = new EmbedGenerator(this);
-    // Button generator, responsible for generating code related to message buttons.
-    private ButtonGenerator = new ButtonGenerator(this);
+    /**
+     * The inventory of specialists.
+     * Adding a class here will register it into the all system.
+     */
+    private readonly Components: SubGeneratorClass[] = [
+        EmbedGenerator,
+        ButtonGenerator
+    ];
 
     // Expose the MessageGenerator context to component generatos.
     public MessageGeneratorContext: DisChordGenerator;
@@ -42,11 +45,12 @@ export default class MessageGenerator extends SubGenerator {
             this.getODBProperty(node.object, 'contenido')
         );
 
-        const embeds = this.EmbedGenerator.generateIfNodeExists(node.object);
-        const button = this.ButtonGenerator.generateIfNodeExists(node.object);
+        const ComponentsData = this.Components
+            .map(generator => new generator(this.parent).generateIfNodeExists(node.object))
+            .join('');
 
         const interactionContext: string = this.parent.currentInteraction === 'interaccion' ? 'interaccion' : 'null';
 
-        return `await createMessage(${channel}, { content: ${content} ${embeds}${button} }, ${interactionContext})`;
+        return `await createMessage(${channel}, { content: ${content} ${ComponentsData} }, ${interactionContext})`;
     }
 }

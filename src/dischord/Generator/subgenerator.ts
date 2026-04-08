@@ -12,6 +12,15 @@ export abstract class SubGenerator {
     constructor(protected parent: DisChordGenerator) {}
 
     /**
+     * Optional method for generators that act as components.
+     * By default, it returns an empty string.
+     * Subclasses can override this to implement custom existence logic.
+     */
+    public generateIfNodeExists(node: ODBNode | undefined): string {
+        return node ? this.generate(node) : '';
+    }
+
+    /**
      * Core logic to transform AST node into code string.
      * @returns The resulted code string.
      */

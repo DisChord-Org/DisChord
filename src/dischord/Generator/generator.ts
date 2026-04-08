@@ -26,13 +26,13 @@ export class DisChordGenerator extends Generator<DisChordNodeType, DisChordNode>
      * The inventory of specialists.
      * Adding a class here will register it into the all system.
      */
-        private static readonly SubGenerators: SubGeneratorClass[] = [
-            ClietInitGenerator,
-            EventGenerator,
-            CommandGenerator,
-            MessageGenerator,
-            CollectorGenerator
-        ];
+    private static readonly SubGenerators: SubGeneratorClass[] = [
+        ClietInitGenerator,
+        EventGenerator,
+        CommandGenerator,
+        MessageGenerator,
+        CollectorGenerator
+    ];
 
     /**
      * Constructor for the DisChordGenerator class.
