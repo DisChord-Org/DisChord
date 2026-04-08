@@ -1,7 +1,5 @@
 import { DisChordParser } from "../parser";
-import { MessageBodyNode, MessageNode } from "../../types";
-import ButtonParser from "./MessageComponents/ButtonParser";
-import EmbedParser from "./MessageComponents/EmbedParser";
+import { MessageNode } from "../../types";
 import { KeyWords } from "../../../chord/keywords";
 import { SubParser } from "../subparser";
 
@@ -13,11 +11,6 @@ import { SubParser } from "../subparser";
 export default class MessageParser extends SubParser {
     /** To identify when this parser should be used */
     static triggerToken: string = "mensaje";
-
-    // Parsers for message components
-    private EmbedParser = new EmbedParser(this);
-    // The ButtonParser is initialized after the EmbedParser to ensure it has access to the MessageParser context if needed
-    private ButtonParser = new ButtonParser(this);
 
     // Expose the MessageParser context to component parsers
     public MessageParserContext;
