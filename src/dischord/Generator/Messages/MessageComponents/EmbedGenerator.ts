@@ -17,6 +17,12 @@ export default class EmbedGenerator extends SubGenerator {
         super(parent);
     }
 
+    /**
+     * Helper method to generate the embed array structure if the node exists.
+     * Useful for embedding the result directly into a message components object.
+     * @param node The potential DisChordASTNode for the embed.
+     * @returns A formatted string containing the 'embeds' key and the generated embed, or an empty string.
+     */
     generateIfNodeExists (node: DisChordASTNode | undefined): string {
         return node ? `, embeds: [ ${this.generate(node)} ] ` : '';
     }
@@ -53,6 +59,10 @@ export default class EmbedGenerator extends SubGenerator {
         `;
     }
 
+    /**
+     * Resolves the 'color' property using the core library mapping.
+     * @private
+     */
     private resolveColors (node: ODBNode): string {
         const color = this.visitIfExists(
             this.getODBProperty(node, 'color')
@@ -67,6 +77,10 @@ export default class EmbedGenerator extends SubGenerator {
         return `.setColor("${EmbedColors[RawColor]}")`;
     }
 
+    /**
+     * Resolves the 'titulo' property.
+     * @private
+     */
     private resolveTitle (node: ODBNode): string {
         const title = this.visitIfExists(
             this.getODBProperty(node, 'titulo')
@@ -77,6 +91,10 @@ export default class EmbedGenerator extends SubGenerator {
         return `.setTitle(${title})`;
     }
 
+    /**
+     * Resolves the 'autor' block, including nested 'nombre' and 'icono' properties.
+     * @private
+     */
     private resolveAuthor (node: ODBNode): string {
         const author = this.getODBProperty(node, 'autor');
 
@@ -93,6 +111,10 @@ export default class EmbedGenerator extends SubGenerator {
         return `.setAuthor({ text: ${name}, iconUrl: ${iconUrl} })`
     }
 
+    /**
+     * Resolves the 'descripcion' property.
+     * @private
+     */
     private resolveDescription (node: ODBNode): string {
         const description = this.visitIfExists(
             this.getODBProperty(node, 'descripcion')
@@ -103,6 +125,11 @@ export default class EmbedGenerator extends SubGenerator {
         return `.setDescription(${description})`;
     }
 
+    /**
+     * Resolves the 'hora' property. 
+     * If present, triggers the setTimestamp() method.
+     * @private
+     */
     private resolveTimestamp (node: ODBNode): string {
         const timestamp = this.getODBProperty(node, 'hora');
 
@@ -111,6 +138,10 @@ export default class EmbedGenerator extends SubGenerator {
         return '.setTimestamp()';
     }
 
+    /**
+     * Resolves the 'imagen' URL property.
+     * @private
+     */
     private resolveImage (node: ODBNode): string {
         const image = this.visitIfExists(
             this.getODBProperty(node, 'imagen')
@@ -122,6 +153,10 @@ export default class EmbedGenerator extends SubGenerator {
         return `.setImage(${image})`;
     }
 
+    /**
+     * Resolves the 'cartel' URL property.
+     * @private
+     */
     private resolveThumbnail (node: ODBNode): string {
         const thumbnail = this.visitIfExists(
             this.getODBProperty(node, 'cartel')
@@ -132,6 +167,12 @@ export default class EmbedGenerator extends SubGenerator {
         return `.setThumbnail(${thumbnail})`;
     }
 
+    /**
+     * Resolves the 'campos' list. 
+     * Iterates through a list of BDOs to generate an array of field objects.
+     * @private
+     * @throws Error if a field is not a BDO or lacks a 'titulo'.
+     */
     private resolveFields (node: ODBNode): string {
         const fields = this.getODBProperty(node, 'campos');
 
@@ -160,6 +201,11 @@ export default class EmbedGenerator extends SubGenerator {
         return `.addFields(${FieldsResolved})`;
     }
 
+    /**
+     * Resolves the 'pie' block, requiring a 'texto' property.
+     * @private
+     * @throws Error if 'pie' is present but lacks 'texto'.
+     */
     private resolveFooter (node: ODBNode): string {
         const footer = this.getODBProperty(node, 'pie');
 
