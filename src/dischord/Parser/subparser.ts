@@ -34,6 +34,15 @@ export abstract class SubParser {
     }
 
     /**
+     * Create ASTNode's adding location data
+     * @param node Omitted Node
+     * @returns The generated ASTNode
+     */
+    protected createNode<NodeType extends DisChordASTNode> (node: Omit<NodeType, 'location'>): NodeType {
+        return this.parent.createNode(node);
+    }
+
+    /**
      * Helper to parse ODB's.
      */
     protected parseODB(type: 'definition-only' | 'definition-code' = 'definition-code'): ODBNode {

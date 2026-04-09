@@ -52,11 +52,11 @@ export default class CollectorParser extends SubParser {
         }
         this.consume('R_BRACE');
 
-        return {
+        return this.createNode<CollectorNode>({
             type: 'CrearRecolector',
             variable,
             body
-        };
+        });
     }
 
     /**

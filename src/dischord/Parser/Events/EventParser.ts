@@ -47,10 +47,10 @@ export default class EventParser extends SubParser {
     
         this.consume('R_BRACE');
     
-        return {
+        return this.createNode<EventNode>({
             type: 'Evento',
             name: eventName,
             body
-        };
+        });
     }
 }

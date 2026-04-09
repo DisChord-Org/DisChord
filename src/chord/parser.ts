@@ -39,7 +39,7 @@ export class Parser<T = never, N = never> {
         return this.tokens[this.current++];
     }
 
-    protected createNode<NodeType extends ASTNode<T, N>> (node: Omit<NodeType, 'location'>): NodeType {
+    public createNode<NodeType extends ASTNode<T, N>> (node: Omit<NodeType, 'location'>): NodeType {
         const token: Token = this.peek();
 
         return {

@@ -44,9 +44,9 @@ export default class ClientParser extends SubParser {
     
         const configBody = this.parseODB('definition-only');
     
-        return {
+        return this.createNode<StartBotNode>({
             type: 'EncenderBot',
             object: configBody
-        };
+        });
     }
 }

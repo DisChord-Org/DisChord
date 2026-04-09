@@ -79,12 +79,12 @@ export default class CommandParser extends SubParser {
         }
     
         this.consume('R_BRACE');
-        return {
+        return this.createNode<CommandNode>({
             type: 'CrearComando',
             value: commandName,
             body,
             params
-        }
+        });
     }
 
     /**

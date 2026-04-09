@@ -123,11 +123,11 @@ export class DisChordParser extends Parser<DisChordNodeType, DisChordNode> {
 
         this.consume('R_BRACE');
 
-        return {
+        return this.createNode<ODBNode>({
             type: 'BDO',
             blocks,
             body
-        };
+        });
     }
 
     /**
