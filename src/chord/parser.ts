@@ -64,10 +64,10 @@ export class Parser<T = never, N = never> {
 
         throw new ChordError(
             ErrorLevel.Parser,
-            `${customMessage}. (En su lugar encontré '${token.value}')`,
+            `${customMessage}. (En su lugar se encontró '${token.value}')`,
             token.location,
             this.input.split('\n')[token.location.line - 1] || ''
-        );
+        ).format();
     }
 
     public createNode<NodeType extends ASTNode<T, N>> (node: Omit<NodeType, 'location'>): NodeType {
@@ -215,12 +215,12 @@ export class Parser<T = never, N = never> {
     private parseClassDeclaration(): ClassNode<T, N> {
         this.consume('CLASE');
         
-        const id = this.consume('IDENTIFICADOR').value;
+        const id = this.consume('IDENTIFICADOR', 'Se debe especificar el nombre de la clase').value;
         
         let superClass = undefined;
         if (this.current < this.tokens.length && this.peek().type === 'EXTIENDE') {
             this.consume('EXTIENDE');
-            superClass = this.consume('IDENTIFICADOR').value;
+            superClass = this.consume('IDENTIFICADOR', `Se debe especificar el nombre de la clase padre`).value;
         }
 
         this.consume('L_BRACE', `Al declarar una clase debes usar '{'.`);
@@ -249,22 +249,22 @@ export class Parser<T = never, N = never> {
         let id: string;
         
         if (isConstructor) {
-            id = this.consume('IDENTIFICADOR').value;
+            id = this.consume('IDENTIFICADOR', `Se debe especificar el nombre del constructor`).value;
         } else {
             this.consume('FUNCION');
-            id = this.consume('IDENTIFICADOR').value;
+            id = this.consume('IDENTIFICADOR', `Se debe especificar el nombre de la función`).value;
         }
 
-        this.consume('L_EXPRESSION');
+        this.consume('L_EXPRESSION', `Al declarar una función se debe usar '(' para arbir la lista de parámetros.`);
 
         const params: string[] = [];
         while (this.peek().type !== 'R_EXPRESSION') {
-            params.push(this.consume('IDENTIFICADOR').value);
+            params.push(this.consume('IDENTIFICADOR', `Se debe especificar el nombre del parámetro`).value);
             if (this.peek().type === ',') this.consume(',');
         }
 
         this.consume('R_EXPRESSION');
-        this.consume('L_BRACE');
+        this.consume('L_BRACE', `Al declarar una función debes usar '{' para abrir el bloque de código de la función.`);
 
         const body: ASTNode<T, N>[] = [];
         while (this.peek().type !== 'R_BRACE') {
@@ -296,7 +296,7 @@ export class Parser<T = never, N = never> {
 
     private parseProperty(): PropertyNode<T, N> {
         this.consume('PROP');
-        const id = this.consume('IDENTIFICADOR').value;
+        const id = this.consume('IDENTIFICADOR', `Se debe especificar el nombre de la propiedad`).value;
         
         let value = this.createNode<LiteralNode<T>>({
             type: 'Literal',
@@ -330,7 +330,7 @@ export class Parser<T = never, N = never> {
         ];
 
         while (this.current < this.tokens.length && binaryExpressions.includes(this.peek().type)) {
-            const operator = this.consume(this.peek().type);
+            const operator = this.consume(this.peek().type, `Se esperaba un operador binario`);
             const right = this.parsePrimary();
             
             left = this.createNode<BinaryExpressionNode<T, N>>({
@@ -360,9 +360,9 @@ export class Parser<T = never, N = never> {
 
         if (token.value === 'js') {
             this.consume('JS');
-            this.consume('L_EXPRESSION');
+            this.consume('L_EXPRESSION', `Después de usar el escape a JS se debe abrir una expresión.`);
             
-            const content = this.consume('TEXTO').value; 
+            const content = this.consume('TEXTO', `Se debe especificar el contenido de la expresión JS`).value; 
             
             this.consume('R_EXPRESSION');
             
@@ -391,7 +391,7 @@ export class Parser<T = never, N = never> {
         }
 
         if (token.type === 'SUPER') {
-            this.current++;
+            this.consume('SUPER');
             return this.parseIdentifierOrCall(
                 this.createNode<SuperNode<T>>({
                     type: 'Super',
@@ -401,12 +401,12 @@ export class Parser<T = never, N = never> {
         }
 
         if (token.type === 'ESTA') {
+            this.consume('ESTA');
             const estaNode = this.createNode<ThisNode<T>>({
                 type: 'Esta',
                 value: 'this'
             });
 
-            this.current++;
             return this.parseIdentifierOrCall(estaNode);
         }
 
@@ -481,10 +481,10 @@ export class Parser<T = never, N = never> {
             const properties: ObjectProperty<T, N>[] = [];
 
             while (this.peek().type !== 'R_BRACE') {
-                const keyToken = this.consume(['TEXTO', 'IDENTIFICADOR']);
+                const keyToken = this.consume(['TEXTO', 'IDENTIFICADOR'], `Las claves de los objetos deben ser identificadores o textos`);
                 const key = keyToken.type === 'TEXTO' ? `"${keyToken.value}"` : keyToken.value;
                 
-                this.consume(':');
+                this.consume(':', `Después de la clave de un objeto debe ir ':'`);
                 const value = this.parseExpression();
                 
                 properties.push(
@@ -508,7 +508,12 @@ export class Parser<T = never, N = never> {
             });
         }
         
-        throw new Error(`Token inesperado en expresión: ${token.type} en la posición ${this.current}`);
+        throw new ChordError(
+            ErrorLevel.Parser,
+            `Token inesperado en expresión: ${token.type} en la posición ${this.current}`,
+            token.location,
+            this.input.split('\n')[token.location.line - 1] || ''
+        ).format();
     }
 
     private parseIdentifierOrCall(startNode?: ASTNode<T, N>): ASTNode<T, N> {
@@ -519,7 +524,7 @@ export class Parser<T = never, N = never> {
 
             if (next.type === '.') {
                 this.consume('.');
-                const property = this.consume('IDENTIFICADOR');
+                const property = this.consume('IDENTIFICADOR', `Después de '.' se esperaba un identificador para acceder a la propiedad`);
                 
                 node = this.createNode<AccessNode<T, N>>({
                     type: 'Acceso',
@@ -562,7 +567,7 @@ export class Parser<T = never, N = never> {
     }
 
     private parseLiteral(): ASTNode<T, N> {
-        const token = this.consume(['NUMERO', 'TEXTO', 'BOOL', 'INDEFINIDO']);
+        const token = this.consume(['NUMERO', 'TEXTO', 'BOOL', 'INDEFINIDO'], `Se esperaba un literal (número, texto, booleano o indefinido)`);
 
         let value: boolean | number | string | undefined = token.value;
 
@@ -587,7 +592,7 @@ export class Parser<T = never, N = never> {
 
     private parseVariableDeclaration(): VariableNode<T, N> {
         this.consume('VAR');
-        const id = this.consume('IDENTIFICADOR').value;
+        const id = this.consume('IDENTIFICADOR', `Se debe especificar un nombre para la variable`).value;
         
         let value = this.createNode<LiteralNode<T>>({
             type: 'Literal',
@@ -614,12 +619,12 @@ export class Parser<T = never, N = never> {
 
     private parseIfStatement(): ConditionNode<T, N> {
         this.consume('SI');
-        this.consume('L_EXPRESSION');
+        this.consume('L_EXPRESSION', `Después de 'si' se debe abrir una expresión con '(' para especificar la condición.`);
 
         const test = this.parseExpression();
 
         this.consume('R_EXPRESSION');
-        this.consume('L_BRACE');
+        this.consume('L_BRACE', `Después de la condición de un 'si' se debe abrir un bloque de código con '{'.`);
 
         const consequent: ASTNode<T, N>[] = [];
 
@@ -637,7 +642,7 @@ export class Parser<T = never, N = never> {
             if (next.type === 'ADEMAS') {
                 alternate = this.parseIfStatement();
             } else {
-                this.consume('L_BRACE');
+                this.consume('L_BRACE', `Después de 'sino' se debe abrir un bloque de código con '{'.`);
 
                 const elseBody: ASTNode<T, N>[] = [];
 
@@ -662,14 +667,14 @@ export class Parser<T = never, N = never> {
         this.consume('PARA');
         this.consume('L_EXPRESSION');
         
-        const variable = this.consume('IDENTIFICADOR').value;
+        const variable = this.consume('IDENTIFICADOR', `Se debe especificar un nombre para la variable del bucle`).value;
 
-        this.consume('EN');
+        this.consume('EN', `Después de la variable del bucle se debe usar 'en' para especificar el iterable.`);
         
         const iterable = this.parseExpression();
         
         this.consume('R_EXPRESSION');
-        this.consume('L_BRACE');
+        this.consume('L_BRACE', `Después de la expresión de un 'para' se debe abrir un bloque de código con '{'.`);
 
         const body: ASTNode<T, N>[] = [];
 
