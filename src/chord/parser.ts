@@ -1,6 +1,6 @@
 import { ChordError, ErrorLevel } from "../ChordError";
 import { SUGGESTIONS } from "./core.lib";
-import { ASTNode, ClassNode, ConditionNode, LoopNode, FunctionNode, PropertyNode, Token, VariableNode, Symbol, SymbolKind, IdentificatorNode, NewNode, ThisNode, SuperNode, ObjectProperty, ReturnNode, ExportNode, ObjectNode, ImportNode, ExitLoopNode, PassLoopNode, AssignmentNode, BinaryExpressionNode, JSNode, LiteralNode, NoUnaryNode, UnaryNode, ListNode, ExpressionNode, AccessNode, AccessNodeByIndex, CallNode } from "./types";
+import { ASTNode, ClassNode, ConditionNode, LoopNode, FunctionNode, PropertyNode, Token, VariableNode, Symbol, SymbolKind, IdentificatorNode, NewNode, ThisNode, SuperNode, ObjectProperty, ReturnNode, ExportNode, ObjectNode, ImportNode, ExitLoopNode, PassLoopNode, AssignmentNode, BinaryExpressionNode, JSNode, LiteralNode, NoUnaryNode, UnaryNode, ListNode, ExpressionNode, AccessNode, AccessNodeByIndex, CallNode, SOF, EOF } from "./types";
 
 export class Parser<T = never, N = never> {
     public symbols: Map<string, Symbol> = new Map();
@@ -37,11 +37,22 @@ export class Parser<T = never, N = never> {
         if (type === 'prev') targetIndex = this.current - 1;
 
         if (targetIndex < 0) {
-            return { type: 'SOF', value: 'SOF', location: { line: 1, column: 1 } };
+            return {
+                type: 'SOF',
+                value: '',
+                location: {
+                    line: 1,
+                    column: 1
+                }
+            } as SOF<T>;
         }
 
         if (targetIndex >= this.tokens.length) {
-            return { type: 'EOF', value: 'EOF', location: this.tokens[this.tokens.length - 1]?.location || { line: 1, column: 1 } };
+            return {
+                type: 'EOF',
+                value: '',
+                location: this.tokens[this.tokens.length - 1]?.location || { line: 1, column: 1 }
+            } as EOF<T>;
         }
 
         return this.tokens[targetIndex];

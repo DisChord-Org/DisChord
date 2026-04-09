@@ -208,8 +208,20 @@ export interface ThisNode<T = never> extends BaseNode<T> {
     value: 'this';
 }
 
+export interface EOF<T = never> extends BaseNode<T> {
+    type: 'EOF';
+    value: '';
+}
+
+export interface SOF<T = never> extends BaseNode<T> {
+    type: 'SOF';
+    value: '';
+}
+
 export type ASTNode<T = never, N = never> =
-      LiteralNode<T>
+      EOF<T>
+    | SOF<T>
+    |  LiteralNode<T>
     | BinaryExpressionNode<T, N>
     | ConditionNode<T, N>
     | VariableNode<T, N>
