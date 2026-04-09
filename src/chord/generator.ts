@@ -1,10 +1,11 @@
+import { ChordError, ErrorLevel } from "../ChordError";
 import { corelib, runtimeInjections } from "./core.lib";
-import { AccessNode, AccessNodeByIndex, AssignmentNode, ASTNode, BinaryExpressionNode, CallNode, ClassNode, ConditionNode, ExportNode, FunctionNode, ListNode, LiteralNode, LoopNode, NodeType, NoUnaryNode, ObjectNode, ObjectProperty, PropertyNode, Symbol, UnaryNode, VariableNode } from "./types";
+import { AccessNode, AccessNodeByIndex, AssignmentNode, ASTNode, BinaryExpressionNode, CallNode, ClassNode, ConditionNode, ExportNode, FunctionNode, ListNode, LiteralNode, LoopNode, NoUnaryNode, ObjectNode, ObjectProperty, PropertyNode, Symbol, UnaryNode, VariableNode } from "./types";
 
 export class Generator<T extends string = string, N = never> {
     private SymbolsTable: Map<string, Symbol>;
 
-    constructor (private symbols: Map<string, Symbol>) {
+    constructor (private symbols: Map<string, Symbol>, private input: string) {
         this.SymbolsTable = symbols;
     }
 
@@ -86,7 +87,12 @@ export class Generator<T extends string = string, N = never> {
             case 'JS':
                 return `${node.value}`;
             default:
-                throw new Error(`Generador: Tipo de nodo desconocido: ${(node as { type: string }).type}`);
+                throw new ChordError(
+                    ErrorLevel.Compiler,
+                    `Generador: Tipo de nodo desconocido: ${node.type}`,
+                    node.location,
+                    this.input.split('\n')[node.location.line - 1] || ''
+                ).format();
         }
     }
 
@@ -136,9 +142,20 @@ export class Generator<T extends string = string, N = never> {
             const symbol = this.SymbolsTable.get(node.object.property);
             if (symbol && symbol.metadata.isAsync) isAsyncCall = true;
         } else {
-            if (!('value' in node.object)) throw new Error(`Se esperaba una llamada con valor en su objeto.`);
+            if (!('value' in node.object)) throw new ChordError(
+                ErrorLevel.Compiler,
+                `Se esperaba una llamada con valor en su objeto.`,
+                node.location,
+                this.input.split('\n')[node.location.line - 1] || ''
+            ).format();
+
             const name = node.object.value;
-            if (typeof name != 'string') throw new Error(`Se esperaba un tipo 'string'. Se encontró '${typeof name}'`);
+            if (typeof name != 'string') throw new ChordError(
+                ErrorLevel.Compiler,
+                `Se esperaba un tipo 'string'. Se encontró '${typeof name}'`,
+                node.location,
+                this.input.split('\n')[node.location.line - 1] || ''
+            ).format();
             translation = name;
 
             const symbol = this.SymbolsTable.get(name);
