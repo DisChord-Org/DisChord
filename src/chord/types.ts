@@ -38,7 +38,7 @@ export type NodeType<T = never> = CoreNodeType | T;
 
 export interface BaseNode<T = never> {
     readonly type: NodeType<T>;
-    location?: Location;
+    location: Location;
 };
 
 export interface ClassNode<T = never, N = never> extends BaseNode<T> {
@@ -142,7 +142,8 @@ export interface ExpressionNode<T = never, N = never> extends BaseNode<T> {
     object: ASTNode<T, N>;
 }
 
-export interface ObjectProperty<T = never, N = never> {
+export interface ObjectProperty<T = never, N = never> extends BaseNode<T> {
+    type: 'PropiedadObjeto'
     key: string;
     value: ASTNode<T, N>;
 }
@@ -224,11 +225,12 @@ export type ASTNode<T = never, N = never> =
     | UnaryNode<T, N>
     | ListNode<T, N>
     | ExpressionNode<T, N>
-    | ObjectNode<T>
+    | ObjectNode<T, N>
     | IdentificatorNode<T>
     | AccessNode<T, N>
     | CallNode<T, N>
     | ExportNode<T, N>
+    | ObjectProperty<T, N>
     | ImportNode<T, N>
     | AssignmentNode<T, N>
     | JSNode<T>
