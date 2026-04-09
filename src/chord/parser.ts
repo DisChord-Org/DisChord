@@ -1,4 +1,4 @@
-import { ASTNode, ClassNode, ConditionNode, LoopNode, FunctionNode, PropertyNode, Token, VariableNode, Symbol, SymbolKind, IdentificatorNode, NewNode, ThisNode, SuperNode, ObjectProperty, ReturnNode, ExportNode, ObjectNode } from "./types";
+import { ASTNode, ClassNode, ConditionNode, LoopNode, FunctionNode, PropertyNode, Token, VariableNode, Symbol, SymbolKind, IdentificatorNode, NewNode, ThisNode, SuperNode, ObjectProperty, ReturnNode, ExportNode, ObjectNode, ImportNode, ExitLoopNode, PassLoopNode, AssignmentNode, BinaryExpressionNode, JSNode, LiteralNode, NoUnaryNode, UnaryNode, ListNode, ExpressionNode, AccessNode, AccessNodeByIndex, CallNode } from "./types";
 
 export class Parser<T = never, N = never> {
     public symbols: Map<string, Symbol> = new Map();
@@ -37,6 +37,15 @@ export class Parser<T = never, N = never> {
         if (!expected.includes(token.type)) throw new Error(`Se esperaba uno de ${expected.join(', ')} pero se encontró ${token.type}`);
 
         return this.tokens[this.current++];
+    }
+
+    protected createNode<NodeType extends ASTNode<T, N>> (node: Omit<NodeType, 'location'>): NodeType {
+        const token: Token = this.peek();
+
+        return {
+            ...node,
+            location: token.location
+        } as NodeType;
     }
 
     protected parseCustomStatement(): ASTNode<T, N> | null {
@@ -106,12 +115,12 @@ export class Parser<T = never, N = never> {
 
         if (token.type === 'SALIR') {
             this.consume('SALIR');
-            return { type: 'Salir' };
+            return this.createNode<ExitLoopNode<T>>({ type: 'Salir' });
         }
 
         if (token.type === 'PASAR') {
             this.consume('PASAR');
-            return { type: 'Pasar' };
+            return this.createNode<PassLoopNode<T>>({ type: 'Pasar' });
         }
 
         if (token.type === 'DEVOLVER') {
@@ -124,20 +133,20 @@ export class Parser<T = never, N = never> {
                 value = this.parseExpression();
             }
 
-            return {
+            return this.createNode<ReturnNode<T, N>>({
                 type: 'Devolver',
                 object: value
-            } as ReturnNode<T, N>;
+            });
         }
 
         if (token.type === 'EXPORTAR') {
             this.consume('EXPORTAR');
             const declaration = this.parseStatement();
             
-            return {
+            return this.createNode<ExportNode<T, N>>({
                 type: 'Exportar',
                 object: declaration
-            } as ExportNode<T, N>;
+            });
         }
 
         if (token.type === 'IMPORTAR') {
@@ -156,11 +165,11 @@ export class Parser<T = never, N = never> {
             const pathToken = this.consume('TEXTO'); 
             const modulePath = pathToken.value;
 
-            return {
+            return this.createNode<ImportNode<T, N>>({
                 type: 'Importar',
                 identificators,
                 path: modulePath
-            };
+            });
         }
 
         if (classContext && token.type === 'IDENTIFICADOR' && token.value === classContext) {
@@ -197,12 +206,12 @@ export class Parser<T = never, N = never> {
             kind: SymbolKind.Class
         });
 
-        return {
+        return this.createNode<ClassNode<T, N>>({
             type: 'Clase',
             id,
             superClass,
             body
-        };
+        });
     }
 
     private parseFunctionDeclaration(isConstructor: boolean, isMethod: boolean = true, isAsync: boolean = false): FunctionNode<T, N> {
@@ -241,7 +250,7 @@ export class Parser<T = never, N = never> {
             }
         });
 
-        return {
+        return this.createNode<FunctionNode<T, N>>({
             type: 'Funcion',
             id,
             metadata: {
@@ -251,22 +260,22 @@ export class Parser<T = never, N = never> {
             },
             params,
             body
-        };
+        });
     }
 
     private parseProperty(): PropertyNode<T, N> {
         this.consume('PROP');
         const id = this.consume('IDENTIFICADOR').value;
         
-        let value: ASTNode<T, N> = {
+        let value = this.createNode<LiteralNode<T>>({
             type: 'Literal',
             value: undefined,
             raw: 'indefinido'
-        };
+        });
 
         if (this.peek().type === 'ES') {
             this.consume('ES');
-            value = this.parseExpression();
+            value = this.parseExpression() as LiteralNode<T>;
         }
 
         this.registerSymbol(id, {
@@ -274,11 +283,11 @@ export class Parser<T = never, N = never> {
             kind: SymbolKind.Property
         });
 
-        return {
+        return this.createNode<PropertyNode<T, N>>({
             type: 'Propiedad',
             id,
             value
-        };
+        });
     }
 
     private parseExpression(): ASTNode<T, N> {
@@ -293,23 +302,23 @@ export class Parser<T = never, N = never> {
             const operator = this.consume(this.peek().type);
             const right = this.parsePrimary();
             
-            left = {
+            left = this.createNode<BinaryExpressionNode<T, N>>({
                 type: 'ExpresionBinaria',
                 left,
                 operator: operator.type,
                 right
-            };
+            });
         }
 
         if (this.current < this.tokens.length && this.peek().type === 'ES') {
             this.consume('ES');
             const value = this.parseExpression();
             
-            return {
+            return this.createNode<AssignmentNode<T, N>>({
                 type: 'Asignacion',
                 left,
                 assignment: value
-            };
+            });
         }
 
         return left;
@@ -326,37 +335,46 @@ export class Parser<T = never, N = never> {
             
             this.consume('R_EXPRESSION');
             
-            return {
+            return this.createNode<JSNode<T>>({
                 type: 'JS',
                 value: content
-            };
+            });
         }
 
         if (token.type === 'ESPACIO') {
             this.consume('ESPACIO');
-            return {
+            return this.createNode<LiteralNode<T>>({
                 type: 'Literal',
                 value: ' ',
                 raw: ' '
-            }
+            });
         }
 
         if (token.type === 'INTRO') {
             this.consume('INTRO');
-            return {
+            return this.createNode<LiteralNode<T>>({
                 type: 'Literal',
                 value: '\\n',
                 raw: '\\n'
-            }
+            });
         }
 
         if (token.type === 'SUPER') {
             this.current++;
-            return this.parseIdentifierOrCall({ type: 'Super', value: 'super' });
+            return this.parseIdentifierOrCall(
+                this.createNode<SuperNode<T>>({
+                    type: 'Super',
+                    value: 'super'
+                })
+            );
         }
 
         if (token.type === 'ESTA') {
-            const estaNode: ASTNode<T, N> = { type: 'Esta', value: 'this' };
+            const estaNode = this.createNode<ThisNode<T>>({
+                type: 'Esta',
+                value: 'this'
+            });
+
             this.current++;
             return this.parseIdentifierOrCall(estaNode);
         }
@@ -372,32 +390,32 @@ export class Parser<T = never, N = never> {
         if (token.type === 'NUEVO') {
             this.consume('NUEVO');
             const call = this.parseIdentifierOrCall(); 
-            return {
+            return this.createNode<NewNode<T, N>>({
                 type: 'Nuevo',
                 object: call
-            };
+            });
         }
 
         if (token.type === 'NO') {
             this.consume('NO');
             const argument = this.parsePrimary();
 
-            return {
+            return this.createNode<NoUnaryNode<T, N>>({
                 type: 'NoUnario',
                 operator: 'NO',
                 object: argument
-            };
+            });
         }
 
         if (token.type === 'TIPO') {
             this.consume('TIPO');
             const argument = this.parsePrimary();
 
-            return {
+            return this.createNode<UnaryNode<T, N>>({
                 type: 'Unario',
                 operator: 'TIPO',
                 object: argument
-            };
+            });
         }
 
         if (token.type === 'L_SQUARE') {
@@ -408,10 +426,10 @@ export class Parser<T = never, N = never> {
                 if (this.peek().type === ',') this.consume(',');
             }
             this.consume('R_SQUARE');
-            return {
+            return this.createNode<ListNode<T, N>>({
                 type: 'Lista',
                 body: elements
-            };
+            });
         }
 
         if (token.type === 'L_EXPRESSION') {
@@ -421,10 +439,10 @@ export class Parser<T = never, N = never> {
             
             this.consume('R_EXPRESSION');
 
-            return {
+            return this.createNode<ExpressionNode<T, N>>({
                 type: 'Expresion',
                 object: node,
-            };
+            });
         }
 
         if (token.type === 'L_BRACE') {
@@ -438,7 +456,13 @@ export class Parser<T = never, N = never> {
                 this.consume(':');
                 const value = this.parseExpression();
                 
-                properties.push({ key, value });
+                properties.push(
+                    this.createNode<ObjectProperty<T, N>>({
+                        type: 'PropiedadObjeto',
+                        key,
+                        value
+                    })
+                );
 
                 if (this.peek().type === ',') {
                     this.consume(',');
@@ -447,17 +471,17 @@ export class Parser<T = never, N = never> {
 
             this.consume('R_BRACE');
 
-            return {
+            return this.createNode<ObjectNode<T, N>>({
                 type: 'Objeto',
                 properties
-            } as ObjectNode;
+            });
         }
         
         throw new Error(`Token inesperado en expresión: ${token.type} en la posición ${this.current}`);
     }
 
-    private parseIdentifierOrCall(startNode?: IdentificatorNode | NewNode | ThisNode | SuperNode): ASTNode<T, N> {
-        let node: ASTNode<T, N> = startNode || { type: 'Identificador', value: this.consume('IDENTIFICADOR').value };
+    private parseIdentifierOrCall(startNode?: ASTNode<T, N>): ASTNode<T, N> {
+        let node = startNode || this.createNode<IdentificatorNode<T>>({ type: 'Identificador', value: this.consume('IDENTIFICADOR').value });
 
         while (this.current < this.tokens.length) {
             const next = this.peek();
@@ -466,24 +490,22 @@ export class Parser<T = never, N = never> {
                 this.consume('.');
                 const property = this.consume('IDENTIFICADOR');
                 
-                node = {
+                node = this.createNode<AccessNode<T, N>>({
                     type: 'Acceso',
                     object: node,
                     property: property.value
-                };
+                });
             } else if (next.type === 'L_SQUARE') {
                 this.consume('L_SQUARE');
                 const index = this.parseExpression();
                 this.consume('R_SQUARE');
 
-                node = {
+                node = this.createNode<AccessNodeByIndex<T, N>>({
                     type: 'AccesoPorIndice',
                     object: node,
                     index: index
-                };
-            } else {
-                break;
-            }
+                });
+            } else break;
         }
 
         if (this.current < this.tokens.length && this.peek().type === 'L_EXPRESSION') {
@@ -498,11 +520,11 @@ export class Parser<T = never, N = never> {
             }
             this.consume('R_EXPRESSION');
 
-            return {
+            return this.createNode<CallNode<T, N>>({
                 type: 'Llamada',
                 object: node,
                 params: args
-            };
+            });
         }
 
         return node;
@@ -525,22 +547,26 @@ export class Parser<T = never, N = never> {
                 break;
         }
 
-        return {
+        return this.createNode<LiteralNode<T>>({
             type: 'Literal',
             value,
             raw: token.value
-        };
+        });
     }
 
     private parseVariableDeclaration(): VariableNode<T, N> {
         this.consume('VAR');
         const id = this.consume('IDENTIFICADOR').value;
         
-        let value: ASTNode<T, N> = { type: 'Literal', value: undefined, raw: 'indefinido' };
+        let value = this.createNode<LiteralNode<T>>({
+            type: 'Literal',
+            value: undefined,
+            raw: 'indefinido'
+        });
 
         if (this.current < this.tokens.length && this.peek().type === 'ES') {
             this.consume('ES');
-            value = this.parseExpression();
+            value = this.parseExpression() as LiteralNode<T>;
         }
 
         this.registerSymbol(id, {
@@ -548,11 +574,11 @@ export class Parser<T = never, N = never> {
             kind: SymbolKind.Variable
         });
 
-        return {
+        return this.createNode<VariableNode<T, N>>({
             type: 'Variable',
             id,
             value
-        };
+        });
     }
 
     private parseIfStatement(): ConditionNode<T, N> {
@@ -572,7 +598,7 @@ export class Parser<T = never, N = never> {
 
         this.consume('R_BRACE');
 
-        let alternate: ASTNode<T, N>[] | ConditionNode<T, N> | undefined = undefined;
+        let alternate: ConditionNode<T, N>['alternate'] = undefined;
 
         if (this.current < this.tokens.length && (this.peek().type === 'SINO' || this.peek().type === 'ADEMAS')) {
             const next = this.consume(this.peek().type);
@@ -593,12 +619,12 @@ export class Parser<T = never, N = never> {
             }
         }
 
-        return {
+        return this.createNode<ConditionNode<T, N>>({
             type: 'Condicion',
             test,
             consequent,
             alternate
-        };
+        });
     }
 
     private parseForStatement(): LoopNode<T, N> {
@@ -622,11 +648,11 @@ export class Parser<T = never, N = never> {
 
         this.consume('R_BRACE');
 
-        return {
+        return this.createNode<LoopNode<T, N>>({
             type: 'Bucle',
             var: variable,
             iterable,
             body
-        };
+        });
     }
 }
