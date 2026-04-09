@@ -51,7 +51,8 @@ export class Lexer {
             }
 
             if (char === "/") {  // Comentarios
-                const nextChar = this.advance(); // Consume el primer "/"
+                this.advance();
+                const nextChar = this.peek(); // Consume el primer "/"
             
                 if (nextChar === "/") { // Comentario de línea
                     this.advance(); // Consume el segundo "/"
@@ -104,7 +105,7 @@ export class Lexer {
                         
                         if (/[0-9]/.test(next)) {
                             value += this.advance();
-                        } else if (char === ".") {
+                        } else if (next === ".") {
                             const nextChar = this.input[this.current + 1];
                             if (/[0-9]/.test(nextChar) && !value.includes(".")) {
                                 value += this.advance();
@@ -136,7 +137,7 @@ export class Lexer {
 
             if (/[a-zA-Z]/.test(char)) { // Keywords, identificadores, booleanos, undefined
                 let value = "";
-                while (/[a-zA-Z0-9_]/.test(char) && this.current < this.input.length) {
+                while (/[a-zA-Z0-9_]/.test(this.peek()) && this.current < this.input.length) {
                     value += this.advance();
                 }
 
