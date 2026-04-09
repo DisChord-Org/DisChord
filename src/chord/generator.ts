@@ -5,7 +5,7 @@ import { AccessNode, AccessNodeByIndex, AssignmentNode, ASTNode, BinaryExpressio
 export class Generator<T extends string = string, N = never> {
     private SymbolsTable: Map<string, Symbol>;
 
-    constructor (private symbols: Map<string, Symbol>, private input: string) {
+    constructor (public symbols: Map<string, Symbol>, public input: string) {
         this.SymbolsTable = symbols;
     }
 

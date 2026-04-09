@@ -10,6 +10,7 @@ import MessageParser from './Messages/MessageParser';
 import CollectorParser from './CollectorParser';
 import ClientParser from './Client/ClientParser';
 import EventParser from './Events/EventParser';
+import { ChordError, ErrorLevel } from '../../ChordError';
 
 /**
  * Main Orchestrator for DisChord's syntactic analysis.
@@ -83,7 +84,13 @@ export class DisChordParser extends Parser<DisChordNodeType, DisChordNode> {
                 this.consume('CREAR');
 
                 const customStatement = this.parseCustomStatement();
-                if (!customStatement) throw new Error("Se esperaba una estructura válida después de 'crear'");
+                
+                if (!customStatement) throw new ChordError(
+                    ErrorLevel.Parser,
+                    `Se esperaba una estructura válida después de 'crear'`,
+                    token.location,
+                    this.input.split('\n')[token.location.line - 1] || ''
+                ).format();
 
                 return customStatement;
             case 'L_BRACE':
@@ -112,7 +119,12 @@ export class DisChordParser extends Parser<DisChordNodeType, DisChordNode> {
                 const value = this.parsePrimary();
                 blocks[key] = value;
             } else {
-                if (type === 'definition-only') throw new Error("Se definió código en un BDO 'definition-only'");
+                if (type === 'definition-only') throw new ChordError(
+                    ErrorLevel.Parser,
+                    `Se definió código en un BDO 'definition-only'`,
+                    this.peek().location,
+                    this.input.split('\n')[this.peek().location.line - 1] || ''
+                ).format();
 
                 definitionMode = false;
 

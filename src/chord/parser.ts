@@ -8,7 +8,7 @@ export class Parser<T = never, N = never> {
 
     constructor(
         private tokens: Token[],
-        private input: string,
+        public input: string,
         private current: number = 0
     ) {}
 

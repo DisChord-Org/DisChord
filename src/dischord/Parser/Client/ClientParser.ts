@@ -2,6 +2,7 @@ import { DisChordParser } from "../parser";
 import { StartBotNode } from "../../types";
 import { KeyWords } from '../../../chord/keywords';
 import { SubParser } from "../subparser";
+import { ChordError, ErrorLevel } from "../../../ChordError";
 
 /**
  * Handles the initial bot declaration.
@@ -38,10 +39,14 @@ export default class ClientParser extends SubParser {
         this.consume('ENCENDER');
 
         const id = this.consume('BOT');
-        if (id.value !== 'bot') {
-            throw new Error(`Se esperaba 'bot' después de 'encender', se encontró '${id.value}'`);
-        }
-    
+
+        if (id.value !== 'bot') throw new ChordError(
+            ErrorLevel.Parser,
+            `Se esperaba 'bot' después de 'encender', se encontró '${id.value}'`,
+            this.peek().location,
+            this.parent.input.split('\n')[this.peek().location.line - 1] || ''
+        ).format();
+        
         const configBody = this.parseODB('definition-only');
     
         return this.createNode<StartBotNode>({
