@@ -1,10 +1,16 @@
+import { ChordError, ErrorLevel } from "../ChordError";
+import { SUGGESTIONS } from "./core.lib";
 import { ASTNode, ClassNode, ConditionNode, LoopNode, FunctionNode, PropertyNode, Token, VariableNode, Symbol, SymbolKind, IdentificatorNode, NewNode, ThisNode, SuperNode, ObjectProperty, ReturnNode, ExportNode, ObjectNode, ImportNode, ExitLoopNode, PassLoopNode, AssignmentNode, BinaryExpressionNode, JSNode, LiteralNode, NoUnaryNode, UnaryNode, ListNode, ExpressionNode, AccessNode, AccessNodeByIndex, CallNode } from "./types";
 
 export class Parser<T = never, N = never> {
     public symbols: Map<string, Symbol> = new Map();
     public nodes: ASTNode<T, N>[] = [];
 
-    constructor(private tokens: Token[], private current: number = 0) {}
+    constructor(
+        private tokens: Token[],
+        private input: string,
+        private current: number = 0
+    ) {}
 
     private registerSymbol(name: string, info: Partial<Symbol>) {
         this.symbols.set(name, {
@@ -30,20 +36,38 @@ export class Parser<T = never, N = never> {
         if (type === 'next') targetIndex = this.current + 1;
         if (type === 'prev') targetIndex = this.current - 1;
 
-        if (targetIndex < 0) throw new Error('No hay tokens previos.');
+        if (targetIndex < 0) {
+            return { type: 'SOF', value: 'SOF', location: { line: 1, column: 1 } };
+        }
 
-        if (targetIndex >= this.tokens.length) throw new Error("Se acabaron los tokens");
+        if (targetIndex >= this.tokens.length) {
+            return { type: 'EOF', value: 'EOF', location: this.tokens[this.tokens.length - 1]?.location || { line: 1, column: 1 } };
+        }
 
         return this.tokens[targetIndex];
     }
 
-    consume(expectedTypes: string | string[]): Token {
-        const token = this.tokens[this.current];
-        const expected = Array.isArray(expectedTypes) ? expectedTypes : [ expectedTypes ];
+    consume(expectedTypes: string | string[], message?: string): Token {
+        const token = this.peek();
+        const expected = Array.isArray(expectedTypes) ? expectedTypes : [expectedTypes];
 
-        if (!expected.includes(token.type)) throw new Error(`Se esperaba uno de ${expected.join(', ')} pero se encontró ${token.type}`);
+        if (expected.includes(token.type)) return this.tokens[this.current++];
 
-        return this.tokens[this.current++];
+        let customMessage = message;
+    
+        if (!customMessage) {
+            const hint = SUGGESTIONS[expected[0]];
+            customMessage = hint
+                ? hint
+                : `Esperaba un elemento de tipo '${expected.join(' o ')}'`;
+        }
+
+        throw new ChordError(
+            ErrorLevel.Parser,
+            `${customMessage}. (En su lugar encontré '${token.value}')`,
+            token.location,
+            this.input.split('\n')[token.location.line - 1] || ''
+        );
     }
 
     public createNode<NodeType extends ASTNode<T, N>> (node: Omit<NodeType, 'location'>): NodeType {
@@ -66,7 +90,7 @@ export class Parser<T = never, N = never> {
         if (custom) return custom;
 
         if (token.type === 'DECORADOR' && token.value === '@asincrono') {
-            this.consume('DECORADOR');
+            this.consume('DECORADOR', `Solo existe un decorador. ¿Querías decir '@asincrono'?`);
             
             if (this.peek().type === 'FIJAR') {
                 this.consume('FIJAR');
@@ -131,7 +155,7 @@ export class Parser<T = never, N = never> {
         }
 
         if (token.type === 'DEVOLVER') {
-            this.consume('DEVOLVER');
+            this.consume('DEVOLVER',);
             
             const next = this.peek();
             let value = undefined;
@@ -158,7 +182,7 @@ export class Parser<T = never, N = never> {
 
         if (token.type === 'IMPORTAR') {
             this.consume('IMPORTAR');
-            this.consume('L_BRACE');
+            this.consume('L_BRACE', `Después de querer importar debes usar '{'`);
 
             const identificators: string[] = [];
             while (this.peek().type !== 'R_BRACE') {
@@ -167,9 +191,9 @@ export class Parser<T = never, N = never> {
             }
 
             this.consume('R_BRACE');
-            this.consume('DESDE');
+            this.consume('DESDE', `Después de usar 'importar' debes especificar la ruta del fichero a importar usando 'desde'.`);
             
-            const pathToken = this.consume('TEXTO'); 
+            const pathToken = this.consume('TEXTO', `Debes especificar un 'texto' con la ruta del fichero a importar.`); 
             const modulePath = pathToken.value;
 
             return this.createNode<ImportNode<T, N>>({
@@ -199,7 +223,7 @@ export class Parser<T = never, N = never> {
             superClass = this.consume('IDENTIFICADOR').value;
         }
 
-        this.consume('L_BRACE');
+        this.consume('L_BRACE', `Al declarar una clase debes usar '{'.`);
 
         const body: ASTNode<T, N>[] = [];
         while (this.peek().type !== 'R_BRACE') {

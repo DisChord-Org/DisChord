@@ -89,7 +89,7 @@ export default class Init {
         const tokens = lexer.tokenize();
         if (args.includes('--lexer')) this.log("LEXER", tokens);
 
-        const parser = new DisChordParser(tokens);
+        const parser = new DisChordParser(tokens, code);
         const ast = parser.parse();
         if (args.includes('--ast')) this.log("AST", ast);
     

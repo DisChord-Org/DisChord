@@ -19,11 +19,12 @@ export abstract class SubParser {
     
     /**
      * Consumes the next token if it matches the expected type(s).
-     * @param expectedTypes - THe expected token type to consume.
+     * @param expectedTypes - The expected token type to consume.
+     * @param message - The message error to log.
      * @returns The consumed token.
      */
-    protected consume(expectedTypes: string | string[]) {
-        return this.parent.consume(expectedTypes);
+    protected consume(expectedTypes: string | string[], message?: string) {
+        return this.parent.consume(expectedTypes, message);
     }
     
     /**
