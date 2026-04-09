@@ -24,9 +24,16 @@ export class Parser<T = never, N = never> {
         return this.nodes;
     }
 
-    peek(type: 'this' | 'next' = 'this'): Token {
-        const targetIndex = type === 'this' ? this.current : this.current + 1;
+    peek(type: 'this' | 'next' | 'prev' = 'this'): Token {
+        let targetIndex = this.current;
+
+        if (type === 'next') targetIndex = this.current + 1;
+        if (type === 'prev') targetIndex = this.current - 1;
+
+        if (targetIndex < 0) throw new Error('No hay tokens previos.');
+
         if (targetIndex >= this.tokens.length) throw new Error("Se acabaron los tokens");
+
         return this.tokens[targetIndex];
     }
 
@@ -40,7 +47,7 @@ export class Parser<T = never, N = never> {
     }
 
     public createNode<NodeType extends ASTNode<T, N>> (node: Omit<NodeType, 'location'>): NodeType {
-        const token: Token = this.peek();
+        const token: Token = this.peek('prev');
 
         return {
             ...node,
