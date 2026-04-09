@@ -128,8 +128,7 @@ export default class Init {
             }
         
         } catch (error: any) {
-            console.log("ERROR DE COMPILACIÓN");
-            console.log(error.message);
+            console.log(error);
             process.exit(1);
         }
     }
