@@ -1,6 +1,7 @@
 import { Token } from './types';
 import { symbols } from './symbols';
 import { KeyWords } from './keywords';
+import { ChordError, ErrorLevel } from '../ChordError';
 
 export class Lexer {
     private line = 1;
@@ -92,11 +93,11 @@ export class Lexer {
             if (/[0-9]/.test(char) || char === "0") { // Números y BigInt
                 let value = "";
 
-                if (char === "0" && /[bBoOxX]/.test(this.input[this.current + 1])) { // bin, oct, hex
+                if (this.peek() === "0" && /[bBoOxX]/.test(this.input[this.current + 1])) { // bin, oct, hex
                     value += this.advance();
                     value += this.advance();
 
-                    while (/[0-9a-fA-F]/.test(char) && this.current < this.input.length) {
+                    while (/[0-9a-fA-F]/.test(this.peek()) && this.current < this.input.length) {
                         value += this.advance();
                     }
                 } else {
@@ -114,7 +115,7 @@ export class Lexer {
                     }
                 }
 
-                if (char === "n") {
+                if (this.peek() === "n") {
                     value += this.advance();
                     tokens.push(this.createToken("BIGINT", value, startLine, startCol));
                 } else {
@@ -127,7 +128,7 @@ export class Lexer {
             if (char === '@') {
                 let value = this.advance();
 
-                while (this.current < this.input.length && /[a-zA-Z0-9_]/.test(char)) {
+                while (this.current < this.input.length && /[a-zA-Z0-9_]/.test(this.peek())) {
                     value += this.advance();
                 }
 
@@ -154,7 +155,8 @@ export class Lexer {
             }
 
             if (this.current < this.input.length - 1) {
-                const twoChar = char + this.input[this.current + 1];
+                const nextChar = this.input[this.current + 1];
+                const twoChar = char + nextChar;
                 if (symbols[twoChar]) {
                     this.advance();
                     this.advance();
@@ -169,7 +171,12 @@ export class Lexer {
                 continue;
             }
 
-            throw new Error(`Token inesperado: ${char}`);
+            throw new ChordError(
+                ErrorLevel.Lexer,
+                `Carácter inesperado: ${char}`,
+                { line: this.line, column: this.column },
+                this.input.split('\n')[this.line - 1] || ''
+            ).format();
         }
 
         return tokens;
