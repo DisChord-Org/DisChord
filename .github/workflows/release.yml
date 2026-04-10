@@ -24,6 +24,7 @@ jobs:
       - uses: oven-sh/setup-bun@v1
 
       - name: Build Binary
+        id: build
         shell: bash
         run: |
           mkdir -p dist
@@ -32,13 +33,16 @@ jobs:
           [ "${{ matrix.platform }}" = "windows-latest" ] && EXT=".exe" || EXT=""
           
           FILENAME="dischord-compiler-$ARCH_NAME-${{ matrix.target-name }}$EXT"
+          echo "FINAL_FILENAME=$FILENAME" >> $GITHUB_ENV
+
           bun install
           bun build ./src/index.ts --compile --outfile "./dist/$FILENAME"
       
       - name: Codesign (ad-hoc)
         if: matrix.platform == 'macos-latest'
         run: |
-          codesign --force --deep --sign - dist/*
+          chmod +x "dist/${{ env.FINAL_FILENAME }}"
+          codesign --force --sign - "dist/${{ env.FINAL_FILENAME }}"
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
