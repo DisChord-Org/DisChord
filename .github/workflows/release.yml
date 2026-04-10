@@ -36,13 +36,21 @@ jobs:
           echo "FINAL_FILENAME=$FILENAME" >> $GITHUB_ENV
 
           bun install
-          bun build ./src/index.ts --compile --outfile "./dist/$FILENAME"
+          if [ "${{ matrix.platform }}" == "macos-latest" ]; then
+            bun build ./src/index.ts --compile --minify --target=bun-darwin-arm64 --outfile "./dist/$FILENAME"
+          else
+            bun build ./src/index.ts --compile --outfile "./dist/$FILENAME"
+          fi
       
       - name: Codesign (ad-hoc)
         if: matrix.platform == 'macos-latest'
         run: |
-          chmod +x "dist/${{ env.FINAL_FILENAME }}"
-          codesign --force --sign - "dist/${{ env.FINAL_FILENAME }}"
+          FILE_PATH="dist/${{ env.FINAL_FILENAME }}"
+          chmod +x "$FILE_PATH"
+          
+          codesign --remove-signature "$FILE_PATH" || true
+          codesign --force -s - "$FILE_PATH"
+          codesign --verify --verbose "$FILE_PATH"
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
