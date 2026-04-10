@@ -36,15 +36,17 @@ abstract class BaseChordError extends Error {
     }
 }
 
+type ChordErrorLevels = ErrorLevel.Lexer | ErrorLevel.Parser | ErrorLevel.Compiler;
 export class ChordError extends BaseChordError {
-    constructor(phase: ErrorLevel, message: string, location?: Location, rawLine?: string) {
+    constructor(phase: ChordErrorLevels, message: string, location?: Location, rawLine?: string) {
         super(phase, message, ErrorType.Fatal, location, rawLine);
         this.name = 'ChordError';
     }
 }
 
+type DisChordErrorLevels = ErrorLevel.Parser | ErrorLevel.Compiler | ErrorLevel.Execution;
 export class DisChordError extends BaseChordError {
-    constructor(phase: ErrorLevel, message: string, location?: Location, rawLine?: string) {
+    constructor(phase: DisChordErrorLevels, message: string, location?: Location, rawLine?: string) {
         super(phase, message, ErrorType.Error, location, rawLine);
         this.name = 'DisChordError';
     }

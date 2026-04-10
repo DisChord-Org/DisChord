@@ -1,4 +1,4 @@
-import { ChordError, ErrorLevel } from "../../../../ChordError";
+import { DisChordError, ErrorLevel } from "../../../../ChordError";
 import { ButtonStyles, DisChordASTNode, ODBNode } from "../../../types";
 import { DisChordGenerator } from "../../generator";
 import { SubGenerator } from "../../subgenerator";
@@ -39,7 +39,7 @@ export default class ButtonGenerator extends SubGenerator {
      * @returns A string representing the instantiation and configuration of a new Button.
      */
     generate (node: DisChordASTNode): string {
-        if (node.type != 'BDO') throw new ChordError(
+        if (node.type != 'BDO') throw new DisChordError(
             ErrorLevel.Compiler,
             `Se esperaba un BDO, se recibió '${node.type}'`,
             node.location,
@@ -70,7 +70,7 @@ export default class ButtonGenerator extends SubGenerator {
             this.getODBProperty(node, 'id')
         );
 
-        if (!customId) throw new ChordError(
+        if (!customId) throw new DisChordError(
             ErrorLevel.Compiler,
             `Se debe especificar una id en el botón`,
             node.location,
@@ -90,7 +90,7 @@ export default class ButtonGenerator extends SubGenerator {
             this.getODBProperty(node, 'etiqueta')
         );
 
-        if (!label) throw new ChordError(
+        if (!label) throw new DisChordError(
             ErrorLevel.Parser,
             `Se debe especificar una etiqueta en el botón`,
             node.location,
@@ -110,14 +110,14 @@ export default class ButtonGenerator extends SubGenerator {
             this.getODBProperty(node, 'estilo')
         );
         
-        if (!style) throw new ChordError(
+        if (!style) throw new DisChordError(
             ErrorLevel.Compiler,
             `Se debe especificar el estilo en el botón`,
             node.location,
             this.parent.input.split('\n')[node.location.line - 1] || ''
         ).format();
 
-        if (!(style in ButtonStyles)) throw new ChordError(
+        if (!(style in ButtonStyles)) throw new DisChordError(
             ErrorLevel.Compiler,
             `Estilo inválido: '${style}'`,
             node.location,

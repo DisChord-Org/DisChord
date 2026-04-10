@@ -1,4 +1,4 @@
-import { ChordError, ErrorLevel } from "../../../../ChordError";
+import { DisChordError, ErrorLevel } from "../../../../ChordError";
 import { EmbedColors } from "../../../core.lib";
 import { DisChordASTNode, ODBNode } from "../../../types";
 import { DisChordGenerator } from "../../generator";
@@ -42,7 +42,7 @@ export default class EmbedGenerator extends SubGenerator {
      * @returns A string representing the instantiation and configuration of a new Embed.
      */
     generate (node: DisChordASTNode): string {
-        if (node.type != 'BDO') throw new ChordError(
+        if (node.type != 'BDO') throw new DisChordError(
             ErrorLevel.Parser,
             `Se esperaba un BDO, se recibió '${node.type}'`,
             node.location,
@@ -201,7 +201,7 @@ export default class EmbedGenerator extends SubGenerator {
         if (!fields || fields.type != 'Lista' || fields.body.length < 1) return '';
 
         const FieldsResolved: string = fields.body.map((Field: DisChordASTNode): string => {
-            if (Field.type != 'BDO') throw new ChordError(
+            if (Field.type != 'BDO') throw new DisChordError(
                 ErrorLevel.Compiler,
                 `Se esperaba un BDO para el campo, se recibió '${Field.type}'`,
                 node.location,
@@ -212,7 +212,7 @@ export default class EmbedGenerator extends SubGenerator {
                 this.getODBProperty(Field, 'titulo')
             );
 
-            if (!name) throw new ChordError(
+            if (!name) throw new DisChordError(
                 ErrorLevel.Compiler,
                 `El campo requiere una propiedad 'titulo'`,
                 node.location,
@@ -248,7 +248,7 @@ export default class EmbedGenerator extends SubGenerator {
             this.getODBProperty(footer, 'texto')
         );
 
-        if (!text) throw new ChordError(
+        if (!text) throw new DisChordError(
             ErrorLevel.Compiler,
             `El pie de página requiere una propiedad 'text'`,
             node.location,

@@ -6,7 +6,7 @@ import { StartBotNode } from "../../types";
 import { DisChordGenerator } from "../generator";
 import { intentsMap } from "../../core.lib";
 import { SubGenerator } from "../subgenerator";
-import { ChordError, ErrorLevel } from "../../../ChordError";
+import { DisChordError, ErrorLevel } from "../../../ChordError";
 
 /**
  * Generator class responsible for generating code related to starting the bot and setting up the client in DisChrod.
@@ -30,7 +30,7 @@ export default class ClietInitGenerator extends SubGenerator {
      * @returns The generated code for starting the bot.
      */
     generate (node: StartBotNode): string {
-        if (node.object.type != 'BDO') throw new ChordError(
+        if (node.object.type != 'BDO') throw new DisChordError(
             ErrorLevel.Compiler,
             `Se encontró '${node.object.type}', se esperaba 'Objeto'`,
             node.location,
@@ -39,7 +39,7 @@ export default class ClietInitGenerator extends SubGenerator {
 
         const { blocks } = node.object;
         const prefixNode = blocks['prefijo'] || blocks['prefijos'];
-        if (!prefixNode) throw new ChordError(
+        if (!prefixNode) throw new DisChordError(
             ErrorLevel.Compiler,
             `No se ha especificado el prefijo en el bloque 'encender bot'`,
             node.location,
@@ -94,7 +94,7 @@ export default class ClietInitGenerator extends SubGenerator {
      * @returns The generated Seyfert configuration file content.
      */
     private generateSeyfertConfig(node: StartBotNode): string {
-        if (node.object.type != 'BDO') throw new ChordError(
+        if (node.object.type != 'BDO') throw new DisChordError(
             ErrorLevel.Compiler,
             `Se encontró '${node.object.type}', se esperaba 'BDO'`,
             node.location,
@@ -105,7 +105,7 @@ export default class ClietInitGenerator extends SubGenerator {
         const tokenNode = blocks['token'];
         const intentsNode = blocks['intenciones'];
 
-        if (!tokenNode) throw new ChordError(
+        if (!tokenNode) throw new DisChordError(
             ErrorLevel.Compiler,
             `Falta el bloque 'token' en la configuración del bot.`,
             node.location,
@@ -119,7 +119,7 @@ export default class ClietInitGenerator extends SubGenerator {
             const list = intentsNode.body.map((item: any) => {
                 const val = item.value?.toString().replace(/"/g, '');
                 const mapped = intentsMap[val];
-                if (!mapped) throw new ChordError(
+                if (!mapped) throw new DisChordError(
                     ErrorLevel.Compiler,
                     `Intención desconocida: ${val}`,
                     node.location,

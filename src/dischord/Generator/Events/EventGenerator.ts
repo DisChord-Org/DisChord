@@ -5,7 +5,7 @@ import { createMessageFunctionInjection, eventsMap } from "../../core.lib";
 import { DisChordASTNode, EventNode } from "../../types";
 import { DisChordGenerator } from "../generator";
 import { SubGenerator } from '../subgenerator';
-import { ChordError, ErrorLevel } from '../../../ChordError';
+import { DisChordError, ErrorLevel } from '../../../ChordError';
 
 /**
  * Generator class responsible for generating code related to listeners in DisChord.
@@ -29,7 +29,7 @@ export default class EventGenerator extends SubGenerator {
      */
     generate (node: EventNode): string {
         const eventName = eventsMap[node.name]?.name;
-        if (!eventName) throw new ChordError(
+        if (!eventName) throw new DisChordError(
             ErrorLevel.Compiler,
             `El evento '${node.name}' no existe`,
             node.location,

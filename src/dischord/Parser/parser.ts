@@ -10,7 +10,7 @@ import MessageParser from './Messages/MessageParser';
 import CollectorParser from './CollectorParser';
 import ClientParser from './Client/ClientParser';
 import EventParser from './Events/EventParser';
-import { ChordError, ErrorLevel } from '../../ChordError';
+import { DisChordError, ErrorLevel } from '../../ChordError';
 
 /**
  * Main Orchestrator for DisChord's syntactic analysis.
@@ -85,7 +85,7 @@ export class DisChordParser extends Parser<DisChordNodeType, DisChordNode> {
 
                 const customStatement = this.parseCustomStatement();
                 
-                if (!customStatement) throw new ChordError(
+                if (!customStatement) throw new DisChordError(
                     ErrorLevel.Parser,
                     `Se esperaba una estructura válida después de 'crear'`,
                     token.location,
@@ -119,7 +119,7 @@ export class DisChordParser extends Parser<DisChordNodeType, DisChordNode> {
                 const value = this.parsePrimary();
                 blocks[key] = value;
             } else {
-                if (type === 'definition-only') throw new ChordError(
+                if (type === 'definition-only') throw new DisChordError(
                     ErrorLevel.Parser,
                     `Se definió código en un BDO 'definition-only'`,
                     this.peek().location,

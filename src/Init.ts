@@ -93,7 +93,7 @@ export default class Init {
         const ast = parser.parse();
         if (args.includes('--ast')) this.log("AST", ast);
     
-        const generator = new DisChordGenerator(parser.symbols, this.projectRoot);
+        const generator = new DisChordGenerator(parser.symbols, code, this.projectRoot);
         let output = generator.generate(ast as ASTNode<DisChordNodeType>[]);
         if (args.includes('--output')) this.log("OUTPUT", output);
 
