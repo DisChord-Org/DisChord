@@ -42,9 +42,9 @@ export default class MessageParser extends SubParser {
 
         const configBody = this.parseODB('definition-only');
 
-        return {
+        return this.createNode<MessageNode>({
             type: 'CrearMensaje',
             object: configBody
-        };
+        });
     }
 }
