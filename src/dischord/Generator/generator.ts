@@ -39,8 +39,8 @@ export class DisChordGenerator extends Generator<DisChordNodeType, DisChordNode>
      * @param symbols A map of symbols used for code generation, typically containing variable and function definitions.
      * @param projectRoot The root directory of the project, used for resolving imports and file paths during code generation.
      */
-    constructor(symbols: Map<string, any>, projectRoot: string) {
-        super(symbols);
+    constructor(symbols: Map<string, any>, input: string, projectRoot: string) {
+        super(symbols, input);
         this.projectRoot = projectRoot;
     }
 

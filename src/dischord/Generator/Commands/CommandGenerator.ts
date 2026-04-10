@@ -5,6 +5,7 @@ import { createMessageFunctionInjection } from "../../core.lib";
 import { CommandNode, CommandOptionNode, CommandParam, DisChordASTNode } from "../../types";
 import { DisChordGenerator } from "../generator";
 import { SubGenerator } from '../subgenerator';
+import { ChordError, ErrorLevel } from '../../../ChordError';
 
 /**
  * Generator class responsible for generating code related to command definitions in DisChord.
@@ -29,7 +30,12 @@ export default class CommandGenerator extends SubGenerator {
     generate (node: CommandNode): string {
         const commandName = node.value;
         const commandDescription = node.params.find((param: CommandParam) => param.property === 'Descripcion');
-        if (!commandDescription) throw new Error('Se requiere descripción para el comando.');
+        if (!commandDescription) throw new ChordError(
+            ErrorLevel.Compiler,
+            `Se requiere descripción para el comando`,
+            node.location,
+            this.parent.input.split('\n')[node.location.line - 1] || ''
+        ).format();
         
         const OptionsNode: CommandOptionNode[] | undefined = node.params.find((param: CommandParam) => param.property === 'Opciones')?.options;
         const OptionsString: string = OptionsNode? `const options = [${OptionsNode.map((option: CommandOptionNode) => this.generateOption(option)).join(',')}];` : '';

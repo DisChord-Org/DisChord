@@ -1,3 +1,4 @@
+import { ChordError, ErrorLevel } from "../../../../ChordError";
 import { ButtonStyles, DisChordASTNode, ODBNode } from "../../../types";
 import { DisChordGenerator } from "../../generator";
 import { SubGenerator } from "../../subgenerator";
@@ -38,7 +39,12 @@ export default class ButtonGenerator extends SubGenerator {
      * @returns A string representing the instantiation and configuration of a new Button.
      */
     generate (node: DisChordASTNode): string {
-        if (node.type != 'BDO') throw new Error(`Se esperaba un BDO, se recibió '${node.type}'`);
+        if (node.type != 'BDO') throw new ChordError(
+            ErrorLevel.Compiler,
+            `Se esperaba un BDO, se recibió '${node.type}'`,
+            node.location,
+            this.parent.input.split('\n')[node.location.line - 1] || ''
+        ).format();
 
         const ResolvedCustomId = this.resolveCustomId(node);
         const ResolvedLabel = this.resolveLabel(node);
@@ -64,7 +70,12 @@ export default class ButtonGenerator extends SubGenerator {
             this.getODBProperty(node, 'id')
         );
 
-        if (!customId) throw new Error('Se debe especificar una id en el botón');
+        if (!customId) throw new ChordError(
+            ErrorLevel.Compiler,
+            `Se debe especificar una id en el botón`,
+            node.location,
+            this.parent.input.split('\n')[node.location.line - 1] || ''
+        ).format();
 
         return `.setCustomId(${customId})`;
     }
@@ -79,7 +90,12 @@ export default class ButtonGenerator extends SubGenerator {
             this.getODBProperty(node, 'etiqueta')
         );
 
-        if (!label) throw new Error('Se debe especificar una etiqueta en el botón');
+        if (!label) throw new ChordError(
+            ErrorLevel.Parser,
+            `Se debe especificar una etiqueta en el botón`,
+            node.location,
+            this.parent.input.split('\n')[node.location.line - 1] || ''
+        ).format();
 
         return `.setLabel(${label})`;
     }
@@ -94,8 +110,19 @@ export default class ButtonGenerator extends SubGenerator {
             this.getODBProperty(node, 'estilo')
         );
         
-        if (!style) throw new Error('Se debe especificar el estilo en el botón');
-        if (!(style in ButtonStyles)) throw new Error(`Estilo inválido: '${style}'`);
+        if (!style) throw new ChordError(
+            ErrorLevel.Compiler,
+            `Se debe especificar el estilo en el botón`,
+            node.location,
+            this.parent.input.split('\n')[node.location.line - 1] || ''
+        ).format();
+
+        if (!(style in ButtonStyles)) throw new ChordError(
+            ErrorLevel.Compiler,
+            `Estilo inválido: '${style}'`,
+            node.location,
+            this.parent.input.split('\n')[node.location.line - 1] || ''
+        ).format();
 
         const ButtonStyle = ButtonStyles[style as keyof typeof ButtonStyles];
 

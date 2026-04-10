@@ -6,6 +6,7 @@ import { StartBotNode } from "../../types";
 import { DisChordGenerator } from "../generator";
 import { intentsMap } from "../../core.lib";
 import { SubGenerator } from "../subgenerator";
+import { ChordError, ErrorLevel } from "../../../ChordError";
 
 /**
  * Generator class responsible for generating code related to starting the bot and setting up the client in DisChrod.
@@ -29,11 +30,21 @@ export default class ClietInitGenerator extends SubGenerator {
      * @returns The generated code for starting the bot.
      */
     generate (node: StartBotNode): string {
-        if (node.object.type != 'BDO') throw new Error(`Se encontró '${node.object.type}', se esperaba 'Objeto'`);
+        if (node.object.type != 'BDO') throw new ChordError(
+            ErrorLevel.Compiler,
+            `Se encontró '${node.object.type}', se esperaba 'Objeto'`,
+            node.location,
+            this.parent.input.split('\n')[node.location.line - 1] || ''
+        ).format();
 
         const { blocks } = node.object;
         const prefixNode = blocks['prefijo'] || blocks['prefijos'];
-        if (!prefixNode) throw new Error("No se ha especificado el prefijo en el bloque 'encender bot'.");
+        if (!prefixNode) throw new ChordError(
+            ErrorLevel.Compiler,
+            `No se ha especificado el prefijo en el bloque 'encender bot'`,
+            node.location,
+            this.parent.input.split('\n')[node.location.line - 1] || ''
+        ).format();
 
         const prefix = this.visit(prefixNode);
         const isArray = prefixNode.type === 'Lista';
@@ -83,14 +94,23 @@ export default class ClietInitGenerator extends SubGenerator {
      * @returns The generated Seyfert configuration file content.
      */
     private generateSeyfertConfig(node: StartBotNode): string {
-        if (node.object.type != 'BDO') throw new Error(`Se encontró '${node.object.type}', se esperaba 'BDO'`);
+        if (node.object.type != 'BDO') throw new ChordError(
+            ErrorLevel.Compiler,
+            `Se encontró '${node.object.type}', se esperaba 'BDO'`,
+            node.location,
+            this.parent.input.split('\n')[node.location.line - 1] || ''
+        ).format();
 
         const { blocks } = node.object;
-
         const tokenNode = blocks['token'];
         const intentsNode = blocks['intenciones'];
 
-        if (!tokenNode) throw new Error("Falta el bloque 'token' en la configuración del bot.");
+        if (!tokenNode) throw new ChordError(
+            ErrorLevel.Compiler,
+            `Falta el bloque 'token' en la configuración del bot.`,
+            node.location,
+            this.parent.input.split('\n')[node.location.line - 1] || ''
+        ).format();
         
         const token = this.visit(tokenNode);
         let intents = "[]";
@@ -99,7 +119,12 @@ export default class ClietInitGenerator extends SubGenerator {
             const list = intentsNode.body.map((item: any) => {
                 const val = item.value?.toString().replace(/"/g, '');
                 const mapped = intentsMap[val];
-                if (!mapped) throw new Error(`Intención desconocida: ${val}`);
+                if (!mapped) throw new ChordError(
+                    ErrorLevel.Compiler,
+                    `Intención desconocida: ${val}`,
+                    node.location,
+                    this.parent.input.split('\n')[node.location.line - 1] || ''
+                ).format();
                 return `"${mapped}"`;
             });
             intents = `[ ${list.join(',')} ]`;
