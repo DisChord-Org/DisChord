@@ -14,9 +14,7 @@ import { CLI, LogFlagLevel } from './CLI';
 import { Runner } from './Runner';
 
 /**
- * The Init class for DisChord.
- * @private {inputPath} The selected path to run in.
- * @private {args} Proccess argumments.
+ * Main orchestrator for the DisChord compilation process.
  */
 export default class Init {
     private config: CompilerConfig;
@@ -27,6 +25,10 @@ export default class Init {
         this.config = FileSystem.configure(rawPath);
     }
 
+    /**
+     * Entry point that triggers the compilation of all relevant files
+     * and executes the resulting code if the --no-run flag is absent.
+     */
     async run() {
         const files = FileSystem.getChordFiles(this.config.inputPath, this.config.isDirectory);
         
@@ -46,10 +48,18 @@ export default class Init {
 
             console.log(`Ejecutando: ${path.relative(this.config.projectRoot, runTarget)}\n`);
 
-            Runner.execute(runTarget, this.config.projectRoot);
+            Runner.execute(runTarget, this.config.projectRoot).catch(error => {
+                console.error(error);
+                process.exit(1);
+            });
         }
     }
 
+    /**
+     * Executes the compilation pipeline for a single .chord file.
+     * @param file - Full path to the source file.
+     * @returns The path to the generated .mjs file.
+     */
     async compile(file: string) {
         console.log(`Compilando: ${path.relative(this.config.projectRoot, file)}`);
 
