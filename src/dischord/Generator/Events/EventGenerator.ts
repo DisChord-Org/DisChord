@@ -1,5 +1,5 @@
 import { join } from 'path';
-import Prettifier from '../../../Prettifier';
+import Prettifier from '../../../init/Prettifier';
 
 import { createMessageFunctionInjection, eventsMap } from "../../core.lib";
 import { DisChordASTNode, EventNode } from "../../types";

@@ -1,6 +1,6 @@
 import { join } from "node:path";
 import fs from "fs";
-import Prettifier from "../../../Prettifier";
+import Prettifier from "../../../init/Prettifier";
 
 import { StartBotNode } from "../../types";
 import { DisChordGenerator } from "../generator";
