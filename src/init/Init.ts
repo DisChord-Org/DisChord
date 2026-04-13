@@ -1,6 +1,5 @@
 import * as fs from 'fs';
 import path from 'path';
-import { pathToFileURL } from 'url';
 
 import Prettifier from './Prettifier';
 import { ASTNode } from '../chord/types';
@@ -86,7 +85,5 @@ export default class Init {
 
         if (!fs.existsSync(targetDir)) fs.mkdirSync(targetDir, { recursive: true });
         Prettifier.savePrettified(outputPath, output);
-    
-        return outputPath;
     }
 }
