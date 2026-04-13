@@ -1,6 +1,7 @@
 import { ChordError, ErrorLevel } from "../ChordError";
 import { SUGGESTIONS } from "./core.lib";
-import { ASTNode, ClassNode, ConditionNode, LoopNode, FunctionNode, PropertyNode, Token, VariableNode, Symbol, SymbolKind, IdentificatorNode, NewNode, ThisNode, SuperNode, ObjectProperty, ReturnNode, ExportNode, ObjectNode, ImportNode, ExitLoopNode, PassLoopNode, AssignmentNode, BinaryExpressionNode, JSNode, LiteralNode, NoUnaryNode, UnaryNode, ListNode, ExpressionNode, AccessNode, AccessNodeByIndex, CallNode, SOF, EOF } from "./types";
+import { KeyWords } from "./keywords";
+import { ASTNode, ClassNode, ConditionNode, LoopNode, FunctionNode, PropertyNode, Token, VariableNode, Symbol, SymbolKind, IdentificatorNode, NewNode, ThisNode, SuperNode, ObjectProperty, ReturnNode, ExportNode, ObjectNode, ImportNode, ExitLoopNode, PassLoopNode, AssignmentNode, BinaryExpressionNode, JSNode, LiteralNode, NoUnaryNode, UnaryNode, ListNode, ExpressionNode, AccessNode, AccessNodeByIndex, CallNode, SOF, EOF, ODBNode } from "./types";
 
 export class Parser<T = never, N = never> {
     public symbols: Map<string, Symbol> = new Map();
@@ -701,5 +702,70 @@ export class Parser<T = never, N = never> {
             iterable,
             body
         });
+    }
+
+    /**
+      * Parses an ODB.
+      * Distinguishes between property blocks (key-value pairs) and execution statements.
+      * @returns {ODBNode} A node containing organized blocks and an executable body.
+      */
+    parseODB(type: 'definition-only' | 'definition-code' = 'definition-code'): ODBNode<T, N> {
+        this.consume('L_BRACE');
+    
+        const blocks: Record<string, ASTNode<T, N>> = {};
+        const body: ASTNode<T, N>[] = [];
+        let definitionMode: boolean = true;
+
+        while (this.peek().type !== 'R_BRACE') {
+            if (definitionMode && this.isPropertyAssignment()) {
+                const key = this.consume('IDENTIFICADOR').value;
+
+                const value = this.parsePrimary();
+                blocks[key] = value;
+            } else {
+                if (type === 'definition-only') throw new ChordError(
+                    ErrorLevel.Parser,
+                    `Se definió código en un BDO 'definition-only'`,
+                    this.peek().location,
+                    this.input.split('\n')[this.peek().location.line - 1] || ''
+                ).format();
+
+                definitionMode = false;
+    
+                const statement = this.parseStatement();
+                if (statement) body.push(statement);
+            }
+        }
+    
+        this.consume('R_BRACE');
+    
+        return this.createNode<ODBNode<T, N>>({
+            type: 'BDO',
+            blocks,
+            body
+        });
+    }
+
+    /**
+      * Predicate to distinguish between a property assignment and a statement.
+      * Looks a token forward to decide.
+      */
+    private isPropertyAssignment(): boolean {
+        const current = this.peek();
+        const next = this.peek('next');
+
+        if (
+            current.type !== 'IDENTIFICADOR' ||
+            next.type === 'R_BRACE' ||
+            KeyWords.getStatements().includes(current.value)
+        ) return false;
+    
+        /**
+          * If it is an IDENTIFIER followed by an L_BRACE,
+          * it is a block assignment (nested property).
+          */
+        if (next.type === 'L_BRACE') return true;
+
+        return true; 
     }
 }

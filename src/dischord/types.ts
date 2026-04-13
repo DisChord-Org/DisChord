@@ -1,4 +1,4 @@
-import { ASTNode, BaseNode } from "../chord/types";
+import { ASTNode, BaseNode, ODBNode } from "../chord/types";
 
 export type DisChordNodeType =
         'EncenderBot' | 'Evento' | 'CrearComando'
@@ -72,19 +72,12 @@ export interface CollectorPulseBody {
     body: DisChordASTNode[];
 }
 
-export interface ODBNode extends BaseNode<DisChordNodeType> {
-    type: 'BDO';
-    blocks: Record<string, DisChordASTNode>;
-    body: DisChordASTNode[];
-} 
-
 export type CreationNode = CommandNode | MessageNode | CollectorNode;
 export type DisChordNode =
       StartBotNode
     | EventNode
     | CommandNode
     | MessageNode
-    | CollectorNode
-    | ODBNode;
+    | CollectorNode;
 
 export type DisChordASTNode = ASTNode<DisChordNodeType, DisChordNode>;

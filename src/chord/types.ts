@@ -32,7 +32,8 @@ export type CoreNodeType<T = string> =
       | 'Pasar' | 'Devolver' | 'Nuevo' | 'NoUnario' | 'Unario'
       | 'Lista' | 'Expresion' | 'Objeto' | 'Identificador'
       | 'Acceso' | 'Llamada' | 'Exportar' | 'Importar'
-      | 'Asignacion' | 'JS' | 'Super' | 'Esta' | 'AccesoPorIndice' | T;
+      | 'Asignacion' | 'JS' | 'Super' | 'Esta' | 'AccesoPorIndice'
+      | 'ODBNode' | T;
 
 export type NodeType<T = never> = CoreNodeType | T;
 
@@ -218,6 +219,12 @@ export interface SOF<T = never> extends BaseNode<T> {
     value: '';
 }
 
+export interface ODBNode<T = never, N = never> extends BaseNode<T> {
+    type: 'BDO';
+    blocks: Record<string, ASTNode<T, N>>;
+    body: ASTNode<T, N>[];
+} 
+
 export type ASTNode<T = never, N = never> =
       EOF<T>
     | SOF<T>
@@ -249,4 +256,5 @@ export type ASTNode<T = never, N = never> =
     | SuperNode<T>
     | ThisNode<T>
     | AccessNodeByIndex<T, N>
+    | ODBNode<T, N>
     | N;

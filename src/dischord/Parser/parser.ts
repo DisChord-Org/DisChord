@@ -1,6 +1,6 @@
 import { KeyWords } from '../../chord/keywords';
 import { Token } from '../../chord/types';
-import { DisChordASTNode, DisChordNode, DisChordNodeType, ODBNode } from '../types';
+import { DisChordASTNode, DisChordNode, DisChordNodeType } from '../types';
 
 import { Parser } from '../../chord/parser';
 import { SubParserClass } from './subparser';
@@ -98,70 +98,5 @@ export class DisChordParser extends Parser<DisChordNodeType, DisChordNode> {
             default:
                 return super.parsePrimary();
         }
-    }
-
-    /**
-     * Parses an ODB.
-     * Distinguishes between property blocks (key-value pairs) and execution statements.
-     * @returns {ODBNode} A node containing organized blocks and an executable body.
-     */
-    parseODB(type: 'definition-only' | 'definition-code' = 'definition-code'): ODBNode {
-        this.consume('L_BRACE');
-
-        const blocks: Record<string, DisChordASTNode> = {};
-        const body: DisChordASTNode[] = [];
-        let definitionMode: boolean = true;
-
-        while (this.peek().type !== 'R_BRACE') {
-            if (definitionMode && this.isPropertyAssignment()) {
-                const key = this.consume('IDENTIFICADOR').value;
-
-                const value = this.parsePrimary();
-                blocks[key] = value;
-            } else {
-                if (type === 'definition-only') throw new DisChordError(
-                    ErrorLevel.Parser,
-                    `Se definió código en un BDO 'definition-only'`,
-                    this.peek().location,
-                    this.input.split('\n')[this.peek().location.line - 1] || ''
-                ).format();
-
-                definitionMode = false;
-
-                const statement = this.parseStatement();
-                if (statement) body.push(statement);
-            }
-        }
-
-        this.consume('R_BRACE');
-
-        return this.createNode<ODBNode>({
-            type: 'BDO',
-            blocks,
-            body
-        });
-    }
-
-    /**
-     * Predicate to distinguish between a property assignment and a statement.
-     * Looks a token forward to decide.
-     */
-    private isPropertyAssignment(): boolean {
-        const current = this.peek();
-        const next = this.peek('next');
-
-        if (
-            current.type !== 'IDENTIFICADOR' ||
-            next.type === 'R_BRACE' ||
-            KeyWords.getStatements().includes(current.value)
-        ) return false;
-
-        /**
-         * If it is an IDENTIFIER followed by an L_BRACE,
-         * it is a block assignment (nested property).
-         */
-        if (next.type === 'L_BRACE') return true;
-
-        return true; 
     }
 }

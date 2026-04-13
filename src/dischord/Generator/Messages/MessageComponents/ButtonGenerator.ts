@@ -1,5 +1,5 @@
 import { DisChordError, ErrorLevel } from "../../../../ChordError";
-import { ButtonStyles, DisChordASTNode, ODBNode } from "../../../types";
+import { ButtonStyles, DisChordASTNode, DisChordODBNode } from "../../../types";
 import { DisChordGenerator } from "../../generator";
 import { SubGenerator } from "../../subgenerator";
 
@@ -23,7 +23,7 @@ export default class ButtonGenerator extends SubGenerator {
      * * @param node The parent ODBNode that may contain a 'boton' definition.
      * @returns A string representing the 'components array or an empty string if no button property is defined.
      */
-    generateIfNodeExists (node: ODBNode | undefined): string {
+    generateIfNodeExists (node: DisChordODBNode | undefined): string {
         if (!node) return '';
 
         const button = this.getODBProperty(node, 'boton');
@@ -65,7 +65,7 @@ export default class ButtonGenerator extends SubGenerator {
      * @private
      * @throws {Error} If the 'id' property is missing.
      */
-    private resolveCustomId (node: ODBNode): string {
+    private resolveCustomId (node: DisChordODBNode): string {
         const customId = this.visitIfExists(
             this.getODBProperty(node, 'id')
         );
@@ -85,7 +85,7 @@ export default class ButtonGenerator extends SubGenerator {
      * @private
      * @throws {Error} If the 'etiqueta' property is missing.
      */
-    private resolveLabel (node: ODBNode): string {
+    private resolveLabel (node: DisChordODBNode): string {
         const label = this.visitIfExists(
             this.getODBProperty(node, 'etiqueta')
         );
@@ -105,7 +105,7 @@ export default class ButtonGenerator extends SubGenerator {
      * @private
      * @throws {Error} If the 'estilo' property is missing or if the style value is not recognized.
      */
-    private resolveStyle (node: ODBNode): string {
+    private resolveStyle (node: DisChordODBNode): string {
         const style = this.visitIfExists(
             this.getODBProperty(node, 'estilo')
         );
@@ -117,14 +117,16 @@ export default class ButtonGenerator extends SubGenerator {
             this.parent.input.split('\n')[node.location.line - 1] || ''
         ).format();
 
-        if (!(style in ButtonStyles)) throw new DisChordError(
+        const SlicedStyle = style.slice(1, -1);
+
+        if (!(SlicedStyle in ButtonStyles)) throw new DisChordError(
             ErrorLevel.Compiler,
-            `Estilo inválido: '${style}'`,
+            `Estilo inválido: '${SlicedStyle}'`,
             node.location,
             this.parent.input.split('\n')[node.location.line - 1] || ''
         ).format();
 
-        const ButtonStyle = ButtonStyles[style as keyof typeof ButtonStyles];
+        const ButtonStyle = ButtonStyles[SlicedStyle as keyof typeof ButtonStyles];
 
 
         return `.setStyle(${ButtonStyle})`;
@@ -135,7 +137,7 @@ export default class ButtonGenerator extends SubGenerator {
      * @private
      * @returns The generated setEmoji call or an empty string if not defined.
      */
-    private resolveEmoji (node: ODBNode): string {
+    private resolveEmoji (node: DisChordODBNode): string {
         const emoji = this.visitIfExists(
             this.getODBProperty(node, 'emoji')
         );
