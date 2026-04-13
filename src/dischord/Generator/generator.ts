@@ -1,6 +1,6 @@
 import { corelib } from "./../core.lib";
 import { AccessNode, ASTNode, CallNode } from "../../chord/types";
-import { DisChordASTNode, DisChordNode, DisChordNodeType, ODBNode } from "./../types";
+import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordODBNode } from "./../types";
 
 import { Generator } from "../../chord/generator";
 import { SubGeneratorClass } from "./subgenerator";
@@ -115,7 +115,7 @@ export class DisChordGenerator extends Generator<DisChordNodeType, DisChordNode>
      * @param property The key name of the property to retrieve.
      * @returns The corresponding DisChordASTNode if the property exists, otherwise undefined.
      */
-    public getODBProperty(node: ODBNode, property: string): DisChordASTNode | undefined {
+    public getODBProperty(node: DisChordODBNode, property: string): DisChordASTNode | undefined {
         return node.blocks[property];
     }
 

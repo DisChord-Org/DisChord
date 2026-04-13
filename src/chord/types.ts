@@ -30,10 +30,10 @@ export type CoreNodeType<T = string> =
         'Clase' | 'Funcion' | 'Bucle' | 'Propiedad' | 'Variable'
       | 'Condicion' | 'ExpresionBinaria' | 'Literal' | 'Salir'
       | 'Pasar' | 'Devolver' | 'Nuevo' | 'NoUnario' | 'Unario'
-      | 'Lista' | 'Expresion' | 'Objeto' | 'Identificador'
+      | 'Lista' | 'Expresion' | 'Identificador'
       | 'Acceso' | 'Llamada' | 'Exportar' | 'Importar'
       | 'Asignacion' | 'JS' | 'Super' | 'Esta' | 'AccesoPorIndice'
-      | 'ODBNode' | T;
+      | 'BDO' | T;
 
 export type NodeType<T = never> = CoreNodeType | T;
 
@@ -143,17 +143,6 @@ export interface ExpressionNode<T = never, N = never> extends BaseNode<T> {
     object: ASTNode<T, N>;
 }
 
-export interface ObjectProperty<T = never, N = never> extends BaseNode<T> {
-    type: 'PropiedadObjeto'
-    key: string;
-    value: ASTNode<T, N>;
-}
-
-export interface ObjectNode<T = never, N = never> extends BaseNode<T> {
-    type: 'Objeto';
-    properties: ObjectProperty<T, N>[];
-}
-
 export interface IdentificatorNode<T = never> extends BaseNode<T> {
     type: 'Identificador';
     value: string;
@@ -228,7 +217,7 @@ export interface ODBNode<T = never, N = never> extends BaseNode<T> {
 export type ASTNode<T = never, N = never> =
       EOF<T>
     | SOF<T>
-    |  LiteralNode<T>
+    | LiteralNode<T>
     | BinaryExpressionNode<T, N>
     | ConditionNode<T, N>
     | VariableNode<T, N>
@@ -244,12 +233,10 @@ export type ASTNode<T = never, N = never> =
     | UnaryNode<T, N>
     | ListNode<T, N>
     | ExpressionNode<T, N>
-    | ObjectNode<T, N>
     | IdentificatorNode<T>
     | AccessNode<T, N>
     | CallNode<T, N>
     | ExportNode<T, N>
-    | ObjectProperty<T, N>
     | ImportNode<T, N>
     | AssignmentNode<T, N>
     | JSNode<T>

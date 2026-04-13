@@ -3,11 +3,11 @@ import { ASTNode, BaseNode, ODBNode } from "../chord/types";
 export type DisChordNodeType =
         'EncenderBot' | 'Evento' | 'CrearComando'
       | 'ParametroDeComando' | 'CrearMensaje' | 'CuerpoDelMensaje'
-      | 'CrearRecolector' | 'BDO';
+      | 'CrearRecolector';
 
 export interface StartBotNode extends BaseNode<DisChordNodeType> {
     type: 'EncenderBot';
-    object: ODBNode;
+    object: DisChordODBNode;
 }
 
 export interface EventNode extends BaseNode<DisChordNodeType> {
@@ -48,7 +48,7 @@ export type CommandParam = CommandDescriptionParam | CommandOptionsParam;
 
 export interface MessageNode extends BaseNode<DisChordNodeType> {
     type: 'CrearMensaje';
-    object: ODBNode;
+    object: DisChordODBNode;
 }
 
 export enum ButtonStyles {
@@ -80,4 +80,5 @@ export type DisChordNode =
     | MessageNode
     | CollectorNode;
 
+export type DisChordODBNode = ODBNode<DisChordNodeType, DisChordNode>;
 export type DisChordASTNode = ASTNode<DisChordNodeType, DisChordNode>;

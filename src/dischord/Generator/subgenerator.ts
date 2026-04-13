@@ -1,4 +1,4 @@
-import { DisChordASTNode, ODBNode } from "../types";
+import { DisChordASTNode, DisChordODBNode } from "../types";
 import { DisChordGenerator } from "./generator";
 
 /**
@@ -16,7 +16,7 @@ export abstract class SubGenerator {
      * By default, it returns an empty string.
      * Subclasses can override this to implement custom existence logic.
      */
-    public generateIfNodeExists(node: ODBNode | undefined): string {
+    public generateIfNodeExists(node: DisChordODBNode | undefined): string {
         return node ? this.generate(node) : '';
     }
 
@@ -44,7 +44,7 @@ export abstract class SubGenerator {
      * @param property The key name of the property to retrieve.
      * @returns The corresponding DisChordASTNode if the property exists, otherwise undefined.
      */
-    protected getODBProperty(node: ODBNode, property: string): DisChordASTNode | undefined {
+    protected getODBProperty(node: DisChordODBNode, property: string): DisChordASTNode | undefined {
         return this.parent.getODBProperty(node, property);
     }
 

@@ -1,6 +1,6 @@
 import { DisChordError, ErrorLevel } from "../../../../ChordError";
 import { EmbedColors } from "../../../core.lib";
-import { DisChordASTNode, ODBNode } from "../../../types";
+import { DisChordASTNode, DisChordODBNode } from "../../../types";
 import { DisChordGenerator } from "../../generator";
 import { SubGenerator } from "../../subgenerator";
 
@@ -26,7 +26,7 @@ export default class EmbedGenerator extends SubGenerator {
      * * @param node The parent ODBNode containing a potential 'embed' definition.
      * @returns A string containing the embeds or an empty string if no embed property is defined.
      */
-    generateIfNodeExists (node: ODBNode | undefined): string {
+    generateIfNodeExists (node: DisChordODBNode | undefined): string {
         if (!node) return '';
 
         const embed = this.getODBProperty(node, 'embed');
@@ -78,7 +78,7 @@ export default class EmbedGenerator extends SubGenerator {
      * @private
      * @returns The generated setColor call or an empty string if the color is not defined.
      */
-    private resolveColors (node: ODBNode): string {
+    private resolveColors (node: DisChordODBNode): string {
         const color = this.visitIfExists(
             this.getODBProperty(node, 'color')
         );
@@ -97,7 +97,7 @@ export default class EmbedGenerator extends SubGenerator {
      * @private
      * @returns The generated setTitle call or an empty string if the title is not defined.
      */
-    private resolveTitle (node: ODBNode): string {
+    private resolveTitle (node: DisChordODBNode): string {
         const title = this.visitIfExists(
             this.getODBProperty(node, 'titulo')
         );
@@ -112,7 +112,7 @@ export default class EmbedGenerator extends SubGenerator {
      * @private
      * @returns The generated setAuthor call or an empty string if the author is not defined.
      */
-    private resolveAuthor (node: ODBNode): string {
+    private resolveAuthor (node: DisChordODBNode): string {
         const author = this.getODBProperty(node, 'autor');
 
         if (!author) return '';
@@ -133,7 +133,7 @@ export default class EmbedGenerator extends SubGenerator {
      * @private
      * @returns The generated setDescription call or an empty string if the description is not defined.
      */
-    private resolveDescription (node: ODBNode): string {
+    private resolveDescription (node: DisChordODBNode): string {
         const description = this.visitIfExists(
             this.getODBProperty(node, 'descripcion')
         );
@@ -149,7 +149,7 @@ export default class EmbedGenerator extends SubGenerator {
      * @private
      * @return The generated setTimestamp call or an empty string if the timestamp is not defined.
      */
-    private resolveTimestamp (node: ODBNode): string {
+    private resolveTimestamp (node: DisChordODBNode): string {
         const timestamp = this.getODBProperty(node, 'hora');
 
         if (!timestamp) return '';
@@ -162,7 +162,7 @@ export default class EmbedGenerator extends SubGenerator {
      * @private
      * @returns The generated setImage call or an empty string if the image is not defined.
      */
-    private resolveImage (node: ODBNode): string {
+    private resolveImage (node: DisChordODBNode): string {
         const image = this.visitIfExists(
             this.getODBProperty(node, 'imagen')
         );
@@ -178,7 +178,7 @@ export default class EmbedGenerator extends SubGenerator {
      * @private
      * @returns The generated setThumbnail call or an empty string if the thumbnail is not defined.
      */
-    private resolveThumbnail (node: ODBNode): string {
+    private resolveThumbnail (node: DisChordODBNode): string {
         const thumbnail = this.visitIfExists(
             this.getODBProperty(node, 'cartel')
         );
@@ -195,7 +195,7 @@ export default class EmbedGenerator extends SubGenerator {
      * @throws Error if a field is not a BDO or lacks a 'titulo'.
      * @returns The generated addFields call with an array of field objects or an empty string if no fields are defined.
      */
-    private resolveFields (node: ODBNode): string {
+    private resolveFields (node: DisChordODBNode): string {
         const fields = this.getODBProperty(node, 'campos');
 
         if (!fields || fields.type != 'Lista' || fields.body.length < 1) return '';
@@ -239,7 +239,7 @@ export default class EmbedGenerator extends SubGenerator {
      * @throws Error if 'pie' is present but lacks 'texto'.
      * @returns The generated setFooter call with the specified text and optional iconUrl, or an empty string if 'pie' is not defined.
      */
-    private resolveFooter (node: ODBNode): string {
+    private resolveFooter (node: DisChordODBNode): string {
         const footer = this.getODBProperty(node, 'pie');
 
         if (!footer || footer.type != 'BDO') return '';

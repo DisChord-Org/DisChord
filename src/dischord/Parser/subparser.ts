@@ -1,4 +1,4 @@
-import { DisChordASTNode, ODBNode } from "../types";
+import { DisChordASTNode, DisChordODBNode } from "../types";
 import { DisChordParser } from "./parser";
 
 /**
@@ -46,7 +46,7 @@ export abstract class SubParser {
     /**
      * Helper to parse ODB's.
      */
-    protected parseODB(type: 'definition-only' | 'definition-code' = 'definition-code'): ODBNode {
+    protected parseODB(type: 'definition-only' | 'definition-code' = 'definition-code'): DisChordODBNode {
         return this.parent.parseODB(type);
     }
 

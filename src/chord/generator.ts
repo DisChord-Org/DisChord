@@ -1,6 +1,6 @@
 import { ChordError, ErrorLevel } from "../ChordError";
 import { corelib, runtimeInjections } from "./core.lib";
-import { AccessNode, AccessNodeByIndex, AssignmentNode, ASTNode, BinaryExpressionNode, CallNode, ClassNode, ConditionNode, ExportNode, FunctionNode, ListNode, LiteralNode, LoopNode, NoUnaryNode, ObjectNode, ObjectProperty, PropertyNode, Symbol, UnaryNode, VariableNode } from "./types";
+import { AccessNode, AccessNodeByIndex, AssignmentNode, ASTNode, BinaryExpressionNode, CallNode, ClassNode, ConditionNode, ExportNode, FunctionNode, ListNode, LiteralNode, LoopNode, NoUnaryNode, ODBNode, PropertyNode, Symbol, UnaryNode, VariableNode } from "./types";
 
 export class Generator<T extends string = string, N = never> {
     private SymbolsTable: Map<string, Symbol>;
@@ -65,7 +65,7 @@ export class Generator<T extends string = string, N = never> {
                 return this.generateUnaryOperation(node);
             case 'Bucle':
                 return this.generateFor(node);
-            case 'Objeto':
+            case 'BDO':
                 return this.generateObject(node);
             case 'Salir':
                 return 'break';
@@ -293,11 +293,27 @@ export class Generator<T extends string = string, N = never> {
         return `for (let ${varName} of (Array.isArray(${iterable}) ? ${iterable} : Object.keys(${iterable}))) {\n${body}\n}`;
     }
 
-    private generateObject(node: ObjectNode<T>): string {
-        const props = node.properties
-            .map((p: ObjectProperty<T>) => `${p.key}: ${this.visit(p.value)}`)
-            .join(', ');
-        return `{ ${props} }`;
+    private generateObject(node: ODBNode<T>): string {
+        if (node.body.length === 0) {
+            const props = Object.entries(node.blocks).map(([key, value]) => {
+                return `${key}: ${this.visit(value)}`;
+            });
+            return `{ ${props.join(', ')} }`;
+        }
+
+        const declarations = Object.entries(node.blocks).map(([key, value]) => {
+            return `let ${key} = ${this.visit(value)};`;
+        }).join('\n');
+
+        const executableBody = node.body.map(stmt => this.visit(stmt)).join(';\n');
+
+        const exports = Object.keys(node.blocks).join(', ');
+
+        return `(() => {
+                ${declarations}
+                ${executableBody}
+                return { ${exports} }
+            })()`;
     }
 
     private generateExport(node: ExportNode<T>): string {

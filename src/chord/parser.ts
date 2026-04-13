@@ -1,7 +1,7 @@
 import { ChordError, ErrorLevel } from "../ChordError";
 import { SUGGESTIONS } from "./core.lib";
 import { KeyWords } from "./keywords";
-import { ASTNode, ClassNode, ConditionNode, LoopNode, FunctionNode, PropertyNode, Token, VariableNode, Symbol, SymbolKind, IdentificatorNode, NewNode, ThisNode, SuperNode, ObjectProperty, ReturnNode, ExportNode, ObjectNode, ImportNode, ExitLoopNode, PassLoopNode, AssignmentNode, BinaryExpressionNode, JSNode, LiteralNode, NoUnaryNode, UnaryNode, ListNode, ExpressionNode, AccessNode, AccessNodeByIndex, CallNode, SOF, EOF, ODBNode } from "./types";
+import { ASTNode, ClassNode, ConditionNode, LoopNode, FunctionNode, PropertyNode, Token, VariableNode, Symbol, SymbolKind, IdentificatorNode, NewNode, ThisNode, SuperNode, ReturnNode, ExportNode, ImportNode, ExitLoopNode, PassLoopNode, AssignmentNode, BinaryExpressionNode, JSNode, LiteralNode, NoUnaryNode, UnaryNode, ListNode, ExpressionNode, AccessNode, AccessNodeByIndex, CallNode, SOF, EOF, ODBNode } from "./types";
 
 export class Parser<T = never, N = never> {
     public symbols: Map<string, Symbol> = new Map();
@@ -488,37 +488,7 @@ export class Parser<T = never, N = never> {
             });
         }
 
-        if (token.type === 'L_BRACE') {
-            this.consume('L_BRACE');
-            const properties: ObjectProperty<T, N>[] = [];
-
-            while (this.peek().type !== 'R_BRACE') {
-                const keyToken = this.consume(['TEXTO', 'IDENTIFICADOR'], `Las claves de los objetos deben ser identificadores o textos`);
-                const key = keyToken.type === 'TEXTO' ? `"${keyToken.value}"` : keyToken.value;
-                
-                this.consume(':', `Después de la clave de un objeto debe ir ':'`);
-                const value = this.parseExpression();
-                
-                properties.push(
-                    this.createNode<ObjectProperty<T, N>>({
-                        type: 'PropiedadObjeto',
-                        key,
-                        value
-                    })
-                );
-
-                if (this.peek().type === ',') {
-                    this.consume(',');
-                }
-            }
-
-            this.consume('R_BRACE');
-
-            return this.createNode<ObjectNode<T, N>>({
-                type: 'Objeto',
-                properties
-            });
-        }
+        if (token.type === 'L_BRACE') return this.parseODB();
         
         throw new ChordError(
             ErrorLevel.Parser,
@@ -705,10 +675,10 @@ export class Parser<T = never, N = never> {
     }
 
     /**
-      * Parses an ODB.
-      * Distinguishes between property blocks (key-value pairs) and execution statements.
-      * @returns {ODBNode} A node containing organized blocks and an executable body.
-      */
+     * Parses an ODB.
+     * Distinguishes between property blocks (key-value pairs) and execution statements.
+     * @returns {ODBNode} A node containing organized blocks and an executable body.
+     */
     parseODB(type: 'definition-only' | 'definition-code' = 'definition-code'): ODBNode<T, N> {
         this.consume('L_BRACE');
     
@@ -747,25 +717,20 @@ export class Parser<T = never, N = never> {
     }
 
     /**
-      * Predicate to distinguish between a property assignment and a statement.
-      * Looks a token forward to decide.
-      */
+     * Predicate to distinguish between a property assignment and a statement.
+     * Looks a token forward to decide.
+     */
     private isPropertyAssignment(): boolean {
         const current = this.peek();
         const next = this.peek('next');
 
-        if (
-            current.type !== 'IDENTIFICADOR' ||
-            next.type === 'R_BRACE' ||
-            KeyWords.getStatements().includes(current.value)
-        ) return false;
-    
-        /**
-          * If it is an IDENTIFIER followed by an L_BRACE,
-          * it is a block assignment (nested property).
-          */
-        if (next.type === 'L_BRACE') return true;
+        if (current.type !== 'IDENTIFICADOR') return false;
+        if (KeyWords.getStatements().includes(current.value)) return false;
+        if (next.type === 'PUNTO' || next.type === 'L_PAREN') return false;
+        if (next.type === 'OPERADOR_ASIGNACION') return false; 
 
-        return true; 
+        const validValueTypes = ['LITERAL', 'L_BRACE', 'IDENTIFICADOR', 'TEXTO', 'NUMERO', 'BOOLEANO'];
+
+        return validValueTypes.includes(next.type);
     }
 }
