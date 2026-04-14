@@ -43,8 +43,7 @@ export default class ClientParser extends SubParser {
         if (id.value !== 'bot') throw new DisChordError(
             ErrorLevel.Parser,
             `Se esperaba 'bot' después de 'encender', se encontró '${id.value}'`,
-            this.peek().location,
-            this.parent.input.split('\n')[this.peek().location.line - 1] || ''
+            this.peek().location
         ).format();
         
         const configBody = this.parseODB('definition-only');

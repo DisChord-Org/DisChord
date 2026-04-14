@@ -9,7 +9,6 @@ export class Parser<T = never, N = never> {
 
     constructor(
         private tokens: Token[],
-        public input: string,
         private current: number = 0
     ) {}
 
@@ -77,8 +76,7 @@ export class Parser<T = never, N = never> {
         throw new ChordError(
             ErrorLevel.Parser,
             `${customMessage}. (En su lugar se encontró '${token.value}')`,
-            token.location,
-            this.input.split('\n')[token.location.line - 1] || ''
+            token.location
         ).format();
     }
 
@@ -493,8 +491,7 @@ export class Parser<T = never, N = never> {
         throw new ChordError(
             ErrorLevel.Parser,
             `Token inesperado en expresión: ${token.type} en la posición ${this.current}`,
-            token.location,
-            this.input.split('\n')[token.location.line - 1] || ''
+            token.location
         ).format();
     }
 
@@ -696,8 +693,7 @@ export class Parser<T = never, N = never> {
                 if (type === 'definition-only') throw new ChordError(
                     ErrorLevel.Parser,
                     `Se definió código en un BDO 'definition-only'`,
-                    this.peek().location,
-                    this.input.split('\n')[this.peek().location.line - 1] || ''
+                    this.peek().location
                 ).format();
 
                 definitionMode = false;

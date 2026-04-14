@@ -1,4 +1,5 @@
 import { Location } from "./chord/types";
+import { codeProvider } from "./CodeProvider";
 
 /** Life cycle phase where the failure originated. */
 export enum ErrorLevel {
@@ -22,14 +23,12 @@ abstract class BaseChordError extends Error {
      * @param message Description of the error.
      * @param type Severity level.
      * @param location Source code coordinates (line/column).
-     * @param code Original source code used for visual formatting.
      */
     constructor(
         public phase: ErrorLevel,
         public message: string,
         public type: ErrorType,
-        public location?: Location,
-        public code?: string
+        public location?: Location
     ) {
         super(message);
     }
@@ -39,9 +38,10 @@ abstract class BaseChordError extends Error {
      * @returns The raw line of code where the error occurred, or an empty string if unavailable.
      */
     private get rawLine(): string {
-        if (!this.code || !this.location || this.location.line < 1) return '';
+        const code = codeProvider.currentCode;
+        if (!this.location || this.location.line < 1) return '';
 
-        const lines = this.code.split('\n');
+        const lines = code.split('\n');
         return lines[this.location.line - 1] || '';
     }
 
@@ -67,8 +67,8 @@ type ChordErrorLevels = ErrorLevel.Lexer | ErrorLevel.Parser | ErrorLevel.Compil
 
 /** Critical core engine error. Defaults to FATAL. */
 export class ChordError extends BaseChordError {
-    constructor(phase: ChordErrorLevels, message: string, location?: Location, code?: string) {
-        super(phase, message, ErrorType.Fatal, location, code);
+    constructor(phase: ChordErrorLevels, message: string, location?: Location) {
+        super(phase, message, ErrorType.Fatal, location);
         this.name = 'ChordError';
     }
 }
@@ -78,8 +78,8 @@ type DisChordErrorLevels = ErrorLevel.Parser | ErrorLevel.Compiler | ErrorLevel.
 
 /** Abstraction layer error. Defaults to ERROR. */
 export class DisChordError extends BaseChordError {
-    constructor(phase: DisChordErrorLevels, message: string, location?: Location, code?: string) {
-        super(phase, message, ErrorType.Error, location, code);
+    constructor(phase: DisChordErrorLevels, message: string, location?: Location) {
+        super(phase, message, ErrorType.Error, location);
         this.name = 'DisChordError';
     }
 }

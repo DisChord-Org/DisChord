@@ -11,6 +11,7 @@ import { DisChordGenerator } from '../dischord/Generator/generator';
 import { CompilerConfig, FileSystem } from './FileSystem';
 import { CLI, LogFlagLevel } from './CLI';
 import { Runner } from './Runner';
+import { codeProvider } from '../CodeProvider';
 
 /**
  * Main orchestrator for the DisChord compilation process.
@@ -68,18 +69,20 @@ export default class Init {
         const outputPath = path.join(targetDir, `${fileName}.mjs`);
 
         const code = fs.readFileSync(file, 'utf-8');
-    
+
+        codeProvider.currentCode = { name: file, content: code };
+
         DisChordParser.injectStatements();
 
-        const lexer = new Lexer(code);
+        const lexer = new Lexer();
         const tokens = lexer.tokenize();
         CLI.logFlag(LogFlagLevel.LEXER, tokens);
 
-        const parser = new DisChordParser(tokens, code);
+        const parser = new DisChordParser(tokens);
         const ast = parser.parse();
         CLI.logFlag(LogFlagLevel.AST, ast);
     
-        const generator = new DisChordGenerator(parser.symbols, code, this.config.projectRoot);
+        const generator = new DisChordGenerator(parser.symbols, this.config.projectRoot);
         const output = generator.generate(ast as ASTNode<DisChordNodeType>[]);
         CLI.logFlag(LogFlagLevel.OUTPUT, output);
 

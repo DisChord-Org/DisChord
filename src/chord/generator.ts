@@ -5,7 +5,7 @@ import { AccessNode, AccessNodeByIndex, AssignmentNode, ASTNode, BinaryExpressio
 export class Generator<T extends string = string, N = never> {
     private SymbolsTable: Map<string, Symbol>;
 
-    constructor (public symbols: Map<string, Symbol>, public input: string) {
+    constructor (public symbols: Map<string, Symbol>) {
         this.SymbolsTable = symbols;
     }
 
@@ -90,8 +90,7 @@ export class Generator<T extends string = string, N = never> {
                 throw new ChordError(
                     ErrorLevel.Compiler,
                     `Generador: Tipo de nodo desconocido: ${node.type}`,
-                    node.location,
-                    this.input.split('\n')[node.location.line - 1] || ''
+                    node.location
                 ).format();
         }
     }
@@ -145,16 +144,14 @@ export class Generator<T extends string = string, N = never> {
             if (!('value' in node.object)) throw new ChordError(
                 ErrorLevel.Compiler,
                 `Se esperaba una llamada con valor en su objeto.`,
-                node.location,
-                this.input.split('\n')[node.location.line - 1] || ''
+                node.location
             ).format();
 
             const name = node.object.value;
             if (typeof name != 'string') throw new ChordError(
                 ErrorLevel.Compiler,
                 `Se esperaba un tipo 'string'. Se encontró '${typeof name}'`,
-                node.location,
-                this.input.split('\n')[node.location.line - 1] || ''
+                node.location
             ).format();
             translation = name;
 
