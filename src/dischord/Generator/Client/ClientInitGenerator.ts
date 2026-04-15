@@ -33,8 +33,7 @@ export default class ClietInitGenerator extends SubGenerator {
         if (node.object.type != 'BDO') throw new DisChordError(
             ErrorLevel.Compiler,
             `Se encontró '${node.object.type}', se esperaba 'Objeto'`,
-            node.location,
-            this.parent.input.split('\n')[node.location.line - 1] || ''
+            node.location
         ).format();
 
         const { blocks } = node.object;
@@ -42,8 +41,7 @@ export default class ClietInitGenerator extends SubGenerator {
         if (!prefixNode) throw new DisChordError(
             ErrorLevel.Compiler,
             `No se ha especificado el prefijo en el bloque 'encender bot'`,
-            node.location,
-            this.parent.input.split('\n')[node.location.line - 1] || ''
+            node.location
         ).format();
 
         const prefix = this.visit(prefixNode);
@@ -97,8 +95,7 @@ export default class ClietInitGenerator extends SubGenerator {
         if (node.object.type != 'BDO') throw new DisChordError(
             ErrorLevel.Compiler,
             `Se encontró '${node.object.type}', se esperaba 'BDO'`,
-            node.location,
-            this.parent.input.split('\n')[node.location.line - 1] || ''
+            node.location
         ).format();
 
         const { blocks } = node.object;
@@ -108,8 +105,7 @@ export default class ClietInitGenerator extends SubGenerator {
         if (!tokenNode) throw new DisChordError(
             ErrorLevel.Compiler,
             `Falta el bloque 'token' en la configuración del bot.`,
-            node.location,
-            this.parent.input.split('\n')[node.location.line - 1] || ''
+            node.location
         ).format();
         
         const token = this.visit(tokenNode);
@@ -122,8 +118,7 @@ export default class ClietInitGenerator extends SubGenerator {
                 if (!mapped) throw new DisChordError(
                     ErrorLevel.Compiler,
                     `Intención desconocida: ${val}`,
-                    node.location,
-                    this.parent.input.split('\n')[node.location.line - 1] || ''
+                    node.location
                 ).format();
                 return `"${mapped}"`;
             });

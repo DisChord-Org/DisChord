@@ -33,8 +33,7 @@ export default class CommandGenerator extends SubGenerator {
         if (!commandDescription) throw new DisChordError(
             ErrorLevel.Compiler,
             `Se requiere descripción para el comando`,
-            node.location,
-            this.parent.input.split('\n')[node.location.line - 1] || ''
+            node.location
         ).format();
         
         const OptionsNode: CommandOptionNode[] | undefined = node.params.find((param: CommandParam) => param.property === 'Opciones')?.options;

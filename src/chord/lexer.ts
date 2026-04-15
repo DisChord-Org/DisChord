@@ -2,13 +2,15 @@ import { Token } from './types';
 import { symbols } from './symbols';
 import { KeyWords } from './keywords';
 import { ChordError, ErrorLevel } from '../ChordError';
+import { codeProvider } from '../CodeProvider';
 
 export class Lexer {
     private line = 1;
     private column = 1;
     private current = 0;
+    private input = codeProvider.currentCode;
 
-    constructor(private input: string) {}
+    constructor() {}
 
     private peek(): string {
         return this.input[this.current] || '';
@@ -174,8 +176,7 @@ export class Lexer {
             throw new ChordError(
                 ErrorLevel.Lexer,
                 `Carácter inesperado: ${char}`,
-                { line: this.line, column: this.column },
-                this.input.split('\n')[this.line - 1] || ''
+                { line: this.line, column: this.column }
             ).format();
         }
 

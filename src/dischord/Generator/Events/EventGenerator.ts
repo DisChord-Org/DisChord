@@ -32,8 +32,7 @@ export default class EventGenerator extends SubGenerator {
         if (!eventName) throw new DisChordError(
             ErrorLevel.Compiler,
             `El evento '${node.name}' no existe`,
-            node.location,
-            this.parent.input.split('\n')[node.location.line - 1] || ''
+            node.location
         ).format();
 
         const body = node.body

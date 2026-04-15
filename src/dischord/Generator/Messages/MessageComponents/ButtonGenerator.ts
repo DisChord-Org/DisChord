@@ -42,8 +42,7 @@ export default class ButtonGenerator extends SubGenerator {
         if (node.type != 'BDO') throw new DisChordError(
             ErrorLevel.Compiler,
             `Se esperaba un BDO, se recibió '${node.type}'`,
-            node.location,
-            this.parent.input.split('\n')[node.location.line - 1] || ''
+            node.location
         ).format();
 
         const ResolvedCustomId = this.resolveCustomId(node);
@@ -73,8 +72,7 @@ export default class ButtonGenerator extends SubGenerator {
         if (!customId) throw new DisChordError(
             ErrorLevel.Compiler,
             `Se debe especificar una id en el botón`,
-            node.location,
-            this.parent.input.split('\n')[node.location.line - 1] || ''
+            node.location
         ).format();
 
         return `.setCustomId(${customId})`;
@@ -93,8 +91,7 @@ export default class ButtonGenerator extends SubGenerator {
         if (!label) throw new DisChordError(
             ErrorLevel.Parser,
             `Se debe especificar una etiqueta en el botón`,
-            node.location,
-            this.parent.input.split('\n')[node.location.line - 1] || ''
+            node.location
         ).format();
 
         return `.setLabel(${label})`;
@@ -113,8 +110,7 @@ export default class ButtonGenerator extends SubGenerator {
         if (!style) throw new DisChordError(
             ErrorLevel.Compiler,
             `Se debe especificar el estilo en el botón`,
-            node.location,
-            this.parent.input.split('\n')[node.location.line - 1] || ''
+            node.location
         ).format();
 
         const SlicedStyle = style.slice(1, -1);
@@ -122,8 +118,7 @@ export default class ButtonGenerator extends SubGenerator {
         if (!(SlicedStyle in ButtonStyles)) throw new DisChordError(
             ErrorLevel.Compiler,
             `Estilo inválido: '${SlicedStyle}'`,
-            node.location,
-            this.parent.input.split('\n')[node.location.line - 1] || ''
+            node.location
         ).format();
 
         const ButtonStyle = ButtonStyles[SlicedStyle as keyof typeof ButtonStyles];

@@ -45,8 +45,7 @@ export default class EmbedGenerator extends SubGenerator {
         if (node.type != 'BDO') throw new DisChordError(
             ErrorLevel.Parser,
             `Se esperaba un BDO, se recibió '${node.type}'`,
-            node.location,
-            this.parent.input.split('\n')[node.location.line - 1] || ''
+            node.location
         ).format();
         
         const ResolvedColor = this.resolveColors(node);
@@ -204,8 +203,7 @@ export default class EmbedGenerator extends SubGenerator {
             if (Field.type != 'BDO') throw new DisChordError(
                 ErrorLevel.Compiler,
                 `Se esperaba un BDO para el campo, se recibió '${Field.type}'`,
-                node.location,
-                this.parent.input.split('\n')[node.location.line - 1] || ''
+                node.location
             ).format();
             
             const name = this.visitIfExists(
@@ -215,8 +213,7 @@ export default class EmbedGenerator extends SubGenerator {
             if (!name) throw new DisChordError(
                 ErrorLevel.Compiler,
                 `El campo requiere una propiedad 'titulo'`,
-                node.location,
-                this.parent.input.split('\n')[node.location.line - 1] || ''
+                node.location
             ).format();
 
             const value = this.visitIfExists(
@@ -251,8 +248,7 @@ export default class EmbedGenerator extends SubGenerator {
         if (!text) throw new DisChordError(
             ErrorLevel.Compiler,
             `El pie de página requiere una propiedad 'text'`,
-            node.location,
-            this.parent.input.split('\n')[node.location.line - 1] || ''
+            node.location
         ).format();
 
         const iconUrl = this.visitIfExists(
