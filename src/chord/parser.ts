@@ -726,10 +726,10 @@ export class Parser<T = never, N = never> {
 
         if (current.type !== 'IDENTIFICADOR') return false;
         if (KeyWords.getStatements().includes(current.value)) return false;
-        if (next.type === 'PUNTO' || next.type === 'L_PAREN') return false;
-        if (next.type === 'OPERADOR_ASIGNACION') return false; 
+        if (next.type === '.' || next.type === 'L_EXPRESSION') return false;
+        if (next.type === 'ES') return false; 
 
-        const validValueTypes = ['LITERAL', 'L_BRACE', 'IDENTIFICADOR', 'TEXTO', 'NUMERO', 'BOOLEANO'];
+        const validValueTypes = ['LITERAL', 'L_BRACE', 'L_SQUARE', 'IDENTIFICADOR', 'TEXTO', 'NUMERO', 'BOOLEANO'];
 
         return validValueTypes.includes(next.type);
     }
