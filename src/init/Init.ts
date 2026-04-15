@@ -87,6 +87,6 @@ export default class Init {
         CLI.logFlag(LogFlagLevel.OUTPUT, output);
 
         if (!fs.existsSync(targetDir)) fs.mkdirSync(targetDir, { recursive: true });
-        Prettifier.savePrettified(outputPath, output);
+        await Prettifier.savePrettified(outputPath, output);
     }
 }
