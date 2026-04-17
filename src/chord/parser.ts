@@ -725,7 +725,7 @@ export class Parser<T = never, N = never> {
         if (next.type === '.' || next.type === 'L_EXPRESSION') return false;
         if (next.type === 'ES') return false; 
 
-        const validValueTypes = ['LITERAL', 'L_BRACE', 'L_SQUARE', 'IDENTIFICADOR', 'TEXTO', 'NUMERO', 'BOOLEANO'];
+        const validValueTypes = ['LITERAL', 'L_BRACE', 'L_SQUARE', 'IDENTIFICADOR', 'TEXTO', 'NUMERO', 'BOOL'];
 
         return validValueTypes.includes(next.type);
     }
