@@ -1,3 +1,5 @@
+import { DiscordOptionType } from "./types";
+
 export const corelib: Record<string, Record<string, string> | string> = {
     'usuario': {
         'nombre': 'usuario.username',
@@ -193,4 +195,16 @@ export const EmbedColors: Record<string, string> = {
     'Rojo': 'Red',
     'Blanco': 'White',
     'Amarillo': 'Yellow'
+} as const;
+
+export const DisChordTypeMap: Record<string, DiscordOptionType> = {
+    "texto": DiscordOptionType.String,
+    "entero": DiscordOptionType.Integer,
+    "booleano": DiscordOptionType.Boolean,
+    "usuario": DiscordOptionType.User,
+    "canal": DiscordOptionType.Channel,
+    "rol": DiscordOptionType.Role,
+    "mencionable": DiscordOptionType.Mentionable,
+    "numero": DiscordOptionType.Number,
+    "archivo": DiscordOptionType.Attachment
 } as const;
