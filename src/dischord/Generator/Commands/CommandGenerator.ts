@@ -2,10 +2,11 @@ import { join } from 'path';
 import Prettifier from '../../../init/Prettifier';
 
 import { createMessageFunctionInjection } from "../../core.lib";
-import { CommandNode, CommandOptionNode, CommandParam, DisChordASTNode } from "../../types";
+import { CommandNode, DisChordASTNode } from "../../types";
 import { DisChordGenerator } from "../generator";
-import { SubGenerator } from '../subgenerator';
+import { SubGenerator, SubGeneratorClass } from '../subgenerator';
 import { DisChordError, ErrorLevel } from '../../../ChordError';
+import CommandOptionGenerator from './CommandOptions/CommandOption';
 
 /**
  * Generator class responsible for generating code related to command definitions in DisChord.
@@ -13,6 +14,9 @@ import { DisChordError, ErrorLevel } from '../../../ChordError';
 export default class CommandGenerator extends SubGenerator {
     /** To identify when this generator should be used */
     static triggerToken: string = "CrearComando";
+
+    // Expose the CommandGenerator context to options generator.
+    public CommandGeneratorContext: DisChordGenerator;
     
     /**
      * Constructor for the CommandGenerator class.
@@ -20,6 +24,7 @@ export default class CommandGenerator extends SubGenerator {
      */
     constructor (protected parent: DisChordGenerator) {
         super(parent);
+        this.CommandGeneratorContext = parent;
     }
 
     /**
@@ -29,30 +34,30 @@ export default class CommandGenerator extends SubGenerator {
      */
     generate (node: CommandNode): string {
         const commandName = node.value;
-        const commandDescription = node.params.find((param: CommandParam) => param.property === 'Descripcion');
+        const commandDescription = node.body.blocks['descripcion'];
         if (!commandDescription) throw new DisChordError(
             ErrorLevel.Compiler,
             `Se requiere descripción para el comando`,
             node.location
         ).format();
-        
-        const OptionsNode: CommandOptionNode[] | undefined = node.params.find((param: CommandParam) => param.property === 'Opciones')?.options;
-        const OptionsString: string = OptionsNode? `const options = [${OptionsNode.map((option: CommandOptionNode) => this.generateOption(option)).join(',')}];` : '';
-        const OptionsConstDeclaration: string = OptionsNode? 'options = options;' : '';
-        const OptionsConstExtraction: string = OptionsNode? OptionsNode.map((option: CommandOptionNode) => `const ${option.name} = ctx.options.${option.name};`).join('\n') : '';
 
-        const body = node.body
+        const CommandOptionGeneratorInstance = new CommandOptionGenerator(this.parent);
+        const OptionsData = CommandOptionGeneratorInstance.generateIfNodeExists(node.body);
+        const OptionsConstDeclaration: string = OptionsData.length > 0? 'options = options;' : '';
+        const OptionsConstExtraction: string = CommandOptionGeneratorInstance.getExtractionCode();
+
+        const body = node.body.body
             .map((n: DisChordASTNode): string => "    " + this.visit(n) + ";")
             .join('\n');
 
         const commandBody: string = `
             import { Command, IgnoreCommand, Embed, ActionRow, Button, createStringOption } from 'seyfert';
 
-            ${OptionsString}
+            ${OptionsData}
 
             export default class ${commandName}Command extends Command {
                 name = "${commandName.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase() /*slugified*/}";
-                description = ${this.visit(commandDescription.value) ?? '"Un comando genial"'};
+                description = ${this.visit(commandDescription) ?? '"Un comando genial"'};
                 ignore = IgnoreCommand.Message;
                 integrationTypes = [ 0 ];
                 contexts = [ 0 ];
@@ -73,26 +78,5 @@ export default class CommandGenerator extends SubGenerator {
 
         Prettifier.savePrettified(join(this.parent.projectRoot, 'dist', 'commands', `${commandName}.js`), commandBody)
         return '';
-    }
-
-    /**
-     * Generates the code for a command option based on the provided CommandOptionNode.
-     * @param option The CommandOptionNode representing the command option to generate code for.
-     * @returns The generated AST for the command option.
-     */
-    private generateOption(option: CommandOptionNode): string {
-        const name = option.name;
-        const description = this.visit(option.description);
-        const required = option.required ? 'true' : 'false';
-
-        // Currently, only string options are supported. This can be expanded in the future to support more types.
-        return `
-            {
-                name: "${name}",
-                description: ${description},
-                required: ${required},
-                type: 3
-            }
-        `;
     }
 }
