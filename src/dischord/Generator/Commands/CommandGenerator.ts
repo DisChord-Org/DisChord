@@ -34,7 +34,7 @@ export default class CommandGenerator extends SubGenerator {
      */
     generate (node: CommandNode): string {
         const commandName = node.value;
-        const commandDescription = node.body.blocks['descripcion'];
+        const commandDescription = this.getODBProperty(node.body, 'descripcion');
         if (!commandDescription) throw new DisChordError(
             ErrorLevel.Compiler,
             `Se requiere descripción para el comando`,

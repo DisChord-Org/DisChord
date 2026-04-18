@@ -4,10 +4,18 @@ import { DisChordASTNode, DisChordODBNode, DiscordOptionType } from "../../../ty
 import { DisChordGenerator } from "../../generator";
 import { SubGenerator } from "../../subgenerator";
 
+/**
+ * Specialist generator responsible for parsing and translating DisChord command options 
+ * into Discord-compatible API structures.
+ */
 export default class CommandOptionGenerator extends SubGenerator {
     /** To identify when this generator should be used */
     static triggerToken: string = "opciones";
 
+    /**
+     * Internal cache of option identifiers found during the last generation cycle.
+     * Used to build the destructuring statement in getExtractionCode().
+     */
     private lastGeneratedOptions: string[] = [];
 
     /**
@@ -17,18 +25,36 @@ export default class CommandOptionGenerator extends SubGenerator {
         super(parent);
     }
 
+    /**
+     * Generates a JavaScript destructuring statement for the command's internal logic.
+     * @example Returns "const { myOption } = ctx.options;"
+     * @returns A string containing the variable extraction code.
+     */
     public getExtractionCode(): string {
         if (this.lastGeneratedOptions.length === 0) return '';
         
         return `const { ${this.lastGeneratedOptions.join(', ')} } = ctx.options;`;
     }
 
+    /**
+     * Entry point for the CommandGenerator. Checks if the 'opciones' block exists 
+     * within the provided ODB and initiates generation.
+     * @param node The Object Definition Block (BDO) of the command.
+     * @returns The 'options' constant declaration string.
+     */
     generateIfNodeExists (node: DisChordODBNode): string {
         const options = this.getODBProperty(node, 'opciones');
 
         return options? `const options = [${this.generate(options)}];` : '';
     }
 
+    /**
+     * Iterates through the options defined in the DisChord source and maps them 
+     * to their respective Discord types.
+     * @param node The AST node containing the options map.
+     * @throws {DisChordError} If the node is not a BDO or an option type is invalid.
+     * @returns A stringified array of Discord option objects.
+     */
     generate (node: DisChordASTNode): string {
         if (node.type != 'BDO') throw new DisChordError(
             ErrorLevel.Compiler,
@@ -63,6 +89,10 @@ export default class CommandOptionGenerator extends SubGenerator {
         return results.join(', ');
     }
 
+    /**
+     * Extracts and normalizes the option type from the ODB properties.
+     * @private
+     */
     private getOptionType (node: DisChordODBNode): string {
         const OptionType = this.visitIfExists(
             this.getODBProperty(node, 'opcion')
@@ -71,6 +101,13 @@ export default class CommandOptionGenerator extends SubGenerator {
         return (OptionType ?? '').replace(/"/g, '').toLowerCase();
     }
 
+    /**
+     * Generates the configuration object for a String-type Discord option.
+     * @private
+     * @param name The identifier of the option.
+     * @param node The ODB node containing option properties.
+     * @throws {DisChordError} If mandatory properties are missing.
+     */
     private generateStringOption (name: string, node: DisChordODBNode): string {
         const description = this.visitIfExists(
             this.getODBProperty(node, 'descripcion')
