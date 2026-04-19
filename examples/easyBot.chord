@@ -1,0 +1,19 @@
+encender bot {
+    token "mitoken"
+    prefijo "!"
+    intenciones [ "Servidores" ]
+}
+
+evento encendido {
+    imprimir("[" mas usuario.nombre mas "] Bot Encendido")
+}
+
+
+crear comando Ping {
+    descripcion "comando ping"
+
+    var msgContenido es "pong! " mas cliente.ping mas "ms"
+    crear mensaje {
+        contenido msgContenido
+    }
+}

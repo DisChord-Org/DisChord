@@ -1,0 +1,25 @@
+encender bot {
+    token "mitoken"
+    prefijo "!"
+    intenciones [ "Servidores" ]
+}
+
+evento encendido {
+    imprimir("[" mas usuario.nombre mas "] Bot Encendido")
+}
+
+crear comando StringTest {
+    descripcion "Test de Strings"
+
+    opciones {
+        repetir {
+            opcion "texto"
+            descripcion "El bot responde con lo que escribas"
+            requerido verdadero
+        }
+    }
+
+    crear mensaje {
+        contenido repetir
+    }
+}

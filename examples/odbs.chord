@@ -1,0 +1,25 @@
+// prueba de BDO simple
+var miBDO es {
+    texto "hola mundo"
+}
+
+consola.imprimir(miBDO) // { texto: "hola mundo" }
+
+// prueba de BDO con definición de código
+var miObjetoChetado {
+    Ether "está chetado"
+    JustEvil "goat"
+    ZendrYz "wen pibe"
+
+    consola.imprimir(JustEvil) // "goat"
+    JustEvil es "la cabra"
+}
+
+consola.imprimir(miObjetoChetado)
+/*
+    {
+        Ether "está chetado"
+        JustEvil "la cabra"
+        ZendrYz "wen pibe"
+    }
+*/
