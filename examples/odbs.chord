@@ -6,7 +6,7 @@ var miBDO es {
 consola.imprimir(miBDO) // { texto: "hola mundo" }
 
 // prueba de BDO con definición de código
-var miObjetoChetado {
+var miObjetoChetado es {
     Ether "está chetado"
     JustEvil "goat"
     ZendrYz "wen pibe"
