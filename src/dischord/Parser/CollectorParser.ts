@@ -36,49 +36,12 @@ export default class CollectorParser extends SubParser {
         this.consume('RECOLECTOR');
 
         const variable = this.parsePrimary();
-        const body: CollectorPulseBody[] = [];
-
-        this.consume('L_BRACE');
-        while (this.peek().type !== 'R_BRACE') {
-            const token = this.peek();
-
-            switch (token.value) {
-                case 'alPulsarId':
-                    body.push(this.parseCollectorPulseBody());
-                    break;
-                default:
-                    throw new Error(`Dentro del recolector se esperaba 'alPulsarId', se encontró '${token.value}'`);
-            }
-        }
-        this.consume('R_BRACE');
+        const methods = this.parseODB('definition-only');
 
         return this.createNode<CollectorNode>({
             type: 'CrearRecolector',
             variable,
-            body
+            methods
         });
-    }
-
-    /**
-     * Parses the body of a collector pulse, which defines the behavior when a specific interaction occurs (e.g., button press).
-     * Expected structure: `alPulsarId <id> {...}`
-     * @returns The parsed collector pulse body.
-     */
-    private parseCollectorPulseBody(): CollectorPulseBody {
-        this.consume('IDENTIFICADOR'); // alPulsarId
-        const id = this.parsePrimary();
-        const body: DisChordASTNode[] = [];
-
-        this.consume('L_BRACE');
-        while (this.peek().type !== 'R_BRACE') {
-            body.push(this.parseStatement());
-        }
-        this.consume('R_BRACE');
-
-        return {
-            method: 'run',
-            id,
-            body
-        }
     }
 }

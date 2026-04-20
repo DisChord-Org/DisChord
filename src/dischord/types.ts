@@ -53,7 +53,7 @@ export enum DiscordOptionType {
 export interface CollectorNode extends BaseNode<DisChordNodeType> {
     type: 'CrearRecolector';
     variable: DisChordASTNode;
-    body: CollectorPulseBody[];
+    methods: DisChordODBNode;
 }
 
 export interface CollectorPulseBody {
