@@ -76,14 +76,26 @@ export class Generator<T extends string = string, N = never> {
             case 'Exportar':
                 return this.generateExport(node);
             case 'Importar':
-                const ids = node.identificators.join(', ');
-                let path = node.path;
-                
-                if (!path.endsWith('.mjs') && (path.startsWith('./') || path.startsWith('../'))) {
+                let path = node.path.replace(/\.chord$/, '');
+
+               if (path.startsWith('lib:')) {
+                    path = `../lib/${path.split(':')[1]}.mjs`; 
+                }
+
+                if (!path.startsWith('./') && !path.startsWith('../') && !path.startsWith('/')) {
+                    path = `./${path}`;
+                }
+
+                if (!path.endsWith('.mjs')) {
                     path += '.mjs';
                 }
 
-                return `import { ${ids} } from "${path}"`;
+                if (node.isDestructured) {
+                    const ids = node.identificators.join(', ');
+                    return `import { ${ids} } from "${path}"`;
+                }
+                
+                return `import * as ${node.identificators[0]} from "${path}"`;
             case 'JS':
                 return `${node.value}`;
             default:
@@ -315,10 +327,6 @@ export class Generator<T extends string = string, N = never> {
 
     private generateExport(node: ExportNode<T>): string {
         const innerNode = node.object;
-
-        if (innerNode.type === 'Variable' || innerNode.type === 'Funcion' || innerNode.type === 'Clase') {
-            return `export ${this.visit(innerNode)}`;
-        }
 
         if (innerNode.type === 'Identificador') {
             return `export { ${this.visit(innerNode)} }`;

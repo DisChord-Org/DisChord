@@ -175,6 +175,7 @@ export interface ImportNode<T = never, N = never> extends BaseNode<T> {
     type: 'Importar';
     identificators: string[];
     path: string;
+    isDestructured: boolean;
 }
 
 export interface AssignmentNode<T = never, N = never> extends BaseNode<T> {

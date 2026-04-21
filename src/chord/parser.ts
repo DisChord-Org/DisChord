@@ -192,24 +192,30 @@ export class Parser<T = never, N = never> {
 
         if (token.type === 'IMPORTAR') {
             this.consume('IMPORTAR');
-            this.consume('L_BRACE', `Después de querer importar debes usar '{'`);
-
             const identificators: string[] = [];
-            while (this.peek().type !== 'R_BRACE') {
-                identificators.push(this.consume('IDENTIFICADOR').value);
-                if (this.peek().type === ',') this.consume(',');
+            const isDestructured = this.peek().type === 'L_BRACE';
+
+            if (isDestructured) {
+                this.consume('L_BRACE');
+                while (this.peek().type !== 'R_BRACE') {
+                    identificators.push(this.consume('IDENTIFICADOR', "Se esperaba un nombre de variable para importar").value);
+                    if (this.peek().type === ',') this.consume(',');
+                }
+                this.consume('R_BRACE');
+            } else {
+                identificators.push(this.consume('IDENTIFICADOR', "Después de 'importar' debe ir '{' o el nombre de una variable").value);
             }
 
-            this.consume('R_BRACE');
-            this.consume('DESDE', `Después de usar 'importar' debes especificar la ruta del fichero a importar usando 'desde'.`);
-            
-            const pathToken = this.consume('TEXTO', `Debes especificar un 'texto' con la ruta del fichero a importar.`); 
+            this.consume('DESDE', `Se esperaba la palabra 'desde' después de los identificadores.`);
+
+            const pathToken = this.consume('TEXTO', `Debes especificar la ruta entre comillas (texto).`);
             const modulePath = pathToken.value;
 
             return this.createNode<ImportNode<T, N>>({
                 type: 'Importar',
                 identificators,
-                path: modulePath
+                path: modulePath,
+                isDestructured
             });
         }
 
