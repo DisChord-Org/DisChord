@@ -1,0 +1,33 @@
+encender bot {
+    token "mitoken"
+    prefijo "/"
+    intenciones [ "Servidores" ]
+}
+
+evento encendido {
+    imprimir("[" mas usuario.nombre mas "] Bot Encendido")
+}
+
+crear comando HolaMundo {
+    descripcion "un hola mundo desde DisChord"
+
+    var msg es crear mensaje {
+        embed {
+            descripcion "hola"
+        }
+        boton {
+            id "miid"
+            etiqueta "mi boton"
+            emoji "🔥"
+            estilo "azul"
+        }
+    }
+
+    crear recolector msg {
+        alPulsarId {
+            miid {
+                imprimir("Se ha pulsado el boton con id miid")
+            }
+        }
+    }
+}
