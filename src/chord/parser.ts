@@ -30,7 +30,9 @@ export class Parser<T = never, N = never> {
         return this.nodes;
     }
 
-    peek(type: 'this' | 'next' | 'prev' = 'this'): Token {
+    peek(type: number | 'this' | 'next' | 'prev' = 'this'): Token {
+        if (typeof type == 'number') return this.tokens[type];
+
         let targetIndex = this.current;
 
         if (type === 'next') targetIndex = this.current + 1;
@@ -690,10 +692,11 @@ export class Parser<T = never, N = never> {
         let definitionMode: boolean = true;
 
         while (this.peek().type !== 'R_BRACE') {
-            if (definitionMode && this.isPropertyAssignment()) {
-                const key = this.consume('IDENTIFICADOR').value;
+            if (definitionMode && this.checkPropertyPattern()) {
+                const key = this.consume('IDENTIFICADOR', 'Se esperaba un nombre de la propiedad').value;
+                const value = this.parseExpression();
+                this.consume('SEPARADOR', 'Las definiciones de los BDO deben terminar con ";"');
 
-                const value = this.parsePrimary();
                 blocks[key] = value;
             } else {
                 if (type === 'definition-only') throw new ChordError(
@@ -719,20 +722,27 @@ export class Parser<T = never, N = never> {
     }
 
     /**
-     * Predicate to distinguish between a property assignment and a statement.
-     * Looks a token forward to decide.
+     * Checks if the current pattern looks like a property assignment: IDENTIFIER EXPRESSION ';'
      */
-    private isPropertyAssignment(): boolean {
+    private checkPropertyPattern(): boolean {
         const current = this.peek();
-        const next = this.peek('next');
-
+    
         if (current.type !== 'IDENTIFICADOR') return false;
         if (KeyWords.getStatements().includes(current.value)) return false;
-        if (next.type === '.' || next.type === 'L_EXPRESSION') return false;
-        if (next.type === 'ES') return false; 
 
-        const validValueTypes = ['LITERAL', 'L_BRACE', 'L_SQUARE', 'IDENTIFICADOR', 'TEXTO', 'NUMERO', 'BOOL'];
+        return this.lookAheadForToken('SEPARADOR');
+    }
 
-        return validValueTypes.includes(next.type);
+    /**
+     * Helper to look ahead in the current scope for a specific token type
+     */
+    private lookAheadForToken(type: string): boolean {
+        let i = this.current;
+        while (true) {
+            const token = this.peek(i);
+            if (token.type === type) return true;
+            if (token.type === 'R_BRACE' || token.type === 'EOF') return false;
+            i++;
+        }
     }
 }
