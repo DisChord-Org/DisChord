@@ -1,4 +1,6 @@
-export const symbols = {
+type SymbolAgrupation = Record<string, string>;
+
+export const symbols: SymbolAgrupation = {
     "{": "L_BRACE",
     "}": "R_BRACE",
     "(": "L_EXPRESSION",
@@ -6,7 +8,7 @@ export const symbols = {
     "[": "L_SQUARE",
     "]": "R_SQUARE",
 
-    "=": "ES",
+    // "=": "ES",
     "+": "MAS",
     "-": "MENOS",
     "*": "POR",
@@ -22,11 +24,11 @@ export const symbols = {
     "===": "IGUAL_TIPADO",
     "!=": "NO_IGUAL",
     "!==": "NO_IGUAL_TIPADO",
-    // ";": "separador",
+    ";": "SEPARADOR",
     ":": ":",
     ",": ",",
     ".": ".",
     "&&": "Y",
     "||": "O",
     "@": "@"
-} as any;
+};
