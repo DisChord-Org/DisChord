@@ -1,21 +1,65 @@
-// prueba de BDO simple
+/*
+    prueba de BDO simple
+    - sin definición de código
+    - objeto puro:
+        {
+            "hola": "mundo",
+            "uno": 1
+        }
+    - NO se necesitan puntos y comas al final, pero es posible agregarlos
+*/
 var miBDO es {
     texto "hola mundo"
 }
 
-consola.imprimir(miBDO) // { texto: "hola mundo" }
+consola.imprimir(miBDO)
 
-// prueba de BDO con definición de código
-var miObjetoChetado es {
-    Ether "está chetado"
-    JustEvil "goat"
-    ZendrYz "wen pibe"
+/*
+    forzar un BDO con definición de código
+        por defecto, los BDO sin definición de código son objetos simples
+        por lo que si quieres hacer una jugada como la adjuntada abajo,
+        devolverá un error ya que no estamos en un BDO inteligente (o de definición de código):
+
+        var chainsawman es {
+            makima "narcisista"
+            denji ("mascota de una " + makima)
+        }
+
+        Definitivamente devolverá un error ya que los BDO simples no toleran
+        expresiones complejas, solo datos primitivos simples o BDOs adjuntos.
+
+        Por lo que debemos convertirlo en un BDO inteligente (BDO de definición de código)
+        Para esto agregamos un decorador "@BDOI" (Bloque de Definición Operativa Inteligente)
+        Como todos los BDO sin definición de código son objetos simples por defecto, al no
+        querer agregar código podemos decirle al transpilador de convertirlo a BDOI mediante
+        este decorador
+
+        CUIDADO:
+        Como este BDO será de definición de código, hay que usar PUNTO Y COMA.
+*/
+@BDOI
+var chainsawman es {
+    makima "narcisista";
+    denji ("mascota de una " + makima);
+}
+consola.imprimir(chainsawman)
+
+/*
+    prueba de BDO con definición de código
+    - es OBLIGATORIO agregar puntos y comas
+    - esto transpila a: (() => {}): Record(string, any)
+*/
+
+var panas es {
+    Ether "está chetado";
+    JustEvil "goat";
+    ZendrYz "wen pibe";
 
     consola.imprimir(JustEvil) // "goat"
     JustEvil es "la cabra"
 }
 
-consola.imprimir(miObjetoChetado)
+consola.imprimir(panas)
 /*
     {
         Ether "está chetado"
