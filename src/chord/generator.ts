@@ -1,6 +1,6 @@
 import { ChordError, ErrorLevel } from "../ChordError";
 import { corelib, runtimeInjections } from "./core.lib";
-import { AccessNode, AccessNodeByIndex, AssignmentNode, ASTNode, BinaryExpressionNode, CallNode, ClassNode, ConditionNode, ExportNode, FunctionNode, ListNode, LiteralNode, LoopNode, NoUnaryNode, ODBNode, PropertyNode, Symbol, UnaryNode, VariableNode } from "./types";
+import { AccessNode, AccessNodeByIndex, AssignmentNode, ASTNode, BinaryExpressionNode, CallNode, ClassNode, ConditionNode, ExportNode, FunctionNode, ListNode, LiteralNode, LoopNode, NoUnaryNode, ODBMode, ODBNode, PropertyNode, Symbol, UnaryNode, VariableNode } from "./types";
 
 export class Generator<T extends string = string, N = never> {
     private SymbolsTable: Map<string, Symbol>;
@@ -303,7 +303,7 @@ export class Generator<T extends string = string, N = never> {
     }
 
     private generateObject(node: ODBNode<T>): string {
-        if (node.body.length === 0) {
+        if (node.mode === ODBMode.Simple) {
             const props = Object.entries(node.blocks).map(([key, value]) => {
                 return `${key}: ${this.visit(value)}`;
             });

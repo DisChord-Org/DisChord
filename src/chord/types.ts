@@ -209,11 +209,17 @@ export interface SOF<T = never> extends BaseNode<T> {
     value: '';
 }
 
+export enum ODBMode {
+    Simple = 0,
+    Intelligent = 1
+}
+
 export interface ODBNode<T = never, N = never> extends BaseNode<T> {
     type: 'BDO';
+    mode: ODBMode;
     blocks: Record<string, ASTNode<T, N>>;
     body: ASTNode<T, N>[];
-} 
+}
 
 export type ASTNode<T = never, N = never> =
       EOF<T>

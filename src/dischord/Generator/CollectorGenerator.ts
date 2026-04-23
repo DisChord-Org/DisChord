@@ -29,6 +29,12 @@ export default class CollectorGenerator extends SubGenerator {
             this.getODBProperty(node.methods, 'alPulsarId')
         );
 
+        const filter = this.getODBProperty(node.methods, 'filtro');
+        const time = this.getODBProperty(node.methods, 'tiempo');
+
+        console.log(1, filter);
+        console.log(2, time);
+
         return this.generateCollector(variable, body);
     }
 
@@ -85,6 +91,7 @@ export default class CollectorGenerator extends SubGenerator {
         const pulseCodes: string[] = Object.keys(node.blocks).map(identificator => {
             const idBody = node.blocks[identificator];
 
+            console.log(3, idBody)
             if (!idBody || idBody.type != 'BDO' || idBody.body.length < 1) throw new DisChordError(
                 ErrorLevel.Parser,
                 `Después de definir una ID para detectar pulsos, se esperaba un BDO con código.`,

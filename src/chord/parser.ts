@@ -1,7 +1,8 @@
 import { ChordError, ErrorLevel } from "../ChordError";
 import { SUGGESTIONS } from "./core.lib";
+import { DecoratorProcessor } from "./DecoratorProcessor";
 import { KeyWords } from "./keywords";
-import { ASTNode, ClassNode, ConditionNode, LoopNode, FunctionNode, PropertyNode, Token, VariableNode, Symbol, SymbolKind, IdentificatorNode, NewNode, ThisNode, SuperNode, ReturnNode, ExportNode, ImportNode, ExitLoopNode, PassLoopNode, AssignmentNode, BinaryExpressionNode, JSNode, LiteralNode, NoUnaryNode, UnaryNode, ListNode, ExpressionNode, AccessNode, AccessNodeByIndex, CallNode, SOF, EOF, ODBNode } from "./types";
+import { ASTNode, ClassNode, ConditionNode, LoopNode, FunctionNode, PropertyNode, Token, VariableNode, Symbol, SymbolKind, IdentificatorNode, NewNode, ThisNode, SuperNode, ReturnNode, ExportNode, ImportNode, ExitLoopNode, PassLoopNode, AssignmentNode, BinaryExpressionNode, JSNode, LiteralNode, NoUnaryNode, UnaryNode, ListNode, ExpressionNode, AccessNode, AccessNodeByIndex, CallNode, SOF, EOF, ODBNode, ODBMode } from "./types";
 
 export class Parser<T = never, N = never> {
     public symbols: Map<string, Symbol> = new Map();
@@ -97,22 +98,33 @@ export class Parser<T = never, N = never> {
 
     parseStatement(classContext?: string): ASTNode<T, N> {
         const token = this.peek();
-
         const custom = this.parseCustomStatement();
+
         if (custom) return custom;
 
-        if (token.type === 'DECORADOR' && token.value === '@asincrono') {
-            this.consume('DECORADOR', `Solo existe un decorador. ¿Querías decir '@asincrono'?`);
+        if (token.type === 'DECORADOR') {
+            const decorator = token.value;
+            this.consume('DECORADOR');
+
+            if (decorator === '@asincrono') {
+                /*this.consume('DECORADOR');
             
-            if (this.peek().type === 'FIJAR') {
-                this.consume('FIJAR');
-                const func = this.parseFunctionDeclaration(false, true, true);
-                func.metadata.isStatic = true;
-                return func;
+                if (this.peek().type === 'FIJAR') {
+                    this.consume('FIJAR');
+                    const func = this.parseFunctionDeclaration(false, true, true);
+                    func.metadata.isStatic = true;
+                    return func;
+                }
+
+                const func = this.parseFunctionDeclaration(false, !!classContext, true);
+                return func;*/
             }
 
-            const func = this.parseFunctionDeclaration(false, !!classContext, true);
-            return func;
+            if (decorator === '@BDOI') {
+                DecoratorProcessor.addDecorator('BDOI', true);
+            }
+
+            return this.parseStatement(classContext);
         }
 
         if (token.type === 'SI') {
@@ -432,9 +444,7 @@ export class Parser<T = never, N = never> {
             return this.parseIdentifierOrCall();
         }
 
-        if (token.type === 'NUMERO' || token.type === 'TEXTO' || token.type === 'BOOL' || token.type === 'INDEFINIDO') {
-            return this.parseLiteral();
-        }
+        if (token.type === 'NUMERO' || token.type === 'TEXTO' || token.type === 'BOOL' || token.type === 'INDEFINIDO') return this.parseLiteral();
 
         if (token.type === 'NUEVO') {
             this.consume('NUEVO');
@@ -494,7 +504,10 @@ export class Parser<T = never, N = never> {
             });
         }
 
-        if (token.type === 'L_BRACE') return this.parseODB();
+        if (token.type === 'L_BRACE') {
+            const isIntelligent = DecoratorProcessor.matchAndDelete('BDOI', true);
+            return this.parseODB(isIntelligent? ODBMode.Intelligent : ODBMode.Simple);
+        }
         
         throw new ChordError(
             ErrorLevel.Parser,
@@ -684,7 +697,7 @@ export class Parser<T = never, N = never> {
      * Distinguishes between property blocks (key-value pairs) and execution statements.
      * @returns {ODBNode} A node containing organized blocks and an executable body.
      */
-    parseODB(type: 'definition-only' | 'definition-code' = 'definition-code'): ODBNode<T, N> {
+    parseODB(mode: ODBMode = ODBMode.Simple): ODBNode<T, N> {
         this.consume('L_BRACE');
     
         const blocks: Record<string, ASTNode<T, N>> = {};
@@ -692,21 +705,18 @@ export class Parser<T = never, N = never> {
         let definitionMode: boolean = true;
 
         while (this.peek().type !== 'R_BRACE') {
-            if (definitionMode && this.checkPropertyPattern()) {
+            if (definitionMode && this.checkPropertyPattern(mode)) {
                 const key = this.consume('IDENTIFICADOR', 'Se esperaba un nombre de la propiedad').value;
                 const value = this.parseExpression();
-                this.consume('SEPARADOR', 'Las definiciones de los BDO deben terminar con ";"');
+
+                if (mode === ODBMode.Intelligent) this.consume('SEPARADOR', 'En un BDOI, las definiciones deben terminar con ";"');
+                else if (this.peek().type === 'SEPARADOR') this.consume('SEPARADOR');
 
                 blocks[key] = value;
             } else {
-                if (type === 'definition-only') throw new ChordError(
-                    ErrorLevel.Parser,
-                    `Se definió código en un BDO 'definition-only'`,
-                    this.peek().location
-                ).format();
-
+                if (mode === ODBMode.Simple) mode = ODBMode.Intelligent;
                 definitionMode = false;
-    
+
                 const statement = this.parseStatement();
                 if (statement) body.push(statement);
             }
@@ -716,6 +726,7 @@ export class Parser<T = never, N = never> {
     
         return this.createNode<ODBNode<T, N>>({
             type: 'BDO',
+            mode,
             blocks,
             body
         });
@@ -724,13 +735,15 @@ export class Parser<T = never, N = never> {
     /**
      * Checks if the current pattern looks like a property assignment: IDENTIFIER EXPRESSION ';'
      */
-    private checkPropertyPattern(): boolean {
+    private checkPropertyPattern(mode: ODBMode): boolean {
         const current = this.peek();
     
         if (current.type !== 'IDENTIFICADOR') return false;
         if (KeyWords.getStatements().includes(current.value)) return false;
+        if (this.peek('next').type === '.') return false;
+        if (mode === ODBMode.Intelligent) return this.lookAheadForToken('SEPARADOR');
 
-        return this.lookAheadForToken('SEPARADOR');
+        return true;
     }
 
     /**
