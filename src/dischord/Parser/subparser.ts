@@ -1,3 +1,4 @@
+import { ODBMode } from "../../chord/types";
 import { DisChordASTNode, DisChordODBNode } from "../types";
 import { DisChordParser } from "./parser";
 
@@ -46,8 +47,8 @@ export abstract class SubParser {
     /**
      * Helper to parse ODB's.
      */
-    protected parseODB(type: 'definition-only' | 'definition-code' = 'definition-code'): DisChordODBNode {
-        return this.parent.parseODB(type);
+    protected parseODB(mode: ODBMode = ODBMode.Simple): DisChordODBNode {
+        return this.parent.parseODB(mode);
     }
 
     /**

@@ -2,6 +2,7 @@ import { DisChordParser } from "../parser";
 import { MessageNode } from "../../types";
 import { KeyWords } from "../../../chord/keywords";
 import { SubParser } from "../subparser";
+import { ODBMode } from "../../../chord/types";
 
 /**
  * The Message Parser.
@@ -40,7 +41,7 @@ export default class MessageParser extends SubParser {
     parse (): MessageNode {
         this.consume('MENSAJE');
 
-        const configBody = this.parseODB('definition-only');
+        const configBody = this.parseODB(ODBMode.Simple);
 
         return this.createNode<MessageNode>({
             type: 'CrearMensaje',

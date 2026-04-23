@@ -2,6 +2,7 @@ import { DisChordParser } from "./parser";
 import { CollectorNode, CollectorPulseBody, DisChordASTNode } from "../types";
 import { KeyWords } from "../../chord/keywords";
 import { SubParser } from "./subparser";
+import { ODBMode } from "../../chord/types";
 
 /**
  * The Collector Parser.
@@ -36,7 +37,7 @@ export default class CollectorParser extends SubParser {
         this.consume('RECOLECTOR');
 
         const variable = this.parsePrimary();
-        const methods = this.parseODB('definition-only');
+        const methods = this.parseODB(ODBMode.Simple);
 
         return this.createNode<CollectorNode>({
             type: 'CrearRecolector',
