@@ -92,8 +92,6 @@ export class DisChordParser extends Parser<DisChordNodeType, DisChordNode> {
                 ).format();
 
                 return customStatement;
-            case 'L_BRACE':
-                return this.parseODB();
             default:
                 return super.parsePrimary();
         }
