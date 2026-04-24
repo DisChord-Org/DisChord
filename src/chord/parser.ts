@@ -709,12 +709,29 @@ export class Parser<T = never, N = never> {
                 const key = this.consume('IDENTIFICADOR', 'Se esperaba un nombre de la propiedad').value;
                 const value = this.parseExpression();
 
-                if (mode === ODBMode.Intelligent) this.consume('SEPARADOR', 'En un BDOI, las definiciones deben terminar con ";"');
-                else if (this.peek().type === 'SEPARADOR') this.consume('SEPARADOR');
+                if (this.peek().type === 'SEPARADOR') {
+                    if (mode === ODBMode.Simple) mode = ODBMode.Intelligent;
+                    this.consume('SEPARADOR', 'En un BDOI, las definiciones deben terminar con ";"');
+                } else if (mode === ODBMode.Intelligent) {
+                    throw new ChordError(
+                        ErrorLevel.Parser,
+                        `En un BDO inteligente, la propiedad '${key}' debe terminar en ';'`,
+                        this.peek().location
+                    ).format();
+                }
 
                 blocks[key] = value;
             } else {
-                if (mode === ODBMode.Simple) mode = ODBMode.Intelligent;
+                if (mode === ODBMode.Simple) {
+                    if (Object.keys(blocks).length > 0) {
+                        throw new ChordError(
+                            ErrorLevel.Parser,
+                            `Conflicto de estilo: Si el BDO contiene código ejecutable, todas las propiedades superiores deben terminar en ";"`,
+                            this.peek().location
+                        ).format();
+                    }
+                    mode = ODBMode.Intelligent;
+                }
                 definitionMode = false;
 
                 const statement = this.parseStatement();
@@ -737,10 +754,13 @@ export class Parser<T = never, N = never> {
      */
     private checkPropertyPattern(mode: ODBMode): boolean {
         const current = this.peek();
-    
+        const next = this.peek('next');
+
         if (current.type !== 'IDENTIFICADOR') return false;
         if (KeyWords.getStatements().includes(current.value)) return false;
-        if (this.peek('next').type === '.') return false;
+        if (KeyWords.getStatements().includes(next.value)) return false;
+        if (next.type === '.') return false;
+        if (mode === ODBMode.Simple && this.lookAheadForToken('SEPARADOR')) return true;
         if (mode === ODBMode.Intelligent) return this.lookAheadForToken('SEPARADOR');
 
         return true;
@@ -751,10 +771,20 @@ export class Parser<T = never, N = never> {
      */
     private lookAheadForToken(type: string): boolean {
         let i = this.current;
+        let nestingLevel = 0;
+
         while (true) {
             const token = this.peek(i);
-            if (token.type === type) return true;
-            if (token.type === 'R_BRACE' || token.type === 'EOF') return false;
+
+            if (token.type === 'L_BRACE') nestingLevel++;
+            if (token.type === 'R_BRACE') {
+                if (nestingLevel === 0) return false;
+                nestingLevel--;
+            }
+
+            if (nestingLevel === 0 && token.type === type) return true;
+
+            if (token.type === 'EOF') return false;
             i++;
         }
     }
