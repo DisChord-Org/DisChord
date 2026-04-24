@@ -1,7 +1,14 @@
 import { DisChordError, ErrorLevel } from "../../ChordError";
-import { CollectorNode, CollectorPulseBody, DisChordASTNode, DisChordODBNode } from "../types";
+import { CollectorNode, CollectorPulseBody, DisChordASTNode } from "../types";
 import { DisChordGenerator } from "./generator";
 import { SubGenerator } from "./subgenerator";
+
+/** Config for the Collector Generator param. */
+interface CollectorConfig {
+    variable: string;
+    filter: string;
+    time: string;
+}
 
 /**
  * Generator class responsible for generating code related to component collectors and their event handling in DisChord.
@@ -28,14 +35,20 @@ export default class CollectorGenerator extends SubGenerator {
         const body = this.visitPulseIdMethod(
             this.getODBProperty(node.methods, 'alPulsarId')
         );
+        const filter = this.visitIfExists(
+            this.getODBProperty(node.methods, 'filtro')
+        ) || 'i.user.id === contexto.author.id';
+        const time = this.visitIfExists(
+            this.getODBProperty(node.methods, 'tiempo')
+        ) || '60000';
 
-        const filter = this.getODBProperty(node.methods, 'filtro');
-        const time = this.getODBProperty(node.methods, 'tiempo');
+        const collectorConfig: CollectorConfig = {
+            variable,
+            filter,
+            time
+        };
 
-        console.log(1, filter);
-        console.log(2, time);
-
-        return this.generateCollector(variable, body);
+        return this.generateCollector(collectorConfig, body);
     }
 
     /**
@@ -44,11 +57,11 @@ export default class CollectorGenerator extends SubGenerator {
      * @param variable The message variable name to attach the collector to.
      * @param body The generated event listener methods.
      */
-    private generateCollector (variable: string, body: string): string {
+    private generateCollector (config: CollectorConfig, body: string): string {
         return `
-            let collector = ${variable}.createComponentCollector({
-                filter: (i) => i.user.id === contexto.author.id,
-                timeout: 60000
+            let collector = ${config.variable}.createComponentCollector({
+                filter: (i) => ${config.filter},
+                timeout: ${config.time}
             });
 
             ${body}
@@ -91,7 +104,6 @@ export default class CollectorGenerator extends SubGenerator {
         const pulseCodes: string[] = Object.keys(node.blocks).map(identificator => {
             const idBody = node.blocks[identificator];
 
-            console.log(3, idBody)
             if (!idBody || idBody.type != 'BDO' || idBody.body.length < 1) throw new DisChordError(
                 ErrorLevel.Parser,
                 `Después de definir una ID para detectar pulsos, se esperaba un BDO con código.`,

@@ -107,7 +107,17 @@ export class Parser<T = never, N = never> {
             this.consume('DECORADOR');
 
             if (decorator === '@asincrono') {
-                DecoratorProcessor.addDecorator('async', true);
+                /*this.consume('DECORADOR');
+            
+                if (this.peek().type === 'FIJAR') {
+                    this.consume('FIJAR');
+                    const func = this.parseFunctionDeclaration(false, true, true);
+                    func.metadata.isStatic = true;
+                    return func;
+                }
+
+                const func = this.parseFunctionDeclaration(false, !!classContext, true);
+                return func;*/
             }
 
             if (decorator === '@BDOI') {
@@ -140,8 +150,7 @@ export class Parser<T = never, N = never> {
             }
             
             if (nextToken.type === 'FUNCION') {
-                const isAsync = DecoratorProcessor.matchAndDelete('async', true);
-                const func = this.parseFunctionDeclaration(false, !!classContext, isAsync);
+                const func = this.parseFunctionDeclaration(false, true);
                 func.metadata.isStatic = true;
                 return func;
             }

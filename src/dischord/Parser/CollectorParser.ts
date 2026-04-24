@@ -7,7 +7,7 @@ import { ODBMode } from "../../chord/types";
 /**
  * The Collector Parser.
  * This class is responsible for parsing interaction collector definitions,
- * which include the collector variable and its pulse bodies (e.g., alPulsarId).
+ * which include the collector variable and its pulse bodies.
  */
 export default class CollectorParser extends SubParser {
     /** To identify when this parser should be used */
