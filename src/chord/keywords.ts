@@ -30,9 +30,6 @@ export class KeyWords {
         "js",
         
         "tipo",
-        "verdadero",
-        "falso",
-        "indefinido",
 
         "mas",
         "menos",
