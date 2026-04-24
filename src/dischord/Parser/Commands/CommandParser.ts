@@ -2,6 +2,7 @@ import { DisChordParser } from "../parser";
 import { CommandNode } from "../../types";
 import { KeyWords } from "../../../chord/keywords";
 import { SubParser } from "../subparser";
+import { ODBMode } from "../../../chord/types";
 
 /**
  * The Commands Parser.
@@ -35,7 +36,7 @@ export default class CommandParser extends SubParser {
     parse (): CommandNode {
         this.consume('COMANDO');
         const commandName = this.consume('IDENTIFICADOR').value;
-        const body = this.parseODB();
+        const body = this.parseODB(ODBMode.Intelligent);
 
         return this.createNode<CommandNode>({
             type: 'CrearComando',

@@ -1,4 +1,5 @@
-type DecoratorBoxContent = boolean | string | number | string[] | boolean[] | number[];
+type PrimitiveBoxTypes = boolean | string | string[];
+type DecoratorBoxContent = PrimitiveBoxTypes | Record<string, PrimitiveBoxTypes>;
 type DecoratorBoxRecord = Record<string, DecoratorBoxContent>;
 
 /**

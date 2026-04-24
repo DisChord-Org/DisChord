@@ -3,6 +3,7 @@ import { StartBotNode } from "../../types";
 import { KeyWords } from '../../../chord/keywords';
 import { SubParser } from "../subparser";
 import { DisChordError, ErrorLevel } from "../../../ChordError";
+import { ODBMode } from "../../../chord/types";
 
 /**
  * Handles the initial bot declaration.
@@ -46,7 +47,7 @@ export default class ClientParser extends SubParser {
             this.peek().location
         ).format();
         
-        const configBody = this.parseODB('definition-only');
+        const configBody = this.parseODB(ODBMode.Simple);
     
         return this.createNode<StartBotNode>({
             type: 'EncenderBot',
