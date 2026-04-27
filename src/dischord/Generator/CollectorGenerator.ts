@@ -1,5 +1,5 @@
 import { DisChordError, ErrorLevel } from "../../ChordError";
-import { CollectorNode, CollectorPulseBody, DisChordASTNode } from "../types";
+import { CollectorNode, DisChordASTNode } from "../types";
 import { DisChordGenerator } from "./generator";
 import { SubGenerator } from "./subgenerator";
 

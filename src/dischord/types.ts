@@ -56,12 +56,6 @@ export interface CollectorNode extends BaseNode<DisChordNodeType> {
     methods: DisChordODBNode;
 }
 
-export interface CollectorPulseBody {
-    method: 'run';
-    id: DisChordASTNode;
-    body: DisChordASTNode[];
-}
-
 export type CreationNode = CommandNode | MessageNode | CollectorNode;
 export type DisChordNode =
       StartBotNode
