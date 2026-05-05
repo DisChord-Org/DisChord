@@ -78,8 +78,9 @@ export class Generator<T extends string = string, N = never> {
             case 'Importar':
                 let path = node.path.replace(/\.chord$/, '');
 
-               if (path.startsWith('lib:')) {
-                    path = `../lib/${path.split(':')[1]}.mjs`; 
+                if (path.startsWith('lib:')) {
+                    const libName = path.split(':')[1];
+                    path = `../lib/${libName}/src/${libName}.mjs`;
                 }
 
                 if (!path.startsWith('./') && !path.startsWith('../') && !path.startsWith('/')) {
@@ -95,7 +96,10 @@ export class Generator<T extends string = string, N = never> {
                     return `import { ${ids} } from "${path}"`;
                 }
                 
-                return `import * as ${node.identificators[0]} from "${path}"`;
+                return `
+                    import * as _${node.identificators[0]} from "${path}";
+                    const ${node.identificators[0]} = _${node.identificators[0]}.default || _${node.identificators[0]};
+                `;
             case 'JS':
                 return `${node.value}`;
             default:

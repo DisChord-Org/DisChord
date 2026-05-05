@@ -6,7 +6,8 @@
             "hola": "mundo",
             "uno": 1
         }
-    - NO se necesitan puntos y comas al final, pero es posible agregarlos
+    - NO se necesitan puntos y comas al final
+    - Si agregas puntos y comas al final de cada sentencia, convertirás el BDO a inteligente
 */
 var miBDO es {
     texto "hola mundo"
@@ -36,6 +37,9 @@ consola.imprimir(miBDO)
 
         CUIDADO:
         Como este BDO será de definición de código, hay que usar PUNTO Y COMA.
+
+        NOTA:
+        Desde la v0.8^, los BDO con puntos y comas se convierten a BDOI automáticamente.
 */
 @BDOI
 var chainsawman es {
