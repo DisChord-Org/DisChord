@@ -24,20 +24,24 @@ export class Parser<T = never, N = never> {
         });
     }
 
-    parse(): ASTNode<T, N>[] {
-        while (this.current < this.tokens.length) {
+    public parse(): ASTNode<T, N>[] {
+        while (this.cursor < this.tokens.length) {
             this.nodes.push(this.parseStatement());
         }
         return this.nodes;
     }
 
-    peek(type: number | 'this' | 'next' | 'prev' = 'this'): Token {
+    public get cursor (): number {
+        return this.current;
+    }
+
+    public peek(type: number | 'this' | 'next' | 'prev' = 'this'): Token {
         if (typeof type == 'number') return this.tokens[type];
 
-        let targetIndex = this.current;
+        let targetIndex = this.cursor;
 
-        if (type === 'next') targetIndex = this.current + 1;
-        if (type === 'prev') targetIndex = this.current - 1;
+        if (type === 'next') targetIndex = this.cursor + 1;
+        if (type === 'prev') targetIndex = this.cursor - 1;
 
         if (targetIndex < 0) {
             return {
@@ -92,7 +96,7 @@ export class Parser<T = never, N = never> {
         } as NodeType;
     }
 
-    protected parseCustomStatement(): ASTNode<T, N> | null {
+    public parseCustomStatement(): ASTNode<T, N> | null {
         return null;
     }
 
@@ -234,7 +238,7 @@ export class Parser<T = never, N = never> {
         }
 
         if (classContext && token.type === 'IDENTIFICADOR' && token.value === classContext) {
-            if (this.current + 1 < this.tokens.length && this.tokens[this.current + 1].type === 'L_EXPRESSION') {
+            if (this.cursor + 1 < this.tokens.length && this.tokens[this.cursor + 1].type === 'L_EXPRESSION') {
                 return this.parseFunctionDeclaration(true);
             }
         }
@@ -248,7 +252,7 @@ export class Parser<T = never, N = never> {
         const id = this.consume('IDENTIFICADOR', 'Se debe especificar el nombre de la clase').value;
         
         let superClass = undefined;
-        if (this.current < this.tokens.length && this.peek().type === 'EXTIENDE') {
+        if (this.cursor < this.tokens.length && this.peek().type === 'EXTIENDE') {
             this.consume('EXTIENDE');
             superClass = this.consume('IDENTIFICADOR', `Se debe especificar el nombre de la clase padre`).value;
         }
@@ -359,7 +363,7 @@ export class Parser<T = never, N = never> {
             'MAYOR', 'MENOR', 'MAYOR_IGUAL', 'MENOR_IGUAL', 'IGUAL', 'IGUAL_TIPADO', 'NO_IGUAL', 'NO_IGUAL_TIPADO', 'DIFERENTE', 'Y', 'O'
         ];
 
-        while (this.current < this.tokens.length && binaryExpressions.includes(this.peek().type)) {
+        while (this.cursor < this.tokens.length && binaryExpressions.includes(this.peek().type)) {
             const operator = this.consume(this.peek().type, `Se esperaba un operador binario`);
             const right = this.parsePrimary();
             
@@ -371,7 +375,7 @@ export class Parser<T = never, N = never> {
             });
         }
 
-        if (this.current < this.tokens.length && this.peek().type === 'ES') {
+        if (this.cursor < this.tokens.length && this.peek().type === 'ES') {
             this.consume('ES');
             const value = this.parseExpression();
             
@@ -511,7 +515,7 @@ export class Parser<T = never, N = never> {
         
         throw new ChordError(
             ErrorLevel.Parser,
-            `Token inesperado en expresión: ${token.type} en la posición ${this.current}`,
+            `Token inesperado en expresión: ${token.type} en la posición ${this.cursor}`,
             token.location
         ).format();
     }
@@ -519,7 +523,7 @@ export class Parser<T = never, N = never> {
     private parseIdentifierOrCall(startNode?: ASTNode<T, N>): ASTNode<T, N> {
         let node = startNode || this.createNode<IdentificatorNode<T>>({ type: 'Identificador', value: this.consume('IDENTIFICADOR').value });
 
-        while (this.current < this.tokens.length) {
+        while (this.cursor < this.tokens.length) {
             const next = this.peek();
 
             if (next.type === '.') {
@@ -544,13 +548,13 @@ export class Parser<T = never, N = never> {
             } else break;
         }
 
-        if (this.current < this.tokens.length && this.peek().type === 'L_EXPRESSION') {
+        if (this.cursor < this.tokens.length && this.peek().type === 'L_EXPRESSION') {
             this.consume('L_EXPRESSION');
             
             const args: ASTNode<T, N>[] = [];
             while (this.peek().type !== 'R_EXPRESSION') {
                 args.push(this.parseExpression());
-                if (this.current < this.tokens.length && this.peek().type === ',') {
+                if (this.cursor < this.tokens.length && this.peek().type === ',') {
                     this.consume(',');
                 }
             }
@@ -600,7 +604,7 @@ export class Parser<T = never, N = never> {
             raw: 'indefinido'
         });
 
-        if (this.current < this.tokens.length && this.peek().type === 'ES') {
+        if (this.cursor < this.tokens.length && this.peek().type === 'ES') {
             this.consume('ES');
             value = this.parseExpression() as LiteralNode<T>;
         }
@@ -636,7 +640,7 @@ export class Parser<T = never, N = never> {
 
         let alternate: ConditionNode<T, N>['alternate'] = undefined;
 
-        if (this.current < this.tokens.length && (this.peek().type === 'SINO' || this.peek().type === 'ADEMAS')) {
+        if (this.cursor < this.tokens.length && (this.peek().type === 'SINO' || this.peek().type === 'ADEMAS')) {
             const next = this.consume(this.peek().type);
 
             if (next.type === 'ADEMAS') {
@@ -690,102 +694,5 @@ export class Parser<T = never, N = never> {
             iterable,
             body
         });
-    }
-
-    /**
-     * Parses an ODB.
-     * Distinguishes between property blocks (key-value pairs) and execution statements.
-     * @returns {ODBNode} A node containing organized blocks and an executable body.
-     */
-    parseODB(mode: ODBMode = ODBMode.Simple): ODBNode<T, N> {
-        this.consume('L_BRACE');
-    
-        const blocks: Record<string, ASTNode<T, N>> = {};
-        const body: ASTNode<T, N>[] = [];
-        let definitionMode: boolean = true;
-
-        while (this.peek().type !== 'R_BRACE') {
-            if (definitionMode && this.checkPropertyPattern(mode)) {
-                const key = this.consume('IDENTIFICADOR', 'Se esperaba un nombre de la propiedad').value;
-                const value = this.parseExpression();
-
-                if (this.peek().type === 'SEPARADOR') {
-                    if (mode === ODBMode.Simple) mode = ODBMode.Intelligent;
-                    this.consume('SEPARADOR', 'En un BDOI, las definiciones deben terminar con ";"');
-                } else if (mode === ODBMode.Intelligent) {
-                    throw new ChordError(
-                        ErrorLevel.Parser,
-                        `En un BDO inteligente, la propiedad '${key}' debe terminar en ';'`,
-                        this.peek().location
-                    ).format();
-                }
-
-                blocks[key] = value;
-            } else {
-                if (mode === ODBMode.Simple) {
-                    if (Object.keys(blocks).length > 0) {
-                        throw new ChordError(
-                            ErrorLevel.Parser,
-                            `Conflicto de estilo: Si el BDO contiene código ejecutable, todas las propiedades superiores deben terminar en ";"`,
-                            this.peek().location
-                        ).format();
-                    }
-                    mode = ODBMode.Intelligent;
-                }
-                definitionMode = false;
-
-                const statement = this.parseStatement();
-                if (statement) body.push(statement);
-            }
-        }
-    
-        this.consume('R_BRACE');
-    
-        return this.createNode<ODBNode<T, N>>({
-            type: 'BDO',
-            mode,
-            blocks,
-            body
-        });
-    }
-
-    /**
-     * Checks if the current pattern looks like a property assignment: IDENTIFIER EXPRESSION ';'
-     */
-    private checkPropertyPattern(mode: ODBMode): boolean {
-        const current = this.peek();
-        const next = this.peek('next');
-
-        if (current.type !== 'IDENTIFICADOR') return false;
-        if (KeyWords.getStatements().includes(current.value)) return false;
-        if (KeyWords.getStatements().includes(next.value)) return false;
-        if (next.type === '.') return false;
-        if (mode === ODBMode.Simple && this.lookAheadForToken('SEPARADOR')) return true;
-        if (mode === ODBMode.Intelligent) return this.lookAheadForToken('SEPARADOR');
-
-        return true;
-    }
-
-    /**
-     * Helper to look ahead in the current scope for a specific token type
-     */
-    private lookAheadForToken(type: string): boolean {
-        let i = this.current;
-        let nestingLevel = 0;
-
-        while (true) {
-            const token = this.peek(i);
-
-            if (token.type === 'L_BRACE') nestingLevel++;
-            if (token.type === 'R_BRACE') {
-                if (nestingLevel === 0) return false;
-                nestingLevel--;
-            }
-
-            if (nestingLevel === 0 && token.type === type) return true;
-
-            if (token.type === 'EOF') return false;
-            i++;
-        }
     }
 }
