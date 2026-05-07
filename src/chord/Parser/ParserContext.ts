@@ -33,13 +33,13 @@ export class ParserContext {
      * @private
      * @type {Parser<any, any>}
      */
-    private owner: Parser<any, any>;
+    private owner!: Parser<any, any>;
 
-    /**
-     * @param {Parser<any, any>} owner - The Parser instance to be injected as parent.
-     */
-    constructor(owner: Parser<any, any>) {
+    constructor() {}
+
+    protected setOwner (owner: Parser<any, any>): this {
         this.owner = owner;
+        return this;
     }
 
     /**
@@ -62,14 +62,14 @@ export class ParserContext {
      * @throws {Error} If the requested class has not been registered.
      */
     public get<T extends SubParser<any, any>>(cls: SubParserClass<T>, parent?: Parser<any, any>): T {
-        if (!this.registry.has(cls)) {
-            throw new Error(`[ParserContext] Security Error: The class ${cls.name} has not been registered.`);
-        }
+        if (!this.registry.has(cls)) throw new Error(`[ParserContext] Error de seguridad: La clase ${cls.name} aún no se ha registrado.`);
 
         let instance = this.instances.get(cls);
 
         if (!instance) {
             const targetParent = parent ?? this.owner;
+            if (!targetParent) throw new Error("[ParserContext] Intento de instanciación sin Parent.");
+
             instance = new cls(targetParent);
             this.instances.set(cls, instance);
         }
