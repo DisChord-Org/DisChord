@@ -24,6 +24,7 @@ export class Parser<T = never, N = never> extends ParserContext {
         super();
 
         this.setOwner(this as any);
+        this.registerInstances();
     }
 
     private registerInstances () {
