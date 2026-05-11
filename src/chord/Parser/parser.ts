@@ -37,7 +37,7 @@ export class Parser<T = never, N = never> extends ParserContext {
 
     public parse(): ASTNode<T, N>[] {
         while (this.cursor < this.tokens.length) {
-            this.nodes.push(this.parseStatement());
+            this.nodes.push(this.get(ExpressionParser as any).parse());
         }
         return this.nodes;
     }

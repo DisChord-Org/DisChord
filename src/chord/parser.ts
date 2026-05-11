@@ -358,10 +358,7 @@ export class Parser<T = never, N = never> {
     private parseExpression(): ASTNode<T, N> {
         let left = this.parsePrimary();
 
-        const binaryExpressions = [
-            'MAS', 'MENOS', 'POR', 'ENTRE', 'RESTO', 'EXP', 'INTRO', 'ESPACIO',
-            'MAYOR', 'MENOR', 'MAYOR_IGUAL', 'MENOR_IGUAL', 'IGUAL', 'IGUAL_TIPADO', 'NO_IGUAL', 'NO_IGUAL_TIPADO', 'DIFERENTE', 'Y', 'O'
-        ];
+        const binaryExpressions = [];
 
         while (this.cursor < this.tokens.length && binaryExpressions.includes(this.peek().type)) {
             const operator = this.consume(this.peek().type, `Se esperaba un operador binario`);
