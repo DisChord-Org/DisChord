@@ -1,5 +1,5 @@
 import { ASTNode, Token } from "../../chord/types";
-import { Parser } from "../parser";
+import { Parser } from "./parser";
 
 /**
  * Abstract base for the Delegation Pattern in the DisChord/Chord Parser.

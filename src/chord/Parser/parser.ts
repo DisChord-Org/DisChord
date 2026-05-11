@@ -1,6 +1,6 @@
 import { ChordError, ErrorLevel } from "../../ChordError";
 import { SUGGESTIONS } from "../core.lib";
-import { ASTNode, Token, Symbol, SOF, EOF } from "./../types";
+import { ASTNode, Token, SOF, EOF } from "./../types";
 
 import { BDOParser } from "./Grammar/BDOParser";
 import { AditiveParser } from "./Grammar/Expressions/AditiveParser";
@@ -13,8 +13,7 @@ import { UnaryParser } from "./Grammar/Expressions/UnaryParser";
 
 import { ParserContext } from "./ParserContext";
 
-export class Parser<T = never, N = never> extends ParserContext {
-    public symbols: Map<string, Symbol> = new Map();
+export class Parser<T = never, N = never> extends ParserContext<T, N> {
     public nodes: ASTNode<T, N>[] = [];
 
     constructor(
@@ -23,7 +22,7 @@ export class Parser<T = never, N = never> extends ParserContext {
     ) {
         super();
 
-        this.setOwner(this as any);
+        this.setOwner(this as unknown as Parser<T, N>);
         this.registerInstances();
     }
 
@@ -32,12 +31,12 @@ export class Parser<T = never, N = never> extends ParserContext {
             AditiveParser, ArithmeticParser, AssignmentParser,
             ComparisionParser, ExpressionParser, LogicalParser,
             UnaryParser, BDOParser
-        ].forEach(instance => this.register(instance as any));
+        ].forEach(instance => this.register(instance));
     }
 
     public parse(): ASTNode<T, N>[] {
         while (this.cursor < this.tokens.length) {
-            this.nodes.push(this.get(ExpressionParser as any).parse());
+            this.nodes.push(this.get(ExpressionParser).parse());
         }
         return this.nodes;
     }

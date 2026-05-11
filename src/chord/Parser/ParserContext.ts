@@ -1,11 +1,12 @@
-import { Parser } from "../parser";
+import { Parser } from "./parser";
 import { SubParser } from "./subparser";
 
 /**
  * Represents the constructor signature of any SubParser subclass.
  * * @template T - The specific SubParser type being instantiated.
+ * * @template TP  The type of Parser.
  */
-export type SubParserClass<T extends SubParser<any, any>> = new (parent: Parser<any, any>) => T;
+export type SubParserClass<S extends SubParser<any, any>, TP extends Parser<any, any> = Parser<any, any>> = new (parent: TP) => S;
 
 /**
  * @class ParserContext
@@ -13,41 +14,37 @@ export type SubParserClass<T extends SubParser<any, any>> = new (parent: Parser<
  * When extended by a Parser, it manages grammar rule lifecycles and 
  * automatically injects the parent parser reference into new instances.
  */
-export class ParserContext {
+export class ParserContext<T = any, N = any> {
     /**
      * Set of authorized SubParser constructor references.
      * @private
-     * @type {Set<SubParserClass<any>>}
      */
-    private registry: Set<SubParserClass<any>> = new Set();
+    private registry: Set<SubParserClass<SubParser<T, N>, any>> = new Set();
 
     /**
      * Cache map storing already instantiated SubParsers.
      * @private
-     * @type {Map<SubParserClass<any>, SubParser<any, any>>}
      */
-    private instances: Map<SubParserClass<any>, SubParser<any, any>> = new Map();
+    private instances: Map<SubParserClass<SubParser<T, N>, any>, SubParser<T, N>> = new Map();
 
     /**
      * Reference to the parser that owns this context.
      * @private
-     * @type {Parser<any, any>}
      */
-    private owner!: Parser<any, any>;
+    private owner!: Parser<T, N>;
 
     constructor() {}
 
-    protected setOwner (owner: Parser<any, any>): this {
+    protected setOwner (owner: Parser<T, N>): this {
         this.owner = owner;
         return this;
     }
 
     /**
      * Registers a SubParser class definition.
-     * @template T - The type of SubParser.
-     * @param {SubParserClass<T>} cls - The constructor reference.
+     * @param cls - The constructor reference.
      */
-    public register<T extends SubParser<any, any>>(cls: SubParserClass<T>): void {
+    public register<S extends SubParser<T, N>>(cls: SubParserClass<S, any>): void {
         if (!this.registry.has(cls)) {
             this.registry.add(cls);
         }
@@ -56,12 +53,12 @@ export class ParserContext {
     /**
      * Resolves and retrieves the singleton instance of the requested SubParser.
      * @template T - The type of SubParser expected.
-     * @param {SubParserClass<T>} cls - The constructor reference.
-     * @param {Parser<any, any>} [parent] - Optional explicit parent override. Defaults to context owner.
+     * @param cls - The constructor reference.
+     * @param [parent] - Optional explicit parent override. Defaults to context owner.
      * @returns {T} The resolved instance.
      * @throws {Error} If the requested class has not been registered.
      */
-    public get<T extends SubParser<any, any>>(cls: SubParserClass<T>, parent?: Parser<any, any>): T {
+    public get<S extends SubParser<T, N>>(cls: SubParserClass<S, any>, parent?: Parser<T, N>): S {
         if (!this.registry.has(cls)) throw new Error(`[ParserContext] Error de seguridad: La clase ${cls.name} aún no se ha registrado.`);
 
         let instance = this.instances.get(cls);
@@ -74,7 +71,7 @@ export class ParserContext {
             this.instances.set(cls, instance);
         }
 
-        return instance as T;
+        return instance as S;
     }
 
     /**

@@ -1,10 +1,9 @@
 import { ChordError, ErrorLevel } from "../ChordError";
 import { SUGGESTIONS } from "./core.lib";
 import { DecoratorProcessor } from "./DecoratorProcessor";
-import { KeyWords } from "./keywords";
 import { ASTNode, ClassNode, ConditionNode, LoopNode, FunctionNode, PropertyNode, Token, VariableNode, Symbol, SymbolKind, IdentificatorNode, NewNode, ThisNode, SuperNode, ReturnNode, ExportNode, ImportNode, ExitLoopNode, PassLoopNode, AssignmentNode, BinaryExpressionNode, JSNode, LiteralNode, NoUnaryNode, UnaryNode, ListNode, ExpressionNode, AccessNode, AccessNodeByIndex, CallNode, SOF, EOF, ODBNode, ODBMode } from "./types";
 
-export class Parser<T = never, N = never> {
+class Parser<T = never, N = never> {
     public symbols: Map<string, Symbol> = new Map();
     public nodes: ASTNode<T, N>[] = [];
 
