@@ -1,6 +1,7 @@
-import { Parser } from "../../../parser";
+import { Parser } from "../../parser";
 import { ASTNode, BinaryExpressionNode } from "../../../types";
 import { SubParser } from "../../subparser";
+import { ComparisionParser } from "./ComparisionParser";
 
 export class LogicalParser<T, N> extends SubParser<T, N> {
     /** To identify when this parser should be used */
@@ -9,7 +10,7 @@ export class LogicalParser<T, N> extends SubParser<T, N> {
     /**
      * @param parent - Reference to the main Parser orchestrator.
      */
-    constructor (protected parent: Parser) {
+    constructor (protected parent: Parser<T, N>) {
         super(parent);
     }
 
@@ -18,14 +19,12 @@ export class LogicalParser<T, N> extends SubParser<T, N> {
      * Consumes Y / O statements.
      */
     public parse(): ASTNode<T, N> {
-        // bajando el nivel de prioridad (por hacer)
-        let left = this.parent.comparisonParser.parse();
+        let left = this.parent.get(ComparisionParser).parse();
 
         while ([ 'Y', 'O' ].includes(this.peek().type)) {
             const operator = this.consume(this.peek().type);
             
-            // sucede lo mismo que arriba aquí
-            const right = this.parent.comparisonParser.parse();
+            const right = this.parent.get(ComparisionParser).parse();
             
             left = this.createNode<BinaryExpressionNode<T, N>>({
                 type: 'ExpresionBinaria',

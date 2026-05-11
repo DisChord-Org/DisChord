@@ -1,4 +1,4 @@
-import { Parser } from "../../../parser";
+import { Parser } from "../../parser";
 import { ASTNode, BinaryExpressionNode, NoUnaryNode, UnaryNode } from "../../../types";
 import { SubParser } from "../../subparser";
 
@@ -9,7 +9,7 @@ export class UnaryParser<T, N> extends SubParser<T, N> {
     /**
      * @param parent - Reference to the main Parser orchestrator.
      */
-    constructor (protected parent: Parser) {
+    constructor (protected parent: Parser<T, N>) {
         super(parent);
     }
 

@@ -1,6 +1,7 @@
-import { Parser } from "../../../parser";
+import { Parser } from "../../parser";
 import { ASTNode, BinaryExpressionNode } from "../../../types";
 import { SubParser } from "../../subparser";
+import { AditiveParser } from "./AditiveParser";
 
 export class ComparisionParser<T, N> extends SubParser<T, N> {
     /** To identify when this parser should be used */
@@ -9,7 +10,7 @@ export class ComparisionParser<T, N> extends SubParser<T, N> {
     /**
      * @param parent - Reference to the main Parser orchestrator.
      */
-    constructor (protected parent: Parser) {
+    constructor (protected parent: Parser<T, N>) {
         super(parent);
     }
 
@@ -18,7 +19,7 @@ export class ComparisionParser<T, N> extends SubParser<T, N> {
      * Consumes the comparision operators.
      */
     public parse(): ASTNode<T, N> {
-        let left = this.parent.additiveParser.parse();
+        let left = this.parent.get(AditiveParser).parse();
 
         const comparisonOperators = [
             'MAYOR', 'MENOR', 'MAYOR_IGUAL', 'MENOR_IGUAL', 
@@ -28,7 +29,7 @@ export class ComparisionParser<T, N> extends SubParser<T, N> {
         while (comparisonOperators.includes(this.peek().type)) {
             const operator = this.consume(this.peek().type);
             
-            const right = this.parent.additiveParser.parse();
+            const right = this.parent.get(AditiveParser).parse();
             
             left = this.createNode<BinaryExpressionNode<T, N>>({
                 type: 'ExpresionBinaria',
