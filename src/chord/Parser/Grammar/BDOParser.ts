@@ -1,8 +1,9 @@
 import { ChordError, ErrorLevel } from "../../../ChordError";
 import { KeyWords } from "../../keywords";
-import { Parser } from "../../parser";
 import { ASTNode, ODBMode, ODBNode } from "../../types";
+import { Parser } from "../parser";
 import { SubParser } from "../subparser";
+import { ExpressionParser } from "./Expressions/ExpressionParser";
 
 /**
  * Specialized SubParser for Object Data Blocks (BDO).
@@ -20,7 +21,7 @@ export class BDOParser<T, N> extends SubParser<T, N> {
     /**
      * @param parent - Reference to the main Parser orchestrator.
      */
-    constructor (protected parent: Parser) {
+    constructor (protected parent: Parser<T, N>) {
         super(parent);
     }
 
@@ -62,7 +63,7 @@ export class BDOParser<T, N> extends SubParser<T, N> {
         while (this.peek().type !== 'R_BRACE') {
             if (definitionMode && this.checkPropertyPattern(mode)) {
                 const key = this.consume('IDENTIFICADOR', 'Se esperaba un nombre de la propiedad').value;
-                const value = this.parseExpression();
+                const value = this.parent.get(ExpressionParser).parse();
 
                 if (this.peek().type === 'SEPARADOR') {
                     if (mode === ODBMode.Simple) mode = ODBMode.Intelligent;

@@ -6,6 +6,7 @@ import { DecoratorProcessor } from "../../../DecoratorProcessor";
 import { ChordError, ErrorLevel } from "../../../../ChordError";
 import { BDOParser } from "../BDOParser";
 import { LiteralParser } from "../Expressions/LiteralParser";
+import { AccessParser } from "../Expressions/AccessParser";
 
 export class PrimaryParser<T, N> extends SubParser<T, N> {
     /** To identify when this parser should be used */
@@ -16,7 +17,7 @@ export class PrimaryParser<T, N> extends SubParser<T, N> {
 
         if (token.type === 'NUEVO') {
             this.consume('NUEVO');
-            const call = this.parent.parseIdentifierOrCall(); 
+            const call = this.parent.get(AccessParser).parse(); 
             return this.createNode<NewNode<T, N>>({
                 type: 'Nuevo',
                 object: call
@@ -68,7 +69,7 @@ export class PrimaryParser<T, N> extends SubParser<T, N> {
         }
 
         if ([ 'IDENTIFICADOR', 'ESTA', 'SUPER' ].includes(token.type)) {
-            return this.parent.parseIdentifierOrCall(); 
+            return this.parent.get(AccessParser).parse();
         }
 
         if ([ 'NUMERO', 'TEXTO', 'BOOL', 'INDEFINIDO' ].includes(token.type)) {
@@ -77,7 +78,7 @@ export class PrimaryParser<T, N> extends SubParser<T, N> {
 
         throw new ChordError(
             ErrorLevel.Parser,
-            `Token inesperado en expresión: ${token.type} en la posición ${this.cursor}`,
+            `Token inesperado en expresión: ${token.type} en la posición ${this.parent.cursor}`,
             token.location
         ).format();
     }

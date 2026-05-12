@@ -3,6 +3,7 @@ import { SUGGESTIONS } from "../core.lib";
 import { ASTNode, Token, SOF, EOF } from "./../types";
 
 import { BDOParser } from "./Grammar/BDOParser";
+import { AccessParser } from "./Grammar/Expressions/AccessParser";
 import { AditiveParser } from "./Grammar/Expressions/AditiveParser";
 import { ArithmeticParser } from "./Grammar/Expressions/ArithmeticParser";
 import { AssignmentParser } from "./Grammar/Expressions/AssignmentParser";
@@ -33,7 +34,8 @@ export class Parser<T = never, N = never> extends ParserContext<T, N> {
         const instances: SubParserClass[] = [
             AditiveParser, ArithmeticParser, AssignmentParser,
             ComparisionParser, ExpressionParser, LogicalParser,
-            UnaryParser, BDOParser, PrimaryParser, LiteralParser
+            UnaryParser, BDOParser, PrimaryParser, LiteralParser,
+            AccessParser
         ];
         
         instances.forEach(instance => this.register(instance));

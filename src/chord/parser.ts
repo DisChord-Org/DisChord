@@ -267,56 +267,6 @@ class Parser<T = never, N = never> {
         });
     }
 
-    private parseIdentifierOrCall(startNode?: ASTNode<T, N>): ASTNode<T, N> {
-        let node = startNode || this.createNode<IdentificatorNode<T>>({ type: 'Identificador', value: this.consume('IDENTIFICADOR').value });
-
-        while (this.cursor < this.tokens.length) {
-            const next = this.peek();
-
-            if (next.type === '.') {
-                this.consume('.');
-                const property = this.consume('IDENTIFICADOR', `Después de '.' se esperaba un identificador para acceder a la propiedad`);
-                
-                node = this.createNode<AccessNode<T, N>>({
-                    type: 'Acceso',
-                    object: node,
-                    property: property.value
-                });
-            } else if (next.type === 'L_SQUARE') {
-                this.consume('L_SQUARE');
-                const index = this.parseExpression();
-                this.consume('R_SQUARE');
-
-                node = this.createNode<AccessNodeByIndex<T, N>>({
-                    type: 'AccesoPorIndice',
-                    object: node,
-                    index: index
-                });
-            } else break;
-        }
-
-        if (this.cursor < this.tokens.length && this.peek().type === 'L_EXPRESSION') {
-            this.consume('L_EXPRESSION');
-            
-            const args: ASTNode<T, N>[] = [];
-            while (this.peek().type !== 'R_EXPRESSION') {
-                args.push(this.parseExpression());
-                if (this.cursor < this.tokens.length && this.peek().type === ',') {
-                    this.consume(',');
-                }
-            }
-            this.consume('R_EXPRESSION');
-
-            return this.createNode<CallNode<T, N>>({
-                type: 'Llamada',
-                object: node,
-                params: args
-            });
-        }
-
-        return node;
-    }
-
     private parseVariableDeclaration(): VariableNode<T, N> {
         this.consume('VAR');
         const id = this.consume('IDENTIFICADOR', `Se debe especificar un nombre para la variable`).value;
