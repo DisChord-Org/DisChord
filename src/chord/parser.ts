@@ -317,30 +317,6 @@ class Parser<T = never, N = never> {
         return node;
     }
 
-    private parseLiteral(): ASTNode<T, N> {
-        const token = this.consume(['NUMERO', 'TEXTO', 'BOOL', 'INDEFINIDO'], `Se esperaba un literal (número, texto, booleano o indefinido)`);
-
-        let value: boolean | number | string | undefined = token.value;
-
-        switch (token.type) {
-            case 'BOOL':
-                value = token.value === 'verdadero';
-                break;
-            case 'NUMERO':
-                value = Number(token.value);
-                break;
-            case 'INDEFINIDO':
-                value = undefined;
-                break;
-        }
-
-        return this.createNode<LiteralNode<T>>({
-            type: 'Literal',
-            value,
-            raw: token.value
-        });
-    }
-
     private parseVariableDeclaration(): VariableNode<T, N> {
         this.consume('VAR');
         const id = this.consume('IDENTIFICADOR', `Se debe especificar un nombre para la variable`).value;

@@ -5,6 +5,7 @@ import { AssignmentParser } from "../Expressions/AssignmentParser";
 import { DecoratorProcessor } from "../../../DecoratorProcessor";
 import { ChordError, ErrorLevel } from "../../../../ChordError";
 import { BDOParser } from "../BDOParser";
+import { LiteralParser } from "../Expressions/LiteralParser";
 
 export class PrimaryParser<T, N> extends SubParser<T, N> {
     
@@ -69,7 +70,7 @@ export class PrimaryParser<T, N> extends SubParser<T, N> {
         }
 
         if ([ 'NUMERO', 'TEXTO', 'BOOL', 'INDEFINIDO' ].includes(token.type)) {
-            return this.parent.parseLiteral();
+            return this.parent.get(LiteralParser).parse();
         }
 
         throw new ChordError(

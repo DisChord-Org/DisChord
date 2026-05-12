@@ -8,8 +8,10 @@ import { ArithmeticParser } from "./Grammar/Expressions/ArithmeticParser";
 import { AssignmentParser } from "./Grammar/Expressions/AssignmentParser";
 import { ComparisionParser } from "./Grammar/Expressions/ComparisionParser";
 import { ExpressionParser } from "./Grammar/Expressions/ExpressionParser";
+import { LiteralParser } from "./Grammar/Expressions/LiteralParser";
 import { LogicalParser } from "./Grammar/Expressions/LogicalParser";
 import { UnaryParser } from "./Grammar/Expressions/UnaryParser";
+import { PrimaryParser } from "./Grammar/PrimaryParser/PrimaryParser";
 
 import { ParserContext } from "./ParserContext";
 
@@ -30,7 +32,7 @@ export class Parser<T = never, N = never> extends ParserContext<T, N> {
         [
             AditiveParser, ArithmeticParser, AssignmentParser,
             ComparisionParser, ExpressionParser, LogicalParser,
-            UnaryParser, BDOParser
+            UnaryParser, BDOParser, PrimaryParser, LiteralParser
         ].forEach(instance => this.register(instance));
     }
 

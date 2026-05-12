@@ -1,6 +1,7 @@
 import { Parser } from "../../parser";
 import { ASTNode, BinaryExpressionNode, NoUnaryNode, UnaryNode } from "../../../types";
 import { SubParser } from "../../subparser";
+import { PrimaryParser } from "../PrimaryParser/PrimaryParser";
 
 export class UnaryParser<T, N> extends SubParser<T, N> {
     /** To identify when this parser should be used */
@@ -40,6 +41,6 @@ export class UnaryParser<T, N> extends SubParser<T, N> {
             });
         }
 
-        return this.parent.primaryParser.parse();
+        return this.parent.get(PrimaryParser).parse();
     }
 }
