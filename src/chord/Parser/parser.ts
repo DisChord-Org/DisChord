@@ -14,6 +14,7 @@ import { UnaryParser } from "./Grammar/Expressions/UnaryParser";
 import { PrimaryParser } from "./Grammar/PrimaryParser/PrimaryParser";
 
 import { ParserContext } from "./ParserContext";
+import { SubParserClass } from "./subparser";
 
 export class Parser<T = never, N = never> extends ParserContext<T, N> {
     public nodes: ASTNode<T, N>[] = [];
@@ -29,11 +30,13 @@ export class Parser<T = never, N = never> extends ParserContext<T, N> {
     }
 
     private registerInstances () {
-        [
+        const instances: SubParserClass[] = [
             AditiveParser, ArithmeticParser, AssignmentParser,
             ComparisionParser, ExpressionParser, LogicalParser,
             UnaryParser, BDOParser, PrimaryParser, LiteralParser
-        ].forEach(instance => this.register(instance));
+        ];
+        
+        instances.forEach(instance => this.register(instance));
     }
 
     public parse(): ASTNode<T, N>[] {

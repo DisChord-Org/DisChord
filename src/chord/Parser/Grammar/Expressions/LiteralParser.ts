@@ -2,7 +2,9 @@ import { SubParser } from "../../subparser";
 import { ASTNode, LiteralNode } from "../../../types";
 import { Parser } from "../../parser";
 
-export class LiteralParser<T = any, N = any> extends SubParser<T, N> {
+export class LiteralParser<T, N> extends SubParser<T, N> {
+    /** To identify when this parser should be used */
+    static triggerToken: string = '';
     
     constructor(parent: Parser<T, N>) {
         super(parent);

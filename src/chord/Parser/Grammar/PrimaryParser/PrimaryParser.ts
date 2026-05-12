@@ -8,6 +8,8 @@ import { BDOParser } from "../BDOParser";
 import { LiteralParser } from "../Expressions/LiteralParser";
 
 export class PrimaryParser<T, N> extends SubParser<T, N> {
+    /** To identify when this parser should be used */
+    static triggerToken: string = '';
     
     public parse(): ASTNode<T, N> {
         const token = this.peek();
