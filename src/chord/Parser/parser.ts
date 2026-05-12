@@ -109,4 +109,8 @@ export class Parser<T = never, N = never> extends ParserContext<T, N> {
     public parseCustomStatement(): ASTNode<T, N> | null {
         return null;
     }
+
+    private parseExpression(): ASTNode<T, N> {
+        return this.get(ExpressionParser).parse();
+    }
 }

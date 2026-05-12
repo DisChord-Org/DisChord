@@ -4,10 +4,10 @@ import { SubParser } from "../../subparser";
 import { AssignmentParser } from "./AssignmentParser";
 
 /**
- * # Parser levels
+ * ### Parser levels
  * 
- * 1. (manager) ExpressionParser
- * 2. (lower)   AssignmentParser
+ * 1.           ExpressionParser - (manager)
+ * 2.           AssignmentParser - (lower)
  * 3.           LogicalParser
  * 4.           ComparisionParser
  * 5.           AditiveParser
