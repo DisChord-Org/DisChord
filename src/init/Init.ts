@@ -12,6 +12,16 @@ import { CompilerConfig, FileSystem } from './FileSystem';
 import { CLI, LogFlagLevel } from './CLI';
 import { Runner } from './Runner';
 import { codeProvider } from '../CodeProvider';
+import { SymbolTable } from '../chord/SymbolsTable';
+
+/**
+ * @interface CompilationContext
+ * @description State shared between Parser and Generator.
+ */
+interface CompilationContext {
+    symbolTable: SymbolTable;
+    projectRoot: string;
+}
 
 /**
  * Main orchestrator for the DisChord compilation process.
@@ -78,11 +88,16 @@ export default class Init {
         const tokens = lexer.tokenize();
         CLI.logFlag(LogFlagLevel.LEXER, tokens);
 
-        const parser = new DisChordParser(tokens);
+        const context: CompilationContext = {
+            symbolTable: new SymbolTable(),
+            projectRoot: this.config.projectRoot
+        };
+
+        const parser = new DisChordParser(tokens, context);
         const ast = parser.parse();
         CLI.logFlag(LogFlagLevel.AST, ast);
     
-        const generator = new DisChordGenerator(parser.symbols, this.config.projectRoot);
+        const generator = new DisChordGenerator(context);
         const output = generator.generate(ast as ASTNode<DisChordNodeType>[]);
         CLI.logFlag(LogFlagLevel.OUTPUT, output);
 
