@@ -1,56 +1,35 @@
 export class KeyWords {
     private static statements: string[] = [
         "clase",
-        "extiende",
+        // "extiende",
         "prop",
-        "fijar",
-        "esta",
-        "super",
-        "nuevo",
+        //"fijar",
+        // "esta",
+        //"super",
+        // "nuevo",
         "devolver",
 
         "var",
-        "es",
+        //"es",
 
-        "@asincrono",
+        //"@asincrono",
         "funcion",
 
         "si",
-        "sino",
-        "ademas",
+        //"sino",
+        //"ademas",
 
         "para",
-        "en",
+        //"en",
         "pasar",
         "salir",
 
         "importar",
         "exportar",
-        "desde",
-        "js",
+        //"desde",
+        //"js",
         
-        "tipo",
-
-        "mas",
-        "menos",
-        "por",
-        "entre",
-        "resto",
-        "exp",
-        "intro",
-        "espacio",
-
-        "mayor",
-        "menor",
-        "mayor_igual",
-        "menor_igual",
-        "no",
-        "igual_tipado",
-        "igual",
-        "no_igual",
-        "diferente",
-        "y",
-        "o"
+        "tipo"
     ];
 
     public static addStatements (statements: string[]) {
