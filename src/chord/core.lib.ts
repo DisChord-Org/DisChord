@@ -1,3 +1,20 @@
+import { VariableParser } from "./Parser/Grammar/StatementParser/VariableParser";
+
+export const StatementMap: Record<string, any> = {
+    'CLASE': undefined,
+    'PROP': undefined,
+    'DEVOLVER': undefined,
+    'VAR': VariableParser,
+    'FUNCION': undefined,
+    'SI': undefined,
+    'PARA': undefined,
+    'PASAR': undefined,
+    'SALIR': undefined,
+    'IMPORTAR': undefined,
+    'EXPORTAR': undefined,
+    'TIPO': undefined
+} as const;
+
 export const runtimeInjections = `
     const originalLog = console.log;
 
