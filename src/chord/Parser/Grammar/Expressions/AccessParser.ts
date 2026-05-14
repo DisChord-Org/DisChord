@@ -1,10 +1,18 @@
 import { SubParser } from "../../subparser";
 import { ASTNode, AccessNode, AccessNodeByIndex, CallNode, IdentificatorNode } from "../../../types";
 import { AssignmentParser } from "./AssignmentParser";
+import { Parser } from "../../parser";
 
 export class AccessParser<T, N> extends SubParser<T, N> {
     /** To identify when this parser should be used */
     static triggerToken: string = '';
+
+    /**
+     * @param parent - Reference to the main Parser orchestrator.
+     */
+    constructor (protected parent: Parser<T, N>) {
+        super(parent);
+    }
     
     public parse(startNode?: ASTNode<T, N>): ASTNode<T, N> {
         let node = startNode || this.createNode<IdentificatorNode<T>>({

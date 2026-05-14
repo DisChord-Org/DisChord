@@ -3,6 +3,9 @@ import { ConditionNode, ASTNode } from "../../../types";
 import { ExpressionParser } from "../Expressions/ExpressionParser";
 
 export class ConditionParser<T, N> extends SubParser<T, N> {
+    /** To identify when this parser should be used */
+    static triggerToken: string = 'SI';
+
     public parse(): ConditionNode<T, N> {
         this.consume('SI');
 

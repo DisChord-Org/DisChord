@@ -199,6 +199,11 @@ export interface ThisNode<T = never> extends BaseNode<T> {
     value: 'this';
 }
 
+export interface BlockNode<T, N> extends BaseNode<T> {
+    type: 'Bloque';
+    body: ASTNode<T, N>[];
+}
+
 export interface EOF<T = never> extends BaseNode<T> {
     type: 'EOF';
     value: '';
@@ -251,4 +256,5 @@ export type ASTNode<T = never, N = never> =
     | ThisNode<T>
     | AccessNodeByIndex<T, N>
     | ODBNode<T, N>
+    | BlockNode<T, N>
     | N;

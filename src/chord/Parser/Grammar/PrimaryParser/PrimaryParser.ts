@@ -7,10 +7,18 @@ import { ChordError, ErrorLevel } from "../../../../ChordError";
 import { BDOParser } from "../BDOParser";
 import { LiteralParser } from "../Expressions/LiteralParser";
 import { AccessParser } from "../Expressions/AccessParser";
+import { Parser } from "../../parser";
 
 export class PrimaryParser<T, N> extends SubParser<T, N> {
     /** To identify when this parser should be used */
     static triggerToken: string = '';
+
+    /**
+     * @param parent - Reference to the main Parser orchestrator.
+     */
+    constructor (protected parent: Parser<T, N>) {
+        super(parent);
+    }
     
     public parse(): ASTNode<T, N> {
         const token = this.peek();

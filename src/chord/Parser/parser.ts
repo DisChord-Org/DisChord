@@ -128,11 +128,15 @@ export class Parser<T, N> extends ParserContext<T, N> {
         } as NodeType;
     }
 
-    public parseCustomStatement(): ASTNode<T, N> | null {
+    public parseCustomStatement (): ASTNode<T, N> | null {
         return null;
     }
 
-    public parseExpression(): ASTNode<T, N> {
+    public parseStatement (): ASTNode<T, N> {
+        return this.get(StatementParser).parse();
+    }
+
+    public parseExpression (): ASTNode<T, N> {
         return this.get(ExpressionParser).parse();
     }
 }
