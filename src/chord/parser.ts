@@ -243,33 +243,6 @@ class Parser<T = never, N = never> {
         });
     }
 
-    private parseVariableDeclaration(): VariableNode<T, N> {
-        this.consume('VAR');
-        const id = this.consume('IDENTIFICADOR', `Se debe especificar un nombre para la variable`).value;
-        
-        let value = this.createNode<LiteralNode<T>>({
-            type: 'Literal',
-            value: undefined,
-            raw: 'indefinido'
-        });
-
-        if (this.cursor < this.tokens.length && this.peek().type === 'ES') {
-            this.consume('ES');
-            value = this.parseExpression() as LiteralNode<T>;
-        }
-
-        this.registerSymbol(id, {
-            name: id,
-            kind: SymbolKind.Variable
-        });
-
-        return this.createNode<VariableNode<T, N>>({
-            type: 'Variable',
-            id,
-            value
-        });
-    }
-
     private parseIfStatement(): ConditionNode<T, N> {
         this.consume('SI');
         this.consume('L_EXPRESSION', `Después de 'si' se debe abrir una expresión con '(' para especificar la condición.`);

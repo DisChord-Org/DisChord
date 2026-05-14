@@ -90,7 +90,7 @@ export class BDOParser<T, N> extends SubParser<T, N> {
                 }
                 definitionMode = false;
 
-                const statement = this.parseStatement();
+                const statement = this.parent.get(ExpressionParser).parse();
                 if (statement) body.push(statement);
             }
         }
