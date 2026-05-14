@@ -66,6 +66,10 @@ export abstract class SubParser<T = never, N = never> {
     public isAtEnd (): boolean {
         return this.parent.isAtEnd();
     }
+
+    public match(types: string | string[]): boolean {
+        return this.parent.match(types);
+    }
 }
 
 /**

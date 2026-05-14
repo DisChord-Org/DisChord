@@ -1,6 +1,7 @@
 import { SubParser } from "../../subparser";
-import { ConditionNode, ASTNode } from "../../../types";
+import { ConditionNode, ASTNode, BlockNode } from "../../../types";
 import { ExpressionParser } from "../Expressions/ExpressionParser";
+import { BlockParser } from "../BlockParser";
 
 export class ConditionParser<T, N> extends SubParser<T, N> {
     /** To identify when this parser should be used */
@@ -14,33 +15,17 @@ export class ConditionParser<T, N> extends SubParser<T, N> {
         this.consume('R_EXPRESSION');
 
         this.consume('L_BRACE', `Después de la condición de un 'si' se debe abrir un bloque de código con '{'.`);
-        const consequent: ASTNode<T, N>[] = [];
-
-        while (this.peek().type !== 'R_BRACE') {
-            consequent.push(this.parent.get(ExpressionParser).parse());
-        }
-
+        const consequent: ASTNode<T, N>[] = (this.parent.get(BlockParser) as BlockParser<T, N>).parse().body;
         this.consume('R_BRACE');
 
         let alternate: ConditionNode<T, N>['alternate'] = undefined;
 
-        if (this.parent.cursor < this.parent.tokens.length && (this.peek().type === 'SINO' || this.peek().type === 'ADEMAS')) {
-            const next = this.consume(this.peek().type);
-
-            if (next.type === 'ADEMAS') {
-                alternate = this.parse();
-            } else {
-                this.consume('L_BRACE', `Después de 'sino' se debe abrir un bloque de código con '{'.`);
-
-                const elseBody: ASTNode<T, N>[] = [];
-
-                while (this.peek().type !== 'R_BRACE') {
-                    elseBody.push(this.parse());
-                }
-
-                this.consume('R_BRACE');
-                alternate = elseBody;
-            }
+        if (this.match('ADEMAS')) {
+            alternate = this.parse();
+        } else if (this.match('SINO')) {
+            this.consume('L_BRACE', "Después de 'sino' se debe abrir un bloque con '{'.");
+            alternate = (this.parent.get(BlockParser) as BlockParser<T, N>).parse().body;
+            this.consume('R_BRACE');
         }
 
         return this.createNode<ConditionNode<T, N>>({

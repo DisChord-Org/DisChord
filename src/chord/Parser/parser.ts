@@ -21,6 +21,7 @@ import { SubParserClass } from "./subparser";
 import { CompilationContext } from "../../init/Init";
 import { SymbolTable } from "../SymbolsTable";
 import { ConditionParser } from "./Grammar/StatementParser/ConditionParser";
+import { BlockParser } from "./Grammar/BlockParser";
 
 export class Parser<T, N> extends ParserContext<T, N> {
     public nodes: ASTNode<T, N>[] = [];
@@ -42,7 +43,7 @@ export class Parser<T, N> extends ParserContext<T, N> {
             ComparisionParser, ExpressionParser, LogicalParser,
             UnaryParser, BDOParser, PrimaryParser, LiteralParser,
             AccessParser, StatementParser, VariableParser,
-            ConditionParser
+            BlockParser, ConditionParser
         ];
         
         instances.forEach(instance => this.register(instance));
@@ -97,6 +98,25 @@ export class Parser<T, N> extends ParserContext<T, N> {
         return this.peek().type === 'EOF' || this.current >= this.tokens.length;
     }
 
+    /**
+     * @method match
+     * @description Checks if the current token matches any of the provided types.
+     * If it matches, it consumes the token and returns true.
+     * @param {string | string[]} types - The token type(s) to check against.
+     * @returns {boolean} True if the token was matched and consumed.
+     */
+    public match(types: string | string[]): boolean {
+        const expected = Array.isArray(types) ? types : [types];
+        const currentToken = this.peek();
+
+        if (expected.includes(currentToken.type)) {
+            this.current++;
+            return true;
+        }
+
+        return false;
+    }
+
     consume(expectedTypes: string | string[], message?: string): Token {
         const token = this.peek();
         const expected = Array.isArray(expectedTypes) ? expectedTypes : [expectedTypes];
@@ -104,7 +124,7 @@ export class Parser<T, N> extends ParserContext<T, N> {
         if (expected.includes(token.type)) return this.tokens[this.current++];
 
         let customMessage = message;
-    
+        
         if (!customMessage) {
             const hint = SUGGESTIONS[expected[0]];
             customMessage = hint
