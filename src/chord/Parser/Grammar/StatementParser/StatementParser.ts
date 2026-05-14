@@ -6,6 +6,12 @@ import { SubParser, SubParserClass } from "../../subparser";
 import { ExpressionParser } from "../Expressions/ExpressionParser";
 
 export class StatementParser<T, N> extends SubParser<T, N> {
+    /** To identify when this parser should be used */
+    static triggerToken: string = '';
+
+    /**
+     * @param parent - Reference to the main Parser orchestrator.
+     */
     constructor (protected parent: Parser<T, N>) {
         super(parent);
     }
