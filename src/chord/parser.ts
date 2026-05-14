@@ -10,10 +10,6 @@ class Parser<T = never, N = never> {
 
 
     parseStatement(classContext?: string): ASTNode<T, N> {
-        if (token.type === 'PARA') {
-            return this.parseForStatement();
-        }
-
         if (token.type === 'CLASE') {
             return this.parseClassDeclaration();
         }
@@ -51,22 +47,6 @@ class Parser<T = never, N = never> {
         if (token.type === 'PASAR') {
             this.consume('PASAR');
             return this.createNode<PassLoopNode<T>>({ type: 'Pasar' });
-        }
-
-        if (token.type === 'DEVOLVER') {
-            this.consume('DEVOLVER',);
-            
-            const next = this.peek();
-            let value = undefined;
-            
-            if (next.type !== 'R_BRACE' && next.type !== 'SINO' && next.type !== 'ADEMAS') {
-                value = this.parseExpression();
-            }
-
-            return this.createNode<ReturnNode<T, N>>({
-                type: 'Devolver',
-                object: value
-            });
         }
 
         if (token.type === 'EXPORTAR') {
@@ -223,35 +203,6 @@ class Parser<T = never, N = never> {
             type: 'Propiedad',
             id,
             value
-        });
-    }
-
-    private parseForStatement(): LoopNode<T, N> {
-        this.consume('PARA');
-        this.consume('L_EXPRESSION');
-        
-        const variable = this.consume('IDENTIFICADOR', `Se debe especificar un nombre para la variable del bucle`).value;
-
-        this.consume('EN', `Después de la variable del bucle se debe usar 'en' para especificar el iterable.`);
-        
-        const iterable = this.parseExpression();
-        
-        this.consume('R_EXPRESSION');
-        this.consume('L_BRACE', `Después de la expresión de un 'para' se debe abrir un bloque de código con '{'.`);
-
-        const body: ASTNode<T, N>[] = [];
-
-        while (this.peek().type !== 'R_BRACE') {
-            body.push(this.parseStatement());
-        }
-
-        this.consume('R_BRACE');
-
-        return this.createNode<LoopNode<T, N>>({
-            type: 'Bucle',
-            var: variable,
-            iterable,
-            body
         });
     }
 }
