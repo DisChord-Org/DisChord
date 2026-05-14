@@ -20,6 +20,7 @@ import { ParserContext } from "./ParserContext";
 import { SubParserClass } from "./subparser";
 import { CompilationContext } from "../../init/Init";
 import { SymbolTable } from "../SymbolsTable";
+import { ConditionParser } from "./Grammar/StatementParser/ConditionParser";
 
 export class Parser<T, N> extends ParserContext<T, N> {
     public nodes: ASTNode<T, N>[] = [];
@@ -40,7 +41,8 @@ export class Parser<T, N> extends ParserContext<T, N> {
             AditiveParser, ArithmeticParser, AssignmentParser,
             ComparisionParser, ExpressionParser, LogicalParser,
             UnaryParser, BDOParser, PrimaryParser, LiteralParser,
-            AccessParser, StatementParser, VariableParser
+            AccessParser, StatementParser, VariableParser,
+            ConditionParser
         ];
         
         instances.forEach(instance => this.register(instance));

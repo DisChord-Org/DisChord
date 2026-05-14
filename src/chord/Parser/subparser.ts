@@ -1,4 +1,5 @@
 import { ASTNode, Token } from "../../chord/types";
+import { SymbolTable } from "../SymbolsTable";
 import { Parser } from "./parser";
 
 /**
@@ -52,6 +53,18 @@ export abstract class SubParser<T = never, N = never> {
      */
     protected createNode<NodeType extends ASTNode<T, N>> (node: Omit<NodeType, 'location'>): NodeType {
         return this.parent.createNode(node);
+    }
+
+    public get cursor (): number {
+        return this.parent.cursor;
+    }
+    
+    public get SymbolTable (): SymbolTable {
+        return this.parent.SymbolTable;
+    }
+
+    public isAtEnd (): boolean {
+        return this.parent.isAtEnd();
     }
 }
 
