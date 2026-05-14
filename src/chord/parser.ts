@@ -14,34 +14,10 @@ class Parser<T = never, N = never> {
 
     parseStatement(classContext?: string): ASTNode<T, N> {
         const token = this.peek();
-        const custom = this.parseCustomStatement();
+        const custom = this.parseCustomStatement(); // IMPORTANTE
 
         if (custom) return custom;
 
-        if (token.type === 'DECORADOR') {
-            const decorator = token.value;
-            this.consume('DECORADOR');
-
-            if (decorator === '@asincrono') {
-                /*this.consume('DECORADOR');
-            
-                if (this.peek().type === 'FIJAR') {
-                    this.consume('FIJAR');
-                    const func = this.parseFunctionDeclaration(false, true, true);
-                    func.metadata.isStatic = true;
-                    return func;
-                }
-
-                const func = this.parseFunctionDeclaration(false, !!classContext, true);
-                return func;*/
-            }
-
-            if (decorator === '@BDOI') {
-                DecoratorProcessor.addDecorator('BDOI', true);
-            }
-
-            return this.parseStatement(classContext);
-        }
 
         if (token.type === 'SI') {
             return this.parseIfStatement();

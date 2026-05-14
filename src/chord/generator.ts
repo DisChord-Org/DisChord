@@ -1,13 +1,13 @@
 import { ChordError, ErrorLevel } from "../ChordError";
+import { CompilationContext } from "../init/Init";
 import { corelib, runtimeInjections } from "./core.lib";
 import { AccessNode, AccessNodeByIndex, AssignmentNode, ASTNode, BinaryExpressionNode, CallNode, ClassNode, ConditionNode, ExportNode, FunctionNode, ListNode, LiteralNode, LoopNode, NoUnaryNode, ODBMode, ODBNode, PropertyNode, Symbol, UnaryNode, VariableNode } from "./types";
 
 export class Generator<T extends string = string, N = never> {
-    private SymbolsTable: Map<string, Symbol>;
 
-    constructor (public symbols: Map<string, Symbol>) {
-        this.SymbolsTable = symbols;
-    }
+    constructor (
+        public context: CompilationContext
+    ) {}
 
     public generate(nodes: ASTNode<T>[]): string {
         const body = nodes.map(node => {
@@ -154,7 +154,7 @@ export class Generator<T extends string = string, N = never> {
         if (node.object.type === 'Acceso') {
             translation = this.generateAccess(node.object);
 
-            const symbol = this.SymbolsTable.get(node.object.property);
+            const symbol = this.context.symbolTable.lookup(node.object.property);
             if (symbol && symbol.metadata.isAsync) isAsyncCall = true;
         } else {
             if (!('value' in node.object)) throw new ChordError(
@@ -171,7 +171,7 @@ export class Generator<T extends string = string, N = never> {
             ).format();
             translation = name;
 
-            const symbol = this.SymbolsTable.get(name);
+            const symbol = this.context.symbolTable.lookup(name);
             if (symbol && symbol.metadata.isAsync) isAsyncCall = true;
         }
 

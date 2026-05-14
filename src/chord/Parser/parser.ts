@@ -13,16 +13,20 @@ import { LiteralParser } from "./Grammar/Expressions/LiteralParser";
 import { LogicalParser } from "./Grammar/Expressions/LogicalParser";
 import { UnaryParser } from "./Grammar/Expressions/UnaryParser";
 import { PrimaryParser } from "./Grammar/PrimaryParser/PrimaryParser";
+import { StatementParser } from "./Grammar/StatementParser/StatementParser";
+import { VariableParser } from "./Grammar/StatementParser/VariableParser";
 
 import { ParserContext } from "./ParserContext";
 import { SubParserClass } from "./subparser";
+import { CompilationContext } from "../../init/Init";
 
-export class Parser<T = never, N = never> extends ParserContext<T, N> {
+export class Parser<T, N> extends ParserContext<T, N> {
     public nodes: ASTNode<T, N>[] = [];
-
+    
     constructor(
         private tokens: Token[],
-        private current: number = 0
+        private current: number = 0,
+        public context: CompilationContext
     ) {
         super();
 
@@ -35,7 +39,7 @@ export class Parser<T = never, N = never> extends ParserContext<T, N> {
             AditiveParser, ArithmeticParser, AssignmentParser,
             ComparisionParser, ExpressionParser, LogicalParser,
             UnaryParser, BDOParser, PrimaryParser, LiteralParser,
-            AccessParser
+            AccessParser, StatementParser, VariableParser
         ];
         
         instances.forEach(instance => this.register(instance));

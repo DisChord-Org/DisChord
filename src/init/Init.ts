@@ -18,7 +18,7 @@ import { SymbolTable } from '../chord/SymbolsTable';
  * @interface CompilationContext
  * @description State shared between Parser and Generator.
  */
-interface CompilationContext {
+export interface CompilationContext {
     symbolTable: SymbolTable;
     projectRoot: string;
 }

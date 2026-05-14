@@ -10,15 +10,13 @@ import EventGenerator from "./Events/EventGenerator";
 import CommandGenerator from "./Commands/CommandGenerator";
 import MessageGenerator from "./Messages/MessageGenerator";
 import CollectorGenerator from "./CollectorGenerator";
+import { CompilationContext } from "../../init/Init";
 
 /**
  * Main generator class for DisChord.
  * It extends the base Generator class and overrides the visit method to handle DisChord-specific AST nodes.
  */
 export class DisChordGenerator extends Generator<DisChordNodeType, DisChordNode> {
-    // Root directory of the project, used for resolving imports and file paths.
-    public projectRoot: string = '';
-
     // Context variable to track the current interaction state, used for generating appropriate code in message interactions and collectors.
     public currentInteraction: string | null = null; // context
 
@@ -39,9 +37,8 @@ export class DisChordGenerator extends Generator<DisChordNodeType, DisChordNode>
      * @param symbols A map of symbols used for code generation, typically containing variable and function definitions.
      * @param projectRoot The root directory of the project, used for resolving imports and file paths during code generation.
      */
-    constructor(symbols: Map<string, any>, projectRoot: string) {
-        super(symbols);
-        this.projectRoot = projectRoot;
+    constructor(context: CompilationContext) {
+        super(context);
     }
 
     /**
