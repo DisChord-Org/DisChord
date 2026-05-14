@@ -29,7 +29,7 @@ export class VariableParser<T, N> extends SubParser<T, N> {
             value = this.parent.get(ExpressionParser).parse();
         }
 
-        this.parent.context.symbolTable.register(id,
+        this.parent.SymbolTable.register(id,
             {
                 name: id,
                 kind: SymbolKind.Variable

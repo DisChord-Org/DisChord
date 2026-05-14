@@ -47,7 +47,7 @@ export class StatementParser<T, N> extends SubParser<T, N> {
             return (this.parent.get(StatementParser) as StatementParser<T, N>).parse(classContext);
         }
 
-        const statement: SubParserClass | undefined = StatementMap[token.type];
+        const statement: SubParserClass<T, N> | undefined = StatementMap[token.type];
 
         if (statement) return this.parent.get(statement).parse();
         else return this.parent.get(ExpressionParser).parse();

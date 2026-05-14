@@ -59,11 +59,11 @@ export abstract class SubParser<T = never, N = never> {
  * Static blueprint for SubParser implementations.
  * Defines the contract for registration and identification of grammar specialists.
  */
-export interface SubParserClass {
+export interface SubParserClass<T, N> {
     /** 
      * Constructor signature: accepts any instance that extends the base Parser.
      */
-    new (parent: Parser): SubParser;
+    new (parent: Parser<T, N>): SubParser<T, N>;
     
     /** 
      * The token type string that triggers the activation of this specific sub-parser.

@@ -19,6 +19,7 @@ import { VariableParser } from "./Grammar/StatementParser/VariableParser";
 import { ParserContext } from "./ParserContext";
 import { SubParserClass } from "./subparser";
 import { CompilationContext } from "../../init/Init";
+import { SymbolTable } from "../SymbolsTable";
 
 export class Parser<T, N> extends ParserContext<T, N> {
     public nodes: ASTNode<T, N>[] = [];
@@ -26,7 +27,7 @@ export class Parser<T, N> extends ParserContext<T, N> {
     constructor(
         private tokens: Token[],
         private current: number = 0,
-        public context: CompilationContext
+        private context: CompilationContext
     ) {
         super();
 
@@ -35,7 +36,7 @@ export class Parser<T, N> extends ParserContext<T, N> {
     }
 
     private registerInstances () {
-        const instances: SubParserClass[] = [
+        const instances: SubParserClass<T, N>[] = [
             AditiveParser, ArithmeticParser, AssignmentParser,
             ComparisionParser, ExpressionParser, LogicalParser,
             UnaryParser, BDOParser, PrimaryParser, LiteralParser,
@@ -54,6 +55,10 @@ export class Parser<T, N> extends ParserContext<T, N> {
 
     public get cursor (): number {
         return this.current;
+    }
+
+    public get SymbolTable (): SymbolTable {
+        return this.context.symbolTable;
     }
 
     public peek(type: number | 'this' | 'next' | 'prev' = 'this'): Token {
@@ -84,6 +89,10 @@ export class Parser<T, N> extends ParserContext<T, N> {
         }
 
         return this.tokens[targetIndex];
+    }
+
+    public isAtEnd (): boolean {
+        return this.peek().type === 'EOF' || this.current >= this.tokens.length;
     }
 
     consume(expectedTypes: string | string[], message?: string): Token {
@@ -121,7 +130,7 @@ export class Parser<T, N> extends ParserContext<T, N> {
         return null;
     }
 
-    private parseExpression(): ASTNode<T, N> {
+    public parseExpression(): ASTNode<T, N> {
         return this.get(ExpressionParser).parse();
     }
 }
