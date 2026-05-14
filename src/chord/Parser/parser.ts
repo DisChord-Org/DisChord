@@ -22,6 +22,7 @@ import { CompilationContext } from "../../init/Init";
 import { SymbolTable } from "../SymbolsTable";
 import { ConditionParser } from "./Grammar/StatementParser/ConditionParser";
 import { BlockParser } from "./Grammar/BlockParser";
+import { LoopParser } from "./Grammar/StatementParser/LoopParser";
 
 export class Parser<T, N> extends ParserContext<T, N> {
     public nodes: ASTNode<T, N>[] = [];
@@ -43,16 +44,17 @@ export class Parser<T, N> extends ParserContext<T, N> {
             ComparisionParser, ExpressionParser, LogicalParser,
             UnaryParser, BDOParser, PrimaryParser, LiteralParser,
             AccessParser, StatementParser, VariableParser,
-            BlockParser, ConditionParser
+            BlockParser, ConditionParser, LoopParser
         ];
         
         instances.forEach(instance => this.register(instance));
     }
 
     public parse(): ASTNode<T, N>[] {
-        while (this.cursor < this.tokens.length) {
-            this.nodes.push(this.get(ExpressionParser).parse());
+        while (!this.isAtEnd()) {
+            this.nodes.push(this.parseStatement());
         }
+
         return this.nodes;
     }
 

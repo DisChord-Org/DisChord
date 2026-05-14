@@ -1,3 +1,5 @@
+import { ConditionParser } from "./Parser/Grammar/StatementParser/ConditionParser";
+import { LoopParser } from "./Parser/Grammar/StatementParser/LoopParser";
 import { VariableParser } from "./Parser/Grammar/StatementParser/VariableParser";
 
 export const StatementMap: Record<string, any> = {
@@ -6,8 +8,8 @@ export const StatementMap: Record<string, any> = {
     'DEVOLVER': undefined,
     'VAR': VariableParser,
     'FUNCION': undefined,
-    'SI': undefined,
-    'PARA': undefined,
+    'SI': ConditionParser,
+    'PARA': LoopParser,
     'PASAR': undefined,
     'SALIR': undefined,
     'IMPORTAR': undefined,

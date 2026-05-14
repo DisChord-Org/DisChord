@@ -1,7 +1,4 @@
-import { ChordError, ErrorLevel } from "../ChordError";
-import { SUGGESTIONS } from "./core.lib";
-import { DecoratorProcessor } from "./DecoratorProcessor";
-import { ASTNode, ClassNode, ConditionNode, LoopNode, FunctionNode, PropertyNode, Token, VariableNode, Symbol, SymbolKind, IdentificatorNode, NewNode, ThisNode, SuperNode, ReturnNode, ExportNode, ImportNode, ExitLoopNode, PassLoopNode, AssignmentNode, BinaryExpressionNode, JSNode, LiteralNode, NoUnaryNode, UnaryNode, ListNode, ExpressionNode, AccessNode, AccessNodeByIndex, CallNode, SOF, EOF, ODBNode, ODBMode } from "./types";
+import { ASTNode, ClassNode, LoopNode, FunctionNode, PropertyNode, Token, SymbolKind, ReturnNode, ExportNode, ImportNode, ExitLoopNode, PassLoopNode, LiteralNode } from "./types";
 
 class Parser<T = never, N = never> {
     public nodes: ASTNode<T, N>[] = [];
@@ -13,16 +10,6 @@ class Parser<T = never, N = never> {
 
 
     parseStatement(classContext?: string): ASTNode<T, N> {
-        const token = this.peek();
-        const custom = this.parseCustomStatement(); // IMPORTANTE
-
-        if (custom) return custom;
-
-
-        if (token.type === 'SI') {
-            return this.parseIfStatement();
-        }
-
         if (token.type === 'PARA') {
             return this.parseForStatement();
         }
@@ -54,10 +41,6 @@ class Parser<T = never, N = never> {
 
         if (token.type === 'PROP') {
             return this.parseProperty();
-        }
-
-        if (token.type === 'VAR') {
-            return this.parseVariableDeclaration();
         }
 
         if (token.type === 'SALIR') {
@@ -240,52 +223,6 @@ class Parser<T = never, N = never> {
             type: 'Propiedad',
             id,
             value
-        });
-    }
-
-    private parseIfStatement(): ConditionNode<T, N> {
-        this.consume('SI');
-        this.consume('L_EXPRESSION', `Después de 'si' se debe abrir una expresión con '(' para especificar la condición.`);
-
-        const test = this.parseExpression();
-
-        this.consume('R_EXPRESSION');
-        this.consume('L_BRACE', `Después de la condición de un 'si' se debe abrir un bloque de código con '{'.`);
-
-        const consequent: ASTNode<T, N>[] = [];
-
-        while (this.peek().type !== 'R_BRACE') {
-            consequent.push(this.parseStatement());
-        }
-
-        this.consume('R_BRACE');
-
-        let alternate: ConditionNode<T, N>['alternate'] = undefined;
-
-        if (this.cursor < this.tokens.length && (this.peek().type === 'SINO' || this.peek().type === 'ADEMAS')) {
-            const next = this.consume(this.peek().type);
-
-            if (next.type === 'ADEMAS') {
-                alternate = this.parseIfStatement();
-            } else {
-                this.consume('L_BRACE', `Después de 'sino' se debe abrir un bloque de código con '{'.`);
-
-                const elseBody: ASTNode<T, N>[] = [];
-
-                while (this.peek().type !== 'R_BRACE') {
-                    elseBody.push(this.parseStatement());
-                }
-
-                this.consume('R_BRACE');
-                alternate = elseBody;
-            }
-        }
-
-        return this.createNode<ConditionNode<T, N>>({
-            type: 'Condicion',
-            test,
-            consequent,
-            alternate
         });
     }
 
