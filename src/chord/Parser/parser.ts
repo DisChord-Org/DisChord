@@ -24,6 +24,7 @@ import { ConditionParser } from "./Grammar/StatementParser/ConditionParser";
 import { BlockParser } from "./Grammar/BlockParser";
 import { LoopParser } from "./Grammar/StatementParser/LoopParser";
 import { ReturnParser } from "./Grammar/StatementParser/ReturnParser";
+import { PropertyParser } from "./Grammar/StatementParser/PropertyParser";
 
 export class Parser<T, N> extends ParserContext<T, N> {
     public nodes: ASTNode<T, N>[] = [];
@@ -45,7 +46,8 @@ export class Parser<T, N> extends ParserContext<T, N> {
             ComparisionParser, ExpressionParser, LogicalParser,
             UnaryParser, BDOParser, PrimaryParser, LiteralParser,
             AccessParser, StatementParser, VariableParser,
-            BlockParser, ConditionParser, LoopParser, ReturnParser
+            BlockParser, ConditionParser, LoopParser, ReturnParser,
+            PropertyParser
         ];
         
         instances.forEach(instance => this.register(instance));

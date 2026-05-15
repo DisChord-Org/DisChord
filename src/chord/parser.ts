@@ -30,10 +30,6 @@ class Parser<T = never, N = never> {
             }
         }
 
-        if (token.type === 'PROP') {
-            return this.parseProperty();
-        }
-
         if (token.type === 'SALIR') {
             this.consume('SALIR');
             return this.createNode<ExitLoopNode<T>>({ type: 'Salir' });
@@ -122,33 +118,6 @@ class Parser<T = never, N = never> {
             id,
             superClass,
             body
-        });
-    }
-
-    private parseProperty(): PropertyNode<T, N> {
-        this.consume('PROP');
-        const id = this.consume('IDENTIFICADOR', `Se debe especificar el nombre de la propiedad`).value;
-        
-        let value = this.createNode<LiteralNode<T>>({
-            type: 'Literal',
-            value: undefined,
-            raw: 'indefinido'
-        });
-
-        if (this.peek().type === 'ES') {
-            this.consume('ES');
-            value = this.parseExpression() as LiteralNode<T>;
-        }
-
-        this.registerSymbol(id, {
-            name: id,
-            kind: SymbolKind.Property
-        });
-
-        return this.createNode<PropertyNode<T, N>>({
-            type: 'Propiedad',
-            id,
-            value
         });
     }
 }

@@ -6,6 +6,7 @@ import { ExpressionParser } from "../Expressions/ExpressionParser";
 import { ConditionParser } from "./ConditionParser";
 import { FunctionParser } from "./FunctionParser";
 import { LoopParser } from "./LoopParser";
+import { PropertyParser } from "./PropertyParser";
 import { ReturnParser } from "./ReturnParser";
 import { VariableParser } from "./VariableParser";
 
@@ -66,6 +67,10 @@ export class StatementParser<T, N> extends SubParser<T, N> {
                     .setMethod(!!classContext)
                     .setStatic(false)
                     .setAsync(false)
+                    .parse();
+            case 'PROP':
+                return (this.parent.get(PropertyParser as unknown as any) as PropertyParser<T, N>)
+                    .setStatic(false)
                     .parse();
             default:
                 return this.parent.get(ExpressionParser).parse();

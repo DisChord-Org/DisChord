@@ -1,4 +1,4 @@
-import { LiteralNode, SymbolKind, VariableNode } from "../../../types";
+import { ASTNode, LiteralNode, SymbolKind, VariableNode } from "../../../types";
 import { Parser } from "../../parser";
 import { SubParser } from "../../subparser";
 import { ExpressionParser } from "../Expressions/ExpressionParser";
@@ -18,7 +18,7 @@ export class VariableParser<T, N> extends SubParser<T, N> {
         this.consume('VAR');
         const id = this.consume('IDENTIFICADOR', `Se debe especificar un nombre para la variable`).value;
         
-        let value: any = this.createNode<LiteralNode<T>>({
+        let value: ASTNode<T, N> = this.createNode<LiteralNode<T>>({
             type: 'Literal',
             value: undefined,
             raw: 'indefinido'
