@@ -1,4 +1,4 @@
-import { ASTNode, ClassNode, LoopNode, FunctionNode, PropertyNode, Token, SymbolKind, ReturnNode, ExportNode, ImportNode, ExitLoopNode, PassLoopNode, LiteralNode } from "./types";
+import { ASTNode, ClassNode, PropertyNode, Token, SymbolKind, ExportNode, ImportNode, ExitLoopNode, PassLoopNode, LiteralNode } from "./types";
 
 class Parser<T = never, N = never> {
     public nodes: ASTNode<T, N>[] = [];
@@ -7,7 +7,6 @@ class Parser<T = never, N = never> {
         private tokens: Token[],
         private current: number = 0
     ) {}
-
 
     parseStatement(classContext?: string): ASTNode<T, N> {
         if (token.type === 'CLASE') {
@@ -29,10 +28,6 @@ class Parser<T = never, N = never> {
                 func.metadata.isStatic = true;
                 return func;
             }
-        }
-
-        if (token.type === 'FUNCION') {
-            return this.parseFunctionDeclaration(false, !!classContext);
         }
 
         if (token.type === 'PROP') {
@@ -126,55 +121,6 @@ class Parser<T = never, N = never> {
             type: 'Clase',
             id,
             superClass,
-            body
-        });
-    }
-
-    private parseFunctionDeclaration(isConstructor: boolean, isMethod: boolean = true, isAsync: boolean = false): FunctionNode<T, N> {
-        let id: string;
-        
-        if (isConstructor) {
-            id = this.consume('IDENTIFICADOR', `Se debe especificar el nombre del constructor`).value;
-        } else {
-            this.consume('FUNCION');
-            id = this.consume('IDENTIFICADOR', `Se debe especificar el nombre de la función`).value;
-        }
-
-        this.consume('L_EXPRESSION', `Al declarar una función se debe usar '(' para arbir la lista de parámetros.`);
-
-        const params: string[] = [];
-        while (this.peek().type !== 'R_EXPRESSION') {
-            params.push(this.consume('IDENTIFICADOR', `Se debe especificar el nombre del parámetro`).value);
-            if (this.peek().type === ',') this.consume(',');
-        }
-
-        this.consume('R_EXPRESSION');
-        this.consume('L_BRACE', `Al declarar una función debes usar '{' para abrir el bloque de código de la función.`);
-
-        const body: ASTNode<T, N>[] = [];
-        while (this.peek().type !== 'R_BRACE') {
-            body.push(this.parseStatement());
-        }
-
-        this.consume('R_BRACE');
-
-        this.registerSymbol(id, {
-            name: id,
-            kind: SymbolKind.Function,
-            metadata: {
-                isAsync
-            }
-        });
-
-        return this.createNode<FunctionNode<T, N>>({
-            type: 'Funcion',
-            id,
-            metadata: {
-                isConstructor,
-                isMethod,
-                isAsync
-            },
-            params,
             body
         });
     }

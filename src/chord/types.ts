@@ -33,7 +33,7 @@ export type CoreNodeType<T = string> =
       | 'Lista' | 'Expresion' | 'Identificador'
       | 'Acceso' | 'Llamada' | 'Exportar' | 'Importar'
       | 'Asignacion' | 'JS' | 'Super' | 'Esta' | 'AccesoPorIndice'
-      | 'BDO' | T;
+      | 'BDO' | 'Bloque' | 'EOF' | 'SOF' | T;
 
 export type NodeType<T = never> = CoreNodeType | T;
 

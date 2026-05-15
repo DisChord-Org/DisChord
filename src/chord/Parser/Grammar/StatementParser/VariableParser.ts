@@ -24,8 +24,7 @@ export class VariableParser<T, N> extends SubParser<T, N> {
             raw: 'indefinido'
         });
 
-        if (this.peek().type === 'ES') {
-            this.consume('ES');
+        if (this.match('ES')) {
             value = this.parent.get(ExpressionParser).parse();
         }
 

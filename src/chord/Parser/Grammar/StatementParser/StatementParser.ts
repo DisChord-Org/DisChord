@@ -1,9 +1,13 @@
-import { StatementMap } from "../../../core.lib";
 import { DecoratorProcessor } from "../../../DecoratorProcessor";
 import { ASTNode } from "../../../types";
 import { Parser } from "../../parser";
-import { SubParser, SubParserClass } from "../../subparser";
+import { SubParser } from "../../subparser";
 import { ExpressionParser } from "../Expressions/ExpressionParser";
+import { ConditionParser } from "./ConditionParser";
+import { FunctionParser } from "./FunctionParser";
+import { LoopParser } from "./LoopParser";
+import { ReturnParser } from "./ReturnParser";
+import { VariableParser } from "./VariableParser";
 
 export class StatementParser<T, N> extends SubParser<T, N> {
     /** To identify when this parser should be used */
@@ -47,9 +51,24 @@ export class StatementParser<T, N> extends SubParser<T, N> {
             return (this.parent.get(StatementParser) as StatementParser<T, N>).parse(classContext);
         }
 
-        const statement: SubParserClass<T, N> | undefined = StatementMap[token.type];
-
-        if (statement) return this.parent.get(statement).parse();
-        else return this.parent.get(ExpressionParser).parse();
+        switch (token.type) {
+            case 'VAR':
+                return this.parent.get(VariableParser as unknown as any).parse();
+            case 'CONDICION':
+                return this.parent.get(ConditionParser).parse();
+            case 'PARA':
+                return this.parent.get(LoopParser).parse();
+            case 'DEVOLVER':
+                return this.parent.get(ReturnParser).parse();
+            case 'FUNCION':
+                return (this.parent.get(FunctionParser) as FunctionParser<T, N>)
+                    .setConstructor(false)
+                    .setMethod(!!classContext)
+                    .setStatic(false)
+                    .setAsync(false)
+                    .parse();
+            default:
+                return this.parent.get(ExpressionParser).parse();
+        }
     }
 }

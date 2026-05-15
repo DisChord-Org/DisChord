@@ -113,7 +113,7 @@ export class Parser<T, N> extends ParserContext<T, N> {
         const currentToken = this.peek();
 
         if (expected.includes(currentToken.type)) {
-            this.current++;
+            this.consume(currentToken.type);
             return true;
         }
 

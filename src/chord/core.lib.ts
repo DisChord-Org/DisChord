@@ -1,23 +1,3 @@
-import { ConditionParser } from "./Parser/Grammar/StatementParser/ConditionParser";
-import { LoopParser } from "./Parser/Grammar/StatementParser/LoopParser";
-import { ReturnParser } from "./Parser/Grammar/StatementParser/ReturnParser";
-import { VariableParser } from "./Parser/Grammar/StatementParser/VariableParser";
-
-export const StatementMap: Record<string, any> = {
-    'CLASE': undefined,
-    'PROP': undefined,
-    'DEVOLVER': ReturnParser,
-    'VAR': VariableParser,
-    'FUNCION': undefined,
-    'SI': ConditionParser,
-    'PARA': LoopParser,
-    'PASAR': undefined,
-    'SALIR': undefined,
-    'IMPORTAR': undefined,
-    'EXPORTAR': undefined,
-    'TIPO': undefined
-} as const;
-
 export const runtimeInjections = `
     const originalLog = console.log;
 
