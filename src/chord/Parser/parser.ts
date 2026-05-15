@@ -1,6 +1,11 @@
-import { ChordError, ErrorLevel } from "../../ChordError";
 import { SUGGESTIONS } from "../core.lib";
 import { ASTNode, Token, SOF, EOF } from "./../types";
+
+import { ChordError, ErrorLevel } from "../../ChordError";
+import { CompilationContext } from "../../init/Init";
+import { ParserContext } from "./ParserContext";
+import { SubParserClass } from "./subparser";
+import { SymbolTable } from "../SymbolsTable";
 
 import { BDOParser } from "./Grammar/BDOParser";
 import { AccessParser } from "./Grammar/Expressions/AccessParser";
@@ -15,11 +20,6 @@ import { UnaryParser } from "./Grammar/Expressions/UnaryParser";
 import { PrimaryParser } from "./Grammar/PrimaryParser/PrimaryParser";
 import { StatementParser } from "./Grammar/StatementParser/StatementParser";
 import { VariableParser } from "./Grammar/StatementParser/VariableParser";
-
-import { ParserContext } from "./ParserContext";
-import { SubParserClass } from "./subparser";
-import { CompilationContext } from "../../init/Init";
-import { SymbolTable } from "../SymbolsTable";
 import { ConditionParser } from "./Grammar/StatementParser/ConditionParser";
 import { BlockParser } from "./Grammar/BlockParser";
 import { LoopParser } from "./Grammar/StatementParser/LoopParser";

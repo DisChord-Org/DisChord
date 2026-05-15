@@ -5,7 +5,7 @@ import { ExpressionParser } from "../Expressions/ExpressionParser";
 
 export class VariableParser<T, N> extends SubParser<T, N> {
     /** To identify when this parser should be used */
-    static triggerToken: string = '';
+    static triggerToken: string = 'VAR';
 
     /**
      * @param parent - Reference to the main Parser orchestrator.
@@ -29,13 +29,10 @@ export class VariableParser<T, N> extends SubParser<T, N> {
             value = this.parent.get(ExpressionParser).parse();
         }
 
-        this.parent.SymbolTable.register(id,
-            {
-                name: id,
-                kind: SymbolKind.Variable
-            },
-            this.peek().location
-        );
+        this.parent.SymbolTable.register(id, {
+            name: id,
+            kind: SymbolKind.Variable
+        }, this.peek().location);
 
         return this.createNode<VariableNode<T, N>>({
             type: 'Variable',
