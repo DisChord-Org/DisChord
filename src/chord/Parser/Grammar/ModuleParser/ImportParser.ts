@@ -1,8 +1,8 @@
 import { SubParser } from "../../subparser";
-import { ImportNode, BaseNode } from "../../../types";
+import { ImportNode } from "../../../types";
 import { Parser } from "../../parser";
 
-export class ImportParser<T, N extends BaseNode<T>> extends SubParser<T, N> {
+export class ImportParser<T, N> extends SubParser<T, N> {
     /** To identify when this parser should be used */
     static triggerToken: string = 'SI';
     

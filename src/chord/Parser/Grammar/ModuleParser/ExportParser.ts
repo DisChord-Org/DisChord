@@ -1,9 +1,9 @@
 import { SubParser } from "../../subparser";
-import { ExportNode, BaseNode } from "../../../types";
+import { ExportNode } from "../../../types";
 import { StatementParser } from "../StatementParser/StatementParser";
 import { Parser } from "../../parser";
 
-export class ExportParser<T, N extends BaseNode<T>> extends SubParser<T, N> {
+export class ExportParser<T, N> extends SubParser<T, N> {
     /** To identify when this parser should be used */
     static triggerToken: string = 'EXPORTAR';
 

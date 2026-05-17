@@ -4,8 +4,7 @@ class Parser<T = never, N = never> {
     public nodes: ASTNode<T, N>[] = [];
 
     constructor(
-        private tokens: Token[],
-        private current: number = 0
+        private tokens: Token[]
     ) {}
 
     parseStatement(classContext?: string): ASTNode<T, N> {
@@ -38,16 +37,6 @@ class Parser<T = never, N = never> {
         if (token.type === 'PASAR') {
             this.consume('PASAR');
             return this.createNode<PassLoopNode<T>>({ type: 'Pasar' });
-        }
-
-        if (token.type === 'EXPORTAR') {
-            this.consume('EXPORTAR');
-            const declaration = this.parseStatement();
-            
-            return this.createNode<ExportNode<T, N>>({
-                type: 'Exportar',
-                object: declaration
-            });
         }
 
         if (classContext && token.type === 'IDENTIFICADOR' && token.value === classContext) {

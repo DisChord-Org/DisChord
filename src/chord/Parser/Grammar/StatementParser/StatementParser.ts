@@ -5,6 +5,7 @@ import { SubParser } from "../../subparser";
 import { ExpressionParser } from "../Expressions/ExpressionParser";
 import { ExportParser } from "../ModuleParser/ExportParser";
 import { ImportParser } from "../ModuleParser/ImportParser";
+import { ClassParser } from "./ClassParser";
 import { ConditionParser } from "./ConditionParser";
 import { FunctionParser } from "./FunctionParser";
 import { LoopParser } from "./LoopParser";
@@ -78,6 +79,8 @@ export class StatementParser<T, N> extends SubParser<T, N> {
                 return this.parent.get(ImportParser as unknown as any).parse();
             case 'EXPORTAR':
                 return this.parent.get(ExportParser as unknown as any).parse();
+            case 'CLASE':
+                return this.parent.get(ClassParser).parse();
             default:
                 return this.parent.get(ExpressionParser).parse();
         }
