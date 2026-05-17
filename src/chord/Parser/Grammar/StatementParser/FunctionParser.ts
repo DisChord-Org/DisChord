@@ -2,6 +2,7 @@ import { SubParser } from "../../subparser";
 import { FunctionNode, SymbolKind } from "../../../types";
 import { BlockParser } from "../BlockParser";
 import { Parser } from "../../parser";
+import { DecoratorProcessor } from "../../../DecoratorProcessor";
 
 export class FunctionParser<T, N> extends SubParser<T, N> {
     /** To identify when this parser should be used */
@@ -31,11 +32,6 @@ export class FunctionParser<T, N> extends SubParser<T, N> {
 
     public setStatic (value: boolean): this {
         this.isStatic = value;
-        return this;
-    }
-
-    public setAsync (value: boolean): this {
-        this.isAsync = value;
         return this;
     }
 
@@ -73,6 +69,7 @@ export class FunctionParser<T, N> extends SubParser<T, N> {
             kind: SymbolKind.Function
         }, this.peek('prev').location);
 
+        const isAsync: boolean = DecoratorProcessor.matchAndDelete('asincrono', true);
         return this.createNode<FunctionNode<T, N>>({
             type: 'Funcion',
             id,
@@ -80,7 +77,7 @@ export class FunctionParser<T, N> extends SubParser<T, N> {
                 isConstructor: flags.constructor,
                 isMethod: flags.static,
                 isStatic: flags.static,
-                isAsync: flags.async
+                isAsync
             },
             params,
             body

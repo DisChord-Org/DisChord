@@ -37,17 +37,7 @@ export class StatementParser<T, N> extends SubParser<T, N> {
             this.consume('DECORADOR');
         
             if (decorator === '@asincrono') {
-                /*this.consume('DECORADOR');
-
-                if (this.peek().type === 'FIJAR') {
-                    this.consume('FIJAR');
-                    const func = this.parseFunctionDeclaration(false, true, true);
-                    func.metadata.isStatic = true;
-                    return func;
-                }
-        
-                const func = this.parseFunctionDeclaration(false, !!classContext, true);
-                return func;*/
+                DecoratorProcessor.addDecorator('asincrono', true);
             }
         
             if (decorator === '@BDOI') {
@@ -71,7 +61,6 @@ export class StatementParser<T, N> extends SubParser<T, N> {
                     .setConstructor(false)
                     .setMethod(!!classContext)
                     .setStatic(false)
-                    .setAsync(false)
                     .parse();
             case 'PROP':
                 return (this.parent.get(PropertyParser as unknown as any) as PropertyParser<T, N>)
@@ -95,7 +84,6 @@ export class StatementParser<T, N> extends SubParser<T, N> {
                             .setConstructor(true)
                             .setMethod(true)
                             .setStatic(false)
-                            .setAsync(false)
                             .parse();
                     }
                 }
