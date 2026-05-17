@@ -3,6 +3,8 @@ import { ASTNode } from "../../../types";
 import { Parser } from "../../parser";
 import { SubParser } from "../../subparser";
 import { ExpressionParser } from "../Expressions/ExpressionParser";
+import { ExportParser } from "../ModuleParser/ExportParser";
+import { ImportParser } from "../ModuleParser/ImportParser";
 import { ConditionParser } from "./ConditionParser";
 import { FunctionParser } from "./FunctionParser";
 import { LoopParser } from "./LoopParser";
@@ -72,6 +74,10 @@ export class StatementParser<T, N> extends SubParser<T, N> {
                 return (this.parent.get(PropertyParser as unknown as any) as PropertyParser<T, N>)
                     .setStatic(false)
                     .parse();
+            case 'IMPORTAR':
+                return this.parent.get(ImportParser as unknown as any).parse();
+            case 'EXPORTAR':
+                return this.parent.get(ExportParser as unknown as any).parse();
             default:
                 return this.parent.get(ExpressionParser).parse();
         }

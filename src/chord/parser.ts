@@ -50,35 +50,6 @@ class Parser<T = never, N = never> {
             });
         }
 
-        if (token.type === 'IMPORTAR') {
-            this.consume('IMPORTAR');
-            const identificators: string[] = [];
-            const isDestructured = this.peek().type === 'L_BRACE';
-
-            if (isDestructured) {
-                this.consume('L_BRACE');
-                while (this.peek().type !== 'R_BRACE') {
-                    identificators.push(this.consume('IDENTIFICADOR', "Se esperaba un nombre de variable para importar").value);
-                    if (this.peek().type === ',') this.consume(',');
-                }
-                this.consume('R_BRACE');
-            } else {
-                identificators.push(this.consume('IDENTIFICADOR', "Después de 'importar' debe ir '{' o el nombre de una variable").value);
-            }
-
-            this.consume('DESDE', `Se esperaba la palabra 'desde' después de los identificadores.`);
-
-            const pathToken = this.consume('TEXTO', `Debes especificar la ruta entre comillas (texto).`);
-            const modulePath = pathToken.value;
-
-            return this.createNode<ImportNode<T, N>>({
-                type: 'Importar',
-                identificators,
-                path: modulePath,
-                isDestructured
-            });
-        }
-
         if (classContext && token.type === 'IDENTIFICADOR' && token.value === classContext) {
             if (this.cursor + 1 < this.tokens.length && this.tokens[this.cursor + 1].type === 'L_EXPRESSION') {
                 return this.parseFunctionDeclaration(true);
