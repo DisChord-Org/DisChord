@@ -1,10 +1,10 @@
-import { SubParser } from "../../subparser";
-import { ImportNode } from "../../../types";
-import { Parser } from "../../parser";
+import { SubParser } from "../../../subparser";
+import { ImportNode } from "../../../../types";
+import { Parser } from "../../../parser";
 
 export class ImportParser<T, N> extends SubParser<T, N> {
     /** To identify when this parser should be used */
-    static triggerToken: string = 'SI';
+    static triggerToken: string = 'IMPORTAR';
     
     /**
      * @param parent - Reference to the main Parser orchestrator.

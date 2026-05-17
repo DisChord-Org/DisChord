@@ -1,7 +1,7 @@
-import { SubParser } from "../../subparser";
-import { ExportNode } from "../../../types";
-import { StatementParser } from "../StatementParser/StatementParser";
-import { Parser } from "../../parser";
+import { SubParser } from "../../../subparser";
+import { ExportNode } from "../../../../types";
+import { StatementParser } from "../StatementParser";
+import { Parser } from "../../../parser";
 
 export class ExportParser<T, N> extends SubParser<T, N> {
     /** To identify when this parser should be used */

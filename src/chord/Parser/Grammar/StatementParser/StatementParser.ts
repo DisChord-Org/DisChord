@@ -3,8 +3,8 @@ import { ASTNode } from "../../../types";
 import { Parser } from "../../parser";
 import { SubParser } from "../../subparser";
 import { ExpressionParser } from "../Expressions/ExpressionParser";
-import { ExportParser } from "../ModuleParser/ExportParser";
-import { ImportParser } from "../ModuleParser/ImportParser";
+import { ExportParser } from "./ModuleParser/ExportParser";
+import { ImportParser } from "./ModuleParser/ImportParser";
 import { ClassParser } from "./ClassParser";
 import { ConditionParser } from "./ConditionParser";
 import { FunctionParser } from "./FunctionParser";
@@ -12,6 +12,8 @@ import { LoopParser } from "./LoopParser";
 import { PropertyParser } from "./PropertyParser";
 import { ReturnParser } from "./ReturnParser";
 import { VariableParser } from "./VariableParser";
+import { ExitParser } from "./FlowParser/ExitParser";
+import { PassParser } from "./FlowParser/PassParser";
 
 export class StatementParser<T, N> extends SubParser<T, N> {
     /** To identify when this parser should be used */
@@ -81,6 +83,10 @@ export class StatementParser<T, N> extends SubParser<T, N> {
                 return this.parent.get(ExportParser as unknown as any).parse();
             case 'CLASE':
                 return this.parent.get(ClassParser).parse();
+            case 'SALIR':
+                return this.parent.get(ExitParser).parse();
+            case 'PASAR':
+                return this.parent.get(PassParser).parse();
             default:
                 return this.parent.get(ExpressionParser).parse();
         }
