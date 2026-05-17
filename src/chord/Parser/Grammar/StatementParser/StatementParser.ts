@@ -87,6 +87,20 @@ export class StatementParser<T, N> extends SubParser<T, N> {
                 return this.parent.get(ExitParser).parse();
             case 'PASAR':
                 return this.parent.get(PassParser).parse();
+            case 'IDENTIFICADOR':
+                if (classContext && token.value === classContext) { // Constructor
+                    const nextToken = this.parent.peek('next');
+                    if (nextToken && nextToken.type === 'L_EXPRESSION') {
+                        return (this.parent.get(FunctionParser as any) as FunctionParser<T, N>)
+                            .setConstructor(true)
+                            .setMethod(true)
+                            .setStatic(false)
+                            .setAsync(false)
+                            .parse();
+                    }
+                }
+                
+                return this.parent.get(ExpressionParser).parse();
             default:
                 return this.parent.get(ExpressionParser).parse();
         }

@@ -17,20 +17,6 @@ class Parser<T = never, N = never> {
                 prop.isStatic = true;
                 return prop;
             }
-            
-            if (nextToken.type === 'FUNCION') {
-                const func = this.parseFunctionDeclaration(false, true);
-                func.metadata.isStatic = true;
-                return func;
-            }
         }
-
-        if (classContext && token.type === 'IDENTIFICADOR' && token.value === classContext) {
-            if (this.cursor + 1 < this.tokens.length && this.tokens[this.cursor + 1].type === 'L_EXPRESSION') {
-                return this.parseFunctionDeclaration(true);
-            }
-        }
-
-        return this.parseExpression();
     }
 }
