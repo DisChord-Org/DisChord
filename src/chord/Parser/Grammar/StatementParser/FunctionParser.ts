@@ -17,8 +17,6 @@ export class FunctionParser<T, N> extends SubParser<T, N> {
 
     private isConstructor: boolean = false;
     private isMethod: boolean = true;
-    private isStatic: boolean = false;
-    private isAsync: boolean = false;
 
     public setConstructor (value: boolean): this {
         this.isConstructor = value;
@@ -30,19 +28,13 @@ export class FunctionParser<T, N> extends SubParser<T, N> {
         return this;
     }
 
-    public setStatic (value: boolean): this {
-        this.isStatic = value;
-        return this;
-    }
 
     public parse(): FunctionNode<T, N> {
         let id: string;
 
         const flags = {
             constructor: this.isConstructor,
-            method: this.isMethod,
-            static: this.isStatic,
-            async: this.isAsync
+            method: this.isMethod
         };
 
         this.reset();
@@ -70,13 +62,15 @@ export class FunctionParser<T, N> extends SubParser<T, N> {
         }, this.peek('prev').location);
 
         const isAsync: boolean = DecoratorProcessor.matchAndDelete('asincrono', true);
+        const isStatic: boolean = DecoratorProcessor.matchAndDelete('fijar', true);
+
         return this.createNode<FunctionNode<T, N>>({
             type: 'Funcion',
             id,
             metadata: {
                 isConstructor: flags.constructor,
-                isMethod: flags.static,
-                isStatic: flags.static,
+                isMethod: flags.method,
+                isStatic,
                 isAsync
             },
             params,
@@ -87,6 +81,5 @@ export class FunctionParser<T, N> extends SubParser<T, N> {
     private reset () {
         this.isConstructor = false;
         this.isMethod = true;
-        this.isStatic = false;
     }
 }

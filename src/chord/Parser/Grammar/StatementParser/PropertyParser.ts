@@ -1,6 +1,7 @@
 import { SubParser } from "../../subparser";
 import { PropertyNode, SymbolKind, LiteralNode, ASTNode } from "../../../types";
 import { Parser } from "../../parser";
+import { DecoratorProcessor } from "../../../DecoratorProcessor";
 
 export class PropertyParser<T, N> extends SubParser<T, N> {
     /** To identify when this parser should be used */
@@ -13,17 +14,7 @@ export class PropertyParser<T, N> extends SubParser<T, N> {
         super(parent);
     }
 
-    private isStatic: boolean = false;
-
-    public setStatic(value: boolean): this {
-        this.isStatic = value;
-        return this;
-    }
-
     public parse(): PropertyNode<T, N> {
-        const isStatic = this.isStatic;
-        this.isStatic = false;
-
         this.consume('PROP');
         const id = this.consume('IDENTIFICADOR', "Se esperaba el nombre de la propiedad").value;
         
@@ -41,6 +32,8 @@ export class PropertyParser<T, N> extends SubParser<T, N> {
             name: id,
             kind: SymbolKind.Property
         }, this.peek('prev').location);
+
+        const isStatic: boolean = DecoratorProcessor.matchAndDelete('fijar', true);
 
         return this.createNode<PropertyNode<T, N>>({
             type: 'Propiedad',

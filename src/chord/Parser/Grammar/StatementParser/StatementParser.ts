@@ -44,6 +44,10 @@ export class StatementParser<T, N> extends SubParser<T, N> {
                 DecoratorProcessor.addDecorator('BDOI', true);
             }
 
+            if (decorator === '@fijar') {
+                DecoratorProcessor.addDecorator('fijar', true);
+            }
+
             return (this.parent.get(StatementParser) as StatementParser<T, N>).parse(classContext);
         }
 
@@ -60,12 +64,9 @@ export class StatementParser<T, N> extends SubParser<T, N> {
                 return (this.parent.get(FunctionParser) as FunctionParser<T, N>)
                     .setConstructor(false)
                     .setMethod(!!classContext)
-                    .setStatic(false)
                     .parse();
             case 'PROP':
-                return (this.parent.get(PropertyParser as unknown as any) as PropertyParser<T, N>)
-                    .setStatic(false)
-                    .parse();
+                return (this.parent.get(PropertyParser as unknown as any) as PropertyParser<T, N>).parse();
             case 'IMPORTAR':
                 return this.parent.get(ImportParser as unknown as any).parse();
             case 'EXPORTAR':
@@ -83,7 +84,6 @@ export class StatementParser<T, N> extends SubParser<T, N> {
                         return (this.parent.get(FunctionParser as any) as FunctionParser<T, N>)
                             .setConstructor(true)
                             .setMethod(true)
-                            .setStatic(false)
                             .parse();
                     }
                 }
