@@ -20,7 +20,11 @@ export class KeyWords {
         "salir",
         "importar",
         "exportar",
-        "tipo"
+        "tipo",
+
+        "mas",
+        "menos",
+        "por"
     ];
 
     public static addStatements (statements: string[]) {

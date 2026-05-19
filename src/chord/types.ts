@@ -3,7 +3,7 @@ export enum SymbolKind {
     Function,
     Class,
     Property
-}
+};
 
 export interface Symbol { // symbols table
     name: string;
@@ -13,7 +13,7 @@ export interface Symbol { // symbols table
         isExported?: boolean;
         isStatic?: boolean;
     };
-}
+};
 
 export type Location = {
     line: number;
@@ -25,6 +25,53 @@ export type Token = {
     value: string;
     location: Location;
 };
+
+export enum TokenType {
+    // Reserved words
+    Var = 'var',
+    Es = 'es',
+    Funcion = 'funcion',
+    Fijar = 'fijar',
+    Clase = 'clase',
+    Extiende = 'extiende',
+    En = 'en',
+    Para = 'para',
+    Si = 'si',
+    Devolver = 'devolver',
+    Importar = 'importar',
+    Exportar = 'exportar',
+    Desde = 'desde',
+    Salir = 'salir',
+    Pasar = 'pasar',
+
+    // Decorators
+    Decorador = 'decorador',
+
+    // Operators
+    Mas = 'mas',
+    Menos = 'menos',
+    Por = 'por',
+    Entre = 'entre',
+    Punto = 'punto',
+    Igual = 'igual',
+    IgualTipado = 'igual_tipado',
+
+    // Delimiters
+    L_BRACE = 'L_BRACE',     // {
+    R_BRACE = 'R_BRACE',     // }
+    L_PAREN = 'L_PAREN',     // (
+    R_PAREN = 'R_PAREN',     // )
+    COMA = 'COMA',
+
+    // Dynamic Literals & Identifiers
+    IDENTIFICADOR = 'IDENTIFICADOR',
+    NUMERO = 'NUMERO',
+    TEXTO = 'TEXTO',
+    
+    // System
+    EOF = 'EOF',
+    SOF = 'SOF'
+}
 
 export type CoreNodeType<T = string> =
         'Clase' | 'Funcion' | 'Bucle' | 'Propiedad' | 'Variable'
