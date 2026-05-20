@@ -1,3 +1,8 @@
+/**
+ * @file types.ts
+ * @description Core AST node type definitions and generic structural bindings for the DisChord compiler.
+ */
+
 export enum SymbolKind {
     Variable,
     Function,
@@ -5,9 +10,16 @@ export enum SymbolKind {
     Property
 };
 
-export interface Symbol { // symbols table
+/**
+ * Represents an entry in the compiler's Symbol Table.
+ * @interface Symbol
+ */
+export interface Symbol {
+    /** The identifier name of the symbol */
     name: string;
+    /** The structural category of the symbol */
     kind: SymbolKind;
+    /** Compile-time flags and metadata modifier properties */
     metadata: {
         isAsync?: boolean;
         isExported?: boolean;
@@ -15,11 +27,19 @@ export interface Symbol { // symbols table
     };
 };
 
+/**
+ * Tracking coordinates for source code references.
+ * @type {Object} Location
+ */
 export type Location = {
     line: number;
     column: number;
 };
 
+/**
+ * Lexical token payload structure utilized by the Parser.
+ * @type {Object} Token
+ */
 export type Token = {
     type: string;
     value: string;
@@ -43,6 +63,11 @@ export enum TokenType {
     Desde = 'desde',
     Salir = 'salir',
     Pasar = 'pasar',
+    Prop = 'prop',
+    Nuevo = 'nuevo',
+    JS = 'js',
+    Super = 'super',
+    Esta = 'esta',
 
     // Decorators
     Decorador = 'decorador',
@@ -73,6 +98,10 @@ export enum TokenType {
     SOF = 'SOF'
 }
 
+/**
+ * Base collection of internal, strictly supported AST node type literal strings.
+ * @template T - Extension string literal type union for custom abstraction layers.
+ */
 export type CoreNodeType<T = string> =
         'Clase' | 'Funcion' | 'Bucle' | 'Propiedad' | 'Variable'
       | 'Condicion' | 'ExpresionBinaria' | 'Literal' | 'Salir'
@@ -82,8 +111,17 @@ export type CoreNodeType<T = string> =
       | 'Asignacion' | 'JS' | 'Super' | 'Esta' | 'AccesoPorIndice'
       | 'BDO' | 'Bloque' | 'EOF' | 'SOF' | T;
 
+/**
+ * Resolves the final comprehensive type classification for any given AST node.
+ * @template T - Extensible custom node types injection.
+ */
 export type NodeType<T = never> = CoreNodeType | T;
 
+/**
+ * Base abstract blueprint for every syntax tree node generated during parsing.
+ * @interface BaseNode
+ * @template T - Custom token/node type overriding hook.
+ */
 export interface BaseNode<T = never> {
     readonly type: NodeType<T>;
     location: Location;
