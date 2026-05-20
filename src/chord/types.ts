@@ -132,26 +132,26 @@ export type Token = {
  * Resolves the final comprehensive type classification for any given AST node.
  * @template T - Extensible custom node types injection.
  */
-export type NodeType<T> = TokenType | T;
+export type NodeType<T extends string> = TokenType | T;
 
 /**
  * Base abstract blueprint for every syntax tree node generated during parsing.
  * @interface BaseNode
  * @template T - Custom token/node type overriding hook.
  */
-export interface BaseNode<T> {
+export interface BaseNode<T extends string> {
     readonly type: NodeType<T>;
     location: Location;
 };
 
-export interface ClassNode<T, N> extends BaseNode<T> {
+export interface ClassNode<T extends string, N extends BaseNode<T>> extends BaseNode<T> {
     type: typeof TokenType.Clase;
     id: string;
     superClass?: string;
     body: ASTNode<T, N>[];
 }
 
-export interface FunctionNode<T, N> extends BaseNode<T> {
+export interface FunctionNode<T extends string, N extends BaseNode<T>> extends BaseNode<T> {
     type: typeof TokenType.Funcion;
     id: string;
     metadata: {
@@ -164,154 +164,154 @@ export interface FunctionNode<T, N> extends BaseNode<T> {
     body: ASTNode<T, N>[];
 }
 
-export interface LoopNode<T, N> extends BaseNode<T> {
+export interface LoopNode<T extends string, N extends BaseNode<T>> extends BaseNode<T> {
     type: typeof TokenType.BUCLE;
     var: string;
     iterable: ASTNode<T, N>;
     body: ASTNode<T, N>[];
 }
 
-export interface PropertyNode<T, N> extends BaseNode<T> {
+export interface PropertyNode<T extends string, N extends BaseNode<T>> extends BaseNode<T> {
     type: typeof TokenType.PROPIEDAD;
     id: string;
     value: ASTNode<T, N>;
     isStatic?: boolean;
 }
 
-export interface VariableNode<T, N> extends BaseNode<T> {
+export interface VariableNode<T extends string, N extends BaseNode<T>> extends BaseNode<T> {
     type: typeof TokenType.VARIABLE;
     id: string;
     value: ASTNode<T, N>;
     isStatic?: boolean;
 }
 
-export interface ConditionNode<T, N> extends BaseNode<T> {
+export interface ConditionNode<T extends string, N extends BaseNode<T>> extends BaseNode<T> {
     type: typeof TokenType.CONDICION;
     test: ASTNode<T, N>;
     consequent: ASTNode<T, N>[];
     alternate?: ASTNode<T, N>[] | ConditionNode<T, N>;
 }
 
-export interface BinaryExpressionNode<T, N> extends BaseNode<T> {
+export interface BinaryExpressionNode<T extends string, N extends BaseNode<T>> extends BaseNode<T> {
     type: typeof TokenType.EXPRESION_BINARIA;
     left: ASTNode<T, N>;
     operator: string;
     right: ASTNode<T, N>;
 }
 
-export interface LiteralNode<T> extends BaseNode<T> {
+export interface LiteralNode<T extends string> extends BaseNode<T> {
     type: typeof TokenType.LITERAL;
     value: string | number | boolean | undefined;
     raw: string;
 }
 
-export interface ExitLoopNode<T> extends BaseNode<T> {
+export interface ExitLoopNode<T extends string> extends BaseNode<T> {
     type: typeof TokenType.Salir;
 }
 
-export interface PassLoopNode<T> extends BaseNode<T> {
+export interface PassLoopNode<T extends string> extends BaseNode<T> {
     type: typeof TokenType.Pasar;
 }
 
-export interface ReturnNode<T, N> extends BaseNode<T> {
+export interface ReturnNode<T extends string, N extends BaseNode<T>> extends BaseNode<T> {
     type: typeof TokenType.Devolver;
     object: ASTNode<T, N> | undefined;
 }
 
-export interface NewNode<T, N> extends BaseNode<T> {
+export interface NewNode<T extends string, N extends BaseNode<T>> extends BaseNode<T> {
     type: typeof TokenType.Nuevo;
     object: ASTNode<T, N>;
 }
 
-export interface NoUnaryNode<T, N> extends BaseNode<T> {
+export interface NoUnaryNode<T extends string, N extends BaseNode<T>> extends BaseNode<T> {
     type: typeof TokenType.NO_UNARIO;
     operator: string;
     object: ASTNode<T, N>;
 }
 
-export interface UnaryNode<T, N> extends BaseNode<T> {
-    type: typeof TokenType.NO_UNARIO;
+export interface UnaryNode<T extends string, N extends BaseNode<T>> extends BaseNode<T> {
+    type: typeof TokenType.UNARIO;
     operator: string;
     object: ASTNode<T, N>;
 }
 
-export interface ListNode<T, N> extends BaseNode<T> {
+export interface ListNode<T extends string, N extends BaseNode<T>> extends BaseNode<T> {
     type: typeof TokenType.LISTA;
     body: ASTNode<T, N>[];
 }
 
-export interface ExpressionNode<T, N> extends BaseNode<T> {
+export interface ExpressionNode<T extends string, N extends BaseNode<T>> extends BaseNode<T> {
     type: typeof TokenType.EXPRESION;
     object: ASTNode<T, N>;
 }
 
-export interface IdentificatorNode<T> extends BaseNode<T> {
+export interface IdentificatorNode<T extends string> extends BaseNode<T> {
     type: typeof TokenType.IDENTIFICADOR;
     value: string;
 }
 
-export interface AccessNode<T, N> extends BaseNode<T> {
+export interface AccessNode<T extends string, N extends BaseNode<T>> extends BaseNode<T> {
     type: typeof TokenType.ACCESO;
     object: ASTNode<T, N>;
     property: string;
 }
 
-export interface AccessNodeByIndex<T, N> extends BaseNode<T> {
+export interface AccessNodeByIndex<T extends string, N extends BaseNode<T>> extends BaseNode<T> {
     type: typeof TokenType.ACCESO_POR_INDICE;
     object: ASTNode<T, N>;
     index: ASTNode<T, N>;
 }
 
-export interface CallNode<T, N> extends BaseNode<T> {
+export interface CallNode<T extends string, N extends BaseNode<T>> extends BaseNode<T> {
     type: typeof TokenType.LLAMADA;
     object: ASTNode<T, N>;
     params: ASTNode<T, N>[];
 }
 
-export interface ExportNode<T, N> extends BaseNode<T> {
+export interface ExportNode<T extends string, N extends BaseNode<T>> extends BaseNode<T> {
     type: typeof TokenType.Exportar;
     object: ASTNode<T, N>;
 }
 
-export interface ImportNode<T, N> extends BaseNode<T> {
+export interface ImportNode<T extends string> extends BaseNode<T> {
     type: typeof TokenType.Importar;
     identificators: string[];
     path: string;
     isDestructured: boolean;
 }
 
-export interface AssignmentNode<T, N> extends BaseNode<T> {
+export interface AssignmentNode<T extends string, N extends BaseNode<T>> extends BaseNode<T> {
     type: typeof TokenType.ASIGNACION;
     left: ASTNode<T, N>;
     assignment: ASTNode<T, N>;
 }
 
-export interface JSNode<T> extends BaseNode<T> {
+export interface JSNode<T extends string> extends BaseNode<T> {
     type: typeof TokenType.JS,
     value: string
 }
 
-export interface SuperNode<T> extends BaseNode<T> {
+export interface SuperNode<T extends string> extends BaseNode<T> {
     type: typeof TokenType.Super;
     value: '';
 }
 
-export interface ThisNode<T> extends BaseNode<T> {
+export interface ThisNode<T extends string> extends BaseNode<T> {
     type: typeof TokenType.Esta;
     value: '';
 }
 
-export interface BlockNode<T, N> extends BaseNode<T> {
+export interface BlockNode<T extends string, N extends BaseNode<T>> extends BaseNode<T> {
     type: typeof TokenType.BLOQUE;
     body: ASTNode<T, N>[];
 }
 
-export interface EOF<T> extends BaseNode<T> {
+export interface EOF<T extends string> extends BaseNode<T> {
     type: typeof TokenType.EOF;
     value: '';
 }
 
-export interface SOF<T> extends BaseNode<T> {
+export interface SOF<T extends string> extends BaseNode<T> {
     type: typeof TokenType.SOF;
     value: '';
 }
@@ -321,15 +321,15 @@ export enum ODBMode {
     Intelligent = 1
 }
 
-export interface ODBNode<T, N> extends BaseNode<T> {
+export interface ODBNode<T extends string, N extends BaseNode<T>> extends BaseNode<T> {
     type: typeof TokenType.BDO;
     mode: ODBMode;
     blocks: Record<string, ASTNode<T, N>>;
     body: ASTNode<T, N>[];
 }
 
-export type ASTNode<T, N> =
-      EOF<T>
+export type ASTNode<T extends string, N extends BaseNode<T>> =
+    | EOF<T>
     | SOF<T>
     | LiteralNode<T>
     | BinaryExpressionNode<T, N>
@@ -351,7 +351,7 @@ export type ASTNode<T, N> =
     | AccessNode<T, N>
     | CallNode<T, N>
     | ExportNode<T, N>
-    | ImportNode<T, N>
+    | ImportNode<T>
     | AssignmentNode<T, N>
     | JSNode<T>
     | SuperNode<T>
