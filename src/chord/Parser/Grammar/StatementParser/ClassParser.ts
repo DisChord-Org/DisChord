@@ -1,11 +1,11 @@
 import { SubParser } from "../../subparser";
-import { ClassNode, SymbolKind, ASTNode } from "../../../types";
+import { ClassNode, SymbolKind, ASTNode, BaseNode, TokenType } from "../../../types";
 import { StatementParser } from "./StatementParser";
 import { Parser } from "../../parser";
 
-export class ClassParser<T, N> extends SubParser<T, N> {
+export class ClassParser<T extends string, N extends BaseNode<T>> extends SubParser<T, N> {
     /** To identify when this parser should be used */
-    static triggerToken: string = 'CLASE';
+    static triggerToken: TokenType | undefined = TokenType.Clase;
 
     /**
      * @param parent - Reference to the main Parser orchestrator.
@@ -15,24 +15,24 @@ export class ClassParser<T, N> extends SubParser<T, N> {
     }
 
     public parse(): ClassNode<T, N> {
-        this.consume('CLASE');
-        const id = this.consume('IDENTIFICADOR', 'Se debe especificar el nombre de la clase').value;
+        this.consume(TokenType.Clase);
+        const id = this.consume(TokenType.IDENTIFICADOR, 'Se debe especificar el nombre de la clase').value;
         
         let superClass = undefined;
-        if (this.match('EXTIENDE')) {
-            superClass = this.consume('IDENTIFICADOR', "Se debe especificar el nombre de la clase padre").value;
+        if (this.match(TokenType.Extiende)) {
+            superClass = this.consume(TokenType.IDENTIFICADOR, "Se debe especificar el nombre de la clase padre").value;
         }
 
-        this.consume('L_BRACE', "Al declarar una clase debes usar '{'");
+        this.consume(TokenType.L_BRACE, "Al declarar una clase debes usar '{'");
 
         const body: ASTNode<T, N>[] = [];
         const statementParser = this.parent.get(StatementParser) as StatementParser<T, N>;
 
-        while (this.peek().type !== 'R_BRACE' && !this.isAtEnd()) {
+        while (this.peek().type !== TokenType.R_BRACE && !this.isAtEnd()) {
             body.push(statementParser.parse(id));
         }
 
-        this.consume('R_BRACE');
+        this.consume(TokenType.R_BRACE);
 
         this.SymbolTable.register(id, {
             name: id,
@@ -40,7 +40,7 @@ export class ClassParser<T, N> extends SubParser<T, N> {
         }, this.peek('prev').location);
 
         return this.createNode<ClassNode<T, N>>({
-            type: 'Clase',
+            type: TokenType.Clase,
             id,
             superClass,
             body

@@ -1,6 +1,5 @@
 import { ChordError, ErrorLevel } from "../../../ChordError";
-import { KeyWords } from "../../KeywordsManager";
-import { ASTNode, ODBMode, ODBNode } from "../../types";
+import { ASTNode, BaseNode, ODBMode, ODBNode, TokenType } from "../../types";
 import { Parser } from "../parser";
 import { SubParser } from "../subparser";
 import { ExpressionParser } from "./Expressions/ExpressionParser";
@@ -8,9 +7,9 @@ import { ExpressionParser } from "./Expressions/ExpressionParser";
 /**
  * Specialized SubParser for Object Data Blocks (BDO).
  */
-export class BDOParser<T, N> extends SubParser<T, N> {
+export class BDOParser<T extends string, N extends BaseNode<T>> extends SubParser<T, N> {
     /** To identify when this parser should be used */
-    static triggerToken: string = 'L_BRACE';
+    static triggerToken: TokenType | undefined = TokenType.L_BRACE;
 
     /**
      * Stores the mode for the next parsing operation. 
@@ -54,20 +53,20 @@ export class BDOParser<T, N> extends SubParser<T, N> {
      * @throws {ChordError} If style rules are violated (e.g., missing ';' in BDOI).
      */
     private parseODB(mode: ODBMode = ODBMode.Simple): ODBNode<T, N> {
-        this.consume('L_BRACE');
+        this.consume(TokenType.L_BRACE);
     
         const blocks: Record<string, ASTNode<T, N>> = {};
         const body: ASTNode<T, N>[] = [];
         let definitionMode: boolean = true;
 
-        while (this.peek().type !== 'R_BRACE') {
+        while (this.peek().type !== TokenType.R_BRACE) {
             if (definitionMode && this.checkPropertyPattern(mode)) {
-                const key = this.consume('IDENTIFICADOR', 'Se esperaba un nombre de la propiedad').value;
+                const key = this.consume(TokenType.IDENTIFICADOR, 'Se esperaba un nombre de la propiedad').value;
                 const value = this.parent.get(ExpressionParser).parse();
 
-                if (this.peek().type === 'SEPARADOR') {
+                if (this.peek().type === TokenType.SEPARADOR) {
                     if (mode === ODBMode.Simple) mode = ODBMode.Intelligent;
-                    this.consume('SEPARADOR', 'En un BDOI, las definiciones deben terminar con ";"');
+                    this.consume(TokenType.SEPARADOR, 'En un BDOI, las definiciones deben terminar con ";"');
                 } else if (mode === ODBMode.Intelligent) {
                     throw new ChordError(
                         ErrorLevel.Parser,
@@ -95,10 +94,10 @@ export class BDOParser<T, N> extends SubParser<T, N> {
             }
         }
     
-        this.consume('R_BRACE');
+        this.consume(TokenType.R_BRACE);
     
         return this.createNode<ODBNode<T, N>>({
-            type: 'BDO',
+            type: TokenType.BDO,
             mode,
             blocks,
             body
@@ -114,12 +113,12 @@ export class BDOParser<T, N> extends SubParser<T, N> {
         const current = this.peek();
         const next = this.peek('next');
 
-        if (current.type !== 'IDENTIFICADOR') return false;
-        if (KeyWords.getStatements().includes(current.value)) return false;
-        if (KeyWords.getStatements().includes(next.value)) return false;
-        if (next.type === '.') return false;
-        if (mode === ODBMode.Simple && this.lookAheadForToken('SEPARADOR')) return true;
-        if (mode === ODBMode.Intelligent) return this.lookAheadForToken('SEPARADOR');
+        if (current.type !== TokenType.IDENTIFICADOR) return false;
+        if (this.parent.KeywordsManager.isKeyword(current.value)) return false;
+        if (this.parent.KeywordsManager.isKeyword(next.value)) return false;
+        if (next.type === TokenType.Punto) return false;
+        if (mode === ODBMode.Simple && this.lookAheadForToken(TokenType.SEPARADOR)) return true;
+        if (mode === ODBMode.Intelligent) return this.lookAheadForToken(TokenType.SEPARADOR);
 
         return true;
     }
@@ -137,15 +136,15 @@ export class BDOParser<T, N> extends SubParser<T, N> {
         while (true) {
             const token = this.peek(i);
 
-            if (token.type === 'L_BRACE') nestingLevel++;
-            if (token.type === 'R_BRACE') {
+            if (token.type === TokenType.L_BRACE) nestingLevel++;
+            if (token.type === TokenType.R_BRACE) {
                 if (nestingLevel === 0) return false;
                 nestingLevel--;
             }
 
             if (nestingLevel === 0 && token.type === type) return true;
 
-            if (token.type === 'EOF') return false;
+            if (token.type === TokenType.EOF) return false;
             i++;
         }
     }

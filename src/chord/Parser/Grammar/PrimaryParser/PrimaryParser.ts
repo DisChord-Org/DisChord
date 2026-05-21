@@ -1,5 +1,5 @@
 import { SubParser } from "../../subparser";
-import { ASTNode, ExpressionNode, JSNode, ListNode, NewNode, ODBMode } from "../../../types";
+import { ASTNode, BaseNode, ExpressionNode, JSNode, ListNode, NewNode, ODBMode, TokenType } from "../../../types";
 import { ExpressionParser } from "../Expressions/ExpressionParser";
 import { AssignmentParser } from "../Expressions/AssignmentParser";
 import { DecoratorProcessor } from "../../../DecoratorProcessor";
@@ -9,9 +9,9 @@ import { LiteralParser } from "../Expressions/LiteralParser";
 import { AccessParser } from "../Expressions/AccessParser";
 import { Parser } from "../../parser";
 
-export class PrimaryParser<T, N> extends SubParser<T, N> {
+export class PrimaryParser<T extends string, N extends BaseNode<T>> extends SubParser<T, N> {
     /** To identify when this parser should be used */
-    static triggerToken: string = '';
+    static triggerToken: TokenType | undefined;
 
     /**
      * @param parent - Reference to the main Parser orchestrator.
@@ -23,64 +23,64 @@ export class PrimaryParser<T, N> extends SubParser<T, N> {
     public parse(): ASTNode<T, N> {
         const token = this.peek();
 
-        if (token.type === 'NUEVO') {
-            this.consume('NUEVO');
+        if (token.type === TokenType.Nuevo) {
+            this.consume(TokenType.Nuevo);
             const call = this.parent.get(AccessParser).parse(); 
             return this.createNode<NewNode<T, N>>({
-                type: 'Nuevo',
+                type: TokenType.Nuevo,
                 object: call
             });
         }
 
-        if (token.type === 'L_SQUARE') {
-            this.consume('L_SQUARE');
+        if (token.type === TokenType.L_SQUARE) {
+            this.consume(TokenType.L_SQUARE);
             const elements: ASTNode<T, N>[] = [];
-            while (this.peek().type !== 'R_SQUARE') {
+            while (this.peek().type !== TokenType.R_SQUARE) {
                 elements.push(this.parent.get(AssignmentParser).parse());
-                if (this.peek().type === ',') this.consume(',');
+                if (this.peek().type === TokenType.COMA) this.consume(TokenType.COMA);
             }
-            this.consume('R_SQUARE');
+            this.consume(TokenType.R_SQUARE);
             return this.createNode<ListNode<T, N>>({
-                type: 'Lista',
+                type: TokenType.LISTA,
                 body: elements
             });
         }
 
-        if (token.type === 'L_BRACE') {
+        if (token.type === TokenType.L_BRACE) {
             const isIntelligent = DecoratorProcessor.matchAndDelete('BDOI', true);
             const parser: BDOParser<T, N> = this.parent.get(BDOParser) as BDOParser<T, N>;
 
             return parser.setMode(isIntelligent ? ODBMode.Intelligent : ODBMode.Simple).parse();
         }
 
-        if (token.type === 'L_EXPRESSION') {
-            this.consume('L_EXPRESSION');
+        if (token.type === TokenType.L_PAREN) {
+            this.consume(TokenType.L_PAREN);
             const node = this.parent.get(ExpressionParser).parse();
-            this.consume('R_EXPRESSION');
+            this.consume(TokenType.R_PAREN);
 
             return this.createNode<ExpressionNode<T, N>>({
-                type: 'Expresion',
+                type: TokenType.EXPRESION,
                 object: node,
             });
         }
 
-        if (token.value === 'js') {
-            this.consume('JS');
-            this.consume('L_EXPRESSION');
-            const content = this.consume('TEXTO').value;
-            this.consume('R_EXPRESSION');
-            
+        if (token.value === TokenType.JS) {
+            this.consume(TokenType.JS);
+            this.consume(TokenType.L_PAREN);
+            const content = this.consume(TokenType.TEXTO).value;
+            this.consume(TokenType.R_PAREN);
+
             return this.createNode<JSNode<T>>({
-                type: 'JS',
+                type: TokenType.JS,
                 value: content
             });
         }
 
-        if ([ 'IDENTIFICADOR', 'ESTA', 'SUPER' ].includes(token.type)) {
+        if (([ TokenType.IDENTIFICADOR, TokenType.Esta, TokenType.Super ] as TokenType[]).includes(token.type)) {
             return this.parent.get(AccessParser).parse();
         }
 
-        if ([ 'NUMERO', 'TEXTO', 'BOOL', 'INDEFINIDO' ].includes(token.type)) {
+        if (([ TokenType.NUMERO, TokenType.BIGINT, TokenType.TEXTO, TokenType.BOOLEANO, TokenType.Indefinido ] as TokenType[]).includes(token.type)) {
             return this.parent.get(LiteralParser).parse();
         }
 

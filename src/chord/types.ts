@@ -55,6 +55,11 @@ export type Location = {
     column: number;
 };
 
+/**
+ * Registry of all lexical tokens and virtual parser nodes within the Chord infrastructure.
+ * Grouped logically to separate raw stream definitions from abstract syntax structures.
+ * @type {const}
+ */
 export const TokenType = {
     // Reserved words
     Var: 'var',
@@ -66,6 +71,8 @@ export const TokenType = {
     En: 'en',
     Para: 'para',
     Si: 'si',
+    Ademas: 'ademas',
+    Sino: 'sino',
     Devolver: 'devolver',
     Importar: 'importar',
     Exportar: 'exportar',
@@ -87,6 +94,8 @@ export const TokenType = {
     Decorador: 'decorador',
 
     // Operators
+    Intro: 'intro',
+    Espacio: 'espacio',
     Mas: 'mas',
     Menos: 'menos',
     Por: 'por',
@@ -123,6 +132,7 @@ export const TokenType = {
     NUMERO: 'NUMERO',
     BIGINT: 'BIGINT',
     TEXTO: 'TEXTO',
+    TIPO: 'TIPO',
     
     // System
     EOF: 'EOF',

@@ -1,10 +1,10 @@
-import { ExitLoopNode } from "../../../../types";
+import { BaseNode, ExitLoopNode, TokenType } from "../../../../types";
 import { Parser } from "../../../parser";
 import { SubParser } from "../../../subparser";
 
-export class ExitParser<T, N> extends SubParser<T, N> {
+export class ExitParser<T extends string, N extends BaseNode<T>> extends SubParser<T, N> {
     /** To identify when this parser should be used */
-    static triggerToken: string = 'SALIR';
+    static triggerToken: TokenType | undefined = TokenType.Salir;
 
     /**
      * @param parent - Reference to the main Parser orchestrator.
@@ -14,9 +14,9 @@ export class ExitParser<T, N> extends SubParser<T, N> {
     }
 
     public parse(): ExitLoopNode<T> {
-        this.consume('SALIR');
+        this.consume(TokenType.Salir);
         return this.createNode<ExitLoopNode<T>>({
-            type: 'Salir'
+            type: TokenType.Salir
         });
     }
 }

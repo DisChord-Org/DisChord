@@ -1,11 +1,11 @@
-import { ASTNode } from "../../../types";
+import { ASTNode, BaseNode, TokenType } from "../../../types";
 import { Parser } from "../../parser";
 import { SubParser } from "../../subparser";
 import { LogicalParser } from "./LogicalParser";
 
-export class AssignmentParser<T, N> extends SubParser<T, N> {
+export class AssignmentParser<T extends string, N extends BaseNode<T>> extends SubParser<T, N> {
     /** To identify when this parser should be used */
-    static triggerToken: string = 'ES';
+    static triggerToken: TokenType | undefined = TokenType.Es;
 
     /**
      * @param parent - Reference to the main Parser orchestrator.

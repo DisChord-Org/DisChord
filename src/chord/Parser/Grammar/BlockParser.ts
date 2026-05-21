@@ -1,4 +1,4 @@
-import { ASTNode, BlockNode } from "../../types";
+import { ASTNode, BaseNode, BlockNode, TokenType } from "../../types";
 import { Parser } from "../parser";
 import { SubParser } from "../subparser";
 
@@ -7,9 +7,9 @@ import { SubParser } from "../subparser";
  * @extends SubParser
  * @description Handles the parsing of code blocks enclosed in braces.
  */
-export class BlockParser<T, N> extends SubParser<T, N> {
+export class BlockParser<T extends string, N extends BaseNode<T>> extends SubParser<T, N> {
     /** To identify when this parser should be used */
-    static triggerToken: string = '';
+    static triggerToken: TokenType | undefined;
 
     /**
      * @param parent - Reference to the main Parser orchestrator.
@@ -26,20 +26,20 @@ export class BlockParser<T, N> extends SubParser<T, N> {
     public parse (): BlockNode<T, N> {
         const body: ASTNode<T, N>[] = [];
 
-        this.consume('L_BRACE', "Se esperaba '{' para iniciar el bloque.");
+        this.consume(TokenType.L_BRACE);
         
         this.SymbolTable.pushScope();
 
-        while (!this.isAtEnd() && this.peek().type !== 'R_BRACE') {
+        while (!this.isAtEnd() && this.peek().type !== TokenType.R_BRACE) {
             body.push(this.parent.parseExpression());
         }
 
-        this.consume('R_BRACE', "Se esperaba '}' para cerrar el bloque.");
+        this.consume(TokenType.R_BRACE);
         
         this.SymbolTable.popScope();
 
         return this.createNode<BlockNode<T, N>>({
-            type: 'Bloque',
+            type: TokenType.BLOQUE,
             body
         });
     }

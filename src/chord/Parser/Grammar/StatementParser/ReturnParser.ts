@@ -1,10 +1,10 @@
 import { SubParser } from "../../subparser";
-import { ReturnNode } from "../../../types";
+import { BaseNode, ReturnNode, TokenType } from "../../../types";
 import { Parser } from "../../parser";
 
-export class ReturnParser<T, N> extends SubParser<T, N> {
+export class ReturnParser<T extends string, N extends BaseNode<T>> extends SubParser<T, N> {
     /** To identify when this parser should be used */
-    static triggerToken: string = 'DEVOLVER';
+    static triggerToken: TokenType | undefined = TokenType.Devolver;
 
     /**
      * @param parent - Reference to the main Parser orchestrator.
@@ -14,19 +14,19 @@ export class ReturnParser<T, N> extends SubParser<T, N> {
     }
     
     public parse(): ReturnNode<T, N> {
-        this.consume('DEVOLVER');
+        this.consume(TokenType.Devolver);
         
         let value = undefined;
         const next = this.peek();
 
-        const isEndOfStatement = ['R_BRACE', 'SINO', 'ADEMAS', 'EOF'].includes(next.type);
+        const isEndOfStatement = ([ TokenType.R_BRACE, TokenType.Sino, TokenType.Ademas, TokenType.EOF ] as TokenType[]).includes(next.type);
 
         if (!isEndOfStatement) {
             value = this.parent.parseExpression();
         }
 
         return this.createNode<ReturnNode<T, N>>({
-            type: 'Devolver',
+            type: TokenType.Devolver,
             object: value
         });
     }

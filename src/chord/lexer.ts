@@ -2,7 +2,7 @@ import { Token, TokenType } from './types';
 import { ChordError, ErrorLevel } from '../ChordError';
 import { codeProvider } from '../CodeProvider';
 import { CompilationContext } from '../init/Init';
-import { SymbolTranslationMap } from './symbols';
+import { SymbolTranslationMap } from './Symbols';
 
 export class Lexer {
     private line = 1;

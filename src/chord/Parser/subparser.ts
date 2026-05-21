@@ -1,4 +1,4 @@
-import { ASTNode, BaseNode, PeekType, Token } from "../../chord/types";
+import { ASTNode, BaseNode, PeekType, Token, TokenType } from "../../chord/types";
 import { SymbolTable } from "../SymbolsTable";
 import { Parser } from "./parser";
 
@@ -85,5 +85,5 @@ export interface SubParserClass<T extends string, N extends BaseNode<T>> {
     /** 
      * The token type string that triggers the activation of this specific sub-parser.
      */
-    triggerToken: string;
+    triggerToken: TokenType | undefined;
 }

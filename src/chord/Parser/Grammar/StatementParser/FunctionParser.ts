@@ -1,12 +1,12 @@
 import { SubParser } from "../../subparser";
-import { FunctionNode, SymbolKind } from "../../../types";
+import { BaseNode, FunctionNode, SymbolKind, TokenType } from "../../../types";
 import { BlockParser } from "../BlockParser";
 import { Parser } from "../../parser";
 import { DecoratorProcessor } from "../../../DecoratorProcessor";
 
-export class FunctionParser<T, N> extends SubParser<T, N> {
+export class FunctionParser<T extends string, N extends BaseNode<T>> extends SubParser<T, N> {
     /** To identify when this parser should be used */
-    static triggerToken: string = 'FUNCION';
+    static triggerToken: TokenType | undefined = TokenType.Funcion;
 
     /**
      * @param parent - Reference to the main Parser orchestrator.
@@ -40,19 +40,19 @@ export class FunctionParser<T, N> extends SubParser<T, N> {
         this.reset();
 
         if (flags.constructor) {
-            id = this.consume('IDENTIFICADOR', "Se esperaba el nombre del constructor.").value;
+            id = this.consume(TokenType.IDENTIFICADOR, "Se esperaba el nombre del constructor.").value;
         } else {
-            this.consume('FUNCION');
-            id = this.consume('IDENTIFICADOR', "Se esperaba el nombre de la función.").value;
+            this.consume(TokenType.Funcion);
+            id = this.consume(TokenType.IDENTIFICADOR, "Se esperaba el nombre de la función.").value;
         }
 
-        this.consume('L_EXPRESSION');
+        this.consume(TokenType.L_PAREN, `Después del nombre de la función se debe abrir una expresión con '(' para especificar los parámetros.`);
         const params: string[] = [];
-        while (this.peek().type !== 'R_EXPRESSION') {
-            params.push(this.consume('IDENTIFICADOR', "Se esperaba el nombre del parámetro.").value);
-            if (this.peek().type === ',') this.consume(',');
+        while (!this.isAtEnd() && this.peek().type !== TokenType.R_PAREN) {
+            params.push(this.consume(TokenType.IDENTIFICADOR, "Se esperaba el nombre del parámetro.").value);
+            if (this.peek().type === TokenType.COMA) this.consume(TokenType.COMA);
         }
-        this.consume('R_EXPRESSION');
+        this.consume(TokenType.R_PAREN);
 
         const body = (this.parent.get(BlockParser) as BlockParser<T, N>).parse().body;
 
@@ -65,7 +65,7 @@ export class FunctionParser<T, N> extends SubParser<T, N> {
         const isStatic: boolean = DecoratorProcessor.matchAndDelete('fijar', true);
 
         return this.createNode<FunctionNode<T, N>>({
-            type: 'Funcion',
+            type: TokenType.Funcion,
             id,
             metadata: {
                 isConstructor: flags.constructor,

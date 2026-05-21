@@ -1,11 +1,11 @@
 import { SubParser } from "../../subparser";
-import { ASTNode, AccessNode, AccessNodeByIndex, CallNode, IdentificatorNode } from "../../../types";
+import { ASTNode, AccessNode, AccessNodeByIndex, BaseNode, CallNode, IdentificatorNode, TokenType } from "../../../types";
 import { AssignmentParser } from "./AssignmentParser";
 import { Parser } from "../../parser";
 
-export class AccessParser<T, N> extends SubParser<T, N> {
+export class AccessParser<T extends string, N extends BaseNode<T>> extends SubParser<T, N> {
     /** To identify when this parser should be used */
-    static triggerToken: string = '';
+    static triggerToken: TokenType | undefined;
 
     /**
      * @param parent - Reference to the main Parser orchestrator.
@@ -16,18 +16,18 @@ export class AccessParser<T, N> extends SubParser<T, N> {
     
     public parse(startNode?: ASTNode<T, N>): ASTNode<T, N> {
         let node = startNode || this.createNode<IdentificatorNode<T>>({
-            type: 'Identificador',
-            value: this.consume('IDENTIFICADOR').value
+            type: TokenType.IDENTIFICADOR,
+            value: this.consume(TokenType.IDENTIFICADOR).value
         });
 
         while (true) {
             const next = this.peek();
 
-            if (next.type === '.') {
-                this.consume('.');
-                const property = this.consume('IDENTIFICADOR', `Se esperaba un nombre tras '.'`);
+            if (next.type === TokenType.ACCESO) {
+                this.consume(TokenType.ACCESO);
+                const property = this.consume(TokenType.IDENTIFICADOR, `Se esperaba un nombre tras '.'`);
                 node = this.createNode<AccessNode<T, N>>({
-                    type: 'Acceso',
+                    type: TokenType.ACCESO,
                     object: node,
                     property: property.value
                 });
@@ -35,13 +35,13 @@ export class AccessParser<T, N> extends SubParser<T, N> {
                 continue;
             }
 
-            if (next.type === 'L_SQUARE') {
-                this.consume('L_SQUARE');
+            if (next.type === TokenType.L_SQUARE) {
+                this.consume(TokenType.L_SQUARE);
                 const index = this.parent.get(AssignmentParser).parse();
-                this.consume('R_SQUARE');
+                this.consume(TokenType.R_SQUARE);
 
                 node = this.createNode<AccessNodeByIndex<T, N>>({
-                    type: 'AccesoPorIndice',
+                    type: TokenType.ACCESO_POR_INDICE,
                     object: node,
                     index
                 });
@@ -49,18 +49,18 @@ export class AccessParser<T, N> extends SubParser<T, N> {
                 continue;
             }
 
-            if (next.type === 'L_EXPRESSION') {
-                this.consume('L_EXPRESSION');
+            if (next.type === TokenType.L_PAREN) {
+                this.consume(TokenType.L_PAREN);
                 const args: ASTNode<T, N>[] = [];
                 
-                while (this.peek().type !== 'R_EXPRESSION') {
+                while (this.peek().type !== TokenType.R_PAREN) {
                     args.push(this.parent.get(AssignmentParser).parse());
-                    if (this.peek().type === ',') this.consume(',');
+                    if (this.peek().type === TokenType.COMA) this.consume(TokenType.COMA);
                 }
                 
-                this.consume('R_EXPRESSION');
+                this.consume(TokenType.R_PAREN);
                 node = this.createNode<CallNode<T, N>>({
-                    type: 'Llamada',
+                    type: TokenType.LLAMADA,
                     object: node,
                     params: args
                 });

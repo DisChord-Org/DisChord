@@ -1,11 +1,11 @@
 import { SubParser } from "../../../subparser";
-import { ExportNode } from "../../../../types";
+import { BaseNode, ExportNode, TokenType } from "../../../../types";
 import { StatementParser } from "../StatementParser";
 import { Parser } from "../../../parser";
 
-export class ExportParser<T, N> extends SubParser<T, N> {
+export class ExportParser<T extends string, N extends BaseNode<T>> extends SubParser<T, N> {
     /** To identify when this parser should be used */
-    static triggerToken: string = 'EXPORTAR';
+    static triggerToken: TokenType | undefined = TokenType.Exportar;
 
     /**
      * @param parent - Reference to the main Parser orchestrator.
@@ -15,12 +15,12 @@ export class ExportParser<T, N> extends SubParser<T, N> {
     }
 
     public parse(): ExportNode<T, N> {
-        this.consume('EXPORTAR');
+        this.consume(TokenType.Exportar);
         
         const object = this.parent.get(StatementParser).parse();
 
         return this.createNode<ExportNode<T, N>>({
-            type: 'Exportar',
+            type: TokenType.Exportar,
             object
         });
     }

@@ -1,10 +1,10 @@
-import { PassLoopNode } from "../../../../types";
+import { BaseNode, PassLoopNode, TokenType } from "../../../../types";
 import { Parser } from "../../../parser";
 import { SubParser } from "../../../subparser";
 
-export class PassParser<T, N> extends SubParser<T, N> {
+export class PassParser<T extends string, N extends BaseNode<T>> extends SubParser<T, N> {
     /** To identify when this parser should be used */
-    static triggerToken: string = 'PASAR';
+    static triggerToken: TokenType | undefined = TokenType.Pasar;
 
     /**
      * @param parent - Reference to the main Parser orchestrator.
@@ -14,9 +14,9 @@ export class PassParser<T, N> extends SubParser<T, N> {
     }
 
     public parse(): PassLoopNode<T> {
-        this.consume('PASAR');
+        this.consume(TokenType.Pasar);
         return this.createNode<PassLoopNode<T>>({
-            type: 'Pasar'
+            type: TokenType.Pasar
         });
     }
 }

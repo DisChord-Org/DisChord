@@ -31,6 +31,7 @@ import { ClassParser } from "./Grammar/StatementParser/ClassParser";
 import { ExitParser } from "./Grammar/StatementParser/FlowParser/ExitParser";
 import { PassParser } from "./Grammar/StatementParser/FlowParser/PassParser";
 import { FunctionParser } from "./Grammar/StatementParser/FunctionParser";
+import { KeyWords } from "../KeywordsManager";
 
 export class Parser<T extends string, N extends BaseNode<T>> extends ParserContext<T, N> {
     public nodes: ASTNode<T, N>[] = [];
@@ -74,6 +75,10 @@ export class Parser<T extends string, N extends BaseNode<T>> extends ParserConte
 
     public get SymbolTable (): SymbolTable {
         return this.context.symbolTable;
+    }
+
+    public get KeywordsManager (): KeyWords {
+        return this.context.keywordsManager;
     }
 
     public peek(type: PeekType = 'this'): Token {

@@ -1,11 +1,11 @@
 import { Parser } from "../../parser";
-import { ASTNode, BinaryExpressionNode, NoUnaryNode, UnaryNode } from "../../../types";
+import { ASTNode, BaseNode, NoUnaryNode, TokenType, UnaryNode } from "../../../types";
 import { SubParser } from "../../subparser";
 import { PrimaryParser } from "../PrimaryParser/PrimaryParser";
 
-export class UnaryParser<T, N> extends SubParser<T, N> {
+export class UnaryParser<T extends string, N extends BaseNode<T>> extends SubParser<T, N> {
     /** To identify when this parser should be used */
-    static triggerToken: string = '';
+    static triggerToken: TokenType | undefined;
 
     /**
      * @param parent - Reference to the main Parser orchestrator.
@@ -21,22 +21,22 @@ export class UnaryParser<T, N> extends SubParser<T, N> {
     public parse(): ASTNode<T, N> {
         const token = this.peek();
 
-        if (token.type === 'NO') {
-            this.consume('NO');
+        if (token.type === TokenType.No) {
+            this.consume(TokenType.No);
             const argument = this.parse();
             return this.createNode<NoUnaryNode<T, N>>({
-                type: 'NoUnario',
-                operator: 'NO',
+                type: TokenType.NO_UNARIO,
+                operator: TokenType.No,
                 object: argument
             });
         }
 
-        if (token.type === 'TIPO') {
-            this.consume('TIPO');
+        if (token.type === TokenType.TIPO) {
+            this.consume(TokenType.TIPO);
             const argument = this.parse();
             return this.createNode<UnaryNode<T, N>>({
-                type: 'Unario',
-                operator: 'TIPO',
+                type: TokenType.UNARIO,
+                operator: TokenType.TIPO,
                 object: argument
             });
         }

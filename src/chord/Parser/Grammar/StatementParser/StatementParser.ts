@@ -1,5 +1,5 @@
 import { DecoratorProcessor } from "../../../DecoratorProcessor";
-import { ASTNode } from "../../../types";
+import { ASTNode, BaseNode, TokenType } from "../../../types";
 import { Parser } from "../../parser";
 import { SubParser } from "../../subparser";
 import { ExpressionParser } from "../Expressions/ExpressionParser";
@@ -15,9 +15,9 @@ import { VariableParser } from "./VariableParser";
 import { ExitParser } from "./FlowParser/ExitParser";
 import { PassParser } from "./FlowParser/PassParser";
 
-export class StatementParser<T, N> extends SubParser<T, N> {
+export class StatementParser<T extends string, N extends BaseNode<T>> extends SubParser<T, N> {
     /** To identify when this parser should be used */
-    static triggerToken: string = '';
+    static triggerToken: TokenType | undefined;
 
     /**
      * @param parent - Reference to the main Parser orchestrator.
@@ -32,9 +32,9 @@ export class StatementParser<T, N> extends SubParser<T, N> {
         const custom = this.parent.parseCustomStatement();
         if (custom) return custom;
 
-        if (token.type === 'DECORADOR') {
+        if (token.type === TokenType.Decorador) {
             const decorator = token.value;
-            this.consume('DECORADOR');
+            this.consume(TokenType.Decorador);
         
             if (decorator === '@asincrono') {
                 DecoratorProcessor.addDecorator('asincrono', true);
@@ -52,35 +52,35 @@ export class StatementParser<T, N> extends SubParser<T, N> {
         }
 
         switch (token.type) {
-            case 'VAR':
+            case TokenType.Var:
                 return this.parent.get(VariableParser as unknown as any).parse();
-            case 'CONDICION':
+            case TokenType.Si:
                 return this.parent.get(ConditionParser).parse();
-            case 'PARA':
+            case TokenType.Para:
                 return this.parent.get(LoopParser).parse();
-            case 'DEVOLVER':
+            case TokenType.Devolver:
                 return this.parent.get(ReturnParser).parse();
-            case 'FUNCION':
+            case TokenType.Funcion:
                 return (this.parent.get(FunctionParser) as FunctionParser<T, N>)
                     .setConstructor(false)
                     .setMethod(!!classContext)
                     .parse();
-            case 'PROP':
+            case TokenType.Prop:
                 return (this.parent.get(PropertyParser as unknown as any) as PropertyParser<T, N>).parse();
-            case 'IMPORTAR':
+            case TokenType.Importar:
                 return this.parent.get(ImportParser as unknown as any).parse();
-            case 'EXPORTAR':
+            case TokenType.Exportar:
                 return this.parent.get(ExportParser as unknown as any).parse();
-            case 'CLASE':
+            case TokenType.Clase:
                 return this.parent.get(ClassParser).parse();
-            case 'SALIR':
+            case TokenType.Salir:
                 return this.parent.get(ExitParser).parse();
-            case 'PASAR':
+            case TokenType.Pasar:
                 return this.parent.get(PassParser).parse();
-            case 'IDENTIFICADOR':
+            case TokenType.IDENTIFICADOR:
                 if (classContext && token.value === classContext) { // Constructor
                     const nextToken = this.parent.peek('next');
-                    if (nextToken && nextToken.type === 'L_EXPRESSION') {
+                    if (nextToken && nextToken.type === TokenType.L_PAREN) {
                         return (this.parent.get(FunctionParser as any) as FunctionParser<T, N>)
                             .setConstructor(true)
                             .setMethod(true)

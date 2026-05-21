@@ -1,11 +1,11 @@
 import { SubParser } from "../../subparser";
-import { PropertyNode, SymbolKind, LiteralNode, ASTNode } from "../../../types";
+import { PropertyNode, SymbolKind, LiteralNode, ASTNode, BaseNode, TokenType } from "../../../types";
 import { Parser } from "../../parser";
 import { DecoratorProcessor } from "../../../DecoratorProcessor";
 
-export class PropertyParser<T, N> extends SubParser<T, N> {
+export class PropertyParser<T extends string, N extends BaseNode<T>> extends SubParser<T, N> {
     /** To identify when this parser should be used */
-    static triggerToken: string = 'PROP';
+    static triggerToken: TokenType | undefined = TokenType.Prop;
 
     /**
      * @param parent - Reference to the main Parser orchestrator.
@@ -15,16 +15,16 @@ export class PropertyParser<T, N> extends SubParser<T, N> {
     }
 
     public parse(): PropertyNode<T, N> {
-        this.consume('PROP');
-        const id = this.consume('IDENTIFICADOR', "Se esperaba el nombre de la propiedad").value;
+        this.consume(TokenType.Prop);
+        const id = this.consume(TokenType.IDENTIFICADOR, "Se esperaba el nombre de la propiedad").value;
         
         let value: ASTNode<T, N> = this.createNode<LiteralNode<T>>({
-            type: 'Literal',
+            type: TokenType.LITERAL,
             value: undefined,
             raw: 'indefinido'
         });
 
-        if (this.match('ES')) {
+        if (this.match(TokenType.Es)) {
             value = this.parent.parseExpression();
         }
 
@@ -36,7 +36,7 @@ export class PropertyParser<T, N> extends SubParser<T, N> {
         const isStatic: boolean = DecoratorProcessor.matchAndDelete('fijar', true);
 
         return this.createNode<PropertyNode<T, N>>({
-            type: 'Propiedad',
+            type: TokenType.PROPIEDAD,
             id,
             value,
             isStatic
