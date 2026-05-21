@@ -1,5 +1,5 @@
 import { ChordError, ErrorLevel } from "../../../ChordError";
-import { KeyWords } from "../../keywords";
+import { KeyWords } from "../../KeywordsManager";
 import { ASTNode, ODBMode, ODBNode } from "../../types";
 import { Parser } from "../parser";
 import { SubParser } from "../subparser";

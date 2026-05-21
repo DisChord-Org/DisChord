@@ -1,4 +1,4 @@
-import { KeyWords } from '../../chord/keywords';
+import { KeyWords } from '../../chord/KeywordsManager';
 import { Token } from '../../chord/types';
 import { DisChordASTNode, DisChordNode, DisChordNodeType } from '../types';
 

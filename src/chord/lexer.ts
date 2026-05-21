@@ -1,6 +1,6 @@
 import { Token } from './types';
 import { symbols } from './symbols';
-import { KeyWords } from './keywords';
+import { KeyWords } from './KeywordsManager';
 import { ChordError, ErrorLevel } from '../ChordError';
 import { codeProvider } from '../CodeProvider';
 

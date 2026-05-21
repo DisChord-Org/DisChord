@@ -1,6 +1,6 @@
 import { DisChordParser } from "../parser";
 import { StartBotNode } from "../../types";
-import { KeyWords } from '../../../chord/keywords';
+import { KeyWords } from '../../../chord/KeywordsManager';
 import { SubParser } from "../subparser";
 import { DisChordError, ErrorLevel } from "../../../ChordError";
 import { ODBMode } from "../../../chord/types";

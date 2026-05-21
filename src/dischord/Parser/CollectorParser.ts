@@ -1,6 +1,6 @@
 import { DisChordParser } from "./parser";
 import { CollectorNode } from "../types";
-import { KeyWords } from "../../chord/keywords";
+import { KeyWords } from "../../chord/KeywordsManager";
 import { SubParser } from "./subparser";
 import { ODBMode } from "../../chord/types";
 
