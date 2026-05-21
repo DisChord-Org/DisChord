@@ -3,10 +3,29 @@
  * @description Core AST node type definitions and generic structural bindings for the DisChord compiler.
  */
 
+/**
+ * Valid variant token lookup strategies allowed within the parser stream inspection pipeline.
+ * Supports relative numerical index offsets or explicit descriptive semantic aliases.
+ * @typedef {number | 'this' | 'next' | 'prev'} PeekType
+ */
+export type PeekType = number | 'this' | 'next' | 'prev';
+
+/**
+ * Defines the operational categories of symbols encountered during semantic analysis.
+ * Used by the Symbol Table to differentiate identifiers and enforce type-checking boundaries.
+ * @enum {number}
+ */
 export enum SymbolKind {
+    /** Represents a mutable or immutable variable allocation binding. */
     Variable,
+    
+    /** Represents a reusable routine block declaration with scoped parameters. */
     Function,
+    
+    /** Represents an object-oriented structural blueprint definition wrapper. */
     Class,
+    
+    /** Represents an isolated state field or member attribute locked inside a Class context. */
     Property
 };
 

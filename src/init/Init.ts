@@ -86,15 +86,15 @@ export default class Init {
 
         DisChordParser.injectStatements();
 
-        const lexer = new Lexer();
-        const tokens = lexer.tokenize();
-        CLI.logFlag(LogFlagLevel.LEXER, tokens);
-
         const context: CompilationContext = {
             symbolTable: new SymbolTable(),
             keywordsManager: new KeyWords(),
             projectRoot: this.config.projectRoot
         };
+
+        const lexer = new Lexer(context);
+        const tokens = lexer.tokenize();
+        CLI.logFlag(LogFlagLevel.LEXER, tokens);
 
         const parser = new DisChordParser(tokens, context);
         const ast = parser.parse();

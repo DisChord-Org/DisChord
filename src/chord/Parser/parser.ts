@@ -1,5 +1,5 @@
 import { SUGGESTIONS } from "../core.lib";
-import { ASTNode, Token, SOF, EOF, TokenType, BaseNode } from "./../types";
+import { ASTNode, Token, SOF, EOF, TokenType, BaseNode, PeekType } from "./../types";
 
 import { ChordError, ErrorLevel } from "../../ChordError";
 import { CompilationContext } from "../../init/Init";
@@ -76,7 +76,7 @@ export class Parser<T extends string, N extends BaseNode<T>> extends ParserConte
         return this.context.symbolTable;
     }
 
-    public peek(type: number | 'this' | 'next' | 'prev' = 'this'): Token {
+    public peek(type: PeekType = 'this'): Token {
         if (typeof type == 'number') return this.tokens[type];
 
         let targetIndex = this.cursor;

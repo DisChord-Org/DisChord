@@ -1,4 +1,4 @@
-import { ASTNode, Token } from "../../chord/types";
+import { ASTNode, BaseNode, PeekType, Token } from "../../chord/types";
 import { SymbolTable } from "../SymbolsTable";
 import { Parser } from "./parser";
 
@@ -9,7 +9,7 @@ import { Parser } from "./parser";
  * Expressions, Discord-specific structures) are delegated to subclasses of SubParser.
  * It provides a proxy interface to the parent Parser's state and utility methods.
  */
-export abstract class SubParser<T = never, N = never> {
+export abstract class SubParser<T extends string, N extends BaseNode<T>> {
     /**
      * @param parent - Reference to the orchestrator Parser instance (Chord or DisChord).
      */
@@ -33,7 +33,7 @@ export abstract class SubParser<T = never, N = never> {
      * Looks ahead at tokens through the parent's token stream without consuming them.
      * @returns The current token without consuming it.
      */
-    protected peek(type: number | 'this' | 'next' | 'prev' = 'this'): Token {
+    protected peek(type: PeekType = 'this'): Token {
         return this.parent.peek(type);
     }
 
@@ -76,7 +76,7 @@ export abstract class SubParser<T = never, N = never> {
  * Static blueprint for SubParser implementations.
  * Defines the contract for registration and identification of grammar specialists.
  */
-export interface SubParserClass<T, N> {
+export interface SubParserClass<T extends string, N extends BaseNode<T>> {
     /** 
      * Constructor signature: accepts any instance that extends the base Parser.
      */
