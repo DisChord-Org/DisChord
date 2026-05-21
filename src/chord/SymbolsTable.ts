@@ -9,7 +9,7 @@ import { ChordError, ErrorLevel } from "../ChordError";
  * and prevents duplicate declarations within the same scope.
  */
 export class SymbolTable {
-    /** 
+    /**
      * A stack of symbol maps representing nested scopes. 
      * The first element is the global scope, and the last is the current local scope.
      */

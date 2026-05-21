@@ -78,6 +78,11 @@ export const TokenType = {
     Super: 'super',
     Esta: 'esta',
 
+    // Reserver keywords as primitive literal types
+    Verdadero: 'verdadero',
+    Falso: 'falso',
+    Indefinido: 'indefinido',
+
     // Decorators
     Decorador: 'decorador',
 
@@ -87,19 +92,36 @@ export const TokenType = {
     Por: 'por',
     Entre: 'entre',
     Punto: 'punto',
+    Exponente: 'exp',
+    Resto: 'resto',
     Igual: 'igual',
     IgualTipado: 'igual_tipado',
+    Mayor: 'mayor',
+    Menor: 'menor',
+    MayorIgual: 'mayor_igual',
+    MenorIgual: 'menor_igual',
+    NoIgual: 'no_igual',
+    NoIgualTipado: 'no_igual_tipado',
+    Y: 'y',
+    O: 'o',
+    No: 'no',
 
     // Delimiters
     L_BRACE: 'L_BRACE',     // {
     R_BRACE: 'R_BRACE',     // }
     L_PAREN: 'L_PAREN',     // (
     R_PAREN: 'R_PAREN',     // )
+    L_SQUARE: 'L_SQUARE',   // [
+    R_SQUARE: 'R_SQUARE',   // ]
     COMA: 'COMA',
+    DOS_PUNTOS: 'DOS_PUNTOS',
+    SEPARADOR: 'SEPARADOR',
 
     // Dynamic Literals & Identifiers
     IDENTIFICADOR: 'IDENTIFICADOR',
+    BOOLEANO: 'BOOLEANO',
     NUMERO: 'NUMERO',
+    BIGINT: 'BIGINT',
     TEXTO: 'TEXTO',
     
     // System

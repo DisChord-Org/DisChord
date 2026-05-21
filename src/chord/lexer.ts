@@ -1,8 +1,8 @@
 import { Token, TokenType } from './types';
-import { symbols } from './symbols';
 import { ChordError, ErrorLevel } from '../ChordError';
 import { codeProvider } from '../CodeProvider';
 import { CompilationContext } from '../init/Init';
+import { SymbolTranslationMap } from './symbols';
 
 export class Lexer {
     private line = 1;
@@ -78,7 +78,7 @@ export class Lexer {
                     continue;
                 } else {
                     // No es un comentario por lo que vamos a tratar "/" como operador "ENTRE"
-                    tokens.push(this.createToken(symbols["/"], symbols["/"], startLine, startCol));
+                    tokens.push(this.createToken(SymbolTranslationMap["/"], SymbolTranslationMap["/"], startLine, startCol));
                     continue;
                 }
             }
@@ -146,14 +146,14 @@ export class Lexer {
                     value += this.advance();
                 }
 
-                if (value === "verdadero" || value === "falso") {
-                    tokens.push(this.createToken(TokenType.BOOL, value, startLine, startCol));
-                } else if (value === "indefinido") {
-                    tokens.push(this.createToken("INDEFINIDO", value, startLine, startCol));
+                if (value === TokenType.Verdadero || value === TokenType.Falso) {
+                    tokens.push(this.createToken(TokenType.BOOLEANO, value, startLine, startCol));
+                } else if (value === TokenType.Indefinido) {
+                    tokens.push(this.createToken(TokenType.Indefinido, value, startLine, startCol));
                 } else if (this.context.keywordsManager.isKeyword(value)) {
                     tokens.push(this.createToken(this.context.keywordsManager.resolve(value.toLowerCase())!, value, startLine, startCol));
                 } else {
-                    tokens.push(this.createToken("IDENTIFICADOR", value, startLine, startCol));
+                    tokens.push(this.createToken(TokenType.IDENTIFICADOR, value, startLine, startCol));
                 }
                 continue;
             }
@@ -161,17 +161,17 @@ export class Lexer {
             if (this.current < this.input.length - 1) {
                 const nextChar = this.input[this.current + 1];
                 const twoChar = char + nextChar;
-                if (symbols[twoChar]) {
+                if (SymbolTranslationMap[twoChar]) {
                     this.advance();
                     this.advance();
-                    tokens.push(this.createToken(symbols[twoChar], twoChar, startLine, startCol));
+                    tokens.push(this.createToken(SymbolTranslationMap[twoChar], twoChar, startLine, startCol));
                     continue;
                 }
             }
 
-            if (symbols[char]) {
+            if (SymbolTranslationMap[char]) {
                 this.advance();
-                tokens.push(this.createToken(symbols[char], char, startLine, startCol));
+                tokens.push(this.createToken(SymbolTranslationMap[char], char, startLine, startCol));
                 continue;
             }
 
