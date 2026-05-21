@@ -13,6 +13,7 @@ import { CLI, LogFlagLevel } from './CLI';
 import { Runner } from './Runner';
 import { codeProvider } from '../CodeProvider';
 import { SymbolTable } from '../chord/SymbolsTable';
+import { KeyWords } from '../chord/KeywordsManager';
 
 /**
  * @interface CompilationContext
@@ -20,6 +21,7 @@ import { SymbolTable } from '../chord/SymbolsTable';
  */
 export interface CompilationContext {
     symbolTable: SymbolTable;
+    keywordsManager: KeyWords;
     projectRoot: string;
 }
 
@@ -90,6 +92,7 @@ export default class Init {
 
         const context: CompilationContext = {
             symbolTable: new SymbolTable(),
+            keywordsManager: new KeyWords(),
             projectRoot: this.config.projectRoot
         };
 
