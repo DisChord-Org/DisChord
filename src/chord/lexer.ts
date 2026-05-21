@@ -1,4 +1,4 @@
-import { Token } from './types';
+import { Token, TokenType } from './types';
 import { symbols } from './symbols';
 import { ChordError, ErrorLevel } from '../ChordError';
 import { codeProvider } from '../CodeProvider';
@@ -31,7 +31,7 @@ export class Lexer {
         return char;
     }
 
-    private createToken (type: string, value: string, line: number, column: number): Token {
+    private createToken (type: TokenType, value: string, line: number, column: number): Token {
         return {
             type,
             value,
@@ -123,7 +123,7 @@ export class Lexer {
                     value += this.advance();
                     tokens.push(this.createToken("BIGINT", value, startLine, startCol));
                 } else {
-                    tokens.push(this.createToken("NUMERO", value, startLine, startCol));
+                    tokens.push(this.createToken(TokenType.NUMERO, value, startLine, startCol));
                 }
                 continue;
             }
@@ -136,7 +136,7 @@ export class Lexer {
                     value += this.advance();
                 }
 
-                tokens.push(this.createToken("DECORADOR", value, startLine, startCol));
+                tokens.push(this.createToken(TokenType.Decorador, value, startLine, startCol));
                 continue;
             }
 
@@ -147,11 +147,11 @@ export class Lexer {
                 }
 
                 if (value === "verdadero" || value === "falso") {
-                    tokens.push(this.createToken("BOOL", value, startLine, startCol));
+                    tokens.push(this.createToken(TokenType.BOOL, value, startLine, startCol));
                 } else if (value === "indefinido") {
                     tokens.push(this.createToken("INDEFINIDO", value, startLine, startCol));
                 } else if (this.context.keywordsManager.isKeyword(value)) {
-                    tokens.push(this.createToken(value.toUpperCase(), value, startLine, startCol));
+                    tokens.push(this.createToken(this.context.keywordsManager.resolve(value.toLowerCase())!, value, startLine, startCol));
                 } else {
                     tokens.push(this.createToken("IDENTIFICADOR", value, startLine, startCol));
                 }

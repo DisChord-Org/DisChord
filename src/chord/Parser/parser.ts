@@ -1,5 +1,5 @@
 import { SUGGESTIONS } from "../core.lib";
-import { ASTNode, Token, SOF, EOF } from "./../types";
+import { ASTNode, Token, SOF, EOF, TokenType, BaseNode } from "./../types";
 
 import { ChordError, ErrorLevel } from "../../ChordError";
 import { CompilationContext } from "../../init/Init";
@@ -32,7 +32,7 @@ import { ExitParser } from "./Grammar/StatementParser/FlowParser/ExitParser";
 import { PassParser } from "./Grammar/StatementParser/FlowParser/PassParser";
 import { FunctionParser } from "./Grammar/StatementParser/FunctionParser";
 
-export class Parser<T, N> extends ParserContext<T, N> {
+export class Parser<T extends string, N extends BaseNode<T>> extends ParserContext<T, N> {
     public nodes: ASTNode<T, N>[] = [];
     
     constructor(
@@ -86,7 +86,7 @@ export class Parser<T, N> extends ParserContext<T, N> {
 
         if (targetIndex < 0) {
             return {
-                type: 'SOF',
+                type: TokenType.SOF,
                 value: '',
                 location: {
                     line: 1,
@@ -97,7 +97,7 @@ export class Parser<T, N> extends ParserContext<T, N> {
 
         if (targetIndex >= this.tokens.length) {
             return {
-                type: 'EOF',
+                type: TokenType.EOF,
                 value: '',
                 location: this.tokens[this.tokens.length - 1]?.location || { line: 1, column: 1 }
             } as EOF<T>;
@@ -107,7 +107,7 @@ export class Parser<T, N> extends ParserContext<T, N> {
     }
 
     public isAtEnd (): boolean {
-        return this.peek().type === 'EOF' || this.current >= this.tokens.length;
+        return this.peek().type === TokenType.EOF || this.current >= this.tokens.length;
     }
 
     /**
