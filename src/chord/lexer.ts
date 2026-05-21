@@ -1,8 +1,8 @@
 import { Token } from './types';
 import { symbols } from './symbols';
-import { KeyWords } from './KeywordsManager';
 import { ChordError, ErrorLevel } from '../ChordError';
 import { codeProvider } from '../CodeProvider';
+import { CompilationContext } from '../init/Init';
 
 export class Lexer {
     private line = 1;
@@ -10,7 +10,9 @@ export class Lexer {
     private current = 0;
     private input = codeProvider.currentCode;
 
-    constructor() {}
+    constructor(
+        private context: CompilationContext
+    ) {}
 
     private peek(): string {
         return this.input[this.current] || '';
@@ -148,7 +150,7 @@ export class Lexer {
                     tokens.push(this.createToken("BOOL", value, startLine, startCol));
                 } else if (value === "indefinido") {
                     tokens.push(this.createToken("INDEFINIDO", value, startLine, startCol));
-                } else if (KeyWords.getStatements().includes(value)) {
+                } else if (this.context.keywordsManager.isKeyword(value)) {
                     tokens.push(this.createToken(value.toUpperCase(), value, startLine, startCol));
                 } else {
                     tokens.push(this.createToken("IDENTIFICADOR", value, startLine, startCol));

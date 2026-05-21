@@ -1,31 +1,41 @@
+import { BaseNode } from "../types";
 import { Parser } from "./parser";
 import { SubParser } from "./subparser";
 
 /**
  * Represents the constructor signature of any SubParser subclass.
- * * @template T - The specific SubParser type being instantiated.
- * * @template TP  The type of Parser.
+ * * @template {string} T - The custom token classification vector.
+ * * @template {BaseNode<T>} N - The custom node definition structural framework.
+ * * @template {SubParser<T, N>} S - The specific SubParser type being instantiated.
+ * * @template {Parser<T, N>} TP - The precise implementation type of the parent Parser.
  */
-export type SubParserClass<S extends SubParser<any, any>, TP extends Parser<any, any> = Parser<any, any>> = new (parent: TP) => S;
+export type SubParserClass<
+    T extends string,
+    N extends BaseNode<T>,
+    S extends SubParser<T, N> = SubParser<T, N>,
+    TP extends Parser<T, N> = Parser<T, N>
+> = new (parent: TP) => S;
 
 /**
  * @class ParserContext
  * @description Dependency injection container and registry for SubParsers.
  * When extended by a Parser, it manages grammar rule lifecycles and 
  * automatically injects the parent parser reference into new instances.
+ * @template {string} T - Extensible token type string vector.
+ * @template {BaseNode<T>} N - Extensible abstract syntax tree node layout.
  */
-export class ParserContext<T = any, N = any> {
+export class ParserContext<T extends string, N extends BaseNode<T>> {
     /**
      * Set of authorized SubParser constructor references.
      * @private
      */
-    private registry: Set<SubParserClass<SubParser<T, N>, any>> = new Set();
+    private registry: Set<SubParserClass<T, N, SubParser<T, N>, Parser<T, N>>> = new Set();
 
     /**
      * Cache map storing already instantiated SubParsers.
      * @private
      */
-    private instances: Map<SubParserClass<SubParser<T, N>, any>, SubParser<T, N>> = new Map();
+    private instances: Map<SubParserClass<T, N, SubParser<T, N>, Parser<T, N>>, SubParser<T, N>> = new Map();
 
     /**
      * Reference to the parser that owns this context.
@@ -42,9 +52,11 @@ export class ParserContext<T = any, N = any> {
 
     /**
      * Registers a SubParser class definition.
-     * @param cls - The constructor reference.
+     * @template {SubParser<T, N>} S - Extensible target SubParser structure.
+     * @param {SubParserClass<T, N, S, Parser<T, N>>} cls - The constructor class reference blueprint.
+     * @returns {void}
      */
-    public register<S extends SubParser<T, N>>(cls: SubParserClass<S, any>): void {
+    public register<S extends SubParser<T, N>>(cls: SubParserClass<T, N, S, Parser<T, N>>): void {
         if (!this.registry.has(cls)) {
             this.registry.add(cls);
         }
@@ -52,13 +64,14 @@ export class ParserContext<T = any, N = any> {
 
     /**
      * Resolves and retrieves the singleton instance of the requested SubParser.
-     * @template T - The type of SubParser expected.
-     * @param cls - The constructor reference.
-     * @param [parent] - Optional explicit parent override. Defaults to context owner.
-     * @returns {T} The resolved instance.
-     * @throws {Error} If the requested class has not been registered.
+     * @template {SubParser<T, N>} S - The expected exact subclass variant layout to return.
+     * @param {SubParserClass<T, N, S, Parser<T, N>>} cls - The targeted constructor class lookup definition reference.
+     * @param {Parser<T, N>} [parent] - Optional explicit parent override context reference. Defaults to the context owner.
+     * @returns {S} The fully resolved and ready operational subclass framework instance.
+     * @throws {Error} Security error tracking if the requested constructor blueprint has not been registered prior.
+     * @throws {Error} Context lifecycle instantiation error tracking if no parent or owner is found.
      */
-    public get<S extends SubParser<T, N>>(cls: SubParserClass<S, any>, parent?: Parser<T, N>): S {
+    public get<S extends SubParser<T, N>>(cls: SubParserClass<T, N, S, Parser<T, N>>, parent?: Parser<T, N>): S {
         if (!this.registry.has(cls)) throw new Error(`[ParserContext] Error de seguridad: La clase ${cls.name} aún no se ha registrado.`);
 
         let instance = this.instances.get(cls);
