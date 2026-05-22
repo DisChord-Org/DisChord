@@ -11,7 +11,7 @@ import { DisChordGenerator } from '../dischord/Generator/generator';
 import { CompilerConfig, FileSystem } from './FileSystem';
 import { CLI, LogFlagLevel } from './CLI';
 import { Runner } from './Runner';
-import { codeProvider } from '../CodeProvider';
+import { CodeProvider } from '../CodeProvider';
 import { SymbolTable } from '../chord/SymbolsTable';
 import { KeyWords } from '../chord/KeywordsManager';
 
@@ -22,6 +22,7 @@ import { KeyWords } from '../chord/KeywordsManager';
 export interface CompilationContext {
     symbolTable: SymbolTable;
     keywordsManager: KeyWords;
+    codeProvider: CodeProvider;
     projectRoot: string;
 }
 
@@ -80,17 +81,17 @@ export default class Init {
         const targetDir = path.join(this.config.distDir, path.dirname(relativePath));
         const outputPath = path.join(targetDir, `${fileName}.mjs`);
 
-        const code = fs.readFileSync(file, 'utf-8');
-
-        codeProvider.currentCode = { name: file, content: code };
-
         DisChordParser.injectStatements();
 
         const context: CompilationContext = {
             symbolTable: new SymbolTable(),
             keywordsManager: new KeyWords(),
+            codeProvider: new CodeProvider(),
             projectRoot: this.config.projectRoot
         };
+
+        const code = fs.readFileSync(file, 'utf-8');
+        context.codeProvider.currentCode = { name: file, content: code };
 
         const lexer = new Lexer(context);
         const tokens = lexer.tokenize();

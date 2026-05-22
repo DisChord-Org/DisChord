@@ -1,6 +1,5 @@
 import { Token, TokenType } from './types';
 import { ChordError, ErrorLevel } from '../ChordError';
-import { codeProvider } from '../CodeProvider';
 import { CompilationContext } from '../init/Init';
 import { SymbolTranslationMap } from './Symbols';
 
@@ -8,11 +7,13 @@ export class Lexer {
     private line = 1;
     private column = 1;
     private current = 0;
-    private input = codeProvider.currentCode;
+    private input: string;
 
     constructor(
         private context: CompilationContext
-    ) {}
+    ) {
+        this.input = this.context.codeProvider.currentCode;
+    }
 
     private peek(): string {
         return this.input[this.current] || '';

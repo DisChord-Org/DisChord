@@ -12,7 +12,7 @@ interface CodeEntry {
  * * Centralizes access to the current source code and maintains a compilation history
  * to prevent "prop drilling" across the Lexer, Parser, and Compiler layers.
  */
-class CodeProvider {
+export class CodeProvider {
     private _currentCode: string = "";
     private _currentFileName: string = "";
 
@@ -55,9 +55,3 @@ class CodeProvider {
         return this.history[fileName]?.content;
     }
 }
-
-/**
- * Singleton instance of CodeProvider.
- * Use this to set or retrieve the source code across the DisChord engine.
- */
-export const codeProvider = new CodeProvider();
