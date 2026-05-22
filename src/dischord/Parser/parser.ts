@@ -1,6 +1,6 @@
 import { KeyWords } from '../../chord/KeywordsManager';
-import { Token } from '../../chord/types';
-import { DisChordASTNode, DisChordNode, DisChordNodeType } from '../types';
+import { BaseNode, Token } from '../../chord/types';
+import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType } from '../types';
 
 import { Parser } from '../../chord/Parser/parser';
 import { SubParserClass } from './subparser';
@@ -50,11 +50,19 @@ export class DisChordParser extends Parser<DisChordNodeType, DisChordNode> {
      * Injects DisChord-specific keywords into the global system 
      * so the Lexer can correctly identify them as tokens.
      */
-    public static injectStatements() {
-        KeyWords.addStatements([ "crear" ]);
+    public static injectStatements(context: CompilationContext) {
+        context.keywordsManager.extend({ [DisChordTokenType.Crear]: DisChordTokenType.Crear });
 
         this.SubParsers.forEach(SubParser => {
             SubParser.injectStatements();
+        });
+
+        this.SubParsers.forEach(SubParserClass => {
+            if ('keywords' in SubParserClass) {
+                SubParserClass.keywords.forEach(keyword => {
+                    context.keywordsManager.extend({ [keyword]: keyword });
+                });
+            }
         });
     }
 
@@ -68,6 +76,7 @@ export class DisChordParser extends Parser<DisChordNodeType, DisChordNode> {
         const token = this.peek();
 
         const ParserClass = DisChordParser.SubParsers.find(SubParser =>
+            SubParser.triggerToken !== undefined &&
             SubParser.triggerToken.toUpperCase() === token.type
         );
 

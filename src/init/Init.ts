@@ -3,7 +3,7 @@ import path from 'path';
 
 import Prettifier from './Prettifier';
 import { ASTNode } from '../chord/types';
-import { DisChordNodeType } from '../dischord/types';
+import { DisChordASTNode, DisChordNodeType } from '../dischord/types';
 
 import { Lexer } from '../chord/lexer';
 import { DisChordParser } from '../dischord/Parser/parser';
@@ -81,14 +81,14 @@ export default class Init {
         const targetDir = path.join(this.config.distDir, path.dirname(relativePath));
         const outputPath = path.join(targetDir, `${fileName}.mjs`);
 
-        DisChordParser.injectStatements();
-
         const context: CompilationContext = {
             symbolTable: new SymbolTable(),
             keywordsManager: new KeyWords(),
             codeProvider: new CodeProvider(),
             projectRoot: this.config.projectRoot
         };
+
+        DisChordParser.injectStatements(context);
 
         const code = fs.readFileSync(file, 'utf-8');
         context.codeProvider.currentCode = { name: file, content: code };
@@ -98,11 +98,11 @@ export default class Init {
         CLI.logFlag(LogFlagLevel.LEXER, tokens);
 
         const parser = new DisChordParser(tokens, context);
-        const ast = parser.parse();
+        const ast: DisChordASTNode[] = parser.parse();
         CLI.logFlag(LogFlagLevel.AST, ast);
     
         const generator = new DisChordGenerator(context);
-        const output = generator.generate(ast as ASTNode<DisChordNodeType>[]);
+        const output = generator.generate(ast);
         CLI.logFlag(LogFlagLevel.OUTPUT, output);
 
         if (!fs.existsSync(targetDir)) fs.mkdirSync(targetDir, { recursive: true });
