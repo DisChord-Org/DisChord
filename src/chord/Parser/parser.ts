@@ -1,5 +1,5 @@
 import { SUGGESTIONS } from "../core.lib";
-import { ASTNode, Token, SOF, EOF, TokenType, BaseNode, PeekType } from "./../types";
+import { ASTNode, Token, SOF, EOF, TokenType, BaseNode, PeekType, Location } from "./../types";
 
 import { ChordError, ErrorLevel } from "../../ChordError";
 import { CompilationContext } from "../../init/Init";
@@ -156,7 +156,7 @@ export class Parser<T extends string, N extends BaseNode<T>> extends ParserConte
         ).format();
     }
 
-    public createNode<NodeType extends ASTNode<T, N>> (node: Omit<NodeType, 'location'>): NodeType {
+    public createNode<NodeType extends ASTNode<T, N>> (node: Omit<NodeType, 'location'> & { location?: Location }): NodeType {
         const token: Token = this.peek('prev');
 
         return {

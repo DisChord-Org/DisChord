@@ -86,17 +86,17 @@ export class DisChordParser extends Parser<DisChordNodeType, DisChordNode> {
     }
 
     /**
-     * Extends the base language's primary expressions.
-     * Allows the 'crear' (create) keyword to be treated as a primary expression.
-     * Allows 'L_BRACE' to create ODB's.
+     * Intercepts execution statements. Prioritizes DisChord declarations 
+     * before falling back to native Chord statements.
      * @override
+     * @returns {DisChordASTNode} The constructed abstract statement node.
      */
-    override parsePrimary(): DisChordASTNode {
+    override parseStatement (): DisChordASTNode {
         const token = this.peek();
 
         switch (token.type) {
-            case 'CREAR':
-                this.consume('CREAR');
+            case DisChordTokenType.Crear:
+                this.consume(DisChordTokenType.Crear);
 
                 const customStatement = this.parseCustomStatement();
                 
