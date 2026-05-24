@@ -76,11 +76,11 @@ export class PrimaryParser<T extends string, N extends BaseNode<T>> extends SubP
             });
         }
 
-        if (([ TokenType.IDENTIFICADOR, TokenType.Esta, TokenType.Super ] as TokenType[]).includes(token.type)) {
+        if (([ TokenType.IDENTIFICADOR, TokenType.Esta, TokenType.Super ] as TokenType[]).includes(token.type as TokenType)) {
             return this.parent.get(AccessParser).parse();
         }
 
-        if (([ TokenType.NUMERO, TokenType.BIGINT, TokenType.TEXTO, TokenType.BOOLEANO, TokenType.Indefinido ] as TokenType[]).includes(token.type)) {
+        if (([ TokenType.NUMERO, TokenType.BIGINT, TokenType.TEXTO, TokenType.BOOLEANO, TokenType.Indefinido ] as TokenType[]).includes(token.type as TokenType)) {
             return this.parent.get(LiteralParser).parse();
         }
 

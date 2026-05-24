@@ -23,7 +23,7 @@ export class ArithmeticParser<T extends string, N extends BaseNode<T>> extends S
 
         const highPriorityOps: TokenType[] = [ TokenType.Por, TokenType.Entre, TokenType.Resto, TokenType.Exponente ];
 
-        while (highPriorityOps.includes(this.peek().type)) {
+        while (highPriorityOps.includes(this.peek().type as TokenType)) {
             const operator = this.consume(this.peek().type);
             const right = this.parent.get(UnaryParser).parse();
             

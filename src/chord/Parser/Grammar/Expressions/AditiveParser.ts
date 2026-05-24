@@ -23,7 +23,7 @@ export class AditiveParser<T extends string, N extends BaseNode<T>> extends SubP
 
         const additiveOperators: TokenType[] = [ TokenType.Mas, TokenType.Menos, TokenType.Intro, TokenType.Espacio ];
 
-        while (additiveOperators.includes(this.peek().type)) {
+        while (additiveOperators.includes(this.peek().type as TokenType)) {
             const operator = this.consume(this.peek().type);
             
             const right = this.parent.get(ArithmeticParser).parse();

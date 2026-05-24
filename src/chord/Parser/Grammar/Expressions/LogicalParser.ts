@@ -21,7 +21,7 @@ export class LogicalParser<T extends string, N extends BaseNode<T>> extends SubP
     public parse(): ASTNode<T, N> {
         let left = this.parent.get(ComparisionParser).parse();
 
-        while (([ TokenType.Y, TokenType.O ] as TokenType[]).includes(this.peek().type)) {
+        while (([ TokenType.Y, TokenType.O ] as TokenType[]).includes(this.peek().type as TokenType)) {
             const operator = this.consume(this.peek().type);
             
             const right = this.parent.get(ComparisionParser).parse();

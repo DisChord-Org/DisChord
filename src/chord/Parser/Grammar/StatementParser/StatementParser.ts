@@ -53,7 +53,7 @@ export class StatementParser<T extends string, N extends BaseNode<T>> extends Su
 
         switch (token.type) {
             case TokenType.Var:
-                return this.parent.get(VariableParser as unknown as any).parse();
+                return this.parent.get(VariableParser).parse();
             case TokenType.Si:
                 return this.parent.get(ConditionParser).parse();
             case TokenType.Para:
@@ -66,11 +66,11 @@ export class StatementParser<T extends string, N extends BaseNode<T>> extends Su
                     .setMethod(!!classContext)
                     .parse();
             case TokenType.Prop:
-                return (this.parent.get(PropertyParser as unknown as any) as PropertyParser<T, N>).parse();
+                return (this.parent.get(PropertyParser)).parse();
             case TokenType.Importar:
-                return this.parent.get(ImportParser as unknown as any).parse();
+                return this.parent.get(ImportParser).parse();
             case TokenType.Exportar:
-                return this.parent.get(ExportParser as unknown as any).parse();
+                return this.parent.get(ExportParser).parse();
             case TokenType.Clase:
                 return this.parent.get(ClassParser).parse();
             case TokenType.Salir:
@@ -81,7 +81,7 @@ export class StatementParser<T extends string, N extends BaseNode<T>> extends Su
                 if (classContext && token.value === classContext) { // Constructor
                     const nextToken = this.parent.peek('next');
                     if (nextToken && nextToken.type === TokenType.L_PAREN) {
-                        return (this.parent.get(FunctionParser as any) as FunctionParser<T, N>)
+                        return (this.parent.get(FunctionParser) as FunctionParser<T, N>)
                             .setConstructor(true)
                             .setMethod(true)
                             .parse();

@@ -37,7 +37,7 @@ export class Parser<T extends string, N extends BaseNode<T>> extends ParserConte
     public nodes: ASTNode<T, N>[] = [];
     
     constructor(
-        private tokens: Token[],
+        private tokens: Token<T>[],
         private current: number = 0,
         private context: CompilationContext
     ) {
@@ -81,7 +81,7 @@ export class Parser<T extends string, N extends BaseNode<T>> extends ParserConte
         return this.context.keywordsManager;
     }
 
-    public peek(type: PeekType = 'this'): Token {
+    public peek(type: PeekType = 'this'): Token<T> {
         if (typeof type == 'number') return this.tokens[type];
 
         let targetIndex = this.cursor;
@@ -134,7 +134,7 @@ export class Parser<T extends string, N extends BaseNode<T>> extends ParserConte
         return false;
     }
 
-    consume(expectedTypes: string | string[], message?: string): Token {
+    public consume(expectedTypes: string | string[], message?: string): Token<T> {
         const token = this.peek();
         const expected = Array.isArray(expectedTypes) ? expectedTypes : [expectedTypes];
 
@@ -157,7 +157,7 @@ export class Parser<T extends string, N extends BaseNode<T>> extends ParserConte
     }
 
     public createNode<NodeType extends ASTNode<T, N>> (node: Omit<NodeType, 'location'> & { location?: Location }): NodeType {
-        const token: Token = this.peek('prev');
+        const token: Token<T> = this.peek('prev');
 
         return {
             ...node,

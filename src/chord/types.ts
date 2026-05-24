@@ -167,12 +167,18 @@ export const TokenType = {
 export type TokenType = typeof TokenType[keyof typeof TokenType];
 
 /**
+ * Comprehensive union type for all valid token categories, including parser-generated virtual nodes.
+ * @template {string} T - Extensible custom token type bindings vector.
+ */
+export type TokenTypeUnion<T extends string> = T | TokenType | typeof TokenType.EOF | typeof TokenType.SOF;
+
+/**
  * Representation of a lexical token scanned from the source code.
  * @interface Token
  */
 export type Token <T extends string> = {
     /** The strictly typed category from the TokenType enum */
-    type: T;
+    type: TokenTypeUnion<T>;
     /** The raw textual value string found in the code */
     value: string;
     /** Code coordinates tracking for error generation */

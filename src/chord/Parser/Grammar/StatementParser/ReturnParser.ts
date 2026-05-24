@@ -19,7 +19,7 @@ export class ReturnParser<T extends string, N extends BaseNode<T>> extends SubPa
         let value = undefined;
         const next = this.peek();
 
-        const isEndOfStatement = ([ TokenType.R_BRACE, TokenType.Sino, TokenType.Ademas, TokenType.EOF ] as TokenType[]).includes(next.type);
+        const isEndOfStatement = ([ TokenType.R_BRACE, TokenType.Sino, TokenType.Ademas, TokenType.EOF ] as TokenType[]).includes(next.type as TokenType);
 
         if (!isEndOfStatement) {
             value = this.parent.parseExpression();

@@ -2,8 +2,7 @@ import * as fs from 'fs';
 import path from 'path';
 
 import Prettifier from './Prettifier';
-import { ASTNode } from '../chord/types';
-import { DisChordASTNode, DisChordNodeType } from '../dischord/types';
+import { DisChordASTNode } from '../dischord/types';
 
 import { Lexer } from '../chord/lexer';
 import { DisChordParser } from '../dischord/Parser/parser';

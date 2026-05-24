@@ -33,7 +33,7 @@ export abstract class SubParser<T extends string, N extends BaseNode<T>> {
      * Looks ahead at tokens through the parent's token stream without consuming them.
      * @returns The current token without consuming it.
      */
-    protected peek(type: PeekType = 'this'): Token {
+    protected peek(type: PeekType = 'this'): Token<T> {
         return this.parent.peek(type);
     }
 
