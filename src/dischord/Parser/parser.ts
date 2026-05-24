@@ -39,7 +39,7 @@ export class DisChordParser extends Parser<DisChordNodeType, DisChordNode> {
      * @param context - The existing context to the DisChordParser.
      */
     constructor (
-        tokens: Token[],
+        tokens: Token<DisChordTokenType>[],
         context: CompilationContext,
         current: number = 0
     ) {
@@ -108,7 +108,7 @@ export class DisChordParser extends Parser<DisChordNodeType, DisChordNode> {
 
                 return customStatement;
             default:
-                return super.parsePrimary();
+                return super.parseStatement();
         }
     }
 }

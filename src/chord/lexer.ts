@@ -32,7 +32,7 @@ export class Lexer {
         return char;
     }
 
-    private createToken (type: TokenType, value: string, line: number, column: number): Token {
+    private createToken (type: TokenType, value: string, line: number, column: number): Token<TokenType> {
         return {
             type,
             value,
@@ -43,8 +43,8 @@ export class Lexer {
         }
     }
 
-    public tokenize(): Token[] {
-        const tokens: Token[] = [];
+    public tokenize(): Token<TokenType>[] {
+        const tokens: Token<TokenType>[] = [];
 
         while (this.current < this.input.length) {
             const startLine = this.line;

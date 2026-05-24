@@ -170,9 +170,9 @@ export type TokenType = typeof TokenType[keyof typeof TokenType];
  * Representation of a lexical token scanned from the source code.
  * @interface Token
  */
-export type Token = {
+export type Token <T extends string> = {
     /** The strictly typed category from the TokenType enum */
-    type: TokenType;
+    type: T;
     /** The raw textual value string found in the code */
     value: string;
     /** Code coordinates tracking for error generation */
