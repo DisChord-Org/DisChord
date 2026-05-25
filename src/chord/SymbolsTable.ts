@@ -42,11 +42,11 @@ export class SymbolTable {
         const currentScope = this.scopes[this.scopes.length - 1];
         
         if (currentScope.has(name)) {
-            throw new ChordError(
-                ErrorLevel.Parser,
-                `Identificador duplicado: '${name}' ya ha sido declarado en este ámbito.`,
+            throw new ChordError({
+                phase: ErrorLevel.Parser,
+                message: `Identificador duplicado: '${name}' ya ha sido declarado en este ámbito.`,
                 location
-            ).format();
+            }).format();
         }
 
         currentScope.set(name, {

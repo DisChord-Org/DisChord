@@ -149,11 +149,11 @@ export class Parser<T extends string, N extends BaseNode<T>> extends ParserConte
                 : `Esperaba un elemento de tipo '${expected.join(' o ')}'`;
         }
 
-        throw new ChordError(
-            ErrorLevel.Parser,
-            `${customMessage}. (En su lugar se encontró '${token.value}')`,
-            token.location
-        ).format();
+        throw new ChordError({
+            phase: ErrorLevel.Parser,
+            message: `${customMessage}. (En su lugar se encontró '${token.value}')`,
+            location: token.location
+        }).format();
     }
 
     public createNode<NodeType extends ASTNode<T, N>> (node: Omit<NodeType, 'location'> & { location?: Location }): NodeType {

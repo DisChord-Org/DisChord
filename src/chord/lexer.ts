@@ -176,11 +176,14 @@ export class Lexer {
                 continue;
             }
 
-            throw new ChordError(
-                ErrorLevel.Lexer,
-                `Carácter inesperado: ${char}`,
-                { line: this.line, column: this.column }
-            ).format();
+            throw new ChordError({
+                phase: ErrorLevel.Lexer,
+                message: `Carácter inesperado: ${char}`,
+                location: {
+                    line: this.line,
+                    column: this.column
+                }
+            }).format();
         }
 
         return tokens;

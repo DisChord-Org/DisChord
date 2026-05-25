@@ -84,10 +84,10 @@ export class PrimaryParser<T extends string, N extends BaseNode<T>> extends SubP
             return this.parent.get(LiteralParser).parse();
         }
 
-        throw new ChordError(
-            ErrorLevel.Parser,
-            `Token inesperado en expresión: ${token.type} en la posición ${this.parent.cursor}`,
-            token.location
-        ).format();
+        throw new ChordError({
+            phase: ErrorLevel.Parser,
+            message: `Token inesperado en expresión: ${token.type} en la posición ${this.parent.cursor}`,
+            location: token.location
+        }).format();
     }
 }

@@ -68,22 +68,22 @@ export class BDOParser<T extends string, N extends BaseNode<T>> extends SubParse
                     if (mode === ODBMode.Simple) mode = ODBMode.Intelligent;
                     this.consume(TokenType.SEPARADOR, 'En un BDOI, las definiciones deben terminar con ";"');
                 } else if (mode === ODBMode.Intelligent) {
-                    throw new ChordError(
-                        ErrorLevel.Parser,
-                        `En un BDO inteligente, la propiedad '${key}' debe terminar en ';'`,
-                        this.peek().location
-                    ).format();
+                    throw new ChordError({
+                        phase: ErrorLevel.Parser,
+                        message: `En un BDO inteligente, la propiedad '${key}' debe terminar en ';'`,
+                        location: this.peek().location
+                    }).format();
                 }
 
                 blocks[key] = value;
             } else {
                 if (mode === ODBMode.Simple) {
                     if (Object.keys(blocks).length > 0) {
-                        throw new ChordError(
-                            ErrorLevel.Parser,
-                            `Conflicto de estilo: Si el BDO contiene código ejecutable, todas las propiedades superiores deben terminar en ";"`,
-                            this.peek().location
-                        ).format();
+                        throw new ChordError({
+                            phase: ErrorLevel.Parser,
+                            message: `Conflicto de estilo: Si el BDO contiene código ejecutable, todas las propiedades superiores deben terminar en ";"`,
+                            location: this.peek().location
+                        }).format();
                     }
                     mode = ODBMode.Intelligent;
                 }
