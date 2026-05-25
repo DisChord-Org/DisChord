@@ -1,5 +1,4 @@
 import { Location } from "./chord/types";
-import { codeProvider } from "./CodeProvider";
 
 /** Life cycle phase where the failure originated. */
 export enum ErrorLevel {
@@ -15,8 +14,22 @@ export enum ErrorType {
     Fatal = 'FATAL'
 }
 
+/**
+ * Named payload structure to initialize any compiler lifecycle exception.
+ * @interface ErrorPayload
+ */
+export interface ErrorPayload<P> {
+    phase: P;
+    message: string;
+    location?: Location;
+    rawLine?: string;
+}
+
 /** Abstract base class for error handling with location support and source code snippets. */
 abstract class BaseChordError extends Error {
+    public phase: ErrorLevel;
+    public type: ErrorType;
+    public location?: Location;
 
     /**
      * @param phase Lifecycle phase where the error occurred.
@@ -24,41 +37,34 @@ abstract class BaseChordError extends Error {
      * @param type Severity level.
      * @param location Source code coordinates (line/column).
      */
-    constructor(
-        public phase: ErrorLevel,
-        public message: string,
-        public type: ErrorType,
-        public location?: Location
-    ) {
-        super(message);
-    }
-
-    /**
-     * Extracts the specific source line based on the error location.
-     * @returns The raw line of code where the error occurred, or an empty string if unavailable.
-     */
-    private get rawLine(): string {
-        const code = codeProvider.currentCode;
-        if (!this.location || this.location.line < 1) return '';
-
-        const lines = code.split('\n');
-        return lines[this.location.line - 1] || '';
+    constructor(type: ErrorType, payload: ErrorPayload<ErrorLevel>) {
+        super(payload.message);
+        this.type = type;
+        this.phase = payload.phase;
+        this.location = payload.location;
     }
 
     /**
      * Generates a formatted multiline string with header, message, and visual pointer (^).
-     * @returns The formatted error message.
+     * @param {string} [sourceCode] - The optional full source code context to extract the line snippet.
+     * @returns {string} The formatted error message.
      */
-    public format(): string {
+    public format(sourceCode?: string): string {
         const location = this.location ? `[${this.location.line}:${this.location.column}]` : '';
         const header = `${this.type} ${this.phase} Error ${location}`;
 
-        const line = `\n  > ${this.rawLine.replace(/\t/g, ' ')}`;
-        const pointer = (this.rawLine && this.location) 
-            ? `\n    ${' '.repeat(Math.max(0, this.location.column - 1))}^` 
-            : '';
+        let lineSnippet = '';
+        let pointer = '';
 
-        return `${header}\n${this.message}${line}${pointer}`.trim();
+        if (sourceCode && this.location && this.location.line > 0) {
+            const lines = sourceCode.split('\n');
+            const rawLine = lines[this.location.line - 1] || '';
+            
+            lineSnippet = `\n  > ${rawLine.replace(/\t/g, ' ')}`;
+            pointer = `\n    ${' '.repeat(Math.max(0, this.location.column - 1))}^`;
+        }
+
+        return `${header}\n${this.message}${lineSnippet}${pointer}`.trim();
     }
 }
 
@@ -67,8 +73,8 @@ type ChordErrorLevels = ErrorLevel.Lexer | ErrorLevel.Parser | ErrorLevel.Compil
 
 /** Critical core engine error. Defaults to FATAL. */
 export class ChordError extends BaseChordError {
-    constructor(phase: ChordErrorLevels, message: string, location?: Location) {
-        super(phase, message, ErrorType.Fatal, location);
+    constructor(payload: ErrorPayload<ChordErrorLevels>) {
+        super(ErrorType.Fatal, payload);
         this.name = 'ChordError';
     }
 }
@@ -78,8 +84,8 @@ type DisChordErrorLevels = ErrorLevel.Parser | ErrorLevel.Compiler | ErrorLevel.
 
 /** Abstraction layer error. Defaults to ERROR. */
 export class DisChordError extends BaseChordError {
-    constructor(phase: DisChordErrorLevels, message: string, location?: Location) {
-        super(phase, message, ErrorType.Error, location);
+    constructor(payload: ErrorPayload<DisChordErrorLevels>) {
+        super(ErrorType.Error, payload);
         this.name = 'DisChordError';
     }
 }
