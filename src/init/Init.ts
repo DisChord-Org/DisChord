@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import path from 'path';
 
 import Prettifier from './Prettifier';
-import { DisChordASTNode } from '../dischord/types';
+import { DisChordASTNode, DisChordTokenType } from '../dischord/types';
 
 import { Lexer } from '../chord/lexer';
 import { DisChordParser } from '../dischord/Parser/parser';
@@ -92,7 +92,7 @@ export default class Init {
         const code = fs.readFileSync(file, 'utf-8');
         context.codeProvider.currentCode = { name: file, content: code };
 
-        const lexer = new Lexer(context);
+        const lexer = new Lexer<DisChordTokenType>(context);
         const tokens = lexer.tokenize();
         CLI.logFlag(LogFlagLevel.LEXER, tokens);
 

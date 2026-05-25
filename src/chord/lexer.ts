@@ -3,7 +3,7 @@ import { ChordError, ErrorLevel } from '../ChordError';
 import { CompilationContext } from '../init/Init';
 import { SymbolTranslationMap } from './Symbols';
 
-export class Lexer {
+export class Lexer<T extends string> {
     private line = 1;
     private column = 1;
     private current = 0;
@@ -32,7 +32,7 @@ export class Lexer {
         return char;
     }
 
-    private createToken (type: TokenType, value: string, line: number, column: number): Token<TokenType> {
+    private createToken (type: TokenType, value: string, line: number, column: number): Token<T> {
         return {
             type,
             value,
@@ -43,8 +43,8 @@ export class Lexer {
         }
     }
 
-    public tokenize(): Token<TokenType>[] {
-        const tokens: Token<TokenType>[] = [];
+    public tokenize(): Token<T>[] {
+        const tokens: Token<T>[] = [];
 
         while (this.current < this.input.length) {
             const startLine = this.line;

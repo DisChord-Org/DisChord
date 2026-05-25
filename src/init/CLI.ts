@@ -2,7 +2,7 @@ import util from 'util';
 import path from 'path';
 
 import { ASTNode, Token } from '../chord/types';
-import { DisChordNode, DisChordNodeType } from '../dischord/types';
+import { DisChordNode, DisChordNodeType, DisChordTokenType } from '../dischord/types';
 
 /**
  * Supported CLI flags for debugging and execution control.
@@ -14,7 +14,7 @@ export enum LogFlagLevel {
     NORUN = '--no-run'    // Compiles without executing the result
 }
 
-type LogMessage = Token[] | ASTNode<DisChordNodeType, DisChordNode>[] | string;
+type LogMessage = Token<DisChordTokenType>[] | ASTNode<DisChordNodeType, DisChordNode>[] | string;
 
 /**
  * Utility class for CLI argument parsing and formatted logging.
