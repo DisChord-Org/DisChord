@@ -9,7 +9,12 @@ import { ASTNode, BaseNode, ODBNode, TokenType } from "../chord/types";
  * Registry of high-level syntactic syntax structures for DisChord bots.
  */
 export const DisChordTokenType = {
-    Crear: 'crear',
+    Comando: 'comando',
+    Evento: 'evento',
+    Mensaje: 'mensaje',
+    Recolector: 'recolector',
+    Encender: 'encender',
+    Bot: 'bot',
 
     ENCENDER_BOT: 'EncenderBot',
     EVENTO: 'Evento',
