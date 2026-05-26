@@ -1,5 +1,5 @@
 import { SUGGESTIONS } from "../core.lib";
-import { ASTNode, Token, SOF, EOF, TokenType, BaseNode, PeekType, Location } from "./../types";
+import { ASTNode, Token, SOF, EOF, TokenType, BaseNode, PeekType, Location, TokenTypeUnion } from "./../types";
 
 import { ChordError, ErrorLevel } from "../../ChordError";
 import { CompilationContext } from "../../init/Init";
@@ -39,15 +39,15 @@ export class Parser<T extends string, N extends BaseNode<T>> extends ParserConte
     constructor(
         private tokens: Token<T>[],
         private current: number = 0,
-        private context: CompilationContext
+        private context: CompilationContext<T>
     ) {
         super();
 
         this.setOwner(this as unknown as Parser<T, N>);
-        this.registerInstances();
+        this.registerGrammar();
     }
 
-    private registerInstances () {
+    private registerGrammar () {
         const instances: SubParserClass<T, N>[] = [
             AditiveParser, ArithmeticParser, AssignmentParser,
             ComparisionParser, ExpressionParser, LogicalParser,
@@ -58,7 +58,17 @@ export class Parser<T extends string, N extends BaseNode<T>> extends ParserConte
             ExitParser, PassParser, FunctionParser
         ];
         
-        instances.forEach(instance => this.register(instance));
+        instances.forEach(instance => {
+            this.register(instance);
+
+            this.KeywordsManager.extend(
+                instance.keywords.reduce<Record<string, TokenTypeUnion<T>>>((accumulator, keyword) => {
+                    accumulator[keyword] = keyword;
+
+                    return accumulator;
+                }, {})
+            );
+        });
     }
 
     public parse(): ASTNode<T, N>[] {
@@ -77,7 +87,7 @@ export class Parser<T extends string, N extends BaseNode<T>> extends ParserConte
         return this.context.symbolTable;
     }
 
-    public get KeywordsManager (): KeyWords {
+    public get KeywordsManager (): KeyWords<T> {
         return this.context.keywordsManager;
     }
 

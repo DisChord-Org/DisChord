@@ -18,9 +18,9 @@ import { KeyWords } from '../chord/KeywordsManager';
  * @interface CompilationContext
  * @description State shared between Parser and Generator.
  */
-export interface CompilationContext {
+export interface CompilationContext <T extends string = string> {
     symbolTable: SymbolTable;
-    keywordsManager: KeyWords;
+    keywordsManager: KeyWords<T>;
     codeProvider: CodeProvider;
     projectRoot: string;
 }
