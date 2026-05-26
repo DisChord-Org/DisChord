@@ -53,7 +53,7 @@ export class StatementParser<T extends string, N extends BaseNode<T>> extends Su
                 DecoratorProcessor.addDecorator('fijar', true);
             }
 
-            return (this.parent.get(StatementParser) as StatementParser<T, N>).parse(classContext);
+            return (this.parent.get(StatementParser)).parse(classContext);
         }
 
         switch (token.type) {
@@ -66,7 +66,7 @@ export class StatementParser<T extends string, N extends BaseNode<T>> extends Su
             case TokenType.Devolver:
                 return this.parent.get(ReturnParser).parse();
             case TokenType.Funcion:
-                return (this.parent.get(FunctionParser) as FunctionParser<T, N>)
+                return (this.parent.get(FunctionParser))
                     .setConstructor(false)
                     .setMethod(!!classContext)
                     .parse();
@@ -86,7 +86,7 @@ export class StatementParser<T extends string, N extends BaseNode<T>> extends Su
                 if (classContext && token.value === classContext) { // Constructor
                     const nextToken = this.parent.peek('next');
                     if (nextToken && nextToken.type === TokenType.L_PAREN) {
-                        return (this.parent.get(FunctionParser) as FunctionParser<T, N>)
+                        return (this.parent.get(FunctionParser))
                             .setConstructor(true)
                             .setMethod(true)
                             .parse();

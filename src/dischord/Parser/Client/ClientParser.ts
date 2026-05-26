@@ -1,17 +1,23 @@
 import { DisChordParser } from "../parser";
-import { StartBotNode } from "../../types";
+import { DisChordNode, DisChordNodeType, DisChordODBNode, DisChordTokenType, StartBotNode } from "../../types";
 import { KeyWords } from '../../../chord/KeywordsManager';
-import { SubParser } from "../subparser";
 import { DisChordError, ErrorLevel } from "../../../ChordError";
-import { ODBMode } from "../../../chord/types";
+import { ODBMode, TokenTypeUnion } from "../../../chord/types";
+import { SubParser } from "../../../chord/Parser/subparser";
+import { BDOParser } from "../../../chord/Parser/Grammar/BDOParser";
 
 /**
  * Handles the initial bot declaration.
  * Processes the 'encender bot' (turn on bot) statement and captures its configuration.
  */
-export default class ClientParser extends SubParser {
+export default class ClientParser extends SubParser<DisChordNodeType, DisChordNode> {
     /** To identify when this parser should be used */
-    static triggerToken: string = "encender";
+    static triggerToken: DisChordNodeType | undefined = DisChordTokenType.Encender;
+
+    /**
+     * Collection of reserved keywords this specific sub-parser registers
+     */
+    static keywords: TokenTypeUnion<string>[] = [ DisChordTokenType.Encender, DisChordTokenType.Bot ];
 
     /**
      * @param parent - The main DisChordParser context used to access token 
@@ -22,35 +28,26 @@ export default class ClientParser extends SubParser {
     }
 
     /**
-     * Injects DisChord-specific keywords into the global system 
-     * so the Lexer can correctly identify them as tokens.
-     * This method is called by DisChordParser.
-     */
-    public static injectStatements () {
-        KeyWords.addStatements([ "encender", "bot" ]);
-    }
-
-    /**
      * Starts the client declaration analysis.
      * Expected structure: `encender bot { ... }` or `encender bot <expression>`
      * @returns {StartBotNode} An AST node containing the configuration required to initialize the bot.
      * @throws {Error} If the identifier 'bot' does not immediately follow the 'encender' keyword.
      */
     parse (): StartBotNode {
-        this.consume('ENCENDER');
+        this.consume(DisChordTokenType.Encender);
 
-        const id = this.consume('BOT');
+        const id = this.consume(DisChordTokenType.Bot);
 
-        if (id.value !== 'bot') throw new DisChordError(
-            ErrorLevel.Parser,
-            `Se esperaba 'bot' después de 'encender', se encontró '${id.value}'`,
-            this.peek().location
-        ).format();
+        if (id.type !== DisChordTokenType.Bot) throw new DisChordError({
+            phase: ErrorLevel.Parser,
+            message: `Se esperaba 'bot' después de 'encender', se encontró '${id.value}'`,
+            location: this.peek().location
+        }).format();
         
-        const configBody = this.parseODB(ODBMode.Simple);
+        const configBody = this.parent.get(BDOParser).setMode(ODBMode.Simple).parse() as DisChordODBNode;
     
         return this.createNode<StartBotNode>({
-            type: 'EncenderBot',
+            type: DisChordTokenType.ENCENDER_BOT,
             object: configBody
         });
     }

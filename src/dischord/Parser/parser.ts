@@ -3,7 +3,7 @@ import { BaseNode, Token } from '../../chord/types';
 import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType } from '../types';
 
 import { Parser } from '../../chord/Parser/parser';
-import { SubParserClass } from './subparser';
+import { SubParserClass } from '../../chord/Parser/subparser';
 
 import CommandParser from './Commands/CommandParser';
 import MessageParser from './Messages/MessageParser';
@@ -24,7 +24,7 @@ export class DisChordParser extends Parser<DisChordNodeType, DisChordNode> {
      * The inventory of specialists.
      * Adding a class here will register it into the all system.
      */
-    private static readonly SubParsers: SubParserClass[] = [
+    private static readonly SubParsers: SubParserClass<DisChordNodeType, DisChordNode>[] = [
         ClientParser,
         EventParser,
         CommandParser,

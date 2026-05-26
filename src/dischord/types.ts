@@ -40,10 +40,10 @@ export type DisChordNode =
     | CollectorNode;
 
 /** Specialized variant resolving highly encapsulated Object Data Block syntax layouts for Discord payloads */
-export type DisChordODBNode = ODBNode<DisChordTokenType, DisChordNode>;
+export type DisChordODBNode = ODBNode<DisChordNodeType, DisChordNode>;
 
 /** Comprehensive root syntax tree union linking base Chord grammar nodes seamlessly with DisChord modules */
-export type DisChordASTNode = ASTNode<DisChordTokenType, DisChordNode>;
+export type DisChordASTNode = ASTNode<DisChordNodeType, DisChordNode>;
 
 /**
  * Syntactic node representing the core bot engine initialization block.
