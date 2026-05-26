@@ -1,4 +1,4 @@
-import { ASTNode, BaseNode, PeekType, Token, TokenType } from "../../chord/types";
+import { ASTNode, BaseNode, PeekType, Token, TokenType, TokenTypeUnion } from "../../chord/types";
 import { SymbolTable } from "../SymbolsTable";
 import { Parser } from "./parser";
 
@@ -75,6 +75,8 @@ export abstract class SubParser<T extends string, N extends BaseNode<T>> {
 /**
  * Static blueprint for SubParser implementations.
  * Defines the contract for registration and identification of grammar specialists.
+ * @template T - Extensible custom token types vector.
+ * @template N - Extensible custom AST node structures vector.
  */
 export interface SubParserClass<T extends string, N extends BaseNode<T>> {
     /** 
@@ -85,5 +87,10 @@ export interface SubParserClass<T extends string, N extends BaseNode<T>> {
     /** 
      * The token type string that triggers the activation of this specific sub-parser.
      */
-    triggerToken: TokenType | undefined;
+    triggerToken: TokenTypeUnion<T>;
+
+    /**
+     * Collection of reserved keywords this specific sub-parser registers
+     */
+    keywords: TokenTypeUnion<T>[];
 }
