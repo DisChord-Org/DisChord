@@ -14,18 +14,9 @@ export class KeyWords <T extends string = TokenType> {
     private KeywordsList: Map<string, T> = new Map();
 
     /**
-     * Infers and registers keywords dynamically from the TokenType registry at runtime.
      * @constructor
      */
-    constructor () {
-        const isLowercaseKeyword = /^[a-z_]+$/;
-
-        for (const value of Object.values(DisChordTokenType)) {
-            if (isLowercaseKeyword.test(value)) {
-                this.KeywordsList.set(value, value as T);
-            }
-        }
-    }
+    constructor () {}
 
     /**
      * Dynamically registers custom external extensions or framework keywords into the active scanner registry.
