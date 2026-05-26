@@ -1,5 +1,5 @@
 import { SubParser } from "../../subparser";
-import { ConditionNode, ASTNode, BaseNode, TokenType } from "../../../types";
+import { ConditionNode, ASTNode, BaseNode, TokenType, TokenTypeUnion } from "../../../types";
 import { ExpressionParser } from "../Expressions/ExpressionParser";
 import { BlockParser } from "../BlockParser";
 import { Parser } from "../../parser";
@@ -7,6 +7,11 @@ import { Parser } from "../../parser";
 export class ConditionParser<T extends string, N extends BaseNode<T>> extends SubParser<T, N> {
     /** To identify when this parser should be used */
     static triggerToken: TokenType | undefined = TokenType.Si;
+
+    /**
+     * Collection of reserved keywords this specific sub-parser registers
+     */
+    static keywords: TokenTypeUnion<string>[] = [ TokenType.Si, TokenType.Ademas, TokenType.Sino ];
 
     /**
      * @param parent - Reference to the main Parser orchestrator.

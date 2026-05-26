@@ -1,4 +1,4 @@
-import { ASTNode, BaseNode, TokenType } from "../../../types";
+import { ASTNode, BaseNode, TokenType, TokenTypeUnion } from "../../../types";
 import { Parser } from "../../parser";
 import { SubParser } from "../../subparser";
 import { LogicalParser } from "./LogicalParser";
@@ -6,6 +6,11 @@ import { LogicalParser } from "./LogicalParser";
 export class AssignmentParser<T extends string, N extends BaseNode<T>> extends SubParser<T, N> {
     /** To identify when this parser should be used */
     static triggerToken: TokenType | undefined = TokenType.Es;
+
+    /**
+     * Collection of reserved keywords this specific sub-parser registers
+     */
+    static keywords: TokenTypeUnion<string>[] = [ TokenType.Es ];
 
     /**
      * @param parent - Reference to the main Parser orchestrator.

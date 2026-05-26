@@ -1,4 +1,4 @@
-import { ASTNode, BaseNode, BlockNode, TokenType } from "../../types";
+import { ASTNode, BaseNode, BlockNode, TokenType, TokenTypeUnion } from "../../types";
 import { Parser } from "../parser";
 import { SubParser } from "../subparser";
 
@@ -10,6 +10,11 @@ import { SubParser } from "../subparser";
 export class BlockParser<T extends string, N extends BaseNode<T>> extends SubParser<T, N> {
     /** To identify when this parser should be used */
     static triggerToken: TokenType | undefined;
+
+    /**
+     * Collection of reserved keywords this specific sub-parser registers
+     */
+    static keywords: TokenTypeUnion<string>[] = [];
 
     /**
      * @param parent - Reference to the main Parser orchestrator.

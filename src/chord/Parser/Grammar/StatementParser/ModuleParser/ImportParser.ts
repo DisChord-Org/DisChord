@@ -1,10 +1,15 @@
 import { SubParser } from "../../../subparser";
-import { BaseNode, ImportNode, TokenType } from "../../../../types";
+import { BaseNode, ImportNode, TokenType, TokenTypeUnion } from "../../../../types";
 import { Parser } from "../../../parser";
 
 export class ImportParser<T extends string, N extends BaseNode<T>> extends SubParser<T, N> {
     /** To identify when this parser should be used */
     static triggerToken: TokenType | undefined = TokenType.Importar;
+
+    /**
+     * Collection of reserved keywords this specific sub-parser registers
+     */
+    static keywords: TokenTypeUnion<string>[] = [ TokenType.Importar, TokenType.Desde ];
 
     /**
      * @param parent - Reference to the main Parser orchestrator.

@@ -1,10 +1,15 @@
 import { SubParser } from "../../subparser";
-import { ASTNode, BaseNode, LiteralNode, TokenType } from "../../../types";
+import { ASTNode, BaseNode, LiteralNode, TokenType, TokenTypeUnion } from "../../../types";
 import { Parser } from "../../parser";
 
 export class LiteralParser<T extends string, N extends BaseNode<T>> extends SubParser<T, N> {
     /** To identify when this parser should be used */
     static triggerToken: TokenType | undefined;
+
+   /**
+     * Collection of reserved keywords this specific sub-parser registers
+     */
+    static keywords: TokenTypeUnion<string>[] = [ TokenType.Verdadero, TokenType.Falso, TokenType.Indefinido ];
     
     constructor(parent: Parser<T, N>) {
         super(parent);

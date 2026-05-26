@@ -1,11 +1,16 @@
 import { SubParser } from "../../subparser";
-import { ClassNode, SymbolKind, ASTNode, BaseNode, TokenType } from "../../../types";
+import { ClassNode, SymbolKind, ASTNode, BaseNode, TokenType, TokenTypeUnion } from "../../../types";
 import { StatementParser } from "./StatementParser";
 import { Parser } from "../../parser";
 
 export class ClassParser<T extends string, N extends BaseNode<T>> extends SubParser<T, N> {
     /** To identify when this parser should be used */
     static triggerToken: TokenType | undefined = TokenType.Clase;
+
+    /**
+     * Collection of reserved keywords this specific sub-parser registers
+     */
+    static keywords: TokenTypeUnion<string>[] = [ TokenType.Clase, TokenType.Extiende ];
 
     /**
      * @param parent - Reference to the main Parser orchestrator.

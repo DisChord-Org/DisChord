@@ -1,4 +1,4 @@
-import { ASTNode, BaseNode, LiteralNode, SymbolKind, TokenType, VariableNode } from "../../../types";
+import { ASTNode, BaseNode, LiteralNode, SymbolKind, TokenType, TokenTypeUnion, VariableNode } from "../../../types";
 import { Parser } from "../../parser";
 import { SubParser } from "../../subparser";
 import { ExpressionParser } from "../Expressions/ExpressionParser";
@@ -6,6 +6,11 @@ import { ExpressionParser } from "../Expressions/ExpressionParser";
 export class VariableParser<T extends string, N extends BaseNode<T>> extends SubParser<T, N> {
     /** To identify when this parser should be used */
     static triggerToken: TokenType | undefined = TokenType.Var;
+
+    /**
+     * Collection of reserved keywords this specific sub-parser registers
+     */
+    static keywords: TokenTypeUnion<string>[] = [ TokenType.Var ];
 
     /**
      * @param parent - Reference to the main Parser orchestrator.

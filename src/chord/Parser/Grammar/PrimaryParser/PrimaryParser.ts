@@ -1,5 +1,5 @@
 import { SubParser } from "../../subparser";
-import { ASTNode, BaseNode, ExpressionNode, JSNode, ListNode, NewNode, ODBMode, TokenType } from "../../../types";
+import { ASTNode, BaseNode, ExpressionNode, JSNode, ListNode, NewNode, ODBMode, TokenType, TokenTypeUnion } from "../../../types";
 import { ExpressionParser } from "../Expressions/ExpressionParser";
 import { AssignmentParser } from "../Expressions/AssignmentParser";
 import { DecoratorProcessor } from "../../../DecoratorProcessor";
@@ -12,6 +12,11 @@ import { Parser } from "../../parser";
 export class PrimaryParser<T extends string, N extends BaseNode<T>> extends SubParser<T, N> {
     /** To identify when this parser should be used */
     static triggerToken: TokenType | undefined;
+
+    /**
+     * Collection of reserved keywords this specific sub-parser registers
+     */
+    static keywords: TokenTypeUnion<string>[] = [ TokenType.Nuevo, TokenType.JS, TokenType.Esta, TokenType.Super ];
 
     /**
      * @param parent - Reference to the main Parser orchestrator.

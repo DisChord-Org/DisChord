@@ -1,5 +1,5 @@
 import { SubParser } from "../../subparser";
-import { BaseNode, FunctionNode, SymbolKind, TokenType } from "../../../types";
+import { BaseNode, FunctionNode, SymbolKind, TokenType, TokenTypeUnion } from "../../../types";
 import { BlockParser } from "../BlockParser";
 import { Parser } from "../../parser";
 import { DecoratorProcessor } from "../../../DecoratorProcessor";
@@ -7,6 +7,11 @@ import { DecoratorProcessor } from "../../../DecoratorProcessor";
 export class FunctionParser<T extends string, N extends BaseNode<T>> extends SubParser<T, N> {
     /** To identify when this parser should be used */
     static triggerToken: TokenType | undefined = TokenType.Funcion;
+
+    /**
+     * Collection of reserved keywords this specific sub-parser registers
+     */
+    static keywords: TokenTypeUnion<string>[] = [ TokenType.Funcion ];
 
     /**
      * @param parent - Reference to the main Parser orchestrator.

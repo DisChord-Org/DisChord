@@ -1,11 +1,16 @@
 import { Parser } from "../../parser";
-import { ASTNode, BaseNode, BinaryExpressionNode, TokenType } from "../../../types";
+import { ASTNode, BaseNode, BinaryExpressionNode, TokenType, TokenTypeUnion } from "../../../types";
 import { SubParser } from "../../subparser";
 import { AditiveParser } from "./AditiveParser";
 
 export class ComparisionParser<T extends string, N extends BaseNode<T>> extends SubParser<T, N> {
     /** To identify when this parser should be used */
     static triggerToken: TokenType | undefined;
+
+    /**
+     * Collection of reserved keywords this specific sub-parser registers
+     */
+    static keywords: TokenTypeUnion<string>[] = [];
 
     /**
      * @param parent - Reference to the main Parser orchestrator.

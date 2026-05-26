@@ -1,5 +1,5 @@
 import { ChordError, ErrorLevel } from "../../../ChordError";
-import { ASTNode, BaseNode, ODBMode, ODBNode, TokenType } from "../../types";
+import { ASTNode, BaseNode, ODBMode, ODBNode, TokenType, TokenTypeUnion } from "../../types";
 import { Parser } from "../parser";
 import { SubParser } from "../subparser";
 import { ExpressionParser } from "./Expressions/ExpressionParser";
@@ -10,6 +10,11 @@ import { ExpressionParser } from "./Expressions/ExpressionParser";
 export class BDOParser<T extends string, N extends BaseNode<T>> extends SubParser<T, N> {
     /** To identify when this parser should be used */
     static triggerToken: TokenType | undefined = TokenType.L_BRACE;
+
+    /**
+     * Collection of reserved keywords this specific sub-parser registers
+     */
+    static keywords: TokenTypeUnion<string>[] = [];
 
     /**
      * Stores the mode for the next parsing operation. 

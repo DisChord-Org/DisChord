@@ -43,7 +43,7 @@ export class Parser<T extends string, N extends BaseNode<T>> extends ParserConte
     ) {
         super();
 
-        this.setOwner(this as unknown as Parser<T, N>);
+        this.setOwner(this);
         this.registerGrammar();
     }
 
@@ -63,7 +63,7 @@ export class Parser<T extends string, N extends BaseNode<T>> extends ParserConte
 
             this.KeywordsManager.extend(
                 instance.keywords.reduce<Record<string, TokenTypeUnion<T>>>((accumulator, keyword) => {
-                    accumulator[keyword] = keyword;
+                    accumulator[keyword] = keyword as TokenTypeUnion<T>;
 
                     return accumulator;
                 }, {})

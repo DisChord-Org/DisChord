@@ -1,11 +1,16 @@
 import { SubParser } from "../../subparser";
-import { ASTNode, AccessNode, AccessNodeByIndex, BaseNode, CallNode, IdentificatorNode, TokenType } from "../../../types";
+import { ASTNode, AccessNode, AccessNodeByIndex, BaseNode, CallNode, IdentificatorNode, TokenType, TokenTypeUnion } from "../../../types";
 import { AssignmentParser } from "./AssignmentParser";
 import { Parser } from "../../parser";
 
 export class AccessParser<T extends string, N extends BaseNode<T>> extends SubParser<T, N> {
     /** To identify when this parser should be used */
     static triggerToken: TokenType | undefined;
+
+    /**
+     * Collection of reserved keywords this specific sub-parser registers
+     */
+    static keywords: TokenTypeUnion<string>[] = [];
 
     /**
      * @param parent - Reference to the main Parser orchestrator.

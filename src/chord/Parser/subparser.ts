@@ -87,10 +87,10 @@ export interface SubParserClass<T extends string, N extends BaseNode<T>> {
     /** 
      * The token type string that triggers the activation of this specific sub-parser.
      */
-    triggerToken: TokenTypeUnion<T>;
+    triggerToken: TokenTypeUnion<T> | undefined;
 
     /**
      * Collection of reserved keywords this specific sub-parser registers
      */
-    keywords: TokenTypeUnion<T>[];
+    keywords: TokenTypeUnion<T | string>[];
 }
