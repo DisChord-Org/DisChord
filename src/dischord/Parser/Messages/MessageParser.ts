@@ -1,37 +1,29 @@
-import { DisChordParser } from "../parser";
-import { MessageNode } from "../../types";
-import { KeyWords } from "../../../chord/KeywordsManager";
-import { SubParser } from "../subparser";
-import { ODBMode } from "../../../chord/types";
+import { DisChordNode, DisChordNodeType, DisChordODBNode, DisChordTokenType, MessageNode } from "../../types";
+import { ODBMode, TokenTypeUnion } from "../../../chord/types";
+import { SubParser } from "../../../chord/Parser/subparser";
+import { BDOParser } from "../../../chord/Parser/Grammar/BDOParser";
+import { Parser } from "../../../chord/Parser/parser";
 
 /**
  * The Message Parser.
  * This class is responsible for parsing message creation blocks, which include the message content, channel, embeds and buttons.
  * It constructs a MessageNode in the AST that represents the entire message definition.
  */
-export default class MessageParser extends SubParser {
+export default class MessageParser extends SubParser<DisChordNodeType, DisChordNode> {
     /** To identify when this parser should be used */
-    static triggerToken: string = "mensaje";
+    static triggerToken: DisChordNodeType | undefined = DisChordTokenType.Mensaje;
 
-    // Expose the MessageParser context to component parsers
-    public MessageParserContext;
+    /**
+     * Collection of reserved keywords this specific sub-parser registers
+     */
+    static keywords: TokenTypeUnion<DisChordNodeType>[] = [ DisChordTokenType.Mensaje ];
 
     /**
      * Initializes the MessageParser with the main DisChordParser context for token expression handling.
-     * @param parent - The main DisChordParser context for token expression handling
+     * @param parent - The main Parser context for token expression handling
      */
-    constructor (protected parent: DisChordParser) {
+    constructor (protected parent: Parser<DisChordNodeType, DisChordNode>) {
         super(parent);
-        this.MessageParserContext = parent;
-    }
-
-    /**
-     * Injects DisChord-specific keywords into the global system 
-     * so the Lexer can correctly identify them as tokens.
-     * This method is called by DisChordParser.
-     */
-    public static injectStatements () {
-        KeyWords.addStatements([ "mensaje" ]);
     }
 
     /**
@@ -39,13 +31,13 @@ export default class MessageParser extends SubParser {
      * @returns {MessageNode} The AST node representing the message definition.
      */
     parse (): MessageNode {
-        this.consume('MENSAJE');
+        this.consume(DisChordTokenType.Mensaje);
 
-        const configBody = this.parseODB(ODBMode.Simple);
+        const object = this.parent.get(BDOParser).setMode(ODBMode.Simple).parse() as DisChordODBNode;
 
         return this.createNode<MessageNode>({
-            type: 'CrearMensaje',
-            object: configBody
+            type: DisChordTokenType.CREAR_MENSAJE,
+            object
         });
     }
 }

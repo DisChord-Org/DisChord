@@ -26,7 +26,7 @@ export class VariableParser<T extends string, N extends BaseNode<T>> extends Sub
         let value: ASTNode<T, N> = this.createNode<LiteralNode<T>>({
             type: TokenType.LITERAL,
             value: undefined,
-            raw: 'indefinido'
+            raw: TokenType.Indefinido
         });
 
         if (this.match(TokenType.Es)) {

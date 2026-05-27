@@ -1,31 +1,29 @@
-import { DisChordParser } from "./parser";
-import { CollectorNode } from "../types";
-import { KeyWords } from "../../chord/KeywordsManager";
-import { SubParser } from "./subparser";
-import { ODBMode } from "../../chord/types";
+import { CollectorNode, DisChordNode, DisChordNodeType, DisChordODBNode, DisChordTokenType } from "../types";
+import { ODBMode, TokenTypeUnion } from "../../chord/types";
+import { SubParser } from "../../chord/Parser/subparser";
+import { PrimaryParser } from "../../chord/Parser/Grammar/PrimaryParser/PrimaryParser";
+import { BDOParser } from "../../chord/Parser/Grammar/BDOParser";
+import { Parser } from "../../chord/Parser/parser";
 
 /**
  * The Collector Parser.
  * This class is responsible for parsing interaction collector definitions,
  * which include the collector variable and its pulse bodies.
  */
-export default class CollectorParser extends SubParser {
+export default class CollectorParser extends SubParser<DisChordNodeType, DisChordNode> {
     /** To identify when this parser should be used */
-    static triggerToken: string = "recolector";
-    /**
-     * @param parent - The main DisChordParser context for token expression handling
-     */
-    constructor (protected parent: DisChordParser) {
-        super(parent);
-    }
+    static triggerToken: DisChordNodeType | undefined = DisChordTokenType.Recolector;
 
     /**
-     * Injects DisChord-specific keywords into the global system 
-     * so the Lexer can correctly identify them as tokens.
-     * This method is called by DisChordParser.
+     * Collection of reserved keywords this specific sub-parser registers
      */
-    public static injectStatements () {
-        KeyWords.addStatements([ "recolector" ]);
+    static keywords: TokenTypeUnion<DisChordNodeType>[] = [ DisChordTokenType.Recolector ];
+
+    /**
+     * @param parent - The main Parser context for token expression handling
+     */
+    constructor (protected parent: Parser<DisChordNodeType, DisChordNode>) {
+        super(parent);
     }
 
     /**
@@ -34,13 +32,13 @@ export default class CollectorParser extends SubParser {
      * @returns The parsed collector node.
      */
     parse (): CollectorNode {
-        this.consume('RECOLECTOR');
+        this.consume(DisChordTokenType.Recolector);
 
-        const variable = this.parsePrimary();
-        const methods = this.parseODB(ODBMode.Simple);
+        const variable = this.parent.get(PrimaryParser).parse();
+        const methods = this.parent.get(BDOParser).setMode(ODBMode.Simple).parse() as DisChordODBNode;
 
         return this.createNode<CollectorNode>({
-            type: 'CrearRecolector',
+            type: DisChordTokenType.CREAR_RECOLECTOR,
             variable,
             methods
         });

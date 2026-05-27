@@ -1,31 +1,27 @@
-import { DisChordParser } from "../parser";
-import { CommandNode } from "../../types";
-import { KeyWords } from "../../../chord/KeywordsManager";
-import { SubParser } from "../subparser";
-import { ODBMode } from "../../../chord/types";
+import { CommandNode, DisChordNode, DisChordNodeType, DisChordODBNode, DisChordTokenType } from "../../types";
+import { ODBMode, TokenType, TokenTypeUnion } from "../../../chord/types";
+import { SubParser } from "../../../chord/Parser/subparser";
+import { BDOParser } from "../../../chord/Parser/Grammar/BDOParser";
+import { Parser } from "../../../chord/Parser/parser";
 
 /**
  * The Commands Parser.
  * This class handles the extraction of command names, descriptions, options and executions.
  */
-export default class CommandParser extends SubParser {
+export default class CommandParser extends SubParser<DisChordNodeType, DisChordNode> {
     /** To identify when this parser should be used */
-    static triggerToken: string = "comando";
+    static triggerToken: DisChordNodeType | undefined = DisChordTokenType.Comando;
+    
+    /**
+     * Collection of reserved keywords this specific sub-parser registers
+     */
+    static keywords: TokenTypeUnion<DisChordNodeType>[] = [ DisChordTokenType.Comando ];
 
     /**
-     * @param parent - The main DisChordParser context for token expression handling
+     * @param parent - The main Parser context for token expression handling
      */
-    constructor (protected parent: DisChordParser) {
+    constructor (protected parent: Parser<DisChordNodeType, DisChordNode>) {
         super(parent);
-    }
-
-    /**
-     * Injects DisChord-specific keywords into the global system 
-     * so the Lexer can correctly identify them as tokens.
-     * This method is called by DisChordParser.
-     */
-    public static injectStatements () {
-        KeyWords.addStatements([ "comando" ]);
     }
 
     /**
@@ -34,12 +30,12 @@ export default class CommandParser extends SubParser {
      * @returns {CommandNode} The AST node representing the command definition.
      */
     parse (): CommandNode {
-        this.consume('COMANDO');
-        const commandName = this.consume('IDENTIFICADOR').value;
-        const body = this.parseODB(ODBMode.Intelligent);
+        this.consume(DisChordTokenType.Comando);
+        const commandName = this.consume(TokenType.IDENTIFICADOR).value;
+        const body = this.parent.get(BDOParser).setMode(ODBMode.Intelligent).parse() as DisChordODBNode;
 
         return this.createNode<CommandNode>({
-            type: 'CrearComando',
+            type: DisChordTokenType.CREAR_COMANDO,
             value: commandName,
             body
         });

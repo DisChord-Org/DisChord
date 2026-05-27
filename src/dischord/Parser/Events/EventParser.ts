@@ -1,30 +1,27 @@
-import { DisChordParser } from "../parser";
-import { DisChordASTNode, EventNode } from "../../types";
-import { KeyWords } from "../../../chord/KeywordsManager";
-import { SubParser } from "../subparser";
+import { DisChordNode, DisChordNodeType, DisChordTokenType, EventNode } from "../../types";
+import { SubParser } from "../../../chord/Parser/subparser";
+import { TokenType, TokenTypeUnion } from "../../../chord/types";
+import { BlockParser } from "../../../chord/Parser/Grammar/BlockParser";
+import { Parser } from "../../../chord/Parser/parser";
 
 /**
  * The Event Parser.
  * This class is responsible for parsing event definitions, which include the event name and its body of statements to execute when the event is triggered.
  */
-export default class EventParser extends SubParser {
+export default class EventParser extends SubParser<DisChordNodeType, DisChordNode> {
     /** To identify when this parser should be used */
-    static triggerToken: string = "evento";
+    static triggerToken: DisChordNodeType | undefined = DisChordTokenType.Evento;
 
     /**
-     * @param parent - The main DisChordParser context for token expression handling
+     * Collection of reserved keywords this specific sub-parser registers
      */
-    constructor (protected parent: DisChordParser) {
+    static keywords: TokenTypeUnion<string>[] = [ DisChordTokenType.Evento ];
+
+    /**
+     * @param parent - The main Parser context for token expression handling
+     */
+    constructor (protected parent: Parser<DisChordNodeType, DisChordNode>) {
         super(parent);
-    }
-
-    /**
-     * Injects DisChord-specific keywords into the global system 
-     * so the Lexer can correctly identify them as tokens.
-     * This method is called by DisChordParser.
-     */
-    public static injectStatements () {
-        KeyWords.addStatements([ "evento" ]);
     }
 
     /**
@@ -33,22 +30,13 @@ export default class EventParser extends SubParser {
      * @returns {EventNode} The AST node representing the event definition.
      */
     parse (): EventNode {
-        this.consume('EVENTO');
+        this.consume(DisChordTokenType.Evento);
 
-        const eventName = this.consume('IDENTIFICADOR').value;
-
-        this.consume('L_BRACE');
-
-        const body: DisChordASTNode[] = [];
-
-        while (this.peek().type !== 'R_BRACE') {
-            body.push(this.parseStatement());
-        }
-    
-        this.consume('R_BRACE');
+        const eventName = this.consume(TokenType.IDENTIFICADOR).value;
+        const body = this.parent.get(BlockParser).parse().body;
     
         return this.createNode<EventNode>({
-            type: 'Evento',
+            type: DisChordTokenType.EVENTO,
             name: eventName,
             body
         });

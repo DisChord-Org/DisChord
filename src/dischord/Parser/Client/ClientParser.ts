@@ -1,10 +1,9 @@
-import { DisChordParser } from "../parser";
 import { DisChordNode, DisChordNodeType, DisChordODBNode, DisChordTokenType, StartBotNode } from "../../types";
-import { KeyWords } from '../../../chord/KeywordsManager';
 import { DisChordError, ErrorLevel } from "../../../ChordError";
 import { ODBMode, TokenTypeUnion } from "../../../chord/types";
 import { SubParser } from "../../../chord/Parser/subparser";
 import { BDOParser } from "../../../chord/Parser/Grammar/BDOParser";
+import { Parser } from "../../../chord/Parser/parser";
 
 /**
  * Handles the initial bot declaration.
@@ -17,13 +16,13 @@ export default class ClientParser extends SubParser<DisChordNodeType, DisChordNo
     /**
      * Collection of reserved keywords this specific sub-parser registers
      */
-    static keywords: TokenTypeUnion<string>[] = [ DisChordTokenType.Encender, DisChordTokenType.Bot ];
+    static keywords: TokenTypeUnion<DisChordNodeType>[] = [ DisChordTokenType.Encender, DisChordTokenType.Bot ];
 
     /**
-     * @param parent - The main DisChordParser context used to access token 
+     * @param parent - The main Parser context used to access token 
      * consumption and expression parsing methods.
      */
-    constructor (protected parent: DisChordParser) {
+    constructor (protected parent: Parser<DisChordNodeType, DisChordNode>) {
         super(parent);
     }
 
