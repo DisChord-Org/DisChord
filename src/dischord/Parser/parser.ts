@@ -27,30 +27,36 @@ export class DisChordParser extends Parser<DisChordNodeType, DisChordNode> {
      */
     constructor (
         tokens: Token<DisChordTokenType>[],
-        context: CompilationContext,
+        context: CompilationContext<DisChordNodeType>,
         current: number = 0
     ) {
         super(tokens, current, context);
-        this.registerGrammar();
+        this.registerSubParserInstances();
     }
+
+    /**
+     * Internal registry of specialized architectural sub-parsers.
+     * @type {SubParserClass<DisChordNodeType, DisChordNode>[]}
+     * @private
+     * @readonly
+     * @static
+     */
+    private static readonly DisChordSubParsers: SubParserClass<DisChordNodeType, DisChordNode>[] = [
+        ClientParser,
+        EventParser,
+        CommandParser,
+        MessageParser,
+        CollectorParser
+    ];
 
     /**
      * Injects DisChord-specific keywords into the global system 
      * so the Lexer can correctly identify them as tokens.
+     * @override
      */
-    private registerGrammar(): void {
-        const instances: SubParserClass<DisChordNodeType, DisChordNode>[] = [
-            ClientParser,
-            EventParser,
-            CommandParser,
-            MessageParser,
-            CollectorParser
-        ];
-
-        instances.forEach(instance => {
-            this.register(instance);
-
-            this.KeywordsManager.extend(
+    static override registerGrammar (context: CompilationContext<DisChordNodeType>): void {
+        DisChordParser.DisChordSubParsers.forEach(instance => {
+            context.keywordsManager.extend(
                 instance.keywords.reduce<Record<string, TokenTypeUnion<DisChordNodeType>>>((accumulator, keyword) => {
                     accumulator[keyword] = keyword as TokenTypeUnion<DisChordNodeType>;
 
@@ -58,6 +64,20 @@ export class DisChordParser extends Parser<DisChordNodeType, DisChordNode> {
                 }, {})
             );
         });
+
+        super.registerGrammar(context);
+    }
+
+    /**
+     * Binds instance-level routing tables for the injected SubParsers into the core execution context.
+     * @override
+     * @returns {void}
+     */
+    override registerSubParserInstances(): void {
+        DisChordParser.DisChordSubParsers.forEach(instance => {
+            this.register(instance);
+        });
+
     }
 
     /**
@@ -69,7 +89,7 @@ export class DisChordParser extends Parser<DisChordNodeType, DisChordNode> {
     override parseCustomStatement(): DisChordASTNode | null {
         const token = this.peek();
 
-        const ParserClass = DisChordParser.SubParsers.find(SubParser =>
+        const ParserClass = DisChordParser.DisChordSubParsers.find(SubParser =>
             SubParser.triggerToken !== undefined &&
             SubParser.triggerToken.toUpperCase() === token.type
         );
@@ -94,11 +114,11 @@ export class DisChordParser extends Parser<DisChordNodeType, DisChordNode> {
 
                 const customStatement = this.parseCustomStatement();
                 
-                if (!customStatement) throw new DisChordError(
-                    ErrorLevel.Parser,
-                    `Se esperaba una estructura válida después de 'crear'`,
-                    token.location
-                ).format();
+                if (!customStatement) throw new DisChordError({
+                    phase: ErrorLevel.Parser,
+                    message: `Se esperaba una estructura válida después de 'crear'`,
+                    location: token.location
+                }).format();
 
                 return customStatement;
             default:

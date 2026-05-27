@@ -4,8 +4,9 @@ import { ASTNode, Token, SOF, EOF, TokenType, BaseNode, PeekType, Location, Toke
 import { ChordError, ErrorLevel } from "../../ChordError";
 import { CompilationContext } from "../../init/Init";
 import { ParserContext } from "./ParserContext";
-import { SubParserClass } from "./subparser";
+import { SubParser, SubParserClass } from "./subparser";
 import { SymbolTable } from "../SymbolsTable";
+import { KeyWords } from "../KeywordsManager";
 
 import { BDOParser } from "./Grammar/BDOParser";
 import { AccessParser } from "./Grammar/Expressions/AccessParser";
@@ -31,7 +32,6 @@ import { ClassParser } from "./Grammar/StatementParser/ClassParser";
 import { ExitParser } from "./Grammar/StatementParser/FlowParser/ExitParser";
 import { PassParser } from "./Grammar/StatementParser/FlowParser/PassParser";
 import { FunctionParser } from "./Grammar/StatementParser/FunctionParser";
-import { KeyWords } from "../KeywordsManager";
 
 export class Parser<T extends string, N extends BaseNode<T>> extends ParserContext<T, N> {
     public nodes: ASTNode<T, N>[] = [];
@@ -44,30 +44,39 @@ export class Parser<T extends string, N extends BaseNode<T>> extends ParserConte
         super();
 
         this.setOwner(this);
-        this.registerGrammar();
+        this.registerSubParserInstances();
     }
 
-    private registerGrammar () {
-        const instances: SubParserClass<T, N>[] = [
-            AditiveParser, ArithmeticParser, AssignmentParser,
-            ComparisionParser, ExpressionParser, LogicalParser,
-            UnaryParser, BDOParser, PrimaryParser, LiteralParser,
-            AccessParser, StatementParser, VariableParser,
-            BlockParser, ConditionParser, LoopParser, ReturnParser,
-            PropertyParser, ImportParser, ExportParser, ClassParser,
-            ExitParser, PassParser, FunctionParser
-        ];
-        
-        instances.forEach(instance => {
-            this.register(instance);
+    private static SubParsers: SubParserClass<TokenType, BaseNode<TokenType>>[] = [
+        AditiveParser, ArithmeticParser, AssignmentParser,
+        ComparisionParser, ExpressionParser, LogicalParser,
+        UnaryParser, BDOParser, PrimaryParser, LiteralParser,
+        AccessParser, StatementParser, VariableParser,
+        BlockParser, ConditionParser, LoopParser, ReturnParser,
+        PropertyParser, ImportParser, ExportParser, ClassParser,
+        ExitParser, PassParser, FunctionParser
+    ];
 
-            this.KeywordsManager.extend(
-                instance.keywords.reduce<Record<string, TokenTypeUnion<T>>>((accumulator, keyword) => {
-                    accumulator[keyword] = keyword as TokenTypeUnion<T>;
+    protected static registerGrammar (context: CompilationContext<TokenTypeUnion<string>>): void {
+        Parser.SubParsers.forEach(instance => {
+            context.keywordsManager.extend(
+                instance.keywords.reduce<Record<string, TokenTypeUnion<string>>>((accumulator, keyword) => {
+                    accumulator[keyword] = keyword;
 
                     return accumulator;
                 }, {})
             );
+        });
+    }
+
+    /**
+     * Binds instance-level routing tables for the injected SubParsers into the core execution context.
+     * @private
+     * @returns {void}
+     */
+    protected registerSubParserInstances(): void {
+        Parser.SubParsers.forEach(instance => {
+            this.register(instance as unknown as SubParserClass<T, N>);
         });
     }
 

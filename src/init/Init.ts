@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import path from 'path';
 
 import Prettifier from './Prettifier';
-import { DisChordASTNode, DisChordTokenType } from '../dischord/types';
+import { DisChordASTNode, DisChordNodeType, DisChordTokenType } from '../dischord/types';
 
 import { Lexer } from '../chord/lexer';
 import { DisChordParser } from '../dischord/Parser/parser';
@@ -80,14 +80,14 @@ export default class Init {
         const targetDir = path.join(this.config.distDir, path.dirname(relativePath));
         const outputPath = path.join(targetDir, `${fileName}.mjs`);
 
-        const context: CompilationContext = {
+        const context: CompilationContext<DisChordNodeType> = {
             symbolTable: new SymbolTable(),
             keywordsManager: new KeyWords(),
             codeProvider: new CodeProvider(),
             projectRoot: this.config.projectRoot
         };
 
-        DisChordParser.injectStatements(context);
+        DisChordParser.registerGrammar(context);
 
         const code = fs.readFileSync(file, 'utf-8');
         context.codeProvider.currentCode = { name: file, content: code };
