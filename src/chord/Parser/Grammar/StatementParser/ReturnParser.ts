@@ -1,6 +1,7 @@
 import { SubParser } from "../../subparser";
 import { BaseNode, ReturnNode, TokenType, TokenTypeUnion } from "../../../types";
 import { Parser } from "../../parser";
+import { ExpressionParser } from "../Expressions/ExpressionParser";
 
 export class ReturnParser<T extends string, N extends BaseNode<T>> extends SubParser<T, N> {
     /** To identify when this parser should be used */
@@ -27,7 +28,7 @@ export class ReturnParser<T extends string, N extends BaseNode<T>> extends SubPa
         const isEndOfStatement = ([ TokenType.R_BRACE, TokenType.Sino, TokenType.Ademas, TokenType.EOF ] as TokenType[]).includes(next.type as TokenType);
 
         if (!isEndOfStatement) {
-            value = this.parent.parseExpression();
+            value = this.parent.get(ExpressionParser).parse();
         }
 
         return this.createNode<ReturnNode<T, N>>({

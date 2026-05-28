@@ -82,7 +82,7 @@ export class Parser<T extends string, N extends BaseNode<T>> extends ParserConte
 
     public parse(): ASTNode<T, N>[] {
         while (!this.isAtEnd()) {
-            this.nodes.push(this.parseStatement());
+            this.parseStatement();
         }
 
         return this.nodes;
@@ -188,11 +188,7 @@ export class Parser<T extends string, N extends BaseNode<T>> extends ParserConte
         return null;
     }
 
-    public parseStatement (): ASTNode<T, N> {
+    protected parseStatement (): ASTNode<T, N> {
         return this.get(StatementParser).parse();
-    }
-
-    public parseExpression (): ASTNode<T, N> {
-        return this.get(ExpressionParser).parse();
     }
 }

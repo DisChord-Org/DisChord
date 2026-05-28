@@ -9,8 +9,8 @@ import MessageParser from './Messages/MessageParser';
 import CollectorParser from './CollectorParser';
 import ClientParser from './Client/ClientParser';
 import EventParser from './Events/EventParser';
-import { DisChordError, ErrorLevel } from '../../ChordError';
 import { CompilationContext } from '../../init/Init';
+import DisChordStatementParser from './DisChordStatementParser';
 
 /**
  * Main Orchestrator for DisChord's syntactic analysis.
@@ -42,6 +42,7 @@ export class DisChordParser extends Parser<DisChordNodeType, DisChordNode> {
      * @static
      */
     private static readonly DisChordSubParsers: SubParserClass<DisChordNodeType, DisChordNode>[] = [
+        DisChordStatementParser,
         ClientParser,
         EventParser,
         CommandParser,
@@ -77,7 +78,6 @@ export class DisChordParser extends Parser<DisChordNodeType, DisChordNode> {
         DisChordParser.DisChordSubParsers.forEach(instance => {
             this.register(instance);
         });
-
     }
 
     /**
@@ -100,29 +100,11 @@ export class DisChordParser extends Parser<DisChordNodeType, DisChordNode> {
     }
 
     /**
-     * Intercepts execution statements. Prioritizes DisChord declarations 
-     * before falling back to native Chord statements.
+     * Intercepts the statement parsing pipeline to inject the DisChordStatementParser middleware.
      * @override
-     * @returns {DisChordASTNode} The constructed abstract statement node.
+     * @returns {DisChordASTNode} The processed syntax tree node.
      */
-    override parseStatement (): DisChordASTNode {
-        const token = this.peek();
-
-        switch (token.type) {
-            case DisChordTokenType.Crear:
-                this.consume(DisChordTokenType.Crear);
-
-                const customStatement = this.parseCustomStatement();
-                
-                if (!customStatement) throw new DisChordError({
-                    phase: ErrorLevel.Parser,
-                    message: `Se esperaba una estructura válida después de 'crear'`,
-                    location: token.location
-                }).format();
-
-                return customStatement;
-            default:
-                return super.parseStatement();
-        }
+    override parseStatement(): DisChordASTNode {
+        return this.get(DisChordStatementParser).parse();
     }
 }
