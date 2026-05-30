@@ -28,8 +28,8 @@ export class AccessParser<T extends string, N extends BaseNode<T>> extends SubPa
         while (true) {
             const next = this.peek();
 
-            if (next.type === TokenType.ACCESO) {
-                this.consume(TokenType.ACCESO);
+            if (next.type === TokenType.Punto) {
+                this.consume(TokenType.Punto);
                 const property = this.consume(TokenType.IDENTIFICADOR, `Se esperaba un nombre tras '.'`);
                 node = this.createNode<AccessNode<T, N>>({
                     type: TokenType.ACCESO,

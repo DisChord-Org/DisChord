@@ -1,5 +1,5 @@
 import { SubParser } from "../../subparser";
-import { ASTNode, BaseNode, ExpressionNode, JSNode, ListNode, NewNode, ODBMode, TokenType, TokenTypeUnion } from "../../../types";
+import { ASTNode, BaseNode, ExpressionNode, IdentificatorNode, JSNode, ListNode, NewNode, ODBMode, TokenType, TokenTypeUnion } from "../../../types";
 import { ExpressionParser } from "../Expressions/ExpressionParser";
 import { AssignmentParser } from "../Expressions/AssignmentParser";
 import { DecoratorProcessor } from "../../../DecoratorProcessor";
