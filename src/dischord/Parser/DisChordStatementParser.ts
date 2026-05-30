@@ -4,6 +4,7 @@ import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType } fr
 import { DisChordError, ErrorLevel } from '../../ChordError';
 import { Parser } from '../../chord/Parser/parser';
 import { StatementParser } from '../../chord/Parser/Grammar/StatementParser/StatementParser';
+import { DisChordParser } from './parser';
 
 /**
  * @class DisChordStatementParser
@@ -54,6 +55,6 @@ export default class DisChordStatementParser extends SubParser<DisChordNodeType,
             return customStatement;
         }
 
-        return this.parent.get(StatementParser).parse();
+        return (this.parent as DisChordParser).parseNativeStatement();
     }
 }

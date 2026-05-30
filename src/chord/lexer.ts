@@ -152,7 +152,7 @@ export class Lexer<T extends string> {
                 } else if (value === TokenType.Indefinido) {
                     tokens.push(this.createToken(TokenType.Indefinido, value, startLine, startCol));
                 } else if (this.context.keywordsManager.isKeyword(value)) {
-                    tokens.push(this.createToken(this.context.keywordsManager.resolve(value.toLowerCase())!, value, startLine, startCol));
+                    tokens.push(this.createToken(this.context.keywordsManager.resolve(value.toLowerCase()) as TokenType, value, startLine, startCol));
                 } else {
                     tokens.push(this.createToken(TokenType.IDENTIFICADOR, value, startLine, startCol));
                 }
