@@ -45,6 +45,10 @@ export class ParserContext<T extends string, N extends BaseNode<T>> {
 
     constructor() {}
 
+    /**
+     * Injects the execution instance context into the local lifecycle state.
+     * @param owner - The runtime Parser instance.
+     */
     protected setOwner (owner: Parser<T, N>): this {
         this.owner = owner;
         return this;
