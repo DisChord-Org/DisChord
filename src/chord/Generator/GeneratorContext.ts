@@ -45,7 +45,7 @@ export abstract class GeneratorContext<T extends string, N extends BaseNode<T>> 
      * @protected
      * @abstract
      */
-    protected abstract registerVisitorInstances(): void;
+    protected abstract registerVisitors(): void;
 
     /**
      * Injects the execution instance context into the local lifecycle state.
