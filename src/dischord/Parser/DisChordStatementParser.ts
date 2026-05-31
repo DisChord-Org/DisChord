@@ -55,6 +55,6 @@ export default class DisChordStatementParser extends SubParser<DisChordNodeType,
             return customStatement;
         }
 
-        return (this.parent as DisChordParser).parseNativeStatement();
+        return this.parent.get(StatementParser).parse();
     }
 }

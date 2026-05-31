@@ -110,13 +110,4 @@ export class DisChordParser extends Parser<DisChordNodeType, DisChordNode> {
     override parseStatement(): DisChordASTNode {
         return this.get(DisChordStatementParser).parse();
     }
-
-    /**
-     * Native fallback bridge to execute Chord's base statement logic
-     * bypassing the isolated sub-parser container registry.
-     * @returns {DisChordASTNode}
-     */
-    public parseNativeStatement(): DisChordASTNode {
-        return super.parseStatement();
-    }
 }
