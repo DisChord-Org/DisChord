@@ -1,4 +1,5 @@
 import { CompilationContext } from "../../init/Init";
+import { runtimeInjections } from "../core.lib";
 import { ASTNode, BaseNode } from "../types";
 import { GeneratorContext } from "./GeneratorContext";
 import { SubGeneratorClass } from "./SubGenerator";
@@ -8,8 +9,7 @@ import { SubGeneratorClass } from "./SubGenerator";
  * Traverses the AST and delegates the translation of individual nodes 
  * to registered SubGenerators.
  */
-export class Generator<T extends string = string, N extends BaseNode<T> = BaseNode<T>> extends GeneratorContext<T, N> {
-    
+export class Generator<T extends string, N extends BaseNode<T>> extends GeneratorContext<T, N> {
     /**
      * Statement node types that handle their own block structure 
      * and do not require a forced trailing semicolon.
@@ -17,7 +17,7 @@ export class Generator<T extends string = string, N extends BaseNode<T> = BaseNo
     private readonly noSemicolonNodes: string[] = [ 'Condicion', 'Bucle', 'Clase', 'Funcion' ];
 
     constructor(
-        public readonly context: CompilationContext
+        public readonly context: CompilationContext<T>
     ) {
         super();
         
@@ -33,13 +33,12 @@ export class Generator<T extends string = string, N extends BaseNode<T> = BaseNo
 
     /**
      * Populates the local IoC context with the native sub-generators mapping.
-     * @override
      * @protected
      */
-    protected override registerVisitors (): void {
-        Object.entries(Generator.SubGeneratorsMap).forEach(([nodeType, VisitorClass]) => {
-            this.register(nodeType, VisitorClass as unknown as SubGeneratorClass<T, N, ASTNode<T, N>>);
-        });
+    protected registerVisitors (): void {
+        Generator.SubGeneratorsMap.forEach(instance => {
+            this.register(instance as unknown as SubGeneratorClass<T, N>);
+        })
     }
 
     /**
