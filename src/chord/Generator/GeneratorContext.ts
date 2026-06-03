@@ -1,3 +1,4 @@
+import { Generator } from "../generator";
 import { BaseNode } from "../types";
 import { SubGenerator } from "./SubGenerator";
 
