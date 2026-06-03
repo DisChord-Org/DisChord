@@ -7,12 +7,6 @@ import { Generator } from "./Generator";
  */
 export abstract class SubGenerator<T extends string, N extends BaseNode<T>> {
     /**
-     * Optional collection of reserved keywords or configurations 
-     * this specific sub-generator might track.
-     */
-    static keywords: TokenTypeUnion<string>[] = [];
-
-    /**
      * @param parent - Reference to the main Generator orchestrator context.
      */
     constructor(protected parent: Generator<T, N>) {}
@@ -31,4 +25,9 @@ export abstract class SubGenerator<T extends string, N extends BaseNode<T>> {
  */
 export interface SubGeneratorClass<T extends string, N extends BaseNode<T>> {
     new (parent: Generator<T, N>): SubGenerator<T, N>;
+
+    /** 
+     * The token type string that triggers the activation of this specific sub-parser.
+     */
+    triggerToken: TokenTypeUnion<T> | undefined;
 }

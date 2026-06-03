@@ -1,3 +1,4 @@
+import { ChordError, ErrorLevel } from "../../ChordError";
 import { CompilationContext } from "../../init/Init";
 import { runtimeInjections } from "../core.lib";
 import { ASTNode, BaseNode } from "../types";
@@ -63,15 +64,15 @@ export class Generator<T extends string, N extends BaseNode<T>> extends Generato
      * @param node - The target node to be generated.
      */
     public visit(node: ASTNode<T, N>): string {
-        try {
-            return this.get(node.type).visit(node);
-        } catch (error) {
-            throw new ChordError({
-                phase: ErrorLevel.Compiler,
-                message: `Generador: Error al procesar el tipo de nodo '${node.type}'. Asegúrate de que su visitor esté correctamente registrado.`,
-                location: node.location
-            }).format();
-        }
+        const VisitorClass = Generator.SubGeneratorsMap.find(cls => cls.triggerToken === node.type);
+
+        if (!VisitorClass) throw new ChordError({
+            phase: ErrorLevel.Compiler,
+            message: `Generador: Error al procesar el tipo de nodo '${node.type}'. Asegúrate de que su visitor esté correctamente registrado.`,
+            location: node.location
+        }).format();
+
+        return this.get(VisitorClass).visit(node);
     }
 
     /**
