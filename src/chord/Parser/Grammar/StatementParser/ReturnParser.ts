@@ -1,6 +1,6 @@
 import { SubParser } from "../../subparser";
 import { BaseNode, ReturnNode, TokenType, TokenTypeUnion } from "../../../types";
-import { Parser } from "../../parser";
+import { Parser } from "../../Parser";
 import { ExpressionParser } from "../Expressions/ExpressionParser";
 
 export class ReturnParser<T extends string, N extends BaseNode<T>> extends SubParser<T, N> {

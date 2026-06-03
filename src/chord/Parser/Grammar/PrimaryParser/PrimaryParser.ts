@@ -7,7 +7,7 @@ import { ChordError, ErrorLevel } from "../../../../ChordError";
 import { BDOParser } from "../BDOParser";
 import { LiteralParser } from "../Expressions/LiteralParser";
 import { AccessParser } from "../Expressions/AccessParser";
-import { Parser } from "../../parser";
+import { Parser } from "../../Parser";
 
 export class PrimaryParser<T extends string, N extends BaseNode<T>> extends SubParser<T, N> {
     /** To identify when this parser should be used */

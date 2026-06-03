@@ -1,7 +1,7 @@
 import { SubParser } from "../../subparser";
 import { LoopNode, BaseNode, TokenType, TokenTypeUnion } from "../../../types";
 import { BlockParser } from "../BlockParser";
-import { Parser } from "../../parser";
+import { Parser } from "../../Parser";
 
 export class LoopParser<T extends string, N extends BaseNode<T>> extends SubParser<T, N> {
     /** To identify when this parser should be used */

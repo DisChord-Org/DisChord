@@ -1,6 +1,6 @@
 import { SubParser } from "../../../subparser";
 import { BaseNode, ImportNode, TokenType, TokenTypeUnion } from "../../../../types";
-import { Parser } from "../../../parser";
+import { Parser } from "../../../Parser";
 
 export class ImportParser<T extends string, N extends BaseNode<T>> extends SubParser<T, N> {
     /** To identify when this parser should be used */

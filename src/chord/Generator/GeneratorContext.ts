@@ -1,5 +1,4 @@
-import { ChordError, ErrorLevel } from "../../ChordError";
-import { ASTNode, BaseNode } from "../types";
+import { BaseNode } from "../types";
 import { SubGenerator } from "./SubGenerator";
 
 /**
@@ -20,7 +19,7 @@ export type SubGeneratorClass<
  * Isolated Context Lifecycle Manager for the Code Generation Phase.
  * Acts as an internal IoC container for structural AST node processors.
  */
-export abstract class GeneratorContext<T extends string, N extends BaseNode<T>> {
+export class GeneratorContext<T extends string, N extends BaseNode<T>> {
     /**
      * Internal registry pairing strict AST node types with their atomic visitors.
      * @private
@@ -39,13 +38,7 @@ export abstract class GeneratorContext<T extends string, N extends BaseNode<T>> 
      */
     protected owner!: Generator<T, N>;
 
-    /**
-     * Absolute blueprint method to enforce sub-parser/visitor instance allocation 
-     * in upper implementation layers.
-     * @protected
-     * @abstract
-     */
-    protected abstract registerVisitorInstances(): void;
+    constructor () {}
 
     /**
      * Injects the execution instance context into the local lifecycle state.

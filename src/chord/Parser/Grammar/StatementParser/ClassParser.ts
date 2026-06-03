@@ -1,7 +1,7 @@
 import { SubParser } from "../../subparser";
 import { ClassNode, SymbolKind, ASTNode, BaseNode, TokenType, TokenTypeUnion } from "../../../types";
 import { StatementParser } from "./StatementParser";
-import { Parser } from "../../parser";
+import { Parser } from "../../Parser";
 
 export class ClassParser<T extends string, N extends BaseNode<T>> extends SubParser<T, N> {
     /** To identify when this parser should be used */

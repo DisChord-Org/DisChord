@@ -2,7 +2,7 @@ import { TokenType, TokenTypeUnion } from '../../chord/types';
 import { SubParser } from '../../chord/Parser/subparser';
 import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType } from '../types';
 import { DisChordError, ErrorLevel } from '../../ChordError';
-import { Parser } from '../../chord/Parser/parser';
+import { Parser } from '../../chord/Parser/Parser';
 import { StatementParser } from '../../chord/Parser/Grammar/StatementParser/StatementParser';
 import { DisChordParser } from './parser';
 
