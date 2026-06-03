@@ -1,6 +1,6 @@
 import { SubParser } from "../../subparser";
 import { PropertyNode, SymbolKind, LiteralNode, ASTNode, BaseNode, TokenType, TokenTypeUnion } from "../../../types";
-import { Parser } from "../../parser";
+import { Parser } from "../../Parser";
 import { DecoratorProcessor } from "../../../DecoratorProcessor";
 
 export class PropertyParser<T extends string, N extends BaseNode<T>> extends SubParser<T, N> {

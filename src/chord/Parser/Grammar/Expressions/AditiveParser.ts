@@ -1,4 +1,4 @@
-import { Parser } from "../../parser";
+import { Parser } from "../../Parser";
 import { ASTNode, BaseNode, BinaryExpressionNode, TokenType, TokenTypeUnion } from "../../../types";
 import { SubParser } from "../../subparser";
 import { ArithmeticParser } from "./ArithmeticParser";

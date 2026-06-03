@@ -1,7 +1,7 @@
 import { SubParser } from "../../subparser";
 import { ASTNode, AccessNode, AccessNodeByIndex, BaseNode, CallNode, IdentificatorNode, TokenType, TokenTypeUnion } from "../../../types";
 import { AssignmentParser } from "./AssignmentParser";
-import { Parser } from "../../parser";
+import { Parser } from "../../Parser";
 
 export class AccessParser<T extends string, N extends BaseNode<T>> extends SubParser<T, N> {
     /** To identify when this parser should be used */

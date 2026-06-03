@@ -1,7 +1,7 @@
 import { Token, TokenTypeUnion } from '../../chord/types';
 import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType } from '../types';
 
-import { Parser } from '../../chord/Parser/parser';
+import { Parser } from '../../chord/Parser/Parser';
 import { SubParserClass } from '../../chord/Parser/subparser';
 
 import CommandParser from './Commands/CommandParser';

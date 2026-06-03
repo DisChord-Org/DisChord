@@ -1,5 +1,5 @@
 import { ASTNode, BaseNode, LiteralNode, SymbolKind, TokenType, TokenTypeUnion, VariableNode } from "../../../types";
-import { Parser } from "../../parser";
+import { Parser } from "../../Parser";
 import { SubParser } from "../../subparser";
 import { ExpressionParser } from "../Expressions/ExpressionParser";
 

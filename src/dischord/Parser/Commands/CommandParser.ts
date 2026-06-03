@@ -2,7 +2,7 @@ import { CommandNode, DisChordNode, DisChordNodeType, DisChordODBNode, DisChordT
 import { ODBMode, TokenType, TokenTypeUnion } from "../../../chord/types";
 import { SubParser } from "../../../chord/Parser/subparser";
 import { BDOParser } from "../../../chord/Parser/Grammar/BDOParser";
-import { Parser } from "../../../chord/Parser/parser";
+import { Parser } from "../../../chord/Parser/Parser";
 
 /**
  * The Commands Parser.

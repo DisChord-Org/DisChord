@@ -1,6 +1,6 @@
 import { ASTNode, BaseNode, PeekType, Token, TokenType, TokenTypeUnion } from "../../chord/types";
 import { SymbolTable } from "../SymbolsTable";
-import { Parser } from "./parser";
+import { Parser } from "./Parser";
 
 /**
  * Abstract base for the Delegation Pattern in the DisChord/Chord Parser.

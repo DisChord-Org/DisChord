@@ -2,7 +2,7 @@ import { DisChordNode, DisChordNodeType, DisChordTokenType, EventNode } from "..
 import { SubParser } from "../../../chord/Parser/subparser";
 import { TokenType, TokenTypeUnion } from "../../../chord/types";
 import { BlockParser } from "../../../chord/Parser/Grammar/BlockParser";
-import { Parser } from "../../../chord/Parser/parser";
+import { Parser } from "../../../chord/Parser/Parser";
 
 /**
  * The Event Parser.

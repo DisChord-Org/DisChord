@@ -1,5 +1,5 @@
 import { BaseNode, PassLoopNode, TokenType, TokenTypeUnion } from "../../../../types";
-import { Parser } from "../../../parser";
+import { Parser } from "../../../Parser";
 import { SubParser } from "../../../subparser";
 
 export class PassParser<T extends string, N extends BaseNode<T>> extends SubParser<T, N> {

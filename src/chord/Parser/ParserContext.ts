@@ -1,5 +1,5 @@
 import { BaseNode } from "../types";
-import { Parser } from "./parser";
+import { Parser } from "./Parser";
 import { SubParser } from "./subparser";
 
 /**
