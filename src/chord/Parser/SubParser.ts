@@ -1,4 +1,4 @@
-import { ASTNode, BaseNode, PeekType, Token, TokenType, TokenTypeUnion } from "../../chord/types";
+import { ASTNode, BaseNode, PeekType, Token, TokenTypeUnion } from "../types";
 import { SymbolTable } from "../SymbolsTable";
 import { Parser } from "./Parser";
 

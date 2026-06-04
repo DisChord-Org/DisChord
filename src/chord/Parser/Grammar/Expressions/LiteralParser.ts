@@ -1,4 +1,4 @@
-import { SubParser } from "../../subparser";
+import { SubParser } from "../../SubParser";
 import { ASTNode, BaseNode, LiteralNode, TokenType, TokenTypeUnion } from "../../../types";
 import { Parser } from "../../Parser";
 

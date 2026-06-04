@@ -1,6 +1,6 @@
 import { Parser } from "../../Parser";
 import { ASTNode, BaseNode, NoUnaryNode, TokenType, TokenTypeUnion, UnaryNode } from "../../../types";
-import { SubParser } from "../../subparser";
+import { SubParser } from "../../SubParser";
 import { PrimaryParser } from "../PrimaryParser/PrimaryParser";
 
 export class UnaryParser<T extends string, N extends BaseNode<T>> extends SubParser<T, N> {

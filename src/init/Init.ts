@@ -5,7 +5,7 @@ import Prettifier from './Prettifier';
 import { DisChordASTNode, DisChordNodeType, DisChordTokenType } from '../dischord/types';
 
 import { Lexer } from '../chord/lexer';
-import { DisChordParser } from '../dischord/Parser/parser';
+import { DisChordParser } from '../dischord/Parser/Parser';
 import { DisChordGenerator } from '../dischord/Generator/generator';
 import { CompilerConfig, FileSystem } from './FileSystem';
 import { CLI, LogFlagLevel } from './CLI';

@@ -1,4 +1,4 @@
-import { SubParser } from "../../subparser";
+import { SubParser } from "../../SubParser";
 import { LoopNode, BaseNode, TokenType, TokenTypeUnion } from "../../../types";
 import { BlockParser } from "../BlockParser";
 import { Parser } from "../../Parser";

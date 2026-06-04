@@ -1,6 +1,6 @@
 import { ASTNode, BaseNode, TokenType, TokenTypeUnion } from "../../../types";
 import { Parser } from "../../Parser";
-import { SubParser } from "../../subparser";
+import { SubParser } from "../../SubParser";
 import { AssignmentParser } from "./AssignmentParser";
 
 /**

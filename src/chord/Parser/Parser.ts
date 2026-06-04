@@ -4,7 +4,7 @@ import { ASTNode, Token, SOF, EOF, TokenType, BaseNode, PeekType, Location, Toke
 import { ChordError, ErrorLevel } from "../../ChordError";
 import { CompilationContext } from "../../init/Init";
 import { ParserContext } from "./ParserContext";
-import { SubParserClass } from "./subparser";
+import { SubParserClass } from "./SubParser";
 import { SymbolTable } from "../SymbolsTable";
 import { KeyWords } from "../KeywordsManager";
 

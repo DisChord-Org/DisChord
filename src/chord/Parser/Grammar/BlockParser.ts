@@ -1,6 +1,6 @@
 import { ASTNode, BaseNode, BlockNode, TokenType, TokenTypeUnion } from "../../types";
 import { Parser } from "../Parser";
-import { SubParser } from "../subparser";
+import { SubParser } from "../SubParser";
 
 /**
  * @class BlockParser

@@ -1,5 +1,5 @@
-import { SubParser } from "../../subparser";
 import { ASTNode, AccessNode, AccessNodeByIndex, BaseNode, CallNode, IdentificatorNode, TokenType, TokenTypeUnion } from "../../../types";
+import { SubParser } from "../../SubParser";
 import { AssignmentParser } from "./AssignmentParser";
 import { Parser } from "../../Parser";
 
