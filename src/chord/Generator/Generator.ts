@@ -1,4 +1,5 @@
 import { ChordError, ErrorLevel } from "../../ChordError";
+import { DisChordNode, DisChordNodeType } from "../../dischord/types";
 import { CompilationContext } from "../../init/Init";
 import { runtimeInjections } from "../core.lib";
 import { ASTNode, BaseNode } from "../types";
@@ -30,7 +31,7 @@ export class Generator<T extends string, N extends BaseNode<T>> extends Generato
      * Registry of all native Chord sub-generators.
      * Maps the AST node type string to its corresponding class constructor.
      */
-    private static readonly SubGeneratorsMap: SubGeneratorClass<T, N>[] = [];
+    private static readonly SubGeneratorsMap: SubGeneratorClass<DisChordNodeType, DisChordNode>[] = [];
 
     /**
      * Populates the local IoC context with the native sub-generators mapping.
@@ -72,7 +73,7 @@ export class Generator<T extends string, N extends BaseNode<T>> extends Generato
             location: node.location
         }).format();
 
-        return this.get(VisitorClass).visit(node);
+        return this.get(VisitorClass as unknown as SubGeneratorClass<T, N>).visit(node);
     }
 
     /**

@@ -3,7 +3,7 @@ import { CompilationContext } from "../init/Init";
 import { corelib, runtimeInjections } from "./core.lib";
 import { AccessNode, AccessNodeByIndex, AssignmentNode, ASTNode, BinaryExpressionNode, CallNode, ClassNode, ConditionNode, ExportNode, FunctionNode, ListNode, LiteralNode, LoopNode, NoUnaryNode, ODBMode, ODBNode, PropertyNode, Symbol, UnaryNode, VariableNode } from "./types";
 
-export class Generator<T extends string = string, N = never> {
+//export class Generator<T extends string = string, N = never> {
 
     constructor (
         public context: CompilationContext
