@@ -11,7 +11,6 @@ import ClientParser from './Client/ClientParser';
 import EventParser from './Events/EventParser';
 import { CompilationContext } from '../../init/Init';
 import DisChordStatementParser from './DisChordStatementParser';
-import { StatementParser } from '../../chord/Parser/Grammar/StatementParser/StatementParser';
 
 /**
  * Main Orchestrator for DisChord's syntactic analysis.
