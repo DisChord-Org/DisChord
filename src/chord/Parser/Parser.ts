@@ -191,4 +191,8 @@ export class Parser<T extends string, N extends BaseNode<T>> extends ParserConte
     protected parseStatement (): ASTNode<T, N> {
         return this.get(StatementParser).parse();
     }
+
+    public parseExpression (): ASTNode<T, N> {
+        return this.get(ExpressionParser).parse();
+    }
 }
