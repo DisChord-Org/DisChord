@@ -1,7 +1,7 @@
 import { DecoratorProcessor } from "../../../DecoratorProcessor";
 import { ASTNode, BaseNode, TokenType, TokenTypeUnion } from "../../../types";
 import { Parser } from "../../Parser";
-import { SubParser } from "../../subparser";
+import { SubParser } from "../../SubParser";
 import { ExpressionParser } from "../Expressions/ExpressionParser";
 import { ExportParser } from "./ModuleParser/ExportParser";
 import { ImportParser } from "./ModuleParser/ImportParser";

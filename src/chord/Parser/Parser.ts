@@ -4,7 +4,7 @@ import { ASTNode, Token, SOF, EOF, TokenType, BaseNode, PeekType, Location, Toke
 import { ChordError, ErrorLevel } from "../../ChordError";
 import { CompilationContext } from "../../init/Init";
 import { ParserContext } from "./ParserContext";
-import { SubParserClass } from "./subparser";
+import { SubParserClass } from "./SubParser";
 import { SymbolTable } from "../SymbolsTable";
 import { KeyWords } from "../KeywordsManager";
 
@@ -190,5 +190,9 @@ export class Parser<T extends string, N extends BaseNode<T>> extends ParserConte
 
     protected parseStatement (): ASTNode<T, N> {
         return this.get(StatementParser).parse();
+    }
+
+    public parseExpression (): ASTNode<T, N> {
+        return this.get(ExpressionParser).parse();
     }
 }

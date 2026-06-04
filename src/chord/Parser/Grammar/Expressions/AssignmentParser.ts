@@ -1,6 +1,6 @@
 import { ASTNode, BaseNode, TokenType, TokenTypeUnion } from "../../../types";
 import { Parser } from "../../Parser";
-import { SubParser } from "../../subparser";
+import { SubParser } from "../../SubParser";
 import { LogicalParser } from "./LogicalParser";
 
 export class AssignmentParser<T extends string, N extends BaseNode<T>> extends SubParser<T, N> {

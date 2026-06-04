@@ -1,6 +1,6 @@
 import { ASTNode, BaseNode, LiteralNode, SymbolKind, TokenType, TokenTypeUnion, VariableNode } from "../../../types";
 import { Parser } from "../../Parser";
-import { SubParser } from "../../subparser";
+import { SubParser } from "../../SubParser";
 import { ExpressionParser } from "../Expressions/ExpressionParser";
 
 export class VariableParser<T extends string, N extends BaseNode<T>> extends SubParser<T, N> {

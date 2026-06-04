@@ -1,6 +1,6 @@
 import { Parser } from "../../Parser";
 import { ASTNode, BaseNode, BinaryExpressionNode, TokenType, TokenTypeUnion } from "../../../types";
-import { SubParser } from "../../subparser";
+import { SubParser } from "../../SubParser";
 import { ArithmeticParser } from "./ArithmeticParser";
 
 export class AditiveParser<T extends string, N extends BaseNode<T>> extends SubParser<T, N> {

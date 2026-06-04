@@ -1,4 +1,4 @@
-import { SubParser } from "../../subparser";
+import { SubParser } from "../../SubParser";
 import { ASTNode, BaseNode, ExpressionNode, IdentificatorNode, JSNode, ListNode, NewNode, ODBMode, TokenType, TokenTypeUnion } from "../../../types";
 import { ExpressionParser } from "../Expressions/ExpressionParser";
 import { AssignmentParser } from "../Expressions/AssignmentParser";
