@@ -1,6 +1,5 @@
 import { ChordError, ErrorLevel } from "../ChordError";
-import { CompilationContext } from "../init/Init";
-import { corelib, runtimeInjections } from "./core.lib";
+import { corelib } from "./core.lib";
 import { AccessNode, AccessNodeByIndex, AssignmentNode, ASTNode, BinaryExpressionNode, CallNode, ClassNode, ConditionNode, ExportNode, FunctionNode, ListNode, LiteralNode, LoopNode, NoUnaryNode, ODBMode, ODBNode, PropertyNode, Symbol, UnaryNode, VariableNode } from "./types";
 
 //export class Generator<T extends string = string, N = never> {
@@ -111,10 +110,6 @@ import { AccessNode, AccessNodeByIndex, AssignmentNode, ASTNode, BinaryExpressio
         }
     }
 
-    public visitIfExists (node: ASTNode<T> | undefined): string | undefined {
-        return node ? this.visit(node) : undefined;
-    }
-
     private generateClass(node: ClassNode<T>): string {
         const inheritance = node.superClass ? ` extends ${node.superClass}` : '';
         const body = node.body
@@ -179,18 +174,6 @@ import { AccessNode, AccessNodeByIndex, AssignmentNode, ASTNode, BinaryExpressio
         return `${awaitPrefix}${translation}(${args})`;
     }
 
-    private generateLiteral(node: LiteralNode<T>): string {
-        if (typeof node.value === 'boolean') {
-            return node.value ? 'true' : 'false';
-        }
-
-        if (typeof node.value === 'string') {
-            return `"${node.value}"`;
-        }
-
-        return String(node.value);
-    }
-
     private generateArray(node: ListNode<T>): string {
         const elements = node.body.map((element: ASTNode<T>) => this.visit(element)).join(', ');
         return `[${elements}]`;
@@ -248,10 +231,6 @@ import { AccessNode, AccessNodeByIndex, AssignmentNode, ASTNode, BinaryExpressio
         const op = operatorsMap[node.operator];
         
         return `${this.visit(node.left)} ${op} ${this.visit(node.right)}`;
-    }
-
-    private generateVariableDeclaration(node: VariableNode<T>): string {
-        return `let ${node.id} = ${this.visit(node.value)}`;
     }
 
     private generateUnaryOperation(node: UnaryNode<T> | NoUnaryNode<T>): string {

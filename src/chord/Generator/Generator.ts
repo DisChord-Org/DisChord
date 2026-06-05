@@ -12,12 +12,6 @@ import { SubGeneratorClass } from "./SubGenerator";
  * to registered SubGenerators.
  */
 export class Generator<T extends string, N extends BaseNode<T>> extends GeneratorContext<T, N> {
-    /**
-     * Statement node types that handle their own block structure 
-     * and do not require a forced trailing semicolon.
-     */
-    private readonly noSemicolonNodes: string[] = [ 'Condicion', 'Bucle', 'Clase', 'Funcion' ];
-
     constructor(
         public readonly context: CompilationContext<T>
     ) {
@@ -51,7 +45,7 @@ export class Generator<T extends string, N extends BaseNode<T>> extends Generato
     public generate(nodes: ASTNode<T, N>[]): string {
         const body = nodes.map(node => {
             const code = this.visit(node);
-            return this.noSemicolonNodes.includes(node.type) ? code : `${code};`;
+            return code;
         }).join('\n');
 
         return `
