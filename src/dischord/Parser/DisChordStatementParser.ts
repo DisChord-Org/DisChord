@@ -4,7 +4,6 @@ import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType } fr
 import { DisChordError, ErrorLevel } from '../../ChordError';
 import { Parser } from '../../chord/Parser/Parser';
 import { StatementParser } from '../../chord/Parser/Grammar/StatementParser/StatementParser';
-import { DisChordParser } from './Parser';
 
 /**
  * @class DisChordStatementParser
