@@ -1,4 +1,4 @@
-import { AccessNode, BaseNode, TokenType, TokenTypeUnion } from "../../types";
+import { AccessNode, BaseNode, IdentificatorNode, TokenType, TokenTypeUnion } from "../../types";
 import { SubGenerator } from "../SubGenerator";
 import { corelib } from "../core.lib";
 
@@ -24,7 +24,12 @@ export class AccessVisitor<T extends string, N extends BaseNode<T>> extends SubG
      * @public
      */
     public visit(node: AccessNode<T, N>): string {
-        const objName = node.object.type === TokenType.IDENTIFICADOR ? node.object.value : null;
+        const targetObject = node.object as IdentificatorNode<T>;
+        
+        const objName = targetObject.type === TokenType.IDENTIFICADOR
+            ? targetObject.value 
+            : null;
+            
         const propName = node.property;
 
         if (objName && corelib.classes[objName] && corelib.classes[objName].methods[propName]) {
