@@ -119,24 +119,6 @@ import { AccessNode, AccessNodeByIndex, AssignmentNode, ASTNode, BinaryExpressio
         return `class ${node.id}${inheritance} {\n  ${body}\n}`;
     }
 
-    generateAccess(node: AccessNode<T>): string { 
-        const objName = node.object.type === 'Identificador' ? node.object.value : null;
-        const propName = node.property;
-
-        if (objName && corelib.classes[objName] && corelib.classes[objName].methods[propName]) {
-            return corelib.classes[objName].methods[propName];
-        }
-
-        for (const className in corelib.classes) {
-            const methods = corelib.classes[className].methods;
-            if (methods && methods[propName]) {
-                return `${this.visit(node.object)}.${methods[propName]}`;
-            }
-        }
-
-        return `${this.visit(node.object)}.${propName}`;
-    }
-
     private generateIndexAccess(node: AccessNodeByIndex<T>): string {
         return `${this.visit(node.object)}[${this.visit(node.index)}]`;
     }
