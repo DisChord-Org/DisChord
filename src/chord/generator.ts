@@ -119,43 +119,6 @@ import { AccessNode, AccessNodeByIndex, AssignmentNode, ASTNode, BinaryExpressio
         return `class ${node.id}${inheritance} {\n  ${body}\n}`;
     }
 
-    private generateIndexAccess(node: AccessNodeByIndex<T>): string {
-        return `${this.visit(node.object)}[${this.visit(node.index)}]`;
-    }
-
-    generateCall(node: CallNode<T>): string {
-        const args: string = node.params.map((arg: ASTNode<T>) => this.visit(arg)).join(', ');
-        let translation: string;
-        let isAsyncCall = false;
-
-        if (node.object.type === 'Acceso') {
-            translation = this.generateAccess(node.object);
-
-            const symbol = this.context.symbolTable.lookup(node.object.property);
-            if (symbol && symbol.metadata.isAsync) isAsyncCall = true;
-        } else {
-            if (!('value' in node.object)) throw new ChordError(
-                ErrorLevel.Compiler,
-                `Se esperaba una llamada con valor en su objeto.`,
-                node.location
-            ).format();
-
-            const name = node.object.value;
-            if (typeof name != 'string') throw new ChordError(
-                ErrorLevel.Compiler,
-                `Se esperaba un tipo 'string'. Se encontró '${typeof name}'`,
-                node.location
-            ).format();
-            translation = name;
-
-            const symbol = this.context.symbolTable.lookup(name);
-            if (symbol && symbol.metadata.isAsync) isAsyncCall = true;
-        }
-
-        const awaitPrefix = isAsyncCall? 'await ' : '';
-        return `${awaitPrefix}${translation}(${args})`;
-    }
-
     private generateArray(node: ListNode<T>): string {
         const elements = node.body.map((element: ASTNode<T>) => this.visit(element)).join(', ');
         return `[${elements}]`;
@@ -183,36 +146,6 @@ import { AccessNode, AccessNodeByIndex, AssignmentNode, ASTNode, BinaryExpressio
         const isStatic = node.isStatic ? 'static ' : '';
         const init = node.value ? ` = ${this.visit(node.value)}` : '';
         return `${isStatic}${node.id}${init}`;
-    }
-
-    private generateAssignation(node: AssignmentNode<T>): string {
-        return `${this.visit(node.left)} = ${this.visit(node.assignment)}`;
-    }
-
-    private generateBinaryOperation(node: BinaryExpressionNode<T>): string {
-        const operatorsMap: Record<string, string> = {
-            'MAS': '+',
-            'MENOS': '-',
-            'POR': '*',
-            'ENTRE': '/',
-            'RESTO': '%',
-            'EXP': '**',
-            'MAYOR': '>',
-            'MENOR': '<',
-            'MAYOR_IGUAL': '>=',
-            'MENOR_IGUAL': '<=',
-            'IGUAL': '==',
-            'IGUAL_TIPADO': '===',
-            'NO_IGUAL': '!=',
-            'NO_IGUAL_TIPADO': '!==',
-            'DIFERENTE': '!=',
-            'Y': '&&',
-            'O': '||'
-        };
-
-        const op = operatorsMap[node.operator];
-        
-        return `${this.visit(node.left)} ${op} ${this.visit(node.right)}`;
     }
 
     private generateUnaryOperation(node: UnaryNode<T> | NoUnaryNode<T>): string {

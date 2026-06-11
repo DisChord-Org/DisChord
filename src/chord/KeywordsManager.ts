@@ -1,10 +1,11 @@
-import { TokenType, TokenTypeUnion } from "./types";
+import { TokenTypeUnion } from "./types";
 
 /**
- * @file keywords.ts
- * @description Zero-maintenance dynamic keyword registry for the Chord compiler.
+ * Registry and manager for protected reserved keywords and syntax identifiers within the Chord language.
+ * Handles casing-insensitive lookups and allows runtime semantic extensions for custom framework injections.
+ * @class KeyWords
+ * @template {string} T - Extensible custom token type bindings vector mapping external plugins.
  */
-
 export class KeyWords <T extends string> {
     /**
      * Internal map associating low-level text literals with their official TokenType values.
