@@ -1,14 +1,5 @@
-import { BaseNode, TokenType, TokenTypeUnion } from "../../types";
+import { BaseNode, ImportNode, TokenType, TokenTypeUnion } from "../../types";
 import { SubGenerator } from "../SubGenerator";
-
-/**
- * Structural shape of the target Import syntax tree node interface to avoid generic indexing errors.
- */
-interface ImportNodeConstraint<T extends string, N> extends BaseNode<T> {
-    path: string;
-    isDestructured: boolean;
-    identificators: string[];
-}
 
 /**
  * Atomic SubGenerator compiling modular file dependencies and framework internal libraries definitions.
@@ -31,9 +22,7 @@ export class ImportVisitor<T extends string, N extends BaseNode<T>> extends SubG
      * @returns {string} The fully compiled inline ESM import statement or IIFE block wrapper string.
      * @public
      */
-    public visit(rawNode: N): string {
-        const node = rawNode as unknown as ImportNodeConstraint<T, N>;
-        
+    public visit(node: ImportNode<T>): string {        
         let path = node.path.replace(/\.chord$/, '');
 
         if (path.startsWith('lib:')) {
