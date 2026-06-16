@@ -1,6 +1,6 @@
-import { AccessNode, BaseNode, IdentificatorNode, TokenType, TokenTypeUnion } from "../../types";
-import { SubGenerator } from "../SubGenerator";
-import { corelib } from "../core.lib";
+import { AccessNode, BaseNode, IdentificatorNode, TokenType, TokenTypeUnion } from "../../../types";
+import { SubGenerator } from "../../SubGenerator";
+import { corelib } from "../../core.lib";
 
 /**
  * Atomic SubGenerator mapping properties, fields, and core native dictionary methods.
