@@ -4,7 +4,7 @@ import { ASTNode, Token, SOF, EOF, TokenType, BaseNode, PeekType, Location, Toke
 import { ChordError, ErrorLevel } from "../../ChordError";
 import { CompilationContext } from "../../init/Init";
 import { ParserContext } from "./ParserContext";
-import { SubParserClass } from "./SubParser";
+import { SubParser, SubParserClass } from "./SubParser";
 import { SymbolTable } from "../SymbolsTable";
 import { KeyWords } from "../KeywordsManager";
 
@@ -57,6 +57,24 @@ export class Parser<T extends string, N extends BaseNode<T>> extends ParserConte
         ExitParser, PassParser, FunctionParser
     ];
 
+    /**
+     * Resolves and returns an instantiated SubParser capable of handling the current operational token type.
+     * @param {string} tokenType - The current lookahead token type structure.
+     * @returns {SubParser<T, N> | null} The resolved grammar controller executor, or null if unmapped.
+     * @public
+     */
+    public getChordSubParserByToken(tokenType: string): SubParser<T, N> | null {
+        const TargetClass = Parser.SubParsers.find(p => p.triggerToken === tokenType);
+        return TargetClass ? this.get(TargetClass as unknown as SubParserClass<T, N>) : null;
+    }
+
+    /**
+     * Registers the structural grammar components with the compilation context.
+     * @private
+     * @static
+     * @param {CompilationContext<TokenTypeUnion<string>>} context - The compilation context to register the grammar with.
+     * @returns {void}
+     */
     protected static registerGrammar (context: CompilationContext<TokenTypeUnion<string>>): void {
         Parser.SubParsers.forEach(instance => {
             context.keywordsManager.extend(
