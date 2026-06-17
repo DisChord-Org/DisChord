@@ -8,7 +8,7 @@ import { SubGenerator } from "../SubGenerator";
  * @template {string} T - Extensible token type string vector.
  * @template {BaseNode<T>} N - Extensible abstract syntax tree node layout structure.
  */
-export class ContinueVisitor<T extends string, N extends BaseNode<T>> extends SubGenerator<T, N> {
+export class PassVisitor<T extends string, N extends BaseNode<T>> extends SubGenerator<T, N> {
     /**
      * The node type string that triggers the activation of this specific sub-generator.
      * @type {TokenTypeUnion<TokenType> | undefined}

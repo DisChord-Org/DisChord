@@ -5,6 +5,33 @@ import { runtimeInjections } from "./core.lib";
 import { ASTNode, BaseNode } from "../types";
 import { GeneratorContext } from "./GeneratorContext";
 import { SubGeneratorClass } from "./SubGenerator";
+import { ConditionVisitor } from "./visitors/clis/ConditionVisitor";
+import { BreakVisitor } from "./visitors/clis/ExitVisitor";
+import { LoopVisitor } from "./visitors/clis/LoopVisitor";
+import { PassVisitor } from "./visitors/clis/PassVisitor";
+import { ReturnVisitor } from "./visitors/clis/ReturnVisitor";
+import { JSVisitor } from "./visitors/core/JSVisitor";
+import { NewVisitor } from "./visitors/core/NewVisitor";
+import { BDOVisitor } from "./visitors/expressions/BDOVisitor";
+import { BinaryExpressionVisitor } from "./visitors/expressions/BinaryExpressionVisitor";
+import { ExpressionVisitor } from "./visitors/expressions/ExpressionVisitor";
+import { ListVisitor } from "./visitors/expressions/ListVisitor";
+import { LiteralVisitor } from "./visitors/expressions/LiteralVisitor";
+import { NoUnaryVisitor } from "./visitors/expressions/NoUnary";
+import { UnaryVisitor } from "./visitors/expressions/UnaryVisitor";
+import { ExportVisitor } from "./visitors/modularity/ExportVisitor";
+import { FunctionVisitor } from "./visitors/modularity/FunctionVisitor";
+import { ImportVisitor } from "./visitors/modularity/ImportVisitor";
+import { ClassVisitor } from "./visitors/oop/ClassVisitor";
+import { PropertyVisitor } from "./visitors/oop/PropertyVisitor";
+import { SuperVisitor } from "./visitors/oop/SuperVisitor";
+import { ThisVisitor } from "./visitors/oop/ThisVisitor";
+import { AccessVisitor } from "./visitors/variables/AccessVisitor";
+import { AssignmentParser } from "../Parser/Grammar/Expressions/AssignmentParser";
+import { CallVisitor } from "./visitors/variables/CallVisitor";
+import { IdentificatorVisitor } from "./visitors/variables/IdentificatorVisitor";
+import { IndexAccessVisitor } from "./visitors/variables/IndexAccessVisitor";
+import { VariableVisitor } from "./visitors/variables/VariableVisitor";
 
 /**
  * Main Orchestrator for the Code Generation phase in Chord.
@@ -25,7 +52,14 @@ export class Generator<T extends string, N extends BaseNode<T>> extends Generato
      * Registry of all native Chord sub-generators.
      * Maps the AST node type string to its corresponding class constructor.
      */
-    private static readonly SubGeneratorsMap: SubGeneratorClass<DisChordNodeType, DisChordNode>[] = [];
+    private static readonly SubGeneratorsMap: SubGeneratorClass<DisChordNodeType, DisChordNode>[] = [
+        ConditionVisitor, BreakVisitor, LoopVisitor, PassVisitor, ReturnVisitor,
+        JSVisitor, NewVisitor, BDOVisitor, BinaryExpressionVisitor, ExpressionVisitor,
+        ListVisitor, LiteralVisitor, NoUnaryVisitor, UnaryVisitor, UnaryVisitor, UnaryVisitor,
+        ExportVisitor, FunctionVisitor, ImportVisitor, ClassVisitor, PropertyVisitor,
+        SuperVisitor, ThisVisitor, AccessVisitor, AssignmentParser, CallVisitor,
+        IdentificatorVisitor, IndexAccessVisitor, VariableVisitor
+    ];
 
     /**
      * Populates the local IoC context with the native sub-generators mapping.
