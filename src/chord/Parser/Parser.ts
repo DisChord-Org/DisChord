@@ -59,18 +59,18 @@ export class Parser<T extends string, N extends BaseNode<T>> extends ParserConte
 
     /**
      * Resolves and returns an instantiated SubParser capable of handling the current operational token type.
-     * @param {string} tokenType - The current lookahead token type structure.
-     * @returns {SubParser<T, N> | null} The resolved grammar controller executor, or null if unmapped.
+     * @param {TokenTypeUnion<TokenType>} tokenType - The current lookahead token type structure.
+     * @returns {SubParser<T, N> | undefined} The resolved grammar controller executor, or undefined if unmapped.
      * @public
      */
-    public getChordSubParserByToken(tokenType: string): SubParser<T, N> | null {
+    public getChordSubParserByToken(tokenType: TokenTypeUnion<T>): SubParser<T, N> | undefined {
         const TargetClass = Parser.SubParsers.find(p => p.triggerToken === tokenType);
-        return TargetClass ? this.get(TargetClass as unknown as SubParserClass<T, N>) : null;
+        return TargetClass ? (this.get(TargetClass as unknown as SubParserClass<T, N>) as SubParser<T, N>) : undefined;
     }
 
     /**
      * Registers the structural grammar components with the compilation context.
-     * @private
+     * @protected
      * @static
      * @param {CompilationContext<TokenTypeUnion<string>>} context - The compilation context to register the grammar with.
      * @returns {void}
@@ -89,7 +89,7 @@ export class Parser<T extends string, N extends BaseNode<T>> extends ParserConte
 
     /**
      * Binds instance-level routing tables for the injected SubParsers into the core execution context.
-     * @private
+     * @protected
      * @returns {void}
      */
     protected registerSubParserInstances(): void {
