@@ -52,7 +52,7 @@ export class Generator<T extends string, N extends BaseNode<T>> extends Generato
      * Registry of all native Chord sub-generators.
      * Maps the AST node type string to its corresponding class constructor.
      */
-    private static readonly SubGeneratorsMap: SubGeneratorClass<DisChordNodeType, DisChordNode>[] = [
+    private static readonly SubGenerators: SubGeneratorClass<DisChordNodeType, DisChordNode>[] = [
         ConditionVisitor, BreakVisitor, LoopVisitor, PassVisitor, ReturnVisitor,
         JSVisitor, NewVisitor, BDOVisitor, BinaryExpressionVisitor, ExpressionVisitor,
         ListVisitor, LiteralVisitor, NoUnaryVisitor, UnaryVisitor, UnaryVisitor, UnaryVisitor,
@@ -66,7 +66,7 @@ export class Generator<T extends string, N extends BaseNode<T>> extends Generato
      * @protected
      */
     protected registerVisitors (): void {
-        Generator.SubGeneratorsMap.forEach(instance => {
+        Generator.SubGenerators.forEach(instance => {
             this.register(instance as unknown as SubGeneratorClass<T, N>);
         })
     }
@@ -93,7 +93,7 @@ export class Generator<T extends string, N extends BaseNode<T>> extends Generato
      * @param node - The target node to be generated.
      */
     public visit(node: ASTNode<T, N>): string {
-        const VisitorClass = Generator.SubGeneratorsMap.find(cls => cls.triggerToken === node.type);
+        const VisitorClass = Generator.SubGenerators.find(cls => cls.triggerToken === node.type);
 
         if (!VisitorClass) throw new ChordError({
             phase: ErrorLevel.Compiler,
