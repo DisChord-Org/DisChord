@@ -1,6 +1,6 @@
 import { CollectorNode, DisChordNode, DisChordNodeType, DisChordODBNode, DisChordTokenType } from "../types";
 import { ODBMode, TokenTypeUnion } from "../../chord/types";
-import { SubParser } from "../../chord/Parser/subparser";
+import { SubParser } from "../../chord/Parser/SubParser";
 import { PrimaryParser } from "../../chord/Parser/Grammar/PrimaryParser/PrimaryParser";
 import { BDOParser } from "../../chord/Parser/Grammar/BDOParser";
 import { Parser } from "../../chord/Parser/Parser";

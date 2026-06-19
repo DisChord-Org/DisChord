@@ -1,5 +1,5 @@
 import { TokenType, TokenTypeUnion } from '../../chord/types';
-import { SubParser } from '../../chord/Parser/subparser';
+import { SubParser } from '../../chord/Parser/SubParser';
 import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType } from '../types';
 import { DisChordError, ErrorLevel } from '../../ChordError';
 import { Parser } from '../../chord/Parser/Parser';
@@ -18,7 +18,7 @@ export default class DisChordStatementParser extends SubParser<DisChordNodeType,
     /**
      * Collection of reserved keywords this specific sub-parser registers
      */
-    static keywords: TokenTypeUnion<DisChordNodeType>[] = []; // We dont implement 'nuevo' because its injected by the Chord Engine.
+    static keywords: TokenTypeUnion<DisChordNodeType>[] = [];
 
     /**
      * @param parent - The main Parser context for token expression handling
