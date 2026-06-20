@@ -1,8 +1,8 @@
-import { corelib } from "./../core.lib";
+import { corelib } from "../core.lib";
 import { AccessNode, ASTNode, CallNode } from "../../chord/types";
-import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordODBNode } from "./../types";
+import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordODBNode } from "../types";
 
-import { Generator } from "../../chord/generator";
+import { Generator } from "../../chord/Generator/Generator";
 import { SubGeneratorClass } from "./subgenerator";
 
 import ClietInitGenerator from "./Client/ClientInitGenerator";

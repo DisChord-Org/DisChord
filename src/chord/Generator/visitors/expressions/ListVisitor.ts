@@ -1,5 +1,5 @@
-import { ListNode, BaseNode, TokenType, TokenTypeUnion, ASTNode } from "../../types";
-import { SubGenerator } from "../SubGenerator";
+import { ListNode, BaseNode, TokenType, TokenTypeUnion, ASTNode } from "../../../types";
+import { SubGenerator } from "../../SubGenerator";
 
 /**
  * Atomic SubGenerator compiling Chord sequential array collection structures ('Lista').

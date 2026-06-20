@@ -1,5 +1,5 @@
-import { ConditionNode, BaseNode, TokenType, TokenTypeUnion, ASTNode } from "../../types";
-import { SubGenerator } from "../SubGenerator";
+import { ConditionNode, BaseNode, TokenType, TokenTypeUnion, ASTNode } from "../../../types";
+import { SubGenerator } from "../../SubGenerator";
 
 /**
  * Atomic SubGenerator compiling conditional logical bifurcations.

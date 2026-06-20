@@ -1,5 +1,5 @@
-import { LoopNode, BaseNode, TokenType, TokenTypeUnion, ASTNode, CallNode, IdentificatorNode } from "../../types";
-import { SubGenerator } from "../SubGenerator";
+import { LoopNode, BaseNode, TokenType, TokenTypeUnion, ASTNode, CallNode, IdentificatorNode } from "../../../types";
+import { SubGenerator } from "../../SubGenerator";
 
 /**
  * Atomic SubGenerator compiling Chord loop structures ('bucle').

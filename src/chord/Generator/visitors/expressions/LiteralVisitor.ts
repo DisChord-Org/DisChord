@@ -1,5 +1,5 @@
-import { BaseNode, LiteralNode, TokenType, TokenTypeUnion } from "../../types";
-import { SubGenerator } from "../SubGenerator";
+import { BaseNode, LiteralNode, TokenType, TokenTypeUnion } from "../../../types";
+import { SubGenerator } from "../../SubGenerator";
 
 /**
  * Atomic SubGenerator to translate literal nodes into primitive JavaScript expressions.

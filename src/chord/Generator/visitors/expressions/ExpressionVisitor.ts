@@ -1,5 +1,5 @@
-import { TokenType, TokenTypeUnion, ExpressionNode, BaseNode } from "../../types";
-import { SubGenerator } from "../SubGenerator";
+import { TokenType, TokenTypeUnion, ExpressionNode, BaseNode } from "../../../types";
+import { SubGenerator } from "../../SubGenerator";
 
 /**
  * Atomic SubGenerator handling explicit grouping operations wrappers ('Expresion').

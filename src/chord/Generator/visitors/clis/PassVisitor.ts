@@ -1,5 +1,5 @@
-import { BaseNode, PassLoopNode, TokenType, TokenTypeUnion } from "../../types";
-import { SubGenerator } from "../SubGenerator";
+import { BaseNode, PassLoopNode, TokenType, TokenTypeUnion } from "../../../types";
+import { SubGenerator } from "../../SubGenerator";
 
 /**
  * Atomic SubGenerator compiling structured loop bypass operations ('Pasar').

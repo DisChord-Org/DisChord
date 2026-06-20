@@ -1,6 +1,6 @@
 import { DisChordError, ErrorLevel } from "../../../../ChordError";
 import { ButtonStyles, DisChordASTNode, DisChordODBNode } from "../../../types";
-import { DisChordGenerator } from "../../generator";
+import { DisChordGenerator } from "../../Generator";
 import { SubGenerator } from "../../subgenerator";
 
 /**

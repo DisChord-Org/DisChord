@@ -1,5 +1,5 @@
-import { ODBNode, BaseNode, TokenType, TokenTypeUnion, ODBMode, ASTNode } from "../../types";
-import { SubGenerator } from "../SubGenerator";
+import { ODBNode, BaseNode, TokenType, TokenTypeUnion, ODBMode, ASTNode } from "../../../types";
+import { SubGenerator } from "../../SubGenerator";
 
 /**
  * Atomic SubGenerator compiling Chord structured object block expressions (BDO).

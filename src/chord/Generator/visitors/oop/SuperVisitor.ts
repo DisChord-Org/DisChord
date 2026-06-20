@@ -1,5 +1,5 @@
-import { BaseNode, SuperNode, TokenType, TokenTypeUnion } from "../../types";
-import { SubGenerator } from "../SubGenerator";
+import { BaseNode, SuperNode, TokenType, TokenTypeUnion } from "../../../types";
+import { SubGenerator } from "../../SubGenerator";
 
 /**
  * Atomic SubGenerator compiling parent class constructor and method reference proxies ('Super').

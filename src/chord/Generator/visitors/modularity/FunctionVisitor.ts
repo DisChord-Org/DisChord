@@ -1,5 +1,5 @@
-import { FunctionNode, BaseNode, TokenType, TokenTypeUnion, ASTNode } from "../../types";
-import { SubGenerator } from "../SubGenerator";
+import { FunctionNode, BaseNode, TokenType, TokenTypeUnion, ASTNode } from "../../../types";
+import { SubGenerator } from "../../SubGenerator";
 
 /**
  * Atomic SubGenerator that handles subroutine blueprints, structural class methods, and constructors compilation.

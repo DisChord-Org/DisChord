@@ -1,5 +1,5 @@
-import { PropertyNode, BaseNode, TokenType, TokenTypeUnion } from "../../types";
-import { SubGenerator } from "../SubGenerator";
+import { PropertyNode, BaseNode, TokenType, TokenTypeUnion } from "../../../types";
+import { SubGenerator } from "../../SubGenerator";
 
 /**
  * Atomic SubGenerator compiling raw class state attributes or properties declarations.

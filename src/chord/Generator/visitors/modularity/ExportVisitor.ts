@@ -1,5 +1,5 @@
-import { ExportNode, BaseNode, TokenType, TokenTypeUnion } from "../../types";
-import { SubGenerator } from "../SubGenerator";
+import { ExportNode, BaseNode, TokenType, TokenTypeUnion } from "../../../types";
+import { SubGenerator } from "../../SubGenerator";
 
 /**
  * Atomic SubGenerator to compile Chord language module export directives.

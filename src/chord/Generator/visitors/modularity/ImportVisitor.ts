@@ -1,5 +1,5 @@
-import { BaseNode, ImportNode, TokenType, TokenTypeUnion } from "../../types";
-import { SubGenerator } from "../SubGenerator";
+import { BaseNode, ImportNode, TokenType, TokenTypeUnion } from "../../../types";
+import { SubGenerator } from "../../SubGenerator";
 
 /**
  * Atomic SubGenerator compiling modular file dependencies and framework internal libraries definitions.

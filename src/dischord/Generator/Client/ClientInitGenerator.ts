@@ -3,7 +3,7 @@ import fs from "fs";
 import Prettifier from "../../../init/Prettifier";
 
 import { StartBotNode } from "../../types";
-import { DisChordGenerator } from "../generator";
+import { DisChordGenerator } from "../Generator";
 import { intentsMap } from "../../core.lib";
 import { SubGenerator } from "../subgenerator";
 import { DisChordError, ErrorLevel } from "../../../ChordError";

@@ -1,6 +1,6 @@
-import { ChordError, ErrorLevel } from "../../../ChordError";
-import { CallNode, BaseNode, TokenType, TokenTypeUnion, IdentificatorNode, AccessNode } from "../../types";
-import { SubGenerator } from "../SubGenerator";
+import { ChordError, ErrorLevel } from "../../../../ChordError";
+import { CallNode, BaseNode, TokenType, TokenTypeUnion, IdentificatorNode, AccessNode } from "../../../types";
+import { SubGenerator } from "../../SubGenerator";
 
 /**
  * Atomic SubGenerator that handles function and method execution structures.
