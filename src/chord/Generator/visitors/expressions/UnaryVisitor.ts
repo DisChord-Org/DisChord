@@ -1,5 +1,5 @@
-import { UnaryNode, BaseNode, TokenType, TokenTypeUnion } from "../../types";
-import { SubGenerator } from "../SubGenerator";
+import { UnaryNode, BaseNode, TokenType, TokenTypeUnion } from "../../../types";
+import { SubGenerator } from "../../SubGenerator";
 
 /**
  * Atomic SubGenerator compiling standard prefix unary expressions ('Unario').

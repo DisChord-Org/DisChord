@@ -1,5 +1,5 @@
-import { ClassNode, BaseNode, TokenType, TokenTypeUnion, ASTNode } from "../../types";
-import { SubGenerator } from "../SubGenerator";
+import { ClassNode, BaseNode, TokenType, TokenTypeUnion, ASTNode } from "../../../types";
+import { SubGenerator } from "../../SubGenerator";
 
 /**
  * Atomic SubGenerator compiling OOP Class blueprints and blueprints structural wrappers.

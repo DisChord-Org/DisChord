@@ -1,5 +1,5 @@
-import { BaseNode, TokenType, TokenTypeUnion, NewNode } from "../../types";
-import { SubGenerator } from "../SubGenerator";
+import { BaseNode, TokenType, TokenTypeUnion, NewNode } from "../../../types";
+import { SubGenerator } from "../../SubGenerator";
 
 /**
  * Sub-generator responsible for compiling instantiation nodes ('Nuevo') into native JavaScript.

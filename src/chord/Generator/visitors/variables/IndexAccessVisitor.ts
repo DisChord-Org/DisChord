@@ -1,5 +1,5 @@
-import { AccessNodeByIndex, BaseNode, TokenType, TokenTypeUnion } from "../../types";
-import { SubGenerator } from "../SubGenerator";
+import { AccessNodeByIndex, BaseNode, TokenType, TokenTypeUnion } from "../../../types";
+import { SubGenerator } from "../../SubGenerator";
 
 /**
  * Atomic SubGenerator managing bracket notation dynamic indexing data accesses.

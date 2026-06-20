@@ -6,7 +6,7 @@ import { DisChordASTNode, DisChordNodeType, DisChordTokenType } from '../dischor
 
 import { Lexer } from '../chord/lexer';
 import { DisChordParser } from '../dischord/Parser/Parser';
-import { DisChordGenerator } from '../dischord/Generator/generator';
+import { DisChordGenerator } from '../dischord/Generator/Generator';
 import { CompilerConfig, FileSystem } from './FileSystem';
 import { CLI, LogFlagLevel } from './CLI';
 import { Runner } from './Runner';

@@ -1,5 +1,5 @@
-import { BaseNode, ExitLoopNode, TokenType, TokenTypeUnion } from "../../types";
-import { SubGenerator } from "../SubGenerator";
+import { BaseNode, ExitLoopNode, TokenType, TokenTypeUnion } from "../../../types";
+import { SubGenerator } from "../../SubGenerator";
 
 /**
  * Atomic SubGenerator compiling structured loop breaking operations ('Salir').

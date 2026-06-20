@@ -1,7 +1,7 @@
 import { DisChordError, ErrorLevel } from "../../../../ChordError";
 import { DisChordTypeMap } from "../../../core.lib";
 import { DisChordASTNode, DisChordODBNode, DiscordOptionType } from "../../../types";
-import { DisChordGenerator } from "../../generator";
+import { DisChordGenerator } from "../../Generator";
 import { SubGenerator } from "../../subgenerator";
 
 /**

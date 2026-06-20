@@ -1,6 +1,6 @@
 import { DisChordError, ErrorLevel } from "../../ChordError";
 import { CollectorNode, DisChordASTNode } from "../types";
-import { DisChordGenerator } from "./generator";
+import { DisChordGenerator } from "./Generator";
 import { SubGenerator } from "./subgenerator";
 
 /** Config for the Collector Generator param. */

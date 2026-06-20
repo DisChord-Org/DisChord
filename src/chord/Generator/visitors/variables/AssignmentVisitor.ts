@@ -1,5 +1,5 @@
-import { AssignmentNode, BaseNode, TokenType, TokenTypeUnion } from "../../types";
-import { SubGenerator } from "../SubGenerator";
+import { AssignmentNode, BaseNode, TokenType, TokenTypeUnion } from "../../../types";
+import { SubGenerator } from "../../SubGenerator";
 
 /**
  * Atomic SubGenerator to handle state mutation variables and reference assignments.

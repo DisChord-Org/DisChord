@@ -1,5 +1,5 @@
-import { NoUnaryNode, BaseNode, TokenType, TokenTypeUnion } from "../../types";
-import { SubGenerator } from "../SubGenerator";
+import { NoUnaryNode, BaseNode, TokenType, TokenTypeUnion } from "../../../types";
+import { SubGenerator } from "../../SubGenerator";
 
 /**
  * Atomic SubGenerator compiling logical inversion prefix operations ('NoUnario').

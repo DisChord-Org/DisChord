@@ -1,5 +1,5 @@
-import { BaseNode, TokenType, TokenTypeUnion, JSNode } from "../../types";
-import { SubGenerator } from "../SubGenerator";
+import { BaseNode, TokenType, TokenTypeUnion, JSNode } from "../../../types";
+import { SubGenerator } from "../../SubGenerator";
 
 /**
  * Atomic SubGenerator compiling direct raw JavaScript injection fragments ('JS').

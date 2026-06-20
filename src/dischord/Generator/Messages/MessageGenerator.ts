@@ -1,5 +1,5 @@
 import { MessageNode } from "../../types";
-import { DisChordGenerator } from "../generator";
+import { DisChordGenerator } from "../Generator";
 import { SubGenerator, SubGeneratorClass } from "../subgenerator";
 import ButtonGenerator from "./MessageComponents/ButtonGenerator";
 import EmbedGenerator from "./MessageComponents/EmbedGenerator";

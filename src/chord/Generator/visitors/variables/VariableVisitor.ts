@@ -1,5 +1,5 @@
-import { BaseNode, TokenType, TokenTypeUnion, VariableNode } from "../../types";
-import { SubGenerator } from "../SubGenerator";
+import { BaseNode, TokenType, TokenTypeUnion, VariableNode } from "../../../types";
+import { SubGenerator } from "../../SubGenerator";
 
 /**
  * Atomic SubGenerator that handles variable initialization structures.

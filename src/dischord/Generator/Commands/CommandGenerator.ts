@@ -3,7 +3,7 @@ import Prettifier from '../../../init/Prettifier';
 
 import { createMessageFunctionInjection } from "../../core.lib";
 import { CommandNode, DisChordASTNode } from "../../types";
-import { DisChordGenerator } from "../generator";
+import { DisChordGenerator } from "../Generator";
 import { SubGenerator, SubGeneratorClass } from '../subgenerator';
 import { DisChordError, ErrorLevel } from '../../../ChordError';
 import CommandOptionGenerator from './CommandOptions/CommandOption';

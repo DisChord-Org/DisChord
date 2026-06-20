@@ -1,5 +1,5 @@
-import { BaseNode, IdentificatorNode, TokenType, TokenTypeUnion } from "../../types";
-import { SubGenerator } from "../SubGenerator";
+import { BaseNode, IdentificatorNode, TokenType, TokenTypeUnion } from "../../../types";
+import { SubGenerator } from "../../SubGenerator";
 
 /**
  * Atomic SubGenerator to process syntactic Identifier source references.

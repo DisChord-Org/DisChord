@@ -1,5 +1,5 @@
-import { BaseNode, TokenType, TokenTypeUnion, ReturnNode } from "../../types";
-import { SubGenerator } from "../SubGenerator";
+import { BaseNode, TokenType, TokenTypeUnion, ReturnNode } from "../../../types";
+import { SubGenerator } from "../../SubGenerator";
 
 /**
  * Atomic SubGenerator compiling subroutine exit statements and evaluation returns ('Devolver').

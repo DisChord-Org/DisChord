@@ -1,5 +1,5 @@
-import { BaseNode, BinaryExpressionNode, TokenType, TokenTypeUnion } from "../../types";
-import { SubGenerator } from "../SubGenerator";
+import { BaseNode, BinaryExpressionNode, TokenType, TokenTypeUnion } from "../../../types";
+import { SubGenerator } from "../../SubGenerator";
 
 /**
  * Atomic SubGenerator compiling mathematical, relational, and logical infix expressions.

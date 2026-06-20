@@ -1,5 +1,5 @@
-import { ODBNode, BaseNode, TokenType, TokenTypeUnion, ODBMode, ASTNode } from "../../types";
-import { SubGenerator } from "../SubGenerator";
+import { ODBNode, BaseNode, TokenType, TokenTypeUnion, ODBMode, ASTNode } from "../../../types";
+import { SubGenerator } from "../../SubGenerator";
 
 /**
  * Atomic SubGenerator compiling Chord structured object block expressions (BDO).
@@ -46,5 +46,16 @@ export class BDOVisitor<T extends string, N extends BaseNode<T>> extends SubGene
                 ${executableBody}
                 return { ${exports} }
             })()`;
+    }
+
+    /**
+     * Safely retrieves a specific property node from an Object Definition Block (BDO).
+     * @param {ODBNode<T, N>} node - The target object definition block node.
+     * @param {string} property - The identifier key of the property to retrieve.
+     * @returns {ASTNode<T, N> | undefined} The matching abstract syntax tree node, or undefined if not found.
+     * @public
+     */
+    public getODBProperty(node: ODBNode<T, N>, property: string): ASTNode<T, N> | undefined {
+        return node.blocks[property];
     }
 }
