@@ -3,7 +3,7 @@ import { AccessNode, ASTNode, CallNode } from "../../chord/types";
 import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordODBNode } from "../types";
 
 import { Generator } from "../../chord/Generator/Generator";
-import { SubGeneratorClass } from "./subgenerator";
+import { SubGeneratorClass } from "../../chord/Generator/SubGenerator";
 
 import ClietInitGenerator from "./Client/ClientInitGenerator";
 import EventGenerator from "./Events/EventGenerator";
@@ -24,7 +24,7 @@ export class DisChordGenerator extends Generator<DisChordNodeType, DisChordNode>
      * The inventory of specialists.
      * Adding a class here will register it into the all system.
      */
-    private static readonly SubGenerators: SubGeneratorClass[] = [
+    private static readonly SubGenerators: SubGeneratorClass<DisChordNodeType, DisChordNode>[] = [
         ClietInitGenerator,
         EventGenerator,
         CommandGenerator,
@@ -37,8 +37,18 @@ export class DisChordGenerator extends Generator<DisChordNodeType, DisChordNode>
      * @param symbols A map of symbols used for code generation, typically containing variable and function definitions.
      * @param projectRoot The root directory of the project, used for resolving imports and file paths during code generation.
      */
-    constructor(context: CompilationContext) {
+    constructor(context: CompilationContext<DisChordNodeType>) {
         super(context);
+    }
+
+    /**
+     * Populates the local IoC context with the native sub-generators mapping.
+     * @protected
+     */
+    protected registerVisitors (): void {
+        DisChordGenerator.SubGenerators.forEach(instance => {
+            this.register(instance as SubGeneratorClass<DisChordNodeType, DisChordNode>);
+        })
     }
 
     /**
@@ -53,9 +63,9 @@ export class DisChordGenerator extends Generator<DisChordNodeType, DisChordNode>
             SubGenerator.triggerToken === node.type
         );
 
-        if (GeneratorClass) return new GeneratorClass(this).generate(node);
+        if (GeneratorClass) return new GeneratorClass(this).visit(node);
 
-        return super.visit(node as ASTNode<DisChordNodeType>);
+        return super.visit(node);
     }
 
     /**
@@ -102,30 +112,5 @@ export class DisChordGenerator extends Generator<DisChordNodeType, DisChordNode>
         }
 
         return super.generateCall(node as CallNode<DisChordNode>);
-    }
-
-    /**
-     * Retrieves a specific property node from an ODB.
-     * This utility allows sub-generators to extract configuration values 
-     * or nested blocks defined within a BDO structure.
-     * * @param node The ODBNode containing the property blocks.
-     * @param property The key name of the property to retrieve.
-     * @returns The corresponding DisChordASTNode if the property exists, otherwise undefined.
-     */
-    public getODBProperty(node: DisChordODBNode, property: string): DisChordASTNode | undefined {
-        return node.blocks[property];
-    }
-
-    /**
-     * Safely visits a DisChordASTNode if it is defined.
-     * This override ensures that optional nodes within DisChord-specific structures 
-     * (such as optional ODB properties) are processed only when present, 
-     * preventing null pointer exceptions during the generation phase.
-     * * @override
-     * @param node The DisChordASTNode to visit, or undefined.
-     * @returns The generated code string for the node, or undefined if the node is missing.
-     */
-    override visitIfExists (node: DisChordASTNode | undefined): string | undefined {
-        return node ? this.visit(node) : undefined;
     }
 }
