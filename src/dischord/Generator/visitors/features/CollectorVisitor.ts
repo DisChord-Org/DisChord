@@ -1,7 +1,9 @@
-import { DisChordError, ErrorLevel } from "../../ChordError";
-import { CollectorNode, DisChordASTNode } from "../types";
-import { DisChordGenerator } from "./Generator";
-import { SubGenerator } from "./subgenerator";
+import { DisChordError, ErrorLevel } from "../../../../ChordError";
+import { CollectorNode, DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType } from "../../../types";
+import { DisChordGenerator } from "./../../Generator";
+import { SubGenerator } from "./../../../../chord/Generator/SubGenerator";
+import { TokenTypeUnion } from "../../../../chord/types";
+import { BDOVisitor } from "../../../../chord/Generator/visitors/expressions/BDOVisitor";
 
 /** Config for the Collector Generator param. */
 interface CollectorConfig {
@@ -13,9 +15,13 @@ interface CollectorConfig {
 /**
  * Generator class responsible for generating code related to component collectors and their event handling in DisChord.
  */
-export default class CollectorGenerator extends SubGenerator {
-    /** To identify when this generator should be used */
-    static triggerToken: string = "CrearRecolector";
+export default class CollectorVisitor extends SubGenerator<DisChordNodeType, DisChordNode> {
+    /**
+     * The node type string that triggers the activation of this specific sub-generator.
+     * @public
+     * @static
+     */
+    public static triggerToken: TokenTypeUnion<DisChordTokenType> | undefined = DisChordTokenType.CREAR_RECOLECTOR;
 
     /**
      * @param parent The context of the DisChordGenerator.
@@ -29,17 +35,19 @@ export default class CollectorGenerator extends SubGenerator {
      * @param node The CollectorNode containing the target variable and the interaction methods ODB.
      * @returns The generated JavaScript for the collector lifecycle.
      */
-    generate (node: CollectorNode): string {
-        const variable = this.visit(node.variable);
+    visit (node: CollectorNode): string {
+        const variable = this.parent.visit(node.variable);
 
         const body = this.visitPulseIdMethod(
-            this.getODBProperty(node.methods, 'alPulsarId')
+            this.parent.get(BDOVisitor).getODBProperty(node.methods, 'alPulsarId')
         );
-        const filter = this.visitIfExists(
-            this.getODBProperty(node.methods, 'filtro')
+
+        const filter = this.parent.visitIfExists(
+            this.parent.get(BDOVisitor).getODBProperty(node.methods, 'filtro')
         ) || 'i.user.id === contexto.author.id';
-        const time = this.visitIfExists(
-            this.getODBProperty(node.methods, 'tiempo')
+
+        const time = this.parent.visitIfExists(
+            this.parent.get(BDOVisitor).getODBProperty(node.methods, 'tiempo')
         ) || '60000';
 
         const collectorConfig: CollectorConfig = {
@@ -95,25 +103,25 @@ export default class CollectorGenerator extends SubGenerator {
     private visitPulseIdMethod (node: DisChordASTNode | undefined): string {
         if (!node) return '';
 
-        if (node.type != 'BDO') throw new DisChordError(
-            ErrorLevel.Compiler,
-            `Se esperaba on BDO con las ids a ejecutar después del 'alPulsarId'`,
-            node.location
-        ).format();
+        if (node.type != 'BDO') throw new DisChordError({
+            phase: ErrorLevel.Compiler,
+            message: `Se esperaba on BDO con las ids a ejecutar después del 'alPulsarId'`,
+            location: node.location
+        }).format();
 
         const pulseCodes: string[] = Object.keys(node.blocks).map(identificator => {
             const idBody = node.blocks[identificator];
 
-            if (!idBody || idBody.type != 'BDO' || idBody.body.length < 1) throw new DisChordError(
-                ErrorLevel.Parser,
-                `Después de definir una ID para detectar pulsos, se esperaba un BDO con código.`,
-                node.location
-            ).format();
+            if (!idBody || idBody.type != 'BDO' || idBody.body.length < 1) throw new DisChordError({
+                phase: ErrorLevel.Compiler,
+                message: `Después de definir una ID para detectar pulsos, se esperaba un BDO con código.`,
+                location: node.location
+            }).format();
             
             return this.generateMethod(
                 'run',
                 `"${identificator}"`,
-                this.visit(idBody)
+                this.parent.visit(idBody)
             );
         });
 
