@@ -73,9 +73,9 @@ export class StatementParser<T extends string, N extends BaseNode<T>> extends Su
                 const nextToken = this.parent.peek('next');
                 if (nextToken && nextToken.type === TokenType.L_PAREN) {
                     return this.parent.get(FunctionParser)
-                    .setConstructor(true)
-                    .setMethod(true)
-                    .parse();
+                        .setConstructor(true)
+                        .setMethod(true)
+                        .parse();
                 }
             }
         }
