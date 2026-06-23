@@ -1,15 +1,13 @@
 import { corelib } from "../core.lib";
-import { AccessNode, ASTNode, CallNode } from "../../chord/types";
-import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordODBNode } from "../types";
+import { AccessNode, CallNode } from "../../chord/types";
+import { DisChordASTNode, DisChordNode, DisChordNodeType } from "../types";
 
 import { Generator } from "../../chord/Generator/Generator";
 import { SubGeneratorClass } from "../../chord/Generator/SubGenerator";
 
-import ClietInitGenerator from "./Client/ClientInitGenerator";
-import EventGenerator from "./Events/EventGenerator";
-import CommandGenerator from "./Commands/CommandGenerator";
-import MessageGenerator from "./Messages/MessageGenerator";
-import CollectorGenerator from "./CollectorGenerator";
+import ClientInitVisitor from '../Generator/visitors/architectural/ClientInitVisitor';
+import CommandVisitor from '../Generator/visitors/architectural/CommandVisitor';
+import EventVisitor from '../Generator/visitors/architectural/EventVisitor';
 import { CompilationContext } from "../../init/Init";
 
 /**
@@ -25,11 +23,7 @@ export class DisChordGenerator extends Generator<DisChordNodeType, DisChordNode>
      * Adding a class here will register it into the all system.
      */
     private static readonly SubGenerators: SubGeneratorClass<DisChordNodeType, DisChordNode>[] = [
-        ClietInitGenerator,
-        EventGenerator,
-        CommandGenerator,
-        MessageGenerator,
-        CollectorGenerator
+        ClientInitVisitor, CommandVisitor, EventVisitor
     ];
 
     /**
