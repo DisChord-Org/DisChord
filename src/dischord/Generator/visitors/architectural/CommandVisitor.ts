@@ -21,14 +21,6 @@ export default class CommandVisitor extends SubGenerator<DisChordNodeType, DisCh
     public static triggerToken: TokenTypeUnion<DisChordTokenType> | undefined = DisChordTokenType.CREAR_COMANDO;
     
     /**
-     * Constructor for the CommandGenerator class.
-     * @param parent The context of the DisChordGenerator.
-     */
-    constructor (protected parent: DisChordGenerator) {
-        super(parent);
-    }
-
-    /**
      * Generates code for a CommandNode, which represents a command definition in DisChord.
      * @param node The CommandNode representing the command definition to generate code for.
      * @returns The generated code for the command definition.

@@ -9,6 +9,11 @@ import ClientInitVisitor from '../Generator/visitors/architectural/ClientInitVis
 import CommandVisitor from '../Generator/visitors/architectural/CommandVisitor';
 import EventVisitor from '../Generator/visitors/architectural/EventVisitor';
 import { CompilationContext } from "../../init/Init";
+import ButtonVisitor from "./visitors/components/ButtonVisitor";
+import CommandOptionVisitor from "./visitors/components/CommandOptionVisitor";
+import EmbedVisitor from "./visitors/components/EmbedVisitor";
+import CollectorVisitor from "./visitors/features/CollectorVisitor";
+import MessageVisitor from "./visitors/features/MessageVisitor";
 
 /**
  * Main generator class for DisChord.
@@ -23,7 +28,9 @@ export class DisChordGenerator extends Generator<DisChordNodeType, DisChordNode>
      * Adding a class here will register it into the all system.
      */
     private static readonly SubGenerators: SubGeneratorClass<DisChordNodeType, DisChordNode>[] = [
-        ClientInitVisitor, CommandVisitor, EventVisitor
+        ClientInitVisitor, CommandVisitor, EventVisitor,
+        ButtonVisitor, CommandOptionVisitor, EmbedVisitor,
+        CollectorVisitor, MessageVisitor
     ];
 
     /**

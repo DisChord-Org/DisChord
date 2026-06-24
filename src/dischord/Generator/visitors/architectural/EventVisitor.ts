@@ -20,14 +20,6 @@ export default class EventVisitor extends SubGenerator<DisChordNodeType, DisChor
     public static triggerToken: TokenTypeUnion<DisChordTokenType> | undefined = DisChordTokenType.EVENTO;
     
     /**
-     * Constructor for the EventGenerator class.
-     * @param parent The context of the DisChordGenerator.
-     */
-    constructor (protected parent: DisChordGenerator) {
-        super(parent);
-    }
-
-    /**
      * Generates code for a EventNode, which represents a listener in DisChord.
      * @param node The EventNode representing the listener to generate code for.
      * @returns The generated code for the listener.

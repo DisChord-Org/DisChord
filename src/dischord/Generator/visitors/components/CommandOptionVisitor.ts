@@ -25,13 +25,6 @@ export default class CommandOptionVisitor extends SubGenerator<DisChordNodeType,
     private lastGeneratedOptions: string[] = [];
 
     /**
-     * @param parent The context of the CommandGenerator.
-     */
-    constructor (protected parent: DisChordGenerator) {
-        super(parent);
-    }
-
-    /**
      * Generates a JavaScript destructuring statement for the command's internal logic.
      * @example Returns "const { myOption } = ctx.options;"
      * @returns A string containing the variable extraction code.

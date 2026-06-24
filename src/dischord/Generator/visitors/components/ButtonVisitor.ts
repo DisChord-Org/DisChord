@@ -17,13 +17,6 @@ export default class ButtonVisitor extends SubGenerator<DisChordNodeType, DisCho
     public static triggerToken: TokenTypeUnion<DisChordTokenType> | undefined = undefined;
 
     /**
-     * @param parent The context of the MessageGenerator.
-     */
-    constructor (protected parent: DisChordGenerator) {
-        super(parent);
-    }
-
-    /**
      * Helper method to generate the ActionRow and Button structure by searching 
      * for the 'boton' property within a given ODBNode.
      * * @param node The parent ODBNode that may contain a 'boton' definition.

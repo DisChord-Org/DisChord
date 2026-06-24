@@ -16,13 +16,6 @@ export default class MessageVisitor extends SubGenerator<DisChordNodeType, DisCh
     public static triggerToken: TokenTypeUnion<DisChordTokenType> | undefined = DisChordTokenType.CREAR_MENSAJE;
 
     /**
-     * @param parent The context of the DisChordGenerator.
-     */
-    constructor (protected parent: DisChordGenerator) {
-        super(parent);
-    }
-
-    /**
      * Generates code for a MessageNode, which represents a Message in DisChord.
      * @param node The MessageNode representing the message to generate code for.
      * @returns The generated code for message body.

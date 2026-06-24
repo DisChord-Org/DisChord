@@ -24,13 +24,6 @@ export default class CollectorVisitor extends SubGenerator<DisChordNodeType, Dis
     public static triggerToken: TokenTypeUnion<DisChordTokenType> | undefined = DisChordTokenType.CREAR_RECOLECTOR;
 
     /**
-     * @param parent The context of the DisChordGenerator.
-     */
-    constructor (protected parent: DisChordGenerator) {
-        super(parent);
-    }
-
-    /**
      * Generates the initialization and event orchestration for a component collector.
      * @param node The CollectorNode containing the target variable and the interaction methods ODB.
      * @returns The generated JavaScript for the collector lifecycle.

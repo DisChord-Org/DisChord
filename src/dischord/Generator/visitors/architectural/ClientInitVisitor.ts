@@ -21,14 +21,6 @@ export default class ClietInitVisitor extends SubGenerator<DisChordNodeType, Dis
     public static triggerToken: TokenTypeUnion<DisChordTokenType> | undefined = DisChordTokenType.ENCENDER_BOT;
     
     /**
-     * Constructor for the ClientInitGenerator class.
-     * @param parent The context of the DisChordGenerator.
-     */
-    constructor (protected parent: DisChordGenerator) {
-        super(parent);
-    }
-
-    /**
      * Generates code for a StartBotNode, which represents the initialization of the bot in DisChord.
      * It extracts the necessary configuration from the node, generates a Seyfert configuration file, and returns the code to start the client.
      * @param node The StartBotNode representing the bot initialization to generate code for.

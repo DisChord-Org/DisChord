@@ -9,20 +9,13 @@ import { BDOVisitor } from "../../../../chord/Generator/visitors/expressions/BDO
 /**
  * Generator class responsible for generating code related to message embeds in DisChord.
  */
-export default class EmbedVisit extends SubGenerator<DisChordNodeType, DisChordNode> {
+export default class EmbedVisitor extends SubGenerator<DisChordNodeType, DisChordNode> {
     /**
      * The node type string that triggers the activation of this specific sub-generator.
      * @public
      * @static
      */
     public static triggerToken: TokenTypeUnion<DisChordTokenType> | undefined = undefined;
-
-    /**
-     * @param parent The context of the MessageGenerator.
-     */
-    constructor (protected parent: DisChordGenerator) {
-        super(parent);
-    }
 
     /**
      * Helper method to generate the embed array structure by searching for the 
