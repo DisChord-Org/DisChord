@@ -8,6 +8,7 @@ import { DisChordError, ErrorLevel } from '../../../../ChordError';
 import { TokenTypeUnion } from '../../../../chord/types';
 import { BDOVisitor } from '../../../../chord/Generator/visitors/expressions/BDOVisitor';
 import CommandOptionVisitor from '../components/CommandOptionVisitor';
+import { DisChordGenerator } from '../../Generator';
 
 /**
  * Generator class responsible for generating code related to command definitions in DisChord.
@@ -40,7 +41,7 @@ export default class CommandVisitor extends SubGenerator<DisChordNodeType, DisCh
         const OptionsConstExtraction: string = CommandOptionVisitorData.variables;
 
         const body = node.body.body
-            .map((n: DisChordASTNode): string => "    " + this.parent.visit(n) + ";")
+            .map((n: DisChordASTNode): string => "    " + (this.parent as DisChordGenerator).visit(n, { isInteraction: true }) + ";")
             .join('\n');
 
         const commandBody: string = `
