@@ -3,7 +3,6 @@ import fs from "fs";
 import Prettifier from "../../../../init/Prettifier";
 
 import { DisChordNode, DisChordNodeType, DisChordTokenType, StartBotNode } from "../../../types";
-import { DisChordGenerator } from "../../Generator";
 import { intentsMap } from "../../../core.lib";
 import { SubGenerator } from "../../../../chord/Generator/SubGenerator";
 import { DisChordError, ErrorLevel } from "../../../../ChordError";

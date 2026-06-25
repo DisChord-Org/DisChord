@@ -3,7 +3,6 @@ import Prettifier from '../../../../init/Prettifier';
 
 import { createMessageFunctionInjection, eventsMap } from "../../../core.lib";
 import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType, EventNode } from "../../../types";
-import { DisChordGenerator } from "../../Generator";
 import { SubGenerator } from '../../../../chord/Generator/SubGenerator';
 import { DisChordError, ErrorLevel } from '../../../../ChordError';
 import { TokenTypeUnion } from '../../../../chord/types';

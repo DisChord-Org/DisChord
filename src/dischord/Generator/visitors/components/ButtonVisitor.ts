@@ -1,6 +1,5 @@
 import { DisChordError, ErrorLevel } from "../../../../ChordError";
 import { ButtonStyles, DisChordASTNode, DisChordNode, DisChordNodeType, DisChordODBNode, DisChordTokenType } from "../../../types";
-import { DisChordGenerator } from "../../Generator";
 import { SubGenerator } from "../../../../chord/Generator/SubGenerator";
 import { TokenTypeUnion } from "../../../../chord/types";
 import { BDOVisitor } from "../../../../chord/Generator/visitors/expressions/BDOVisitor";

@@ -1,8 +1,9 @@
 import { DisChordNode, DisChordNodeType, DisChordTokenType, MessageNode } from "../../../types";
-import { DisChordGenerator } from "../../Generator";
-import { SubGenerator, SubGeneratorClass } from "../../../../chord/Generator/SubGenerator";
+import { SubGenerator } from "../../../../chord/Generator/SubGenerator";
 import { TokenTypeUnion } from "../../../../chord/types";
 import { BDOVisitor } from "../../../../chord/Generator/visitors/expressions/BDOVisitor";
+import ButtonVisitor from "../components/ButtonVisitor";
+import EmbedVisitor from "../components/EmbedVisitor";
 
 /**
  * Generator class responsible for generating code related to message creation and interactions in DisChord.
@@ -29,9 +30,10 @@ export default class MessageVisitor extends SubGenerator<DisChordNodeType, DisCh
             this.parent.get(BDOVisitor).getODBProperty(node.object, 'contenido')
         );
 
-        const ComponentsData = this.Components
-            .map(generator => new generator(this.parent).generateIfNodeExists(node.object))
-            .join('');
+        const Button = this.parent.get(ButtonVisitor).visitIfNodeExists(node.object);
+        const Embed = this.parent.get(EmbedVisitor).visitIfNodeExists(node.object);
+
+        const ComponentsData = [ Button, Embed ].join('');
 
         const interactionContext: string = this.parent.currentInteraction === 'interaccion' ? 'interaccion' : 'null';
 
