@@ -35,10 +35,10 @@ export default class CommandVisitor extends SubGenerator<DisChordNodeType, DisCh
             location: node.location
         }).format();
 
-        const CommandOptionVisitorInstance = this.parent.get(CommandOptionVisitor);
-        const OptionsData = CommandOptionVisitorInstance.visitIfNodeExists(node.body);
+        const CommandOptionVisitorData = this.parent.get(CommandOptionVisitor).visitIfNodeExists(node.body)
+        const OptionsData = CommandOptionVisitorData.options;
         const OptionsConstDeclaration: string = OptionsData.length > 0? 'options = options;' : '';
-        const OptionsConstExtraction: string = CommandOptionVisitorInstance.getExtractionCode();
+        const OptionsConstExtraction: string = CommandOptionVisitorData.variables;
 
         const body = node.body.body
             .map((n: DisChordASTNode): string => "    " + this.parent.visit(n) + ";")

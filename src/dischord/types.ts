@@ -129,5 +129,3 @@ export enum DiscordOptionType {
     Number = 10,
     Attachment = 11
 }
-
-// export type CreationNode = CommandNode | MessageNode | CollectorNode;

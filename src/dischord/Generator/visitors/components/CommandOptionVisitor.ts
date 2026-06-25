@@ -1,10 +1,19 @@
 import { DisChordError, ErrorLevel } from "../../../../ChordError";
 import { DisChordTypeMap } from "../../../core.lib";
 import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordODBNode, DisChordTokenType, DiscordOptionType } from "../../../types";
-import { DisChordGenerator } from "../../Generator";
 import { SubGenerator } from "../../../../chord/Generator/SubGenerator";
 import { TokenTypeUnion } from "../../../../chord/types";
 import { BDOVisitor } from "../../../../chord/Generator/visitors/expressions/BDOVisitor";
+
+/**
+ * Data structure representing the complete output of the command option processing phase.
+ */
+export interface CommandOptionsOutput {
+    /** The code for the array that Seyfert expects*/
+    options: string;
+    /** The code for extracting variables from context */
+    variables: string;
+}
 
 /**
  * Specialist generator responsible for parsing and translating DisChord command options 
@@ -19,32 +28,23 @@ export default class CommandOptionVisitor extends SubGenerator<DisChordNodeType,
     public static triggerToken: TokenTypeUnion<DisChordTokenType> | undefined = undefined;
 
     /**
-     * Internal cache of option identifiers found during the last generation cycle.
-     * Used to build the destructuring statement in getExtractionCode().
-     */
-    private lastGeneratedOptions: string[] = [];
-
-    /**
-     * Generates a JavaScript destructuring statement for the command's internal logic.
-     * @example Returns "const { myOption } = ctx.options;"
-     * @returns A string containing the variable extraction code.
-     */
-    public getExtractionCode(): string {
-        if (this.lastGeneratedOptions.length === 0) return '';
-        
-        return `const { ${this.lastGeneratedOptions.join(', ')} } = ctx.options;`;
-    }
-
-    /**
      * Entry point for the CommandGenerator. Checks if the 'opciones' block exists 
      * within the provided ODB and initiates generation.
      * @param node The Object Definition Block (BDO) of the command.
-     * @returns The 'options' constant declaration string.
+     * @returns {CommandOptionsOutput} The 'options' and 'variables' constants as object.
      */
-    visitIfNodeExists (node: DisChordODBNode): string {
-        const options = this.parent.get(BDOVisitor).getODBProperty(node, 'opciones');
+    public visitIfNodeExists (node: DisChordODBNode): CommandOptionsOutput {
+        const optionsBlock = this.parent.get(BDOVisitor).getODBProperty(node, 'opciones');
 
-        return options? `const options = [${this.visit(options)}];` : '';
+        if (!optionsBlock || optionsBlock.type !== 'BDO') return {
+            options: '',
+            variables: ''
+        };
+
+        return {
+            options: `const options = [${this.visit(optionsBlock)}];`,
+            variables: this.generateVariables(optionsBlock)
+        };
     }
 
     /**
@@ -52,9 +52,10 @@ export default class CommandOptionVisitor extends SubGenerator<DisChordNodeType,
      * to their respective Discord types.
      * @param node The AST node containing the options map.
      * @throws {DisChordError} If the node is not a BDO or an option type is invalid.
-     * @returns A stringified array of Discord option objects.
+     * @returns {string} A stringified array of Discord option objects.
+     * @override
      */
-    visit (node: DisChordASTNode): string {
+    public visit (node: DisChordASTNode): string {
         if (node.type != 'BDO') throw new DisChordError({
             phase: ErrorLevel.Compiler,
             message: `Se esperaba un BDO, se recibió '${node.type}'`,
@@ -62,7 +63,6 @@ export default class CommandOptionVisitor extends SubGenerator<DisChordNodeType,
         }).format();
 
         const optionNames = Object.keys(node.blocks);
-        this.lastGeneratedOptions = optionNames;
     
         const results = optionNames.map(OptionName => {
             const OptionNode = node.blocks[OptionName] as DisChordODBNode;
@@ -71,12 +71,11 @@ export default class CommandOptionVisitor extends SubGenerator<DisChordNodeType,
             if (!OptionType) {
                 throw new DisChordError({
                     phase: ErrorLevel.Compiler,
-                    message: `Tipo de opción '${Option}' no reconocido en '${OptionName}'`,
+                    message: `Tipo de opción no reconocido en '${OptionName}'`,
                     location: OptionNode.location
                 }).format();
             }
 
-            // Currently, only string options are supported. This can be expanded in the future to support more types.
             switch (OptionType) {
                 case DiscordOptionType.String:
                     return this.generateStringOption(OptionName, OptionNode);
@@ -86,6 +85,20 @@ export default class CommandOptionVisitor extends SubGenerator<DisChordNodeType,
         });
 
         return results.join(', ');
+    }
+
+    /**
+     * Generates the extraction code block based on option keys without mutating state.
+     * @param {DisChordASTNode} node - The AST node containing the options map.
+     * @returns {string} The formatted JS destructured constant code.
+     */
+    public generateVariables (node: DisChordASTNode): string {
+        if (node.type != 'BDO') return '';
+        
+        const optionNames = Object.keys(node.blocks);
+        if (optionNames.length === 0) return '';
+
+        return `const { ${optionNames.join(', ')} } = ctx.options;`;
     }
 
     /**
@@ -103,9 +116,6 @@ export default class CommandOptionVisitor extends SubGenerator<DisChordNodeType,
     /**
      * Generates the configuration object for a String-type Discord option.
      * @private
-     * @param name The identifier of the option.
-     * @param node The ODB node containing option properties.
-     * @throws {DisChordError} If mandatory properties are missing.
      */
     private generateStringOption (name: string, node: DisChordODBNode): string {
         const description = this.parent.visitIfExists(
