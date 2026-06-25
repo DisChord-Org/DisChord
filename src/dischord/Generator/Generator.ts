@@ -14,20 +14,18 @@ import CommandOptionVisitor from "./visitors/components/CommandOptionVisitor";
 import EmbedVisitor from "./visitors/components/EmbedVisitor";
 import CollectorVisitor from "./visitors/features/CollectorVisitor";
 import MessageVisitor from "./visitors/features/MessageVisitor";
+import { DisChordContext } from "./types";
 
 /**
  * Main generator class for DisChord.
  * It extends the base Generator class and overrides the visit method to handle DisChord-specific AST nodes.
  */
 export class DisChordGenerator extends Generator<DisChordNodeType, DisChordNode> {
-    // Context variable to track the current interaction state, used for generating appropriate code in message interactions and collectors.
-    public currentInteraction: string | null = null; // context
-
     /**
      * The inventory of specialists.
      * Adding a class here will register it into the all system.
      */
-    private static readonly SubGenerators: SubGeneratorClass<DisChordNodeType, DisChordNode>[] = [
+    private static readonly DisChordSubGenerators: SubGeneratorClass<DisChordNodeType, DisChordNode>[] = [
         ClientInitVisitor, CommandVisitor, EventVisitor,
         ButtonVisitor, CommandOptionVisitor, EmbedVisitor,
         CollectorVisitor, MessageVisitor
@@ -47,7 +45,7 @@ export class DisChordGenerator extends Generator<DisChordNodeType, DisChordNode>
      * @protected
      */
     protected registerVisitors (): void {
-        DisChordGenerator.SubGenerators.forEach(instance => {
+        DisChordGenerator.DisChordSubGenerators.forEach(instance => {
             this.register(instance as SubGeneratorClass<DisChordNodeType, DisChordNode>);
         })
     }
@@ -59,12 +57,18 @@ export class DisChordGenerator extends Generator<DisChordNodeType, DisChordNode>
      * @param node The AST node to visit, which can be of various types defined in the DisChordNodeType enum.
      * @returns The generated code for the given node.
      */
-    override visit(node: DisChordASTNode): string {
-        const GeneratorClass = DisChordGenerator.SubGenerators.find(SubGenerator =>
+    override visit(node: DisChordASTNode, context?: DisChordContext): string {
+        const GeneratorClass = DisChordGenerator.DisChordSubGenerators.find(SubGenerator =>
             SubGenerator.triggerToken === node.type
         );
 
-        if (GeneratorClass) return new GeneratorClass(this).visit(node);
+        if (GeneratorClass) {
+            const instance = new GeneratorClass(this);
+
+            if (instance instanceof MessageVisitor) instance.setInteraction(!!context?.isInteraction);
+
+            return instance.visit(node);
+        }
 
         return super.visit(node);
     }
