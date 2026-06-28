@@ -25,7 +25,6 @@ export class ConditionParser<T extends string, N extends BaseNode<T>> extends Su
 
         this.consume(TokenType.L_PAREN, `Después de 'si' se debe abrir una expresión con '(' para especificar la condición.`);
         const test = this.parent.get(ExpressionParser).parse();
-        console.log(1, test)
         this.consume(TokenType.R_PAREN);
 
         this.consume(TokenType.L_BRACE, `Después de la condición de un 'si' se debe abrir un bloque de código con '{'.`);
