@@ -82,7 +82,11 @@ export class PrimaryParser<T extends string, N extends BaseNode<T>> extends SubP
         }
 
         if (([ TokenType.IDENTIFICADOR, TokenType.Esta, TokenType.Super ] as TokenType[]).includes(token.type as TokenType)) {
-            return this.parent.get(AccessParser).parse();
+            const node = this.consume(token.type);
+            return this.createNode<IdentificatorNode<T>>({
+                type: TokenType.IDENTIFICADOR,
+                value: node.value
+            });
         }
 
         if (([ TokenType.NUMERO, TokenType.BIGINT, TokenType.TEXTO, TokenType.BOOLEANO, TokenType.Indefinido ] as TokenType[]).includes(token.type as TokenType)) {

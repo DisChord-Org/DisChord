@@ -1,7 +1,7 @@
 import { Parser } from "../../Parser";
 import { ASTNode, BaseNode, NoUnaryNode, TokenType, TokenTypeUnion, UnaryNode } from "../../../types";
 import { SubParser } from "../../SubParser";
-import { PrimaryParser } from "../PrimaryParser/PrimaryParser";
+import { AccessParser } from "./AccessParser";
 
 export class UnaryParser<T extends string, N extends BaseNode<T>> extends SubParser<T, N> {
     /** To identify when this parser should be used */
@@ -10,7 +10,7 @@ export class UnaryParser<T extends string, N extends BaseNode<T>> extends SubPar
    /**
      * Collection of reserved keywords this specific sub-parser registers
      */
-    static keywords: TokenTypeUnion<string>[] = [ TokenType.TIPO ];
+    static keywords: TokenTypeUnion<string>[] = [ TokenType.No, TokenType.TIPO ];
 
     /**
      * @param parent - Reference to the main Parser orchestrator.
@@ -46,6 +46,6 @@ export class UnaryParser<T extends string, N extends BaseNode<T>> extends SubPar
             });
         }
 
-        return this.parent.get(PrimaryParser).parse();
+        return this.parent.get(AccessParser).parse();
     }
 }
