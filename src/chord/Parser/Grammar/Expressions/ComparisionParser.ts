@@ -10,7 +10,10 @@ export class ComparisionParser<T extends string, N extends BaseNode<T>> extends 
     /**
      * Collection of reserved keywords this specific sub-parser registers
      */
-    static keywords: TokenTypeUnion<string>[] = [];
+    static keywords: TokenTypeUnion<string>[] = [
+        TokenType.Mayor, TokenType.Menor, TokenType.MayorIgual, TokenType.MenorIgual,
+        TokenType.Igual, TokenType.IgualTipado, TokenType.NoIgual, TokenType.NoIgualTipado
+    ];
 
     /**
      * @param parent - Reference to the main Parser orchestrator.
@@ -26,14 +29,8 @@ export class ComparisionParser<T extends string, N extends BaseNode<T>> extends 
     public parse(): ASTNode<T, N> {
         let left = this.parent.get(AditiveParser).parse();
 
-        const comparisonOperators: TokenType[] = [
-            TokenType.Mayor, TokenType.Menor, TokenType.MayorIgual, TokenType.MenorIgual,
-            TokenType.Igual, TokenType.IgualTipado, TokenType.NoIgual, TokenType.NoIgualTipado, TokenType.No
-        ];
-
-        while (comparisonOperators.includes(this.peek().type as TokenType)) {
+        while (ComparisionParser.keywords.includes(this.peek().type as TokenType)) {
             const operator = this.consume(this.peek().type);
-            
             const right = this.parent.get(AditiveParser).parse();
             
             left = this.createNode<BinaryExpressionNode<T, N>>({

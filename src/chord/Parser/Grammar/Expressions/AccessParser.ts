@@ -2,6 +2,7 @@ import { ASTNode, AccessNode, AccessNodeByIndex, BaseNode, CallNode, Identificat
 import { AssignmentParser } from "./AssignmentParser";
 import { Parser } from "../../Parser";
 import { SubParser } from "../../SubParser";
+import { PrimaryParser } from "../PrimaryParser/PrimaryParser";
 
 export class AccessParser<T extends string, N extends BaseNode<T>> extends SubParser<T, N> {
     /** To identify when this parser should be used */
@@ -20,10 +21,7 @@ export class AccessParser<T extends string, N extends BaseNode<T>> extends SubPa
     }
     
     public parse(startNode?: ASTNode<T, N>): ASTNode<T, N> {
-        let node = startNode || this.createNode<IdentificatorNode<T>>({
-            type: TokenType.IDENTIFICADOR,
-            value: this.consume(TokenType.IDENTIFICADOR).value
-        });
+        let node = startNode || this.parent.get(PrimaryParser).parse();
 
         while (true) {
             const next = this.peek();
