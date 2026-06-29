@@ -4,7 +4,7 @@ import path from 'path';
 import Prettifier from './Prettifier';
 import { DisChordASTNode, DisChordNodeType, DisChordTokenType } from '../dischord/types';
 
-import { Lexer } from '../chord/lexer';
+import { Lexer } from '../chord/Lexer';
 import { DisChordParser } from '../dischord/Parser/Parser';
 import { DisChordGenerator } from '../dischord/Generator/Generator';
 import { CompilerConfig, FileSystem } from './FileSystem';
