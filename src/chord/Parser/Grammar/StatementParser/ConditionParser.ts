@@ -27,18 +27,14 @@ export class ConditionParser<T extends string, N extends BaseNode<T>> extends Su
         const test = this.parent.get(ExpressionParser).parse();
         this.consume(TokenType.R_PAREN);
 
-        this.consume(TokenType.L_BRACE, `Después de la condición de un 'si' se debe abrir un bloque de código con '{'.`);
         const consequent: ASTNode<T, N>[] = (this.parent.get(BlockParser) as BlockParser<T, N>).parse().body;
-        this.consume(TokenType.R_BRACE);
 
         let alternate: ConditionNode<T, N>['alternate'] = undefined;
 
         if (this.match(TokenType.Ademas)) {
             alternate = this.parse();
         } else if (this.match(TokenType.Sino)) {
-            this.consume(TokenType.L_BRACE, "Después de 'sino' se debe abrir un bloque con '{'.");
-            alternate = (this.parent.get(BlockParser) as BlockParser<T, N>).parse().body;
-            this.consume(TokenType.R_BRACE);
+           alternate = (this.parent.get(BlockParser) as BlockParser<T, N>).parse().body;
         }
 
         return this.createNode<ConditionNode<T, N>>({
