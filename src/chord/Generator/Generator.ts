@@ -61,7 +61,7 @@ export class Generator<T extends string, N extends BaseNode<T>> extends Generato
     private static readonly SubGenerators: SubGeneratorClass<DisChordNodeType, DisChordNode>[] = [
         ConditionVisitor, ExitVisitor, LoopVisitor, PassVisitor, ReturnVisitor,
         JSVisitor, NewVisitor, BDOVisitor, BinaryExpressionVisitor, ExpressionVisitor,
-        ListVisitor, LiteralVisitor, NoUnaryVisitor, UnaryVisitor, UnaryVisitor, UnaryVisitor,
+        ListVisitor, LiteralVisitor, NoUnaryVisitor, UnaryVisitor,
         ExportVisitor, FunctionVisitor, ImportVisitor, ClassVisitor, PropertyVisitor,
         SuperVisitor, ThisVisitor, AccessVisitor, AssignmentVisitor, CallVisitor,
         IdentificatorVisitor, IndexAccessVisitor, VariableVisitor
