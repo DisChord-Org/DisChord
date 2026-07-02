@@ -1,11 +1,12 @@
 import { join } from 'path';
 import Prettifier from '../../../../init/Prettifier';
 
-import { createMessageFunctionInjection, eventsMap } from "../../../core.lib";
+import { createMessageFunctionInjection } from "../../../core.lib";
 import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType, EventNode } from "../../../types";
 import { SubGenerator } from '../../../../chord/Generator/SubGenerator';
 import { DisChordError, ErrorLevel } from '../../../../ChordError';
 import { TokenTypeUnion } from '../../../../chord/types';
+import { eventsMap } from '../../constants/mappings';
 
 /**
  * Generator class responsible for generating code related to listeners in DisChord.

@@ -1,5 +1,5 @@
 import { DisChordError, ErrorLevel } from "../../../../ChordError";
-import { EmbedColors } from "../../../core.lib";
+import { EmbedColors } from "../../constants/mappings";
 import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordODBNode, DisChordTokenType } from "../../../types";
 import { SubGenerator } from "../../../../chord/Generator/SubGenerator";
 import { TokenTypeUnion } from "../../../../chord/types";

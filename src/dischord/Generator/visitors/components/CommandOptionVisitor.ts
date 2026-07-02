@@ -1,5 +1,5 @@
 import { DisChordError, ErrorLevel } from "../../../../ChordError";
-import { DisChordTypeMap } from "../../../core.lib";
+import { DisChordTypeMap } from "../../constants/mappings";
 import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordODBNode, DisChordTokenType, DiscordOptionType } from "../../../types";
 import { SubGenerator } from "../../../../chord/Generator/SubGenerator";
 import { TokenTypeUnion } from "../../../../chord/types";
