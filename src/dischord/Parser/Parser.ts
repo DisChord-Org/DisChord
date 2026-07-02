@@ -31,7 +31,7 @@ export class DisChordParser extends Parser<DisChordNodeType, DisChordNode> {
         current: number = 0
     ) {
         super(tokens, current, context);
-        this.registerSubParserInstances();
+        this.registerInstances();
     }
 
     /**
