@@ -4,13 +4,13 @@ import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType } fr
 import { Parser } from '../../chord/Parser/Parser';
 import { SubParserClass } from '../../chord/Parser/SubParser';
 
-import CommandParser from './architectural/CommandParser';
+import CommandParser from './Grammar/architectural/CommandParser';
 import MessageParser from './Grammar/features/MessageParser';
 import CollectorParser from './Grammar/features/CollectorParser';
-import ClientParser from './architectural/ClientParser';
-import EventParser from './architectural/EventParser';
+import ClientParser from './Grammar/architectural/ClientParser';
+import EventParser from './Grammar/architectural/EventParser';
 import { CompilationContext } from '../../init/Init';
-import DisChordStatementParser from './DisChordStatementParser';
+import DisChordStatementParser from './Grammar/DisChordStatementParser';
 
 /**
  * Main Orchestrator for DisChord's syntactic analysis.

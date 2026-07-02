@@ -1,8 +1,8 @@
-import { DisChordNode, DisChordNodeType, DisChordTokenType, EventNode } from "../../types";
-import { SubParser } from "../../../chord/Parser/SubParser";
-import { TokenType, TokenTypeUnion } from "../../../chord/types";
-import { BlockParser } from "../../../chord/Parser/Grammar/BlockParser";
-import { Parser } from "../../../chord/Parser/Parser";
+import { DisChordNode, DisChordNodeType, DisChordTokenType, EventNode } from "../../../types";
+import { SubParser } from "../../../../chord/Parser/SubParser";
+import { TokenType, TokenTypeUnion } from "../../../../chord/types";
+import { BlockParser } from "../../../../chord/Parser/Grammar/BlockParser";
+import { Parser } from "../../../../chord/Parser/Parser";
 
 /**
  * The Event Parser.

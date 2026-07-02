@@ -1,9 +1,9 @@
-import { DisChordNode, DisChordNodeType, DisChordODBNode, DisChordTokenType, StartBotNode } from "../../types";
-import { DisChordError, ErrorLevel } from "../../../ChordError";
-import { ODBMode, TokenTypeUnion } from "../../../chord/types";
-import { SubParser } from "../../../chord/Parser/SubParser";
-import { BDOParser } from "../../../chord/Parser/Grammar/BDOParser";
-import { Parser } from "../../../chord/Parser/Parser";
+import { DisChordNode, DisChordNodeType, DisChordODBNode, DisChordTokenType, StartBotNode } from "../../../types";
+import { DisChordError, ErrorLevel } from "../../../../ChordError";
+import { ODBMode, TokenTypeUnion } from "../../../../chord/types";
+import { SubParser } from "../../../../chord/Parser/SubParser";
+import { BDOParser } from "../../../../chord/Parser/Grammar/BDOParser";
+import { Parser } from "../../../../chord/Parser/Parser";
 
 /**
  * Handles the initial bot declaration.
