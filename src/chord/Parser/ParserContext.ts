@@ -1,6 +1,6 @@
 import { BaseNode } from "../types";
 import { Parser } from "./Parser";
-import { SubParser } from "./subparser";
+import { SubParser } from "./SubParser";
 
 /**
  * Represents the constructor signature of any SubParser subclass.
