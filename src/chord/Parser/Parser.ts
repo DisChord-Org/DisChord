@@ -44,7 +44,7 @@ export class Parser<T extends string, N extends BaseNode<T>> extends ParserConte
         super();
 
         this.setOwner(this);
-        this.registerSubParserInstances();
+        this.registerInstances();
     }
 
     private static SubParsers: SubParserClass<TokenType, BaseNode<TokenType>>[] = [
@@ -92,7 +92,7 @@ export class Parser<T extends string, N extends BaseNode<T>> extends ParserConte
      * @protected
      * @returns {void}
      */
-    protected registerSubParserInstances(): void {
+    protected registerInstances(): void {
         Parser.SubParsers.forEach(instance => {
             this.register(instance as unknown as SubParserClass<T, N>);
         });

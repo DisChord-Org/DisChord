@@ -49,6 +49,8 @@ export class DisChordGenerator extends Generator<DisChordNodeType, DisChordNode>
         DisChordGenerator.DisChordSubGenerators.forEach(instance => {
             this.register(instance as SubGeneratorClass<DisChordNodeType, DisChordNode>);
         })
+
+        super.registerVisitors();
     }
 
     /**

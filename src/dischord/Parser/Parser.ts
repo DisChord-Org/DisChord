@@ -74,12 +74,12 @@ export class DisChordParser extends Parser<DisChordNodeType, DisChordNode> {
      * @override
      * @returns {void}
      */
-    override registerSubParserInstances(): void {
+    override registerInstances(): void {
         DisChordParser.DisChordSubParsers.forEach(instance => {
             this.register(instance);
         });
 
-        super.registerSubParserInstances();
+        super.registerInstances();
     }
 
     /**
