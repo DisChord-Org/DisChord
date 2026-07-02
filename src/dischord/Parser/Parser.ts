@@ -4,11 +4,11 @@ import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType } fr
 import { Parser } from '../../chord/Parser/Parser';
 import { SubParserClass } from '../../chord/Parser/SubParser';
 
-import CommandParser from './Commands/CommandParser';
-import MessageParser from './Messages/MessageParser';
-import CollectorParser from './CollectorParser';
-import ClientParser from './Client/ClientParser';
-import EventParser from './Events/EventParser';
+import CommandParser from './architectural/CommandParser';
+import MessageParser from './Grammar/features/MessageParser';
+import CollectorParser from './Grammar/features/CollectorParser';
+import ClientParser from './architectural/ClientParser';
+import EventParser from './architectural/EventParser';
 import { CompilationContext } from '../../init/Init';
 import DisChordStatementParser from './DisChordStatementParser';
 
