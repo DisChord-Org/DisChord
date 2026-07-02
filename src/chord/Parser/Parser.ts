@@ -100,7 +100,8 @@ export class Parser<T extends string, N extends BaseNode<T>> extends ParserConte
 
     public parse(): ASTNode<T, N>[] {
         while (!this.isAtEnd()) {
-            this.parseStatement();
+            const node: ASTNode<T, N> = this.parseStatement();
+            if (node) this.nodes.push(node);
         }
 
         return this.nodes;
