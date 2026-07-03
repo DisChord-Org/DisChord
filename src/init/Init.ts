@@ -13,6 +13,7 @@ import { Runner } from './Runner';
 import { CodeProvider } from '../CodeProvider';
 import { SymbolTable } from '../chord/SymbolsTable';
 import { KeyWords } from '../chord/KeywordsManager';
+import { DisChordError, ErrorLevel } from '../ChordError';
 
 /**
  * @interface CompilationContext
@@ -62,6 +63,19 @@ export default class Init {
 
             Runner.execute(runTarget, this.config.projectRoot).catch(error => {
                 console.error(error);
+                process.exit(1);
+            });
+
+            Runner.execute(runTarget, this.config.projectRoot).catch(error => {
+                console.error(new DisChordError({
+                    phase: ErrorLevel.Execution,
+                    message: error instanceof Error ? error.message : String(error),
+                    location: error instanceof Error && error.stack ? { 
+                        line: 0,
+                        column: 0
+                    } : undefined
+                }).format());
+
                 process.exit(1);
             });
         }
