@@ -62,11 +62,6 @@ export default class Init {
             console.log(`Ejecutando: ${path.relative(this.config.projectRoot, runTarget)}\n`);
 
             Runner.execute(runTarget, this.config.projectRoot).catch(error => {
-                console.error(error);
-                process.exit(1);
-            });
-
-            Runner.execute(runTarget, this.config.projectRoot).catch(error => {
                 console.error(new DisChordError({
                     phase: ErrorLevel.Execution,
                     message: error instanceof Error ? error.message : String(error),
