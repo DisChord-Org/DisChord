@@ -107,11 +107,11 @@ export default class Init {
 
         const parser = new DisChordParser(tokens, context);
         const ast: DisChordASTNode[] = parser.parse();
-        CLI.logFlag(LogFlagLevel.AST, ast);
+        CLI.logFlag(LogFlagLevel.PARSER, ast);
     
         const generator = new DisChordGenerator(context);
         const output = generator.generate(ast);
-        CLI.logFlag(LogFlagLevel.OUTPUT, output);
+        CLI.logFlag(LogFlagLevel.GENERATOR, output);
 
         if (!fs.existsSync(targetDir)) fs.mkdirSync(targetDir, { recursive: true });
         await Prettifier.savePrettified(outputPath, output);

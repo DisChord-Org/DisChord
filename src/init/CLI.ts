@@ -9,11 +9,32 @@ import { DisChordNode, DisChordNodeType, DisChordTokenType } from '../dischord/t
  */
 export enum LogFlagLevel {
     LEXER = '--lexer',    // Displays the token list
-    AST = '--ast',        // Displays the Abstract Syntax Tree
-    OUTPUT = '--output',  // Displays the generated JS code
+    PARSER = '--ast',        // Displays the Abstract Syntax Tree
+    GENERATOR = '--output',  // Displays the generated JS code
     NORUN = '--no-run'    // Compiles without executing the result
 }
 
+/**
+ * @type {Record<Exclude<LogFlagLevel, LogFlagLevel.NORUN>, string>}
+ * @description A dictionary that maps each active debugging CLI flag to its corresponding 
+ * formatted, human-readable terminal header label. It excludes execution control flags 
+ * like `NORUN` since they do not produce visual compile-time debug structures.
+ * 
+ * @private
+ * @readonly
+ */
+const LogLabels: Record<Exclude<LogFlagLevel, LogFlagLevel.NORUN>, string> = {
+    [LogFlagLevel.LEXER]: 'TOKENS (LEXER)',
+    [LogFlagLevel.PARSER]: 'AST (ÁRBOL DE SINTAXIS ABSTRACTA)',
+    [LogFlagLevel.GENERATOR]: 'CÓDIGO GENERADO (OUTPUT)'
+};
+
+/**
+ * @typedef {Token<DisChordTokenType>[] | ASTNode<DisChordNodeType, DisChordNode>[] | string} LogMessage
+ * @description Represents the strict union payload that can be processed and inspected by the CLI debug utility.
+ * It ensures type safety across the different compilation stages, accommodating lexer streams, 
+ * abstract syntax tree branches, or raw generated code strings.
+ */
 type LogMessage = Token<DisChordTokenType>[] | ASTNode<DisChordNodeType, DisChordNode>[] | string;
 
 /**
@@ -55,7 +76,7 @@ export class CLI {
             compact: false
         }));
 
-        console.log("--- " + "-".repeat(label.length) + " ---");
+        console.log(`\x1b[33m--- ${"-".repeat(label.length)} ---\x1b[0m`);
     }
 
     /**
@@ -63,19 +84,9 @@ export class CLI {
      * @param flag - The flag to check for.
      * @param message - The message to display.
      */
-    static logFlag (flag: LogFlagLevel, message: LogMessage) {
-        if (!this.hasFlag(flag)) return;
-
-        switch (flag) {
-            case LogFlagLevel.LEXER:
-                this.debug("LEXER", message);
-                break;
-            case LogFlagLevel.AST:
-                this.debug("AST", message);
-                break;
-            case LogFlagLevel.OUTPUT:
-                this.debug("OUTPUT", message);
-                break;
+    static logFlag (flag: Exclude<LogFlagLevel, LogFlagLevel.NORUN>, message: LogMessage) {
+        if (this.hasFlag(flag)) {
+            this.debug(LogLabels[flag], message);
         }
     }
 
