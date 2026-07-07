@@ -14,7 +14,7 @@ export class IdentificatorVisitor<T extends string, N extends BaseNode<T>> exten
      * @public
      * @static
      */
-    public static triggerToken: TokenTypeUnion<TokenType> | undefined = TokenType.IDENTIFICADOR_NODO;
+    public static triggerToken: TokenTypeUnion<TokenType> | undefined = TokenType.IDENTIFICADOR;
 
     /**
      * Translates an Identifier node directly into its raw string literal value representation.
