@@ -39,6 +39,8 @@ export class DisChordGenerator extends Generator<DisChordNodeType, DisChordNode>
      */
     constructor(context: CompilationContext<DisChordNodeType>) {
         super(context);
+        
+        this.registerVisitors();
     }
 
     /**
