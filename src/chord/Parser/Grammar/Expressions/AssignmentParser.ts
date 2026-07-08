@@ -1,4 +1,4 @@
-import { ASTNode, BaseNode, TokenType, TokenTypeUnion } from "../../../types";
+import { AssignmentNode, ASTNode, BaseNode, TokenType, TokenTypeUnion } from "../../../types";
 import { Parser } from "../../Parser";
 import { SubParser } from "../../SubParser";
 import { LogicalParser } from "./LogicalParser";
@@ -24,6 +24,19 @@ export class AssignmentParser<T extends string, N extends BaseNode<T>> extends S
      * Consumes the ES statement and calls the expressions subparsers.
      */
     public parse(): ASTNode<T, N> {
-        return this.parent.get(LogicalParser).parse();
+        const left = this.parent.get(LogicalParser).parse();
+
+        if (this.peek().type === TokenType.Es) {
+            this.consume(TokenType.Es);
+            const assignment = this.parse();
+
+            return this.createNode<AssignmentNode<T, N>>({
+                type: TokenType.ASIGNACION,
+                left,
+                assignment
+            });
+        }
+
+        return left;
     }
 }
