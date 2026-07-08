@@ -10,7 +10,7 @@ export class ArithmeticParser<T extends string, N extends BaseNode<T>> extends S
     /**
      * Collection of reserved keywords this specific sub-parser registers
      */
-    static keywords: TokenTypeUnion<string>[] = [];
+    static keywords: TokenTypeUnion<string>[] = [ TokenType.Por, TokenType.Entre, TokenType.Resto, TokenType.Exponente ];
 
     /**
      * @param parent - Reference to the main Parser orchestrator.
@@ -26,9 +26,7 @@ export class ArithmeticParser<T extends string, N extends BaseNode<T>> extends S
     public parse(): ASTNode<T, N> {
         let left = this.parent.get(UnaryParser).parse();
 
-        const highPriorityOps: TokenType[] = [ TokenType.Por, TokenType.Entre, TokenType.Resto, TokenType.Exponente ];
-
-        while (highPriorityOps.includes(this.peek().type as TokenType)) {
+        while (ArithmeticParser.keywords.includes(this.peek().type as TokenType)) {
             const operator = this.consume(this.peek().type);
             const right = this.parent.get(UnaryParser).parse();
             
