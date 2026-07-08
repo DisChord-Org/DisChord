@@ -10,7 +10,7 @@ export class AditiveParser<T extends string, N extends BaseNode<T>> extends SubP
     /**
      * Collection of reserved keywords this specific sub-parser registers
      */
-    static keywords: TokenTypeUnion<string>[] = [ TokenType.Mas, TokenType.Menos, TokenType.Intro, TokenType.Espacio ];
+    static keywords: TokenTypeUnion<string>[] = [ TokenType.Mas, TokenType.Menos ];
 
     /**
      * @param parent - Reference to the main Parser orchestrator.
@@ -28,7 +28,6 @@ export class AditiveParser<T extends string, N extends BaseNode<T>> extends SubP
 
         while (AditiveParser.keywords.includes(this.peek().type as TokenType)) {
             const operator = this.consume(this.peek().type);
-            
             const right = this.parent.get(ArithmeticParser).parse();
             
             left = this.createNode<BinaryExpressionNode<T, N>>({

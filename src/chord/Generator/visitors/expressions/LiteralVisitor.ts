@@ -28,7 +28,7 @@ export class LiteralVisitor<T extends string, N extends BaseNode<T>> extends Sub
         }
 
         if (typeof node.value === "string") {
-            return `"${node.value}"`;
+            return JSON.stringify(node.value);
         }
 
         return String(node.value);
