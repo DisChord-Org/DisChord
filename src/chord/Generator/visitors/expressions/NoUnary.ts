@@ -23,7 +23,7 @@ export class NoUnaryVisitor<T extends string, N extends BaseNode<T>> extends Sub
      * @public
      */
     public visit(node: NoUnaryNode<T, N>): string {
-        if (node.operator === 'NO') {
+        if (node.operator === TokenType.No) {
             return `!(${this.parent.visit(node.object)})`;
         }
 

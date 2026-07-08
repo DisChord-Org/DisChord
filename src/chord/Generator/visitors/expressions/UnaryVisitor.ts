@@ -24,7 +24,7 @@ export class UnaryVisitor<T extends string, N extends BaseNode<T>> extends SubGe
      * @public
      */
     public visit(node: UnaryNode<T, N>): string {
-        if (node.operator === 'TIPO') {
+        if (node.operator === TokenType.TIPO) {
             const mapping = `{ "number": "numero", "string": "texto", "boolean": "booleano", "undefined": "indefinido", "object": "objeto" }`;
             return `${mapping}[typeof (${this.parent.visit(node.object)})]`;
         }
