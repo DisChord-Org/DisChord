@@ -38,7 +38,7 @@ export class CallVisitor<T extends string, N extends BaseNode<T>> extends SubGen
             if (symbol?.metadata.isAsync) {
                 isAsyncCall = true;
             }
-        } else if (node.object.type === TokenType.IDENTIFICADOR_NODO) {
+        } else if (node.object.type === TokenType.IDENTIFICADOR) {
             const identificatorNode = node.object as IdentificatorNode<T>;
             const name = identificatorNode.value;
             translation = name;
