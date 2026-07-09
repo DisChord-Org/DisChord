@@ -33,11 +33,11 @@ export class LoopVisitor<T extends string, N extends BaseNode<T>> extends SubGen
             
         const iterable = this.parent.visit(node.iterable);
 
-        if (node.iterable.type === 'Llamada') {
+        if (node.iterable.type === TokenType.LLAMADA) {
             const callNode = node.iterable as CallNode<T, N>;
-            
+
             if (
-                callNode.object.type === 'Identificador' && 
+                callNode.object.type === TokenType.IDENTIFICADOR && 
                 (callNode.object as IdentificatorNode<T>).value === 'rango'
             ) {
                 const args = callNode.params;
