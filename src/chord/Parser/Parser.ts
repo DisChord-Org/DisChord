@@ -207,10 +207,16 @@ export class Parser<T extends string, N extends BaseNode<T>> extends ParserConte
         return null;
     }
 
+    /**
+     * @deprecated
+     */
     protected parseStatement (): ASTNode<T, N> {
         return this.get(StatementParser).parse();
     }
 
+    /**
+     * @deprecated
+     */
     public parseExpression (): ASTNode<T, N> {
         return this.get(ExpressionParser).parse();
     }
