@@ -120,7 +120,7 @@ export class BDOParser<T extends string, N extends BaseNode<T>> extends SubParse
 
         if (current.type !== TokenType.IDENTIFICADOR) return false;
         if (this.parent.KeywordsManager.isKeyword(current.value)) return false;
-        if (this.parent.KeywordsManager.isKeyword(next.value)) return false;
+        // if (this.parent.KeywordsManager.isKeyword(next.value)) return false;
         if (next.type === TokenType.Punto) return false;
         if (mode === ODBMode.Simple && this.lookAheadForToken(TokenType.SEPARADOR)) return true;
         if (mode === ODBMode.Intelligent) return this.lookAheadForToken(TokenType.SEPARADOR);
