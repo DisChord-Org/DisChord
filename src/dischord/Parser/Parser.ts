@@ -93,7 +93,7 @@ export class DisChordParser extends Parser<DisChordNodeType, DisChordNode> {
 
         const ParserClass = DisChordParser.DisChordSubParsers.find(SubParser =>
             SubParser.triggerToken !== undefined &&
-            SubParser.triggerToken.toUpperCase() === token.type
+            SubParser.triggerToken === token.type
         );
 
         if (ParserClass) return new ParserClass(this).parse();
