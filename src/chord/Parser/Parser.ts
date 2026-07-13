@@ -33,9 +33,32 @@ import { ExitParser } from "./Grammar/StatementParser/FlowParser/ExitParser";
 import { PassParser } from "./Grammar/StatementParser/FlowParser/PassParser";
 import { FunctionParser } from "./Grammar/StatementParser/FunctionParser";
 
+/**
+ * Core parsing orchestrator for the DisChord transpile engine.
+ * Responsabilities include token stream navigation, registry and routing of granular grammatical sub-parsers,
+ * error boundary management with user-friendly diagnostics, and AST generation.
+ *
+ * @class Parser
+ * @extends {ParserContext<T, N>}
+ * @template T - The token type union constraint, extending string.
+ * @template N - The base AST node model interface constraint.
+ */
 export class Parser<T extends string, N extends BaseNode<T>> extends ParserContext<T, N> {
+    /**
+     * Accumulated abstract syntax tree root-level nodes.
+     * @public
+     * @type {ASTNode<T, N>[]}
+     */
     public nodes: ASTNode<T, N>[] = [];
     
+    /**
+     * Creates an instance of the Parser orchestrator.
+     *
+     * @constructor
+     * @param {Token<T>[]} tokens - Array of lexed tokens to consume during parsing.
+     * @param {number} [current=0] - Starting index cursor in the token stream.
+     * @param {CompilationContext<T>} context - Global compilation context holding compiler utilities like Symbols Table.
+     */
     constructor(
         private tokens: Token<T>[],
         private current: number = 0,
@@ -47,6 +70,12 @@ export class Parser<T extends string, N extends BaseNode<T>> extends ParserConte
         this.registerInstances();
     }
 
+    /**
+     * Statically defined grammar sub-parsers collection mapping grammatical blocks to specialized handlers.
+     * @private
+     * @static
+     * @type {SubParserClass<TokenType, BaseNode<TokenType>>[]}
+     */
     private static SubParsers: SubParserClass<TokenType, BaseNode<TokenType>>[] = [
         AditiveParser, ArithmeticParser, AssignmentParser,
         ComparisionParser, ExpressionParser, LogicalParser,
@@ -98,6 +127,13 @@ export class Parser<T extends string, N extends BaseNode<T>> extends ParserConte
         });
     }
 
+    /**
+     * Processes the token stream to construct the final array of AST nodes.
+     * Consumes expressions and statements iteratively until EOF is reached.
+     *
+     * @public
+     * @returns {ASTNode<T, N>[]} The collection of parsed Abstract Syntax Tree root nodes.
+     */
     public parse(): ASTNode<T, N>[] {
         while (!this.isAtEnd()) {
             const node: ASTNode<T, N> = this.parseStatement();
@@ -107,18 +143,43 @@ export class Parser<T extends string, N extends BaseNode<T>> extends ParserConte
         return this.nodes;
     }
 
+    /**
+     * Gets the current stream iteration cursor index.
+     * * @public
+     * @readonly
+     * @type {number}
+     */
     public get cursor (): number {
         return this.current;
     }
 
+    /**
+     * Accessor to get the global compilation Symbols Table mapping.
+     * * @public
+     * @readonly
+     * @type {SymbolTable}
+     */
     public get SymbolTable (): SymbolTable {
         return this.context.symbolTable;
     }
 
+    /**
+     * Accessor to retrieve the keywords manager instance.
+     * * @public
+     * @readonly
+     * @type {KeyWords<T>}
+     */
     public get KeywordsManager (): KeyWords<T> {
         return this.context.keywordsManager;
     }
 
+    /**
+     * Performs an observation lookahead on the token stream relative to the cursor position without consuming tokens.
+     *
+     * @public
+     * @param {PeekType} [type='this'] - The offset instruction ('this', 'next', 'prev' or raw index integer).
+     * @returns {Token<T>} The inspected token at the target relative position.
+     */
     public peek(type: PeekType = 'this'): Token<T> {
         if (typeof type == 'number') return this.tokens[type];
 
@@ -149,6 +210,12 @@ export class Parser<T extends string, N extends BaseNode<T>> extends ParserConte
         return this.tokens[targetIndex];
     }
 
+    /**
+     * Verifies if the parsing iteration has reached the end of the token stream or hit EOF.
+     *
+     * @public
+     * @returns {boolean} True if no further tokens are available to parse.
+     */
     public isAtEnd (): boolean {
         return this.peek().type === TokenType.EOF || this.current >= this.tokens.length;
     }
@@ -172,6 +239,16 @@ export class Parser<T extends string, N extends BaseNode<T>> extends ParserConte
         return false;
     }
 
+    /**
+     * Guarantees the presence of a specific token type next in the stream. Consumes it if valid.
+     * Throws a formatted diagnostic error containing localized user-friendly hints if validation fails.
+     *
+     * @public
+     * @param {string | string[]} expectedTypes - Token types expected to be at the cursor.
+     * @param {string} [message] - Optional override message for the parsing mismatch.
+     * @throws {ChordError} If the current token does not match any of the expected types.
+     * @returns {Token<T>} The matched and consumed token.
+     */
     public consume(expectedTypes: string | string[], message?: string): Token<T> {
         const token = this.peek();
         const expected = Array.isArray(expectedTypes) ? expectedTypes : [expectedTypes];
@@ -194,6 +271,14 @@ export class Parser<T extends string, N extends BaseNode<T>> extends ParserConte
         }).format();
     }
 
+    /**
+     * Factory utility to instantiate AST nodes binding automatic location tracking metadata relative to the previous token.
+     *
+     * @public
+     * @template NodeType - The structural node target type extending ASTNode.
+     * @param {Omit<NodeType, 'location'> & { location?: Location }} node - The node structure payload.
+     * @returns {NodeType} The fully built AST node structure decorated with location details.
+     */
     public createNode<NodeType extends ASTNode<T, N>> (node: Omit<NodeType, 'location'> & { location?: Location }): NodeType {
         const token: Token<T> = this.peek('prev');
 
@@ -203,6 +288,12 @@ export class Parser<T extends string, N extends BaseNode<T>> extends ParserConte
         } as NodeType;
     }
 
+    /**
+     * Extensibility hook intended for parsing custom dialect elements or macro statements.
+     *
+     * @public
+     * @returns {ASTNode<T, N> | null} Parsed customized ASTNode or null if not applicable.
+     */
     public parseCustomStatement (): ASTNode<T, N> | null {
         return null;
     }
