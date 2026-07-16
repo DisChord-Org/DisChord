@@ -84,7 +84,7 @@ export class DisChordParser extends Parser<DisChordNodeType, DisChordNode> {
 
     /**
      * Entry point for custom DisChord statements.
-     * Analyzes top-level tokens such as 'encender', 'evento', 'crear', etc.
+     * Analyzes top-level tokens such as 'encender', 'evento', etc.
      * @override
      * @returns The generated ASTNode or null if no match is found.
      */

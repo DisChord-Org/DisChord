@@ -26,7 +26,7 @@ export default class CommandParser extends SubParser<DisChordNodeType, DisChordN
 
     /**
      * Parses a command creation block.
-     * Expected structure: `crear comando <nombre> {...}`
+     * Expected structure: `comando <nombre> {...}`
      * @returns {CommandNode} The AST node representing the command definition.
      */
     parse (): CommandNode {
