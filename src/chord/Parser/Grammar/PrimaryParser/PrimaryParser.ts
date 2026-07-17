@@ -30,6 +30,10 @@ export class PrimaryParser<T extends string, N extends BaseNode<T>> extends SubP
 
         if (token.type === TokenType.Nuevo) {
             this.consume(TokenType.Nuevo);
+
+            const customStatement = this.parent.parseCustomStatement();
+            if (customStatement) return customStatement;
+
             const call = this.parent.get(AccessParser).parse(); 
             return this.createNode<NewNode<T, N>>({
                 type: TokenType.Nuevo,
