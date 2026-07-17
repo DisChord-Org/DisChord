@@ -41,7 +41,7 @@ export default class CommandVisitor extends SubGenerator<DisChordNodeType, DisCh
         const OptionsConstExtraction: string = CommandOptionVisitorData.variables;
 
         const body = node.body.body
-            .map((n: DisChordASTNode): string => "    " + (this.parent as DisChordGenerator).visit(n, { isInteraction: true }) + ";")
+            .map((n: DisChordASTNode): string => "    " + (this.parent as DisChordGenerator).visit(n, { isInteraction: false }) + ";")
             .join('\n');
 
         const commandBody: string = `
