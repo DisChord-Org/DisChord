@@ -90,6 +90,7 @@ export class DisChordParser extends Parser<DisChordNodeType, DisChordNode> {
      */
     override parseCustomStatement(): DisChordASTNode | null {
         const token = this.peek();
+        console.log(token)
 
         const ParserClass = DisChordParser.DisChordSubParsers.find(SubParser =>
             SubParser.triggerToken !== undefined &&
