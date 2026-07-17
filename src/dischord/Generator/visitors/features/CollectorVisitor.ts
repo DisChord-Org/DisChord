@@ -36,7 +36,7 @@ export default class CollectorVisitor extends SubGenerator<DisChordNodeType, Dis
 
         const filter = this.parent.visitIfExists(
             this.parent.get(BDOVisitor).getODBProperty(node.methods, 'filtro')
-        ) || 'i.user.id === contexto.author.id';
+        ) || 'interaccion.user.id === contexto.author.id';
 
         const time = this.parent.visitIfExists(
             this.parent.get(BDOVisitor).getODBProperty(node.methods, 'tiempo')
@@ -60,7 +60,7 @@ export default class CollectorVisitor extends SubGenerator<DisChordNodeType, Dis
     private generateCollector (config: CollectorConfig, body: string): string {
         return `
             let collector = ${config.variable}.createComponentCollector({
-                filter: (i) => ${config.filter},
+                filter: (interaccion) => ${config.filter},
                 timeout: ${config.time}
             });
 
