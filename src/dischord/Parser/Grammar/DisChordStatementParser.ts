@@ -1,9 +1,9 @@
-import { TokenType, TokenTypeUnion } from '../../../chord/types';
+import { NewNode, TokenType, TokenTypeUnion } from '../../../chord/types';
 import { SubParser } from '../../../chord/Parser/SubParser';
 import { DisChordASTNode, DisChordNode, DisChordNodeType } from '../../types';
-import { DisChordError, ErrorLevel } from '../../../ChordError';
 import { Parser } from '../../../chord/Parser/Parser';
 import { StatementParser } from '../../../chord/Parser/Grammar/StatementParser/StatementParser';
+import { AccessParser } from '../../../chord/Parser/Grammar/Expressions/AccessParser';
 
 /**
  * @class DisChordStatementParser
@@ -40,18 +40,13 @@ export default class DisChordStatementParser extends SubParser<DisChordNodeType,
             this.consume(TokenType.Nuevo);
 
             const customStatement = this.parent.parseCustomStatement();
+            if (customStatement) return customStatement;
 
-            if (!customStatement) {
-                const nextToken = this.peek();
-
-                throw new DisChordError({
-                    phase: ErrorLevel.Parser,
-                    message: `Estructura de inicialización inválida después de 'nuevo'. Se encontró '${nextToken.value}'`,
-                    location: nextToken.location
-                }).format();
-            }
-
-            return customStatement;
+            const call = this.parent.get(AccessParser).parse();
+            return this.createNode<NewNode<DisChordNodeType, DisChordNode>>({
+                type: TokenType.Nuevo,
+                object: call
+            });
         }
 
         return this.parent.get(StatementParser).parse();
