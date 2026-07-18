@@ -3,6 +3,7 @@ import { CollectorNode, DisChordASTNode, DisChordNode, DisChordNodeType, DisChor
 import { SubGenerator } from "./../../../../chord/Generator/SubGenerator";
 import { TokenTypeUnion } from "../../../../chord/types";
 import { BDOVisitor } from "../../../../chord/Generator/visitors/expressions/BDOVisitor";
+import { DisChordGenerator } from "../../Generator";
 
 /** Config for the Collector Generator param. */
 interface CollectorConfig {
@@ -97,7 +98,7 @@ export default class CollectorVisitor extends SubGenerator<DisChordNodeType, Dis
 
         if (node.type != 'BDO') throw new DisChordError({
             phase: ErrorLevel.Compiler,
-            message: `Se esperaba on BDO con las ids a ejecutar después del 'alPulsarId'`,
+            message: `Se esperaba un BDO con las ids a ejecutar después del 'alPulsarId'`,
             location: node.location
         }).format();
 
@@ -113,7 +114,7 @@ export default class CollectorVisitor extends SubGenerator<DisChordNodeType, Dis
             return this.generateMethod(
                 'run',
                 `"${identificator}"`,
-                this.parent.visit(idBody)
+                (this.parent as DisChordGenerator).visit(idBody, { isInteraction: true })
             );
         });
 
