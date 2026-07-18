@@ -36,8 +36,12 @@ export class BDOVisitor<T extends string, N extends BaseNode<T>> extends SubGene
         }).join('\n');
 
         const executableBody = node.body
-            .map(stmt => this.parent.visit(stmt as unknown as ASTNode<T, N>))
+            .map(statement => this.parent.visit(statement))
             .join(';\n');
+        
+        if (Object.keys(node.blocks).length === 0) {
+            return `${executableBody}`;
+        }
 
         const exports = Object.keys(node.blocks).join(', ');
 
