@@ -1,7 +1,7 @@
 import { DisChordError, ErrorLevel } from "../../../../ChordError";
 import { CollectorNode, DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType } from "../../../types";
 import { SubGenerator } from "./../../../../chord/Generator/SubGenerator";
-import { TokenTypeUnion } from "../../../../chord/types";
+import { CompilerMetadataKind, TokenTypeUnion } from "../../../../chord/types";
 import { BDOVisitor } from "../../../../chord/Generator/visitors/expressions/BDOVisitor";
 import { DisChordGenerator } from "../../Generator";
 
@@ -102,6 +102,10 @@ export default class CollectorVisitor extends SubGenerator<DisChordNodeType, Dis
             location: node.location
         }).format();
 
+        // adding scope & interaction context in the symboltable
+        this.parent.context.symbolTable.pushScope();
+        this.parent.context.symbolTable.setMetadata(CompilerMetadataKind.IsInteraction, true);
+
         const pulseCodes: string[] = Object.keys(node.blocks).map(identificator => {
             const idBody = node.blocks[identificator];
 
@@ -114,9 +118,12 @@ export default class CollectorVisitor extends SubGenerator<DisChordNodeType, Dis
             return this.generateMethod(
                 'run',
                 `"${identificator}"`,
-                (this.parent as DisChordGenerator).visit(idBody, { isInteraction: true })
+                (this.parent as DisChordGenerator).visit(idBody)
             );
         });
+
+        // deleting scope from symboltable
+        this.parent.context.symbolTable.popScope();
 
         return pulseCodes.join('\n');
     }

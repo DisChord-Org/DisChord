@@ -5,7 +5,7 @@ import { createMessageFunctionInjection } from "../../../core.lib";
 import { CommandNode, DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType } from "../../../types";
 import { SubGenerator } from '../../../../chord/Generator/SubGenerator';
 import { DisChordError, ErrorLevel } from '../../../../ChordError';
-import { TokenTypeUnion } from '../../../../chord/types';
+import { CompilerMetadataKind, TokenTypeUnion } from '../../../../chord/types';
 import { BDOVisitor } from '../../../../chord/Generator/visitors/expressions/BDOVisitor';
 import CommandOptionVisitor from '../components/CommandOptionVisitor';
 import { DisChordGenerator } from '../../Generator';
@@ -27,6 +27,12 @@ export default class CommandVisitor extends SubGenerator<DisChordNodeType, DisCh
      * @returns The generated code for the command definition.
      */
     visit (node: CommandNode): string {
+        // first we just add a new scope in the symboltable
+        this.parent.context.symbolTable.pushScope();
+        // adding interaction context
+        this.parent.context.symbolTable.setMetadata(CompilerMetadataKind.IsInteraction, false);
+
+        // generating command flags & body
         const commandName = node.value;
         const commandDescription = this.parent.get(BDOVisitor).getODBProperty(node.body, 'descripcion');
         if (!commandDescription) throw new DisChordError({
@@ -41,7 +47,7 @@ export default class CommandVisitor extends SubGenerator<DisChordNodeType, DisCh
         const OptionsConstExtraction: string = CommandOptionVisitorData.variables;
 
         const body = node.body.body
-            .map((n: DisChordASTNode): string => "    " + (this.parent as DisChordGenerator).visit(n, { isInteraction: false }) + ";")
+            .map((n: DisChordASTNode): string => "    " + (this.parent as DisChordGenerator).visit(n) + ";")
             .join('\n');
 
         const commandBody: string = `
@@ -71,6 +77,9 @@ export default class CommandVisitor extends SubGenerator<DisChordNodeType, DisCh
         `;
 
         Prettifier.savePrettified(join(this.parent.context.projectRoot, 'dist', 'commands', `${commandName}.js`), commandBody)
+        
+        // deleting scope from symboltable
+        this.parent.context.symbolTable.popScope();
         return '';
     }
 }
