@@ -8,14 +8,20 @@ import { DisChordNode, DisChordNodeType, DisChordTokenType } from '../dischord/t
  * Supported CLI flags for debugging and execution control.
  */
 export enum LogFlagLevel {
-    LEXER = '--lexer',    // Displays the token list
-    PARSER = '--ast',        // Displays the Abstract Syntax Tree
-    GENERATOR = '--output',  // Displays the generated JS code
-    NORUN = '--no-run'    // Compiles without executing the result
+    LEXER = '--lexer',      // Displays the token list
+    PARSER = '--ast',       // Displays the Abstract Syntax Tree
+    GENERATOR = '--output', // Displays the generated JS code
+    NORUN = '--no-run',     // Compiles without executing the result
+    TEST = '--test'         // Only run tests
 }
 
 /**
- * @type {Record<Exclude<LogFlagLevel, LogFlagLevel.NORUN>, string>}
+ * Log labels to exclude not displayed flags
+*/
+type LogLabelsType = Record<Exclude<LogFlagLevel, LogFlagLevel.NORUN | LogFlagLevel.TEST>, string>;
+
+/**
+ * @type {LogLabelsType}
  * @description A dictionary that maps each active debugging CLI flag to its corresponding 
  * formatted, human-readable terminal header label. It excludes execution control flags 
  * like `NORUN` since they do not produce visual compile-time debug structures.
@@ -23,7 +29,7 @@ export enum LogFlagLevel {
  * @private
  * @readonly
  */
-const LogLabels: Record<Exclude<LogFlagLevel, LogFlagLevel.NORUN>, string> = {
+const LogLabels: LogLabelsType = {
     [LogFlagLevel.LEXER]: 'TOKENS (LEXER)',
     [LogFlagLevel.PARSER]: 'AST (ÁRBOL DE SINTAXIS ABSTRACTA)',
     [LogFlagLevel.GENERATOR]: 'CÓDIGO GENERADO (OUTPUT)'
@@ -49,7 +55,8 @@ export class CLI {
      * @returns true if the specified flag is present in the arguments.
      */
     static hasFlag(flag: LogFlagLevel): boolean {
-        return this.args.includes(flag);
+                                        // hotfix for tests implementation, i need to improve this
+        return this.args.includes(flag) || process.argv.includes(flag);
     }
 
     /**
@@ -78,13 +85,17 @@ export class CLI {
 
         console.log(`\x1b[33m--- ${"-".repeat(label.length)} ---\x1b[0m`);
     }
-
+    
     /**
-     * Logic to trigger conditional logging based on active flags.
-     * @param flag - The flag to check for.
-     * @param message - The message to display.
+     * @method logFlag
+     * @description Conditional logging trigger that prints compiler stage details if its associated flag is active.
+     * @param {keyof LogLabelsType} flag - A strict subset of LogFlagLevel containing only renderable visual outputs.
+     * @param {LogMessage} message - The current compilation stage data package.
+     * @returns {void}
+     * @public
+     * @static
      */
-    static logFlag (flag: Exclude<LogFlagLevel, LogFlagLevel.NORUN>, message: LogMessage) {
+    static logFlag(flag: keyof LogLabelsType, message: LogMessage): void {
         if (this.hasFlag(flag)) {
             this.debug(LogLabels[flag], message);
         }

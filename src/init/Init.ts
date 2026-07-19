@@ -14,6 +14,7 @@ import { CodeProvider } from '../CodeProvider';
 import { SymbolTable } from '../chord/SymbolsTable';
 import { KeyWords } from '../chord/KeywordsManager';
 import { DisChordError, ErrorLevel } from '../ChordError';
+import { Tester } from '../../tester/Tester';
 
 /**
  * @interface CompilationContext
@@ -30,19 +31,25 @@ export interface CompilationContext <T extends string = string> {
  * Main orchestrator for the DisChord compilation process.
  */
 export default class Init {
-    private config: CompilerConfig;
-
-    constructor () {
-        const rawPath = CLI.validateInput();
-
-        this.config = FileSystem.configure(rawPath);
-    }
+    /**
+     * @type {CompilerConfig | null} Holds the absolute routes and flags configuration if an input is loaded.
+     * @private
+     */
+    private config: CompilerConfig | null = null;
 
     /**
      * Entry point that triggers the compilation of all relevant files
      * and executes the resulting code if the --no-run flag is absent.
      */
     async run() {
+        if (CLI.hasFlag(LogFlagLevel.TEST)) {
+            new Tester().testAll();
+            return;
+        }
+        
+        const rawPath = CLI.validateInput();
+        this.config = FileSystem.configure(rawPath);
+
         const files = FileSystem.getChordFiles(this.config.inputPath, this.config.isDirectory);
         
         console.log(`Compilando proyecto: ${this.config.projectRoot}`);
@@ -82,6 +89,8 @@ export default class Init {
      * @returns The path to the generated .mjs file.
      */
     async compile(file: string) {
+        if (!this.config) return;
+
         console.log(`Compilando: ${path.relative(this.config.projectRoot, file)}`);
 
         const relativePath = path.relative(path.join(this.config.projectRoot, 'src'), file);
