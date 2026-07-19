@@ -1,4 +1,4 @@
-import { Location, Symbol, SymbolKind } from "./types";
+import { Location, Symbol, SymbolKind, CompilerMetadataKind } from "./types";
 import { ChordError, ErrorLevel } from "../ChordError";
 
 /**
@@ -15,11 +15,14 @@ export class SymbolTable {
      */
     private scopes: Map<string, Symbol>[] = [ new Map() ];
 
+    private metadata: Map<CompilerMetadataKind, unknown>[] = [ new Map() ];
+
     /**
      * Creates and enters a new lexical scope (e.g., when entering a block, function, or class).
      */
     public pushScope(): void {
         this.scopes.push(new Map());
+        this.metadata.push(new Map());
     }
 
     /**
@@ -27,7 +30,10 @@ export class SymbolTable {
      * Prevents popping the global scope.
      */
     public popScope(): void {
-        if (this.scopes.length > 1) this.scopes.pop();
+        if (this.scopes.length > 1) {
+            this.scopes.pop();
+            this.metadata.pop();
+        }
     }
 
     /**
@@ -73,6 +79,18 @@ export class SymbolTable {
                 return this.scopes[i].get(name);
             }
         }
+        return undefined;
+    }
+
+    public setMetadata(key: CompilerMetadataKind, value: unknown): void {
+        this.metadata[this.metadata.length - 1].set(key, value);
+    }
+
+    public getMetadata<T>(key: CompilerMetadataKind): T | undefined {
+        for(let i = this.metadata.length - 1; i >= 0; i--) {
+            if (this.metadata[i].has(key)) return this.metadata[i].get(key) as T;
+        }
+
         return undefined;
     }
 }
