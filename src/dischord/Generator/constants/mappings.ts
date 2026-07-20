@@ -1,4 +1,4 @@
-import { DiscordOptionType } from "../../types";
+import { ApplicationIntegrationType, DiscordOptionType } from "../../types";
 
 interface EventType {
     name: string;
@@ -151,3 +151,8 @@ export const DisChordTypeMap: Record<string, DiscordOptionType> = {
     "numero": DiscordOptionType.Number,
     "archivo": DiscordOptionType.Attachment
 } as const;
+
+export const integrationTypes: Record<string, ApplicationIntegrationType> = {
+    "Servidor": ApplicationIntegrationType.GuildInstall,
+    "Usuario": ApplicationIntegrationType.UserInstall
+}

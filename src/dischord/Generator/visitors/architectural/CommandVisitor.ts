@@ -2,13 +2,13 @@ import { join } from 'path';
 import Prettifier from '../../../../init/Prettifier';
 
 import { createMessageFunctionInjection } from "../../../core.lib";
-import { CommandNode, DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType } from "../../../types";
+import { ApplicationIntegrationType, CommandNode, DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType } from "../../../types";
 import { SubGenerator } from '../../../../chord/Generator/SubGenerator';
 import { DisChordError, ErrorLevel } from '../../../../ChordError';
-import { CompilerMetadataKind, TokenTypeUnion } from '../../../../chord/types';
+import { ASTNode, CompilerMetadataKind, LiteralNode, TokenTypeUnion } from '../../../../chord/types';
 import { BDOVisitor } from '../../../../chord/Generator/visitors/expressions/BDOVisitor';
 import CommandOptionVisitor from '../components/CommandOptionVisitor';
-import { DisChordGenerator } from '../../Generator';
+import { integrationTypes } from '../../constants/mappings';
 
 /**
  * Generator class responsible for generating code related to command definitions in DisChord.
@@ -33,13 +33,8 @@ export default class CommandVisitor extends SubGenerator<DisChordNodeType, DisCh
         this.parent.context.symbolTable.setMetadata(CompilerMetadataKind.IsInteraction, false);
 
         // generating command flags & body
-        const commandName = node.value;
-        const commandDescription = this.parent.get(BDOVisitor).getODBProperty(node.body, 'descripcion');
-        if (!commandDescription) throw new DisChordError({
-            phase: ErrorLevel.Compiler,
-            message: `Se requiere descripción para el comando`,
-            location: node.location
-        }).format();
+        const CommandName = this.getCommandName(node);
+        const CommandFlags = this.generateCommandFlags(node);
 
         const CommandOptionVisitorData = this.parent.get(CommandOptionVisitor).visitIfNodeExists(node.body)
         const OptionsData = CommandOptionVisitorData.options;
@@ -47,7 +42,7 @@ export default class CommandVisitor extends SubGenerator<DisChordNodeType, DisCh
         const OptionsConstExtraction: string = CommandOptionVisitorData.variables;
 
         const body = node.body.body
-            .map((n: DisChordASTNode): string => "    " + (this.parent as DisChordGenerator).visit(n) + ";")
+            .map((n: DisChordASTNode): string => "    " + this.parent.visit(n) + ";")
             .join('\n');
 
         const commandBody: string = `
@@ -55,13 +50,11 @@ export default class CommandVisitor extends SubGenerator<DisChordNodeType, DisCh
 
             ${OptionsData}
 
-            export default class ${commandName}Command extends Command {
-                name = "${commandName.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase() /*slugified*/}";
-                description = ${this.parent.visit(commandDescription) ?? '"Un comando genial"'};
-                ignore = IgnoreCommand.Message;
-                integrationTypes = [ 0 ];
-                contexts = [ 0 ];
+            export default class ${CommandName}Command extends Command {
+                ${CommandFlags}
+
                 ${OptionsConstDeclaration}
+
                 async run(ctx) {
                     const contexto = ctx;
                     const cliente = contexto.client;
@@ -76,10 +69,82 @@ export default class CommandVisitor extends SubGenerator<DisChordNodeType, DisCh
             }
         `;
 
-        Prettifier.savePrettified(join(this.parent.context.projectRoot, 'dist', 'commands', `${commandName}.js`), commandBody)
+        Prettifier.savePrettified(join(this.parent.context.projectRoot, 'dist', 'commands', `${CommandName}.js`), commandBody);
         
         // deleting scope from symboltable
         this.parent.context.symbolTable.popScope();
         return '';
+    }
+
+    private generateCommandFlags(node: CommandNode): string {
+        const CommandName = this.getCommandName(node).replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase() /*slugified*/
+        const CommandDescription = this.getCommandDescription(node);
+        const isNsfw = this.isNsfw(node);
+        const integrationTypes = this.getIntegrationTypes(node);
+
+        return `
+            name = "${CommandName}";
+            description = ${CommandDescription};
+            nsfw = ${isNsfw};
+            integrationTypes = ${integrationTypes};
+            ignore = IgnoreCommand.Message;
+            contexts = [ 0 ];
+        `;
+    }
+
+    private getCommandName (node: CommandNode): string {
+        return node.value;
+    }
+
+    private getCommandDescription (node: CommandNode): string {
+        const CommandDescription = this.parent.get(BDOVisitor).getODBProperty(node.body, 'descripcion');
+
+        if (!CommandDescription) throw new DisChordError({
+            phase: ErrorLevel.Compiler,
+            message: `Se requiere descripción para el comando`,
+            location: node.location
+        }).format();
+
+        return this.parent.visit(CommandDescription);
+    }
+
+    private isNsfw (node: CommandNode): string {
+        const isNsfw = this.parent.visitIfExists(
+            this.parent.get(BDOVisitor).getODBProperty(node.body, 'nsfw')
+        );
+
+        return isNsfw || 'false';
+    }
+
+    private getIntegrationTypes (node: CommandNode): string {
+        const IntegrationTypes = this.parent.get(BDOVisitor).getODBProperty(node.body, 'integraciones');
+
+        if (!IntegrationTypes) return `[ ${ApplicationIntegrationType.GuildInstall} ]`;
+
+        if (IntegrationTypes.type !== 'Lista') throw new DisChordError({
+            phase: ErrorLevel.Compiler,
+            message: `El campo 'integraciones' debe ser una lista de opciones`,
+            location: node.location
+        }).format();
+
+        const translatedValues = IntegrationTypes.body.map((literal): number => {
+            if (literal.type !== 'Literal' || typeof literal.value !== 'string') throw new DisChordError({
+                phase: ErrorLevel.Compiler,
+                message: `Solo se permite especificar tipo TEXTO en las integraciones`,
+                location: literal.location
+            }).format();
+
+            const mappedValue = integrationTypes[literal.value];
+
+            if (mappedValue === undefined) throw new DisChordError({
+                phase: ErrorLevel.Compiler,
+                message: `En las integraciones solo se puede especificar: ${Object.keys(integrationTypes).join(' / ')}`,
+                location: literal.location
+            }).format();
+
+            return mappedValue;
+        });
+
+        return `[ ${translatedValues.join(', ')} ]`;
     }
 }
