@@ -73,6 +73,7 @@ export default class CommandVisitor extends SubGenerator<DisChordNodeType, DisCh
         
         // deleting scope from symboltable
         this.parent.context.symbolTable.popScope();
+        
         return '';
     }
 

@@ -131,9 +131,8 @@ export enum DiscordOptionType {
 }
 
 /**
+ * https://discord.com/developers/docs/resources/application#application-object-application-integration-types
  * @enum {number}
- * @copyright Made by Seyfert Contributors
- * @see {@link https://github.com/tiramisulabs/seyfert/blob/dbfdde7e26af309f238565904031e6f24417c706/src/types/payloads/_interactions/applicationCommands.ts#L140} Original implementation source.
  */
 export enum ApplicationIntegrationType {
     /**
