@@ -118,29 +118,35 @@ export default class CommandVisitor extends SubGenerator<DisChordNodeType, DisCh
         return isNsfw || 'false';
     }
 
-    private getIntegrationTypes (node: CommandNode): string {
-        const integrationTypes = this.parent.get(BDOVisitor).getODBProperty(node.body, 'integraciones');
+    private getMappedListOption (config: {
+        node: CommandNode,
+        fieldName: 'integraciones' | 'contextos',
+        mapping: Record<string, InteractionContextType | ApplicationIntegrationType>,
+        defaultValue: InteractionContextType | ApplicationIntegrationType
+    }) {
+        const { node, mapping, defaultValue, fieldName } = config;
 
-        if (!integrationTypes) return `[ ${ApplicationIntegrationType.GuildInstall} ]`;
+        const field = this.parent.get(BDOVisitor).getODBProperty(node.body, fieldName);
+        if (!field) return `[ ${defaultValue} ]`;
 
-        if (integrationTypes.type !== 'Lista') throw new DisChordError({
+        if (field.type !== 'Lista') throw new DisChordError({
             phase: ErrorLevel.Compiler,
-            message: `El campo 'integraciones' debe ser una lista de opciones`,
-            location: integrationTypes.location
+            message: `El campo '${fieldName}' debe ser una lista de opciones`,
+            location: field.location
         }).format();
 
-        const translatedValues = integrationTypes.body.map((literal): number => {
+        const translatedValues = field.body.map((literal): number => {
             if (literal.type !== 'Literal' || typeof literal.value !== 'string') throw new DisChordError({
                 phase: ErrorLevel.Compiler,
-                message: `Solo se permite especificar tipo TEXTO en las integraciones`,
+                message: `Solo se permite especificar tipo TEXTO en ${fieldName}`,
                 location: literal.location
             }).format();
 
-            const mappedValue = IntegrationTypes[literal.value];
+            const mappedValue = mapping[literal.value];
 
             if (mappedValue === undefined) throw new DisChordError({
                 phase: ErrorLevel.Compiler,
-                message: `En las integraciones solo se puede especificar: ${Object.keys(integrationTypes).join(' / ')}`,
+                message: `En las integraciones solo se puede especificar: ${Object.keys(mapping).join(' / ')}`,
                 location: literal.location
             }).format();
 
@@ -150,35 +156,21 @@ export default class CommandVisitor extends SubGenerator<DisChordNodeType, DisCh
         return `[ ${translatedValues.join(', ')} ]`;
     }
 
-    private getContextTypes (node: CommandNode): string {
-        const contextTypes = this.parent.get(BDOVisitor).getODBProperty(node.body, 'contextos');
-
-        if (!contextTypes) return `[ ${InteractionContextType.Guild} ]`;
-
-        if (contextTypes.type !== 'Lista') throw new DisChordError({
-            phase: ErrorLevel.Compiler,
-            message: `El campo 'contextos' debe ser una lista de opciones`,
-            location: contextTypes.location
-        }).format();
-
-        const translatedValues = contextTypes.body.map((literal): number => {
-            if (literal.type !== 'Literal' || typeof literal.value !== 'string') throw new DisChordError({
-                phase: ErrorLevel.Compiler,
-                message: `Solo se permite especificar tipo TEXTO en las integraciones`,
-                location: literal.location
-            }).format();
-
-            const mappedValue = ContextTypes[literal.value];
-
-            if (mappedValue === undefined) throw new DisChordError({
-                phase: ErrorLevel.Compiler,
-                message: `En los contextos solo se puede especificar: ${Object.keys(contextTypes).join(' / ')}`,
-                location: literal.location
-            }).format();
-
-            return mappedValue;
+    private getIntegrationTypes (node: CommandNode): string {
+        return this.getMappedListOption({
+            node,
+            fieldName: 'integraciones',
+            mapping: IntegrationTypes,
+            defaultValue: ApplicationIntegrationType.GuildInstall
         });
+    }
 
-        return `[ ${translatedValues.join(', ')} ]`;
+    private getContextTypes (node: CommandNode): string {
+        return this.getMappedListOption({
+            node,
+            fieldName: 'contextos',
+            mapping: ContextTypes,
+            defaultValue: InteractionContextType.Guild
+        });
     }
 }
