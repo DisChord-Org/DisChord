@@ -2,13 +2,13 @@ import { join } from 'path';
 import Prettifier from '../../../../init/Prettifier';
 
 import { createMessageFunctionInjection } from "../../../core.lib";
-import { ApplicationIntegrationType, CommandNode, DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType } from "../../../types";
+import { ApplicationIntegrationType, CommandNode, DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType, InteractionContextType } from "../../../types";
 import { SubGenerator } from '../../../../chord/Generator/SubGenerator';
 import { DisChordError, ErrorLevel } from '../../../../ChordError';
-import { ASTNode, CompilerMetadataKind, LiteralNode, TokenTypeUnion } from '../../../../chord/types';
+import { CompilerMetadataKind, TokenTypeUnion } from '../../../../chord/types';
 import { BDOVisitor } from '../../../../chord/Generator/visitors/expressions/BDOVisitor';
 import CommandOptionVisitor from '../components/CommandOptionVisitor';
-import { integrationTypes } from '../../constants/mappings';
+import { ContextTypes, IntegrationTypes } from '../../constants/mappings';
 
 /**
  * Generator class responsible for generating code related to command definitions in DisChord.
@@ -82,14 +82,15 @@ export default class CommandVisitor extends SubGenerator<DisChordNodeType, DisCh
         const CommandDescription = this.getCommandDescription(node);
         const isNsfw = this.isNsfw(node);
         const integrationTypes = this.getIntegrationTypes(node);
+        const contextTypes = this.getContextTypes(node);
 
         return `
             name = "${CommandName}";
             description = ${CommandDescription};
             nsfw = ${isNsfw};
             integrationTypes = ${integrationTypes};
+            contexts = ${contextTypes};
             ignore = IgnoreCommand.Message;
-            contexts = [ 0 ];
         `;
     }
 
@@ -118,28 +119,60 @@ export default class CommandVisitor extends SubGenerator<DisChordNodeType, DisCh
     }
 
     private getIntegrationTypes (node: CommandNode): string {
-        const IntegrationTypes = this.parent.get(BDOVisitor).getODBProperty(node.body, 'integraciones');
+        const integrationTypes = this.parent.get(BDOVisitor).getODBProperty(node.body, 'integraciones');
 
-        if (!IntegrationTypes) return `[ ${ApplicationIntegrationType.GuildInstall} ]`;
+        if (!integrationTypes) return `[ ${ApplicationIntegrationType.GuildInstall} ]`;
 
-        if (IntegrationTypes.type !== 'Lista') throw new DisChordError({
+        if (integrationTypes.type !== 'Lista') throw new DisChordError({
             phase: ErrorLevel.Compiler,
             message: `El campo 'integraciones' debe ser una lista de opciones`,
-            location: node.location
+            location: integrationTypes.location
         }).format();
 
-        const translatedValues = IntegrationTypes.body.map((literal): number => {
+        const translatedValues = integrationTypes.body.map((literal): number => {
             if (literal.type !== 'Literal' || typeof literal.value !== 'string') throw new DisChordError({
                 phase: ErrorLevel.Compiler,
                 message: `Solo se permite especificar tipo TEXTO en las integraciones`,
                 location: literal.location
             }).format();
 
-            const mappedValue = integrationTypes[literal.value];
+            const mappedValue = IntegrationTypes[literal.value];
 
             if (mappedValue === undefined) throw new DisChordError({
                 phase: ErrorLevel.Compiler,
                 message: `En las integraciones solo se puede especificar: ${Object.keys(integrationTypes).join(' / ')}`,
+                location: literal.location
+            }).format();
+
+            return mappedValue;
+        });
+
+        return `[ ${translatedValues.join(', ')} ]`;
+    }
+
+    private getContextTypes (node: CommandNode): string {
+        const contextTypes = this.parent.get(BDOVisitor).getODBProperty(node.body, 'contextos');
+
+        if (!contextTypes) return `[ ${InteractionContextType.Guild} ]`;
+
+        if (contextTypes.type !== 'Lista') throw new DisChordError({
+            phase: ErrorLevel.Compiler,
+            message: `El campo 'contextos' debe ser una lista de opciones`,
+            location: contextTypes.location
+        }).format();
+
+        const translatedValues = contextTypes.body.map((literal): number => {
+            if (literal.type !== 'Literal' || typeof literal.value !== 'string') throw new DisChordError({
+                phase: ErrorLevel.Compiler,
+                message: `Solo se permite especificar tipo TEXTO en las integraciones`,
+                location: literal.location
+            }).format();
+
+            const mappedValue = ContextTypes[literal.value];
+
+            if (mappedValue === undefined) throw new DisChordError({
+                phase: ErrorLevel.Compiler,
+                message: `En los contextos solo se puede especificar: ${Object.keys(contextTypes).join(' / ')}`,
                 location: literal.location
             }).format();
 

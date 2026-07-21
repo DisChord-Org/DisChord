@@ -1,4 +1,4 @@
-import { ApplicationIntegrationType, DiscordOptionType } from "../../types";
+import { ApplicationIntegrationType, DiscordOptionType, InteractionContextType } from "../../types";
 
 interface EventType {
     name: string;
@@ -152,7 +152,13 @@ export const DisChordTypeMap: Record<string, DiscordOptionType> = {
     "archivo": DiscordOptionType.Attachment
 } as const;
 
-export const integrationTypes: Record<string, ApplicationIntegrationType> = {
+export const IntegrationTypes: Record<string, ApplicationIntegrationType> = {
     "Servidor": ApplicationIntegrationType.GuildInstall,
     "Usuario": ApplicationIntegrationType.UserInstall
-}
+} as const;
+
+export const ContextTypes: Record<string, InteractionContextType> = {
+    "Servidor": InteractionContextType.Guild,
+    "DM": InteractionContextType.BotDM,
+    "CanalPrivado": InteractionContextType.PrivateChannel
+} as const;
