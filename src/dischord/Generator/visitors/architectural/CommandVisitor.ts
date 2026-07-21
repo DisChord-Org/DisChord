@@ -2,13 +2,13 @@ import { join } from 'path';
 import Prettifier from '../../../../init/Prettifier';
 
 import { createMessageFunctionInjection } from "../../../core.lib";
-import { ApplicationIntegrationType, CommandNode, DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType, InteractionContextType } from "../../../types";
+import { ApplicationIntegrationType, CommandNode, DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType, IgnoreCommandType, InteractionContextType } from "../../../types";
 import { SubGenerator } from '../../../../chord/Generator/SubGenerator';
 import { DisChordError, ErrorLevel } from '../../../../ChordError';
 import { CompilerMetadataKind, TokenTypeUnion } from '../../../../chord/types';
 import { BDOVisitor } from '../../../../chord/Generator/visitors/expressions/BDOVisitor';
 import CommandOptionVisitor from '../components/CommandOptionVisitor';
-import { ContextTypes, IntegrationTypes } from '../../constants/mappings';
+import { ContextTypes, IgnoreCommandTypes, IntegrationTypes } from '../../constants/mappings';
 
 /**
  * Generator class responsible for generating code related to command definitions in DisChord.
@@ -83,6 +83,8 @@ export default class CommandVisitor extends SubGenerator<DisChordNodeType, DisCh
         const isNsfw = this.isNsfw(node);
         const integrationTypes = this.getIntegrationTypes(node);
         const contextTypes = this.getContextTypes(node);
+        const guilds = this.getAllowedGuildIds(node);
+        const ignoredType = this.getIgnoredContext(node);
 
         return `
             name = "${CommandName}";
@@ -90,7 +92,8 @@ export default class CommandVisitor extends SubGenerator<DisChordNodeType, DisCh
             nsfw = ${isNsfw};
             integrationTypes = ${integrationTypes};
             contexts = ${contextTypes};
-            ignore = IgnoreCommand.Message;
+            guildId = ${guilds};
+            ignore = ${ignoredType};
         `;
     }
 
@@ -172,5 +175,34 @@ export default class CommandVisitor extends SubGenerator<DisChordNodeType, DisCh
             mapping: ContextTypes,
             defaultValue: InteractionContextType.Guild
         });
+    }
+
+    private getAllowedGuildIds (node: CommandNode): string {
+        const guilds = this.parent.visitIfExists(
+            this.parent.get(BDOVisitor).getODBProperty(node.body, 'servidoresPermitidos')
+        );
+
+        return guilds || 'undefined';
+    }
+
+    private getIgnoredContext (node: CommandNode): string {
+        const literal = this.parent.get(BDOVisitor).getODBProperty(node.body, 'ignorar');
+        if (!literal) return 'undefined';
+
+        if (literal.type != 'Literal' || typeof literal.value != 'string') throw new DisChordError({
+            phase: ErrorLevel.Compiler,
+            message: `Solo se permite tipo TEXTO en 'ignorar'`,
+            location: literal.location
+        }).format();
+
+        const mappedValue = IgnoreCommandTypes[literal.value];
+
+        if (!mappedValue) throw new DisChordError({
+            phase: ErrorLevel.Compiler,
+            message: `En 'ignorar' solo se puede especificar un TEXTO de: ${Object.keys(IgnoreCommandTypes).join(' / ')}`,
+            location: literal.location
+        }).format();
+
+        return `${mappedValue}`;
     }
 }

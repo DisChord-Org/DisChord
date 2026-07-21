@@ -163,3 +163,18 @@ export enum InteractionContextType {
      */
     PrivateChannel = 2
 }
+
+/**
+ * Seyfert declaration that specifies which type of context has to be ignored 
+ * @enum {number}
+ */
+export enum IgnoreCommandType {
+    /**
+     * SlashCommand contexts
+     */
+    Slash = 0,
+    /**
+     * MessageComand contexts
+     */
+    Message = 1
+}

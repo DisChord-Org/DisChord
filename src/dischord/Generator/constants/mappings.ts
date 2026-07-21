@@ -1,4 +1,4 @@
-import { ApplicationIntegrationType, DiscordOptionType, InteractionContextType } from "../../types";
+import { ApplicationIntegrationType, DiscordOptionType, IgnoreCommandType, InteractionContextType } from "../../types";
 
 interface EventType {
     name: string;
@@ -161,4 +161,9 @@ export const ContextTypes: Record<string, InteractionContextType> = {
     "Servidor": InteractionContextType.Guild,
     "DM": InteractionContextType.BotDM,
     "CanalPrivado": InteractionContextType.PrivateChannel
+} as const;
+
+export const IgnoreCommandTypes: Record<string, IgnoreCommandType> = {
+    "Mensajes": IgnoreCommandType.Message,
+    "Slashs": IgnoreCommandType.Slash
 } as const;
