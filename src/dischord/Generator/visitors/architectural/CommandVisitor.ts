@@ -55,8 +55,7 @@ export default class CommandVisitor extends SubGenerator<DisChordNodeType, DisCh
 
                 ${OptionsConstDeclaration}
 
-                async run(ctx) {
-                    const contexto = ctx;
+                async run(contexto) {
                     const cliente = contexto.client;
                     const usuario = contexto.author;
                     const canal = contexto.interaction ? contexto.interaction.channel : cliente.channels.fetch(contexto.channelId);
