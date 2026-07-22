@@ -85,6 +85,7 @@ export default class CommandVisitor extends SubGenerator<DisChordNodeType, DisCh
         const contextTypes = this.getContextTypes(node);
         const guilds = this.getAllowedGuildIds(node);
         const ignoredType = this.getIgnoredContext(node);
+        const aliases = this.getAliases(node);
 
         return `
             name = "${CommandName}";
@@ -94,6 +95,7 @@ export default class CommandVisitor extends SubGenerator<DisChordNodeType, DisCh
             contexts = ${contextTypes};
             guildId = ${guilds};
             ignore = ${ignoredType};
+            aliases = ${aliases};
         `;
     }
 
@@ -126,7 +128,7 @@ export default class CommandVisitor extends SubGenerator<DisChordNodeType, DisCh
         fieldName: 'integraciones' | 'contextos',
         mapping: Record<string, InteractionContextType | ApplicationIntegrationType>,
         defaultValue: InteractionContextType | ApplicationIntegrationType
-    }) {
+    }): string {
         const { node, mapping, defaultValue, fieldName } = config;
 
         const field = this.parent.get(BDOVisitor).getODBProperty(node.body, fieldName);
@@ -204,5 +206,18 @@ export default class CommandVisitor extends SubGenerator<DisChordNodeType, DisCh
         }).format();
 
         return `${mappedValue}`;
+    }
+
+    private getAliases (node: CommandNode): string {
+        const literal = this.parent.get(BDOVisitor).getODBProperty(node.body, 'alias');
+        if (!literal) return 'undefined';
+
+        if (literal.type != 'Lista') throw new DisChordError({
+            phase: ErrorLevel.Compiler,
+            message: `Los alias deben ser una LISTA con valores tipo TEXTO`,
+            location: literal.location
+        }).format();
+
+        return this.parent.visit(literal);
     }
 }
