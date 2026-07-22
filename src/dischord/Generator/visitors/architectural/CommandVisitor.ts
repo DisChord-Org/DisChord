@@ -59,7 +59,8 @@ export default class CommandVisitor extends SubGenerator<DisChordNodeType, DisCh
                     const contexto = ctx;
                     const cliente = contexto.client;
                     const usuario = contexto.author;
-                    const canal = contexto.interaction.channel;
+                    const canal = contexto.interaction ? contexto.interaction.channel : cliente.channels.fetch(contexto.channelId);
+
                     ${OptionsConstExtraction}
 
                     ${createMessageFunctionInjection}
