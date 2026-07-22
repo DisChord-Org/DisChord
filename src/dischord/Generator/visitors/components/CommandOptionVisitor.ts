@@ -98,7 +98,7 @@ export default class CommandOptionVisitor extends SubGenerator<DisChordNodeType,
         const optionNames = Object.keys(node.blocks);
         if (optionNames.length === 0) return '';
 
-        return `const { ${optionNames.join(', ')} } = ctx.options;`;
+        return `const { ${optionNames.join(', ')} } = contexto.options;`;
     }
 
     /**
