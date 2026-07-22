@@ -2,7 +2,7 @@ import { join } from 'path';
 import Prettifier from '../../../../init/Prettifier';
 
 import { createMessageFunctionInjection } from "../../../core.lib";
-import { ApplicationIntegrationType, CommandNode, DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType, IgnoreCommandType, InteractionContextType } from "../../../types";
+import { ApplicationIntegrationType, CommandNode, DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType, InteractionContextType } from "../../../types";
 import { SubGenerator } from '../../../../chord/Generator/SubGenerator';
 import { DisChordError, ErrorLevel } from '../../../../ChordError';
 import { CompilerMetadataKind, TokenTypeUnion } from '../../../../chord/types';
@@ -199,7 +199,7 @@ export default class CommandVisitor extends SubGenerator<DisChordNodeType, DisCh
 
         const mappedValue = IgnoreCommandTypes[literal.value];
 
-        if (!mappedValue) throw new DisChordError({
+        if (mappedValue === undefined) throw new DisChordError({
             phase: ErrorLevel.Compiler,
             message: `En 'ignorar' solo se puede especificar un TEXTO de: ${Object.keys(IgnoreCommandTypes).join(' / ')}`,
             location: literal.location
