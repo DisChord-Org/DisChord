@@ -1,3 +1,10 @@
+/**
+ * Core library mapping object that translates keywords
+ * and properties into their runtime equivalents.
+ *
+ * @category Transpiler Maps
+ * @type {Readonly<Record<string, Record<string, string> | string>>}
+ */
 export const corelib: Record<string, Record<string, string> | string> = {
     'usuario': {
         'nombre': 'usuario.username',
@@ -22,6 +29,20 @@ export const corelib: Record<string, Record<string, string> | string> = {
     'imprimir': 'cliente.logger.info'
 } as const;
 
+/**
+ * Raw JavaScript string code block injected into the transpiled output.
+ * It defines the internal asynchronous helper function `createMessage` responsible for handling messaging context.
+ *
+ * This function evaluates channel availability, component interaction status,
+ * command context, or raw message event context to properly deliver or reply to messages.
+ *
+ * @param {unknown} channel - Target channel object or identifier where the message should be dispatched.
+ * @param {unknown} options - Content payload, embeddings, or parameters defining the message body.
+ * @param {unknown} [interactionContext=null] - Execution context when triggered from interactive components.
+ * @returns {Promise<unknown>} Resolves with the dispatched message outcome or interaction response.
+ * @throws {Error} Throws an error if no valid target channel or messaging execution context is available.
+ * * @type {string}
+ */
 export const createMessageFunctionInjection = `
     const createMessage = async (channel, options, interactionContext = null) => {
 
