@@ -1,10 +1,20 @@
 import { ApplicationIntegrationType, DiscordOptionType, IgnoreCommandType, InteractionContextType } from "../../types";
 
+/**
+ * @interface EventType
+ * @property {string} name - The internal or low-level Discord event name.
+ * @property {string[]} params - The list of parameters injected into the event handler callback.
+ */
 interface EventType {
     name: string;
     params: string[];
 }
 
+/**
+ * Map translating DisChord Spanish event identifiers to their corresponding internal Discord event structures.
+ *
+ * @type {Readonly<Record<string, EventType>>}
+ */
 export const eventsMap: Record<string, EventType> = {
     'encendido': {
         'name': 'ready',
@@ -80,6 +90,11 @@ export const eventsMap: Record<string, EventType> = {
     }
 } as const;
 
+/**
+ * Map translating DisChord Gateway Intent aliases into standard Discord Gateway Intent flags.
+ *
+ * @type {Readonly<Record<string, string>>}
+ */
 export const intentsMap: Record<string, string> = {
     'ConfiguracionDelAutomoderador': 'AutoModeratorConfiguration',
     'EjecucionDelAutomoderador': 'AutoModerationExecution',
@@ -104,6 +119,11 @@ export const intentsMap: Record<string, string> = {
     'ContenidoDelMensaje': 'MessageContent'
 } as const;
 
+/**
+ * Map translating DisChord color aliases to standardized Discord Embed color identifiers.
+ *
+ * @type {Readonly<Record<string, string>>}
+ */
 export const EmbedColors: Record<string, string> = {
     'Aqua': 'Aqua',
     'Azul': 'Blue',
@@ -140,6 +160,11 @@ export const EmbedColors: Record<string, string> = {
     'Amarillo': 'Yellow'
 } as const;
 
+/**
+ * Map translating DisChord option type keywords to their corresponding `DiscordOptionType` enum values.
+ *
+ * @type {Readonly<Record<string, DiscordOptionType>>}
+ */
 export const DisChordTypeMap: Record<string, DiscordOptionType> = {
     "texto": DiscordOptionType.String,
     "entero": DiscordOptionType.Integer,
@@ -152,17 +177,32 @@ export const DisChordTypeMap: Record<string, DiscordOptionType> = {
     "archivo": DiscordOptionType.Attachment
 } as const;
 
+/**
+ * Map translating DisChord application installation keywords to `ApplicationIntegrationType` enum values.
+ *
+ * @type {Readonly<Record<string, ApplicationIntegrationType>>}
+ */
 export const IntegrationTypes: Record<string, ApplicationIntegrationType> = {
     "Servidor": ApplicationIntegrationType.GuildInstall,
     "Usuario": ApplicationIntegrationType.UserInstall
 } as const;
 
+/**
+ * Map translating DisChord interaction context keywords to `InteractionContextType` enum values.
+ *
+ * @type {Readonly<Record<string, InteractionContextType>>}
+ */
 export const ContextTypes: Record<string, InteractionContextType> = {
     "Servidor": InteractionContextType.Guild,
     "DM": InteractionContextType.BotDM,
     "CanalPrivado": InteractionContextType.PrivateChannel
 } as const;
 
+/**
+ * Map translating DisChord command type exclusion flags to `IgnoreCommandType` enum values.
+ *
+ * @type {Readonly<Record<string, IgnoreCommandType>>}
+ */
 export const IgnoreCommandTypes: Record<string, IgnoreCommandType> = {
     "Mensajes": IgnoreCommandType.Message,
     "Slashs": IgnoreCommandType.Slash
