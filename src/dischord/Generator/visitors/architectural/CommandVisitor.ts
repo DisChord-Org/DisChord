@@ -11,7 +11,7 @@ import CommandOptionVisitor from '../components/CommandOptionVisitor';
 import { ContextTypes, IgnoreCommandTypes, IntegrationTypes } from '../../constants/mappings';
 
 /**
- * Generator class responsible for generating code related to command definitions in DisChord.
+ * Generator class responsible for generating code related to command definitions.
  */
 export default class CommandVisitor extends SubGenerator<DisChordNodeType, DisChordNode> {
     /**
@@ -22,7 +22,7 @@ export default class CommandVisitor extends SubGenerator<DisChordNodeType, DisCh
     public static triggerToken: TokenTypeUnion<DisChordTokenType> | undefined = DisChordTokenType.CREAR_COMANDO;
     
     /**
-     * Generates code for a CommandNode, which represents a command definition in DisChord.
+     * Generates code for a CommandNode, which represents a command definition.
      * @param node The CommandNode representing the command definition to generate code for.
      * @returns The generated code for the command definition.
      */
@@ -77,6 +77,13 @@ export default class CommandVisitor extends SubGenerator<DisChordNodeType, DisCh
         return '';
     }
 
+    /**
+     * Generates class property assignments string representing the command configuration flags.
+     *
+     * @private
+     * @param {CommandNode} node - The AST command node containing properties to evaluate.
+     * @returns {string} Processed source code defining class flags (name, description, nsfw, etc.).
+     */
     private generateCommandFlags(node: CommandNode): string {
         const CommandName = this.getCommandName(node).replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase() /*slugified*/
         const CommandDescription = this.getCommandDescription(node);
@@ -99,10 +106,25 @@ export default class CommandVisitor extends SubGenerator<DisChordNodeType, DisCh
         `;
     }
 
+    /**
+     * Extracts the identifier name of the command from the AST node.
+     *
+     * @private
+     * @param {CommandNode} node - The target command AST node.
+     * @returns {string} The name of the command.
+     */
     private getCommandName (node: CommandNode): string {
         return node.value;
     }
 
+    /**
+     * Retrieves and parses the command description from the AST node body.
+     *
+     * @private
+     * @param {CommandNode} node - The target command AST node.
+     * @returns {string} Generated expression representing the command description.
+     * @throws {DisChordError} Throws a compiler error if the description property is missing.
+     */
     private getCommandDescription (node: CommandNode): string {
         const CommandDescription = this.parent.get(BDOVisitor).getODBProperty(node.body, 'descripcion');
 
@@ -115,6 +137,13 @@ export default class CommandVisitor extends SubGenerator<DisChordNodeType, DisCh
         return this.parent.visit(CommandDescription);
     }
 
+    /**
+     * Evaluates whether the command is flagged as NSFW.
+     *
+     * @private
+     * @param {CommandNode} node - The target command AST node.
+     * @returns {string} String expression evaluating to 'true' or 'false'.
+     */
     private isNsfw (node: CommandNode): string {
         const isNsfw = this.parent.visitIfExists(
             this.parent.get(BDOVisitor).getODBProperty(node.body, 'nsfw')
@@ -123,6 +152,18 @@ export default class CommandVisitor extends SubGenerator<DisChordNodeType, DisCh
         return isNsfw || 'false';
     }
 
+    /**
+     * Helper method to parse and translate AST array property values against a mapping object.
+     *
+     * @private
+     * @param {Object} config - Configuration object parameters.
+     * @param {CommandNode} config.node - The target command AST node.
+     * @param {'integraciones' | 'contextos'} config.fieldName - Property name inside the AST node body to parse.
+     * @param {Record<string, InteractionContextType | ApplicationIntegrationType>} config.mapping - Mapping table to validate and convert string tokens to enum values.
+     * @param {InteractionContextType | ApplicationIntegrationType} config.defaultValue - Default enum value fallback if property is omitted.
+     * @returns {string} String representation of array containing resolved numeric enum values.
+     * @throws {DisChordError} Throws a compiler error if the property is not a list, contains non-string elements, or uses unsupported option tokens.
+     */
     private getMappedListOption (config: {
         node: CommandNode,
         fieldName: 'integraciones' | 'contextos',
@@ -161,6 +202,13 @@ export default class CommandVisitor extends SubGenerator<DisChordNodeType, DisCh
         return `[ ${translatedValues.join(', ')} ]`;
     }
 
+    /**
+     * Resolves the allowed integration types for the command.
+     *
+     * @private
+     * @param {CommandNode} node - The target command AST node.
+     * @returns {string} Stringified array of mapped integration type enum values.
+     */
     private getIntegrationTypes (node: CommandNode): string {
         return this.getMappedListOption({
             node,
@@ -170,6 +218,13 @@ export default class CommandVisitor extends SubGenerator<DisChordNodeType, DisCh
         });
     }
 
+    /**
+     * Resolves the execution contexts where the command is applicable.
+     *
+     * @private
+     * @param {CommandNode} node - The target command AST node.
+     * @returns {string} Stringified array of mapped context type enum values.
+     */
     private getContextTypes (node: CommandNode): string {
         return this.getMappedListOption({
             node,
@@ -179,6 +234,13 @@ export default class CommandVisitor extends SubGenerator<DisChordNodeType, DisCh
         });
     }
 
+    /**
+     * Resolves the target guild IDs assigned to this command, if restricted.
+     *
+     * @private
+     * @param {CommandNode} node - The target command AST node.
+     * @returns {string} Generated expression representing guild IDs array or 'undefined'.
+     */
     private getAllowedGuildIds (node: CommandNode): string {
         const guilds = this.parent.visitIfExists(
             this.parent.get(BDOVisitor).getODBProperty(node.body, 'servidoresPermitidos')
@@ -187,6 +249,14 @@ export default class CommandVisitor extends SubGenerator<DisChordNodeType, DisCh
         return guilds || 'undefined';
     }
 
+    /**
+     * Resolves command execution exclusion rules (e.g., ignoring slash or message execution).
+     *
+     * @private
+     * @param {CommandNode} node - The target command AST node.
+     * @returns {string} Stringified mapped ignore type enum value or 'undefined'.
+     * @throws {DisChordError} Throws a compiler error if value is not string or not present in mapping.
+     */
     private getIgnoredContext (node: CommandNode): string {
         const literal = this.parent.get(BDOVisitor).getODBProperty(node.body, 'ignorar');
         if (!literal) return 'undefined';
@@ -208,6 +278,14 @@ export default class CommandVisitor extends SubGenerator<DisChordNodeType, DisCh
         return `${mappedValue}`;
     }
 
+    /**
+     * Resolves alternative command aliases defined in the AST node.
+     *
+     * @private
+     * @param {CommandNode} node - The target command AST node.
+     * @returns {string} Generated array expression containing aliases or 'undefined'.
+     * @throws {DisChordError} Throws a compiler error if aliases property is not a list node.
+     */
     private getAliases (node: CommandNode): string {
         const literal = this.parent.get(BDOVisitor).getODBProperty(node.body, 'alias');
         if (!literal) return 'undefined';
