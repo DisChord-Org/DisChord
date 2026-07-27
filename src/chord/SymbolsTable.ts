@@ -15,6 +15,12 @@ export class SymbolTable {
      */
     private scopes: Map<string, Symbol>[] = [ new Map() ];
 
+    /**
+     * A stack of metadata maps matching the scope hierarchy, 
+     * storing contextual compilation flags and metadata per scope.
+     * 
+     * @private
+     */
     private metadata: Map<CompilerMetadataKind, unknown>[] = [ new Map() ];
 
     /**
@@ -82,10 +88,24 @@ export class SymbolTable {
         return undefined;
     }
 
+    /**
+     * Sets a compiler metadata value in the current active scope.
+     * 
+     * @template T
+     * @param {CompilerMetadataKind} key - The compiler metadata key enum identifier.
+     * @param {unknown} value - The value payload associated with the metadata key.
+     */
     public setMetadata(key: CompilerMetadataKind, value: unknown): void {
         this.metadata[this.metadata.length - 1].set(key, value);
     }
 
+    /**
+     * Retrieves a compiler metadata value by searching bottom-up from the current active scope to the global scope.
+     * 
+     * @template T
+     * @param {CompilerMetadataKind} key - The compiler metadata key enum identifier to look up.
+     * @returns {T | undefined} The metadata value cast to generic type T if found, otherwise undefined.
+     */
     public getMetadata<T>(key: CompilerMetadataKind): T | undefined {
         for(let i = this.metadata.length - 1; i >= 0; i--) {
             if (this.metadata[i].has(key)) return this.metadata[i].get(key) as T;
