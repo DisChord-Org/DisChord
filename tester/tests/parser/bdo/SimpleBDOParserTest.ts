@@ -2,7 +2,7 @@ import { Test } from "../../../Test";
 
 /**
  * @class SimpleBDOParserTest
- * @description Validates that the parser correctly extracts a single Block Data Object (BDO) variable mapping.
+ * @description Validates that the parser correctly extracts a single BDO variable mapping.
  */
 export class SimpleBDOParserTest extends Test {
     /**
