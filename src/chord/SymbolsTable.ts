@@ -1,5 +1,5 @@
 import { Location, Symbol, SymbolKind, CompilerMetadataKind } from "./types";
-import { ChordError, ErrorLevel } from "../ChordError";
+import { ChordError, ErrorLevel } from "../errors/ChordError";
 
 /**
  * Manages the hierarchical symbol table for the DisChord language.

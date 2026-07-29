@@ -1,4 +1,4 @@
-import { DisChordError, ErrorLevel } from "../../../../ChordError";
+import { DisChordError, ErrorLevel } from "../../../../errors/ChordError";
 import { DisChordTypeMap } from "../../constants/mappings";
 import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordODBNode, DisChordTokenType, DiscordOptionType } from "../../../types";
 import { SubGenerator } from "../../../../chord/Generator/SubGenerator";

@@ -3,7 +3,7 @@ import { ASTNode, BaseNode, ExpressionNode, IdentificatorNode, JSNode, ListNode,
 import { ExpressionParser } from "../Expressions/ExpressionParser";
 import { AssignmentParser } from "../Expressions/AssignmentParser";
 import { DecoratorProcessor } from "../../../DecoratorProcessor";
-import { ChordError, ErrorLevel } from "../../../../ChordError";
+import { ChordError, ErrorLevel } from "../../../../errors/ChordError";
 import { BDOParser } from "../BDOParser";
 import { LiteralParser } from "../Expressions/LiteralParser";
 import { AccessParser } from "../Expressions/AccessParser";

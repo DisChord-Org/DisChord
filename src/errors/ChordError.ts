@@ -1,4 +1,4 @@
-import { Location } from "./chord/types";
+import { Location } from "../chord/types";
 
 /** Life cycle phase where the failure originated. */
 export enum ErrorLevel {

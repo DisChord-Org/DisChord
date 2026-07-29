@@ -1,4 +1,4 @@
-import { ChordError, ErrorLevel } from "../../../../ChordError";
+import { ChordError, ErrorLevel } from "../../../../errors/ChordError";
 import { CallNode, BaseNode, TokenType, TokenTypeUnion, IdentificatorNode, AccessNode } from "../../../types";
 import { SubGenerator } from "../../SubGenerator";
 

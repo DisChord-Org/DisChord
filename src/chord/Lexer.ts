@@ -1,5 +1,5 @@
 import { Token, TokenType } from './types';
-import { ChordError, ErrorLevel } from '../ChordError';
+import { ChordError, ErrorLevel } from '../errors/ChordError';
 import { CompilationContext } from '../init/Init';
 import { SymbolTranslationMap } from './Symbols';
 

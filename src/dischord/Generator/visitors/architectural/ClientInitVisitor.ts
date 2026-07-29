@@ -1,11 +1,11 @@
 import { join } from "node:path";
 import fs from "fs";
-import Prettifier from "../../../../init/Prettifier";
+import Prettifier from "../../../../utils/Prettifier";
 
 import { DisChordNode, DisChordNodeType, DisChordTokenType, StartBotNode } from "../../../types";
 import { intentsMap } from "../../constants/mappings";
 import { SubGenerator } from "../../../../chord/Generator/SubGenerator";
-import { DisChordError, ErrorLevel } from "../../../../ChordError";
+import { DisChordError, ErrorLevel } from "../../../../errors/ChordError";
 import { TokenTypeUnion } from "../../../../chord/types";
 
 /**

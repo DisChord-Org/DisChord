@@ -1,4 +1,4 @@
-import { DisChordError, ErrorLevel } from "../../../../ChordError";
+import { DisChordError, ErrorLevel } from "../../../../errors/ChordError";
 import { CollectorNode, DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType } from "../../../types";
 import { SubGenerator } from "./../../../../chord/Generator/SubGenerator";
 import { CompilerMetadataKind, TokenTypeUnion } from "../../../../chord/types";

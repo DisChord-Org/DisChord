@@ -4,10 +4,10 @@ import { Lexer } from "../src/chord/Lexer";
 import { DisChordParser } from "../src/dischord/Parser/Parser";
 import { SymbolTable } from "../src/chord/SymbolsTable";
 import { ASTNode, BaseNode, Token } from "../src/chord/types";
-import { CodeProvider } from "../src/CodeProvider";
+import { CodeProvider } from "../src/chord/CodeProvider";
 import { DisChordNode, DisChordNodeType, DisChordTokenType } from "../src/dischord/types";
-import { FileSystem } from "../src/init/FileSystem";
-import { CompilationContext } from "../src/init/Init";
+import { FileSystem } from "../src/utils/FileSystem";
+import { CompilationContext } from "../src/cli/commands/CompileCommand";
 
 /**
  * @class Test

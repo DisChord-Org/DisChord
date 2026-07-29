@@ -1,10 +1,10 @@
 import { join } from 'path';
-import Prettifier from '../../../../init/Prettifier';
+import Prettifier from '../../../../utils/Prettifier';
 
 import { createMessageFunctionInjection } from "../../../core.lib";
 import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType, EventNode } from "../../../types";
 import { SubGenerator } from '../../../../chord/Generator/SubGenerator';
-import { DisChordError, ErrorLevel } from '../../../../ChordError';
+import { DisChordError, ErrorLevel } from '../../../../errors/ChordError';
 import { TokenTypeUnion } from '../../../../chord/types';
 import { eventsMap } from '../../constants/mappings';
 

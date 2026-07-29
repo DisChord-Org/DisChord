@@ -1,4 +1,4 @@
-import { ChordError, ErrorLevel } from "../../ChordError";
+import { ChordError, ErrorLevel } from "../../errors/ChordError";
 import { DisChordNode, DisChordNodeType } from "../../dischord/types";
 import { CompilationContext } from "../../init/Init";
 import { runtimeInjections } from "./core.lib";

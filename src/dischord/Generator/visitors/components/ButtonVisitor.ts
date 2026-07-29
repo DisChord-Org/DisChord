@@ -1,4 +1,4 @@
-import { DisChordError, ErrorLevel } from "../../../../ChordError";
+import { DisChordError, ErrorLevel } from "../../../../errors/ChordError";
 import { ButtonStyles, DisChordASTNode, DisChordNode, DisChordNodeType, DisChordODBNode, DisChordTokenType } from "../../../types";
 import { SubGenerator } from "../../../../chord/Generator/SubGenerator";
 import { TokenTypeUnion } from "../../../../chord/types";

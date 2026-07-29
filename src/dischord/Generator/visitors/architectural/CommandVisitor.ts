@@ -1,10 +1,10 @@
 import { join } from 'path';
-import Prettifier from '../../../../init/Prettifier';
+import Prettifier from '../../../../utils/Prettifier';
 
 import { createMessageFunctionInjection } from "../../../core.lib";
 import { ApplicationIntegrationType, CommandNode, DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType, InteractionContextType } from "../../../types";
 import { SubGenerator } from '../../../../chord/Generator/SubGenerator';
-import { DisChordError, ErrorLevel } from '../../../../ChordError';
+import { DisChordError, ErrorLevel } from '../../../../errors/ChordError';
 import { CompilerMetadataKind, TokenTypeUnion } from '../../../../chord/types';
 import { BDOVisitor } from '../../../../chord/Generator/visitors/expressions/BDOVisitor';
 import CommandOptionVisitor from '../components/CommandOptionVisitor';

@@ -54,6 +54,7 @@ export class FileSystem {
      * * @param inputPath - The current working path.
      * @param isDirectory - Boolean flag of the input type.
      * @returns The absolute path to the project's root directory.
+     * @deprecated
      */
     static resolveProjectRoot(inputPath: string, isDirectory: boolean): string {
         const dir = isDirectory ? inputPath : path.dirname(inputPath);
