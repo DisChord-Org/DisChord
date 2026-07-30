@@ -5,7 +5,7 @@
 DisChord is a modern, intuitive, and human-friendly programming language designed to bridge the gap between human language and machine code. By replacing cold, symbolic operators with natural word-based keywords, DisChord offers a readable and expressive syntax that feels as natural as writing a sentence.
 
 [![License: ISC](https://img.shields.io/badge/License-ISC-blue.svg)](https://opensource.org/licenses/ISC)
-[![Version](https://img.shields.io/badge/Version-0.10^-green.svg)](package.json)
+[![Version](https://img.shields.io/badge/Version-1.0^-green.svg)](package.json)
 
 ---
 
@@ -80,13 +80,13 @@ encender bot {
     intenciones [ "MensajesDelServidor", "ContenidoDelMensaje" ]
 }
 
-crear comando Ping {
-    descripcion "¡Prueba la latencia del bot!"
+nuevo comando Ping {
+    descripcion "¡Prueba la latencia del bot!";
     
     consola.imprimir("Ejecutando ping...")
     
     var pingMensaje es "¡Pong " mas cliente.ping mas "ms!"
-    crear mensaje {
+    nuevo mensaje {
         contenido "¡Pong!"
     }
 }
