@@ -9,11 +9,11 @@ evento encendido {
 }
 
 
-crear comando Ping {
-    descripcion "comando ping"
+nuevo comando Ping {
+    descripcion "comando ping";
 
     var msgContenido es "pong! " mas cliente.ping mas "ms"
-    crear mensaje {
+    nuevo mensaje {
         contenido msgContenido
     }
 }
