@@ -1,5 +1,6 @@
 import { Test } from "./Test";
 
+import { BDOIAndCodeParserTest } from "./tests/parser/bdo/BDOIAndCodeParserTest";
 import { BDOIParserTest } from "./tests/parser/bdo/BDOIParserTest";
 import { SimpleBDOParserTest } from "./tests/parser/bdo/SimpleBDOParserTest";
 
@@ -13,7 +14,7 @@ export class Tester {
      * @private
      */
     private tests: Array<new () => Test> = [
-        SimpleBDOParserTest, BDOIParserTest
+        SimpleBDOParserTest, BDOIParserTest, BDOIAndCodeParserTest
     ];
 
     /**
