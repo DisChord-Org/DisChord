@@ -119,6 +119,8 @@ evento entradaMiembro {
 | `/` | `entre` |
 | `**` | `exp` |
 | `%` | `resto` |
+| ` ` | `espacio` |
+| `\n` | `intro` |
 
 ### Discord Specific Keywords
 
