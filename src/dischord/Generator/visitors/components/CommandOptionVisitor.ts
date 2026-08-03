@@ -79,6 +79,8 @@ export default class CommandOptionVisitor extends SubGenerator<DisChordNodeType,
             switch (OptionType) {
                 case DiscordOptionType.String:
                     return this.generateStringOption(OptionName, OptionNode);
+                case DiscordOptionType.Boolean:
+                    return this.generateBooleanOption(OptionName, OptionNode);
                 default:
                     return '';
             }
@@ -143,7 +145,42 @@ export default class CommandOptionVisitor extends SubGenerator<DisChordNodeType,
                 name: "${name}",
                 description: ${description},
                 required: ${required},
-                type: 3
+                type: ${DiscordOptionType.String}
+            }
+        `;
+    }
+
+    /**
+     * Generates the configuration object for a Boolean-type Discord option.
+     * @private
+     */
+    private generateBooleanOption (name: string, node: DisChordODBNode): string {
+        const description = this.parent.visitIfExists(
+            this.parent.get(BDOVisitor).getODBProperty(node, 'descripcion')
+        );
+
+        if (!description) throw new DisChordError({
+            phase: ErrorLevel.Compiler,
+            message: `En la declaración de la opción tipo 'Boolean', se esperaba 'descripcion'.`,
+            location: node.location
+        }).format();
+
+        const required = this.parent.visitIfExists(
+            this.parent.get(BDOVisitor).getODBProperty(node, 'requerido')
+        );
+
+        if (!required) throw new DisChordError({
+            phase: ErrorLevel.Compiler,
+            message: `En la declaración de la opción tipo 'Boolean', se esperaba 'requerido'.`,
+            location: node.location
+        }).format();
+
+        return `
+            {
+                name: "${name}",
+                description: ${description},
+                required: ${required},
+                type: ${DiscordOptionType.Boolean}
             }
         `;
     }
