@@ -6,6 +6,12 @@ import { TokenTypeUnion } from "../../../../chord/types";
 import { BDOVisitor } from "../../../../chord/Generator/visitors/expressions/BDOVisitor";
 
 /**
+ * 
+ * THIS FILE WILL BE REFACTOR, DONT HORRIFY.
+ * 
+ */
+
+/**
  * Data structure representing the complete output of the command option processing phase.
  */
 export interface CommandOptionsOutput {
@@ -81,6 +87,8 @@ export default class CommandOptionVisitor extends SubGenerator<DisChordNodeType,
                     return this.generateStringOption(OptionName, OptionNode);
                 case DiscordOptionType.Boolean:
                     return this.generateBooleanOption(OptionName, OptionNode);
+                case DiscordOptionType.Integer:
+                    return this.generateIntegerOption(OptionName, OptionNode);
                 default:
                     return '';
             }
@@ -181,6 +189,41 @@ export default class CommandOptionVisitor extends SubGenerator<DisChordNodeType,
                 description: ${description},
                 required: ${required},
                 type: ${DiscordOptionType.Boolean}
+            }
+        `;
+    }
+
+   /**
+     * Generates the configuration object for a Integer-type Discord option.
+     * @private
+     */
+    private generateIntegerOption (name: string, node: DisChordODBNode): string {
+        const description = this.parent.visitIfExists(
+            this.parent.get(BDOVisitor).getODBProperty(node, 'descripcion')
+        );
+
+        if (!description) throw new DisChordError({
+            phase: ErrorLevel.Compiler,
+            message: `En la declaración de la opción tipo 'Integer', se esperaba 'descripcion'.`,
+            location: node.location
+        }).format();
+
+        const required = this.parent.visitIfExists(
+            this.parent.get(BDOVisitor).getODBProperty(node, 'requerido')
+        );
+
+        if (!required) throw new DisChordError({
+            phase: ErrorLevel.Compiler,
+            message: `En la declaración de la opción tipo 'Integer', se esperaba 'requerido'.`,
+            location: node.location
+        }).format();
+
+        return `
+            {
+                name: "${name}",
+                description: ${description},
+                required: ${required},
+                type: ${DiscordOptionType.Integer}
             }
         `;
     }
