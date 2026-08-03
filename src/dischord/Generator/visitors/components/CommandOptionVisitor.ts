@@ -72,9 +72,10 @@ export default class CommandOptionVisitor extends SubGenerator<DisChordNodeType,
     
         const results = optionNames.map(OptionName => {
             const OptionNode = node.blocks[OptionName] as DisChordODBNode;
-            const OptionType = DisChordTypeMap[this.getOptionType(OptionNode)];
+            const OptionType = this.getOptionType(OptionNode);
+            const MappedOptionType = DisChordTypeMap[OptionType];
 
-            if (!OptionType) {
+            if (!MappedOptionType) {
                 throw new DisChordError({
                     phase: ErrorLevel.Compiler,
                     message: `Tipo de opción no reconocido en '${OptionName}'`,
@@ -82,16 +83,12 @@ export default class CommandOptionVisitor extends SubGenerator<DisChordNodeType,
                 }).format();
             }
 
-            switch (OptionType) {
-                case DiscordOptionType.String:
-                    return this.generateStringOption(OptionName, OptionNode);
-                case DiscordOptionType.Boolean:
-                    return this.generateBooleanOption(OptionName, OptionNode);
-                case DiscordOptionType.Integer:
-                    return this.generateIntegerOption(OptionName, OptionNode);
-                default:
-                    return '';
-            }
+            return this.generateOption({
+                name: OptionName,
+                node: OptionNode,
+                optionType: OptionType,
+                mappedOption: MappedOptionType
+            });
         });
 
         return results.join(', ');
@@ -124,17 +121,24 @@ export default class CommandOptionVisitor extends SubGenerator<DisChordNodeType,
     }
 
     /**
-     * Generates the configuration object for a String-type Discord option.
+     * Generates the configuration object for a option-type Discord option.
      * @private
      */
-    private generateStringOption (name: string, node: DisChordODBNode): string {
+    private generateOption (options: {
+        name: string,
+        node: DisChordODBNode,
+        optionType: keyof typeof DisChordTypeMap,
+        mappedOption: DiscordOptionType
+    }): string {
+        const { name, node, optionType, mappedOption } = options;
+
         const description = this.parent.visitIfExists(
             this.parent.get(BDOVisitor).getODBProperty(node, 'descripcion')
         );
 
         if (!description) throw new DisChordError({
             phase: ErrorLevel.Compiler,
-            message: `En la declaración de la opción tipo 'String', se esperaba 'descripcion'.`,
+            message: `En la declaración de la opción tipo '${optionType}', se esperaba 'descripcion'.`,
             location: node.location
         }).format();
 
@@ -144,7 +148,7 @@ export default class CommandOptionVisitor extends SubGenerator<DisChordNodeType,
 
         if (!required) throw new DisChordError({
             phase: ErrorLevel.Compiler,
-            message: `En la declaración de la opción tipo 'String', se esperaba 'requerido'.`,
+            message: `En la declaración de la opción tipo '${optionType}', se esperaba 'requerido'.`,
             location: node.location
         }).format();
 
@@ -153,77 +157,7 @@ export default class CommandOptionVisitor extends SubGenerator<DisChordNodeType,
                 name: "${name}",
                 description: ${description},
                 required: ${required},
-                type: ${DiscordOptionType.String}
-            }
-        `;
-    }
-
-    /**
-     * Generates the configuration object for a Boolean-type Discord option.
-     * @private
-     */
-    private generateBooleanOption (name: string, node: DisChordODBNode): string {
-        const description = this.parent.visitIfExists(
-            this.parent.get(BDOVisitor).getODBProperty(node, 'descripcion')
-        );
-
-        if (!description) throw new DisChordError({
-            phase: ErrorLevel.Compiler,
-            message: `En la declaración de la opción tipo 'Boolean', se esperaba 'descripcion'.`,
-            location: node.location
-        }).format();
-
-        const required = this.parent.visitIfExists(
-            this.parent.get(BDOVisitor).getODBProperty(node, 'requerido')
-        );
-
-        if (!required) throw new DisChordError({
-            phase: ErrorLevel.Compiler,
-            message: `En la declaración de la opción tipo 'Boolean', se esperaba 'requerido'.`,
-            location: node.location
-        }).format();
-
-        return `
-            {
-                name: "${name}",
-                description: ${description},
-                required: ${required},
-                type: ${DiscordOptionType.Boolean}
-            }
-        `;
-    }
-
-   /**
-     * Generates the configuration object for a Integer-type Discord option.
-     * @private
-     */
-    private generateIntegerOption (name: string, node: DisChordODBNode): string {
-        const description = this.parent.visitIfExists(
-            this.parent.get(BDOVisitor).getODBProperty(node, 'descripcion')
-        );
-
-        if (!description) throw new DisChordError({
-            phase: ErrorLevel.Compiler,
-            message: `En la declaración de la opción tipo 'Integer', se esperaba 'descripcion'.`,
-            location: node.location
-        }).format();
-
-        const required = this.parent.visitIfExists(
-            this.parent.get(BDOVisitor).getODBProperty(node, 'requerido')
-        );
-
-        if (!required) throw new DisChordError({
-            phase: ErrorLevel.Compiler,
-            message: `En la declaración de la opción tipo 'Integer', se esperaba 'requerido'.`,
-            location: node.location
-        }).format();
-
-        return `
-            {
-                name: "${name}",
-                description: ${description},
-                required: ${required},
-                type: ${DiscordOptionType.Integer}
+                type: ${mappedOption}
             }
         `;
     }
