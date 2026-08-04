@@ -532,7 +532,6 @@ export interface ExportNode<T extends string, N extends BaseNode<T>> extends Bas
  * @interface ImportNode
  * @extends BaseNode<T>
  * @template {string} T - Token extensions vector.
- * @template {BaseNode<T>} N - Node extensions vector.
  */
 export interface ImportNode<T extends string> extends BaseNode<T> {
     type: typeof TokenType.Importar;
