@@ -1,6 +1,6 @@
 import { ChordError, ErrorLevel } from "../../errors/ChordError";
 import { DisChordNode, DisChordNodeType } from "../../dischord/types";
-import { CompilationContext } from "../../init/Init";
+import { CompilationContext } from "../../cli/commands/CompileCommand";
 import { runtimeInjections } from "./core.lib";
 import { ASTNode, BaseNode } from "../types";
 import { GeneratorContext } from "./GeneratorContext";
