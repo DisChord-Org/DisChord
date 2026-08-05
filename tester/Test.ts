@@ -123,9 +123,11 @@ export abstract class Test {
         const generator = new DisChordGenerator(context);
         const output = generator.generate(ast);
 
+        const prettifiedOutput = await Prettifier.prettify(output);
         const actualAstJson = JSON.stringify(ast, null, 2);
+
         await this.assertOrUpdateSnapshot(actualAstJson, 'ast');
-        await this.assertOrUpdateSnapshot(output, 'code');
+        await this.assertOrUpdateSnapshot(prettifiedOutput, 'code');
     }
 
     /**
@@ -143,13 +145,22 @@ export abstract class Test {
         const targetPath = path.join(this.fixturePath, targetFilename);
 
         if (this.forceUpdate || !fs.existsSync(targetPath)) {
-            await Prettifier.savePrettified(targetPath, actualContent.trim() + '\n');
+            switch (snapshotType) {
+                case 'code':
+                    await Prettifier.savePrettified(targetPath, actualContent.trim() + '\n');
+                    break;
+                case 'ast':
+                    const formattedActual = JSON.stringify(JSON.parse(actualContent), null, 2);
+                    fs.writeFileSync(targetPath, formattedActual, 'utf-8');
+                    break;
+            }
+
             console.log(`[SNAPSHOT UPDATED] ${targetPath}`);
             return;
         }
 
         const expectedContent = snapshotType === 'ast' ? this.expectedAST : this.expectedCode;
-        this.assertDeepEqual(actualContent, expectedContent);
+        this.assertDeepEqual(actualContent, expectedContent, snapshotType);
     }
 
     /**
@@ -162,9 +173,19 @@ export abstract class Test {
      * @protected
      * @throws {Error} Throws an assertion failure error if the processed strings do not match.
      */
-    protected assertDeepEqual(actual: string, expected: string): void {
-        const actualStr = JSON.stringify(actual.trim(), null, 2);
-        const expectedStr = JSON.stringify(expected.trim(), null, 2);
+    protected assertDeepEqual(actual: string, expected: string, type: 'ast' | 'code'): void {
+        let actualStr, expectedStr;
+
+        switch (type) {
+            case 'ast':
+                actualStr = JSON.stringify(JSON.parse(actual), null, 2);
+                expectedStr = JSON.stringify(JSON.parse(expected), null, 2);
+                break;
+            case 'code':
+                actualStr = actual.replace(/\r\n/g, '\n').trim();
+                expectedStr = expected.replace(/\r\n/g, '\n').trim();
+                break;
+        }
 
         if (actualStr !== expectedStr) {
             throw new Error(

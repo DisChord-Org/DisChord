@@ -1,99 +1,99 @@
 [
-    {
-        type: 'Variable',
-        id: 'a',
-        value: {
-            type: 'BDO',
-            mode: 0,
-            blocks: {
-                uno: {
-                    type: 'Literal',
-                    value: 1,
-                    raw: '1',
-                    location: {
-                        line: 2,
-                        column: 9,
-                    },
-                },
-                dos: {
-                    type: 'Literal',
-                    value: 2,
-                    raw: '2',
-                    location: {
-                        line: 3,
-                        column: 9,
-                    },
-                },
-                tres: {
-                    type: 'Literal',
-                    value: 3,
-                    raw: '3',
-                    location: {
-                        line: 4,
-                        column: 10,
-                    },
-                },
-            },
-            body: [],
-            location: {
-                line: 5,
-                column: 1,
-            },
+  {
+    "type": "Variable",
+    "id": "a",
+    "value": {
+      "type": "BDO",
+      "mode": 0,
+      "blocks": {
+        "uno": {
+          "type": "Literal",
+          "value": 1,
+          "raw": "1",
+          "location": {
+            "line": 2,
+            "column": 9
+          }
         },
-        location: {
-            line: 5,
-            column: 1,
+        "dos": {
+          "type": "Literal",
+          "value": 2,
+          "raw": "2",
+          "location": {
+            "line": 3,
+            "column": 9
+          }
         },
+        "tres": {
+          "type": "Literal",
+          "value": 3,
+          "raw": "3",
+          "location": {
+            "line": 4,
+            "column": 10
+          }
+        }
+      },
+      "body": [],
+      "location": {
+        "line": 5,
+        "column": 1
+      }
     },
-    {
-        type: 'Bucle',
-        var: 'item',
-        iterable: {
-            type: 'IDENTIFICADOR',
-            value: 'a',
-            location: {
-                line: 7,
-                column: 15,
-            },
+    "location": {
+      "line": 5,
+      "column": 1
+    }
+  },
+  {
+    "type": "Bucle",
+    "var": "item",
+    "iterable": {
+      "type": "IDENTIFICADOR",
+      "value": "a",
+      "location": {
+        "line": 7,
+        "column": 15
+      }
+    },
+    "body": [
+      {
+        "type": "Llamada",
+        "object": {
+          "type": "Acceso",
+          "object": {
+            "type": "IDENTIFICADOR",
+            "value": "consola",
+            "location": {
+              "line": 8,
+              "column": 5
+            }
+          },
+          "property": "imprimir",
+          "location": {
+            "line": 8,
+            "column": 13
+          }
         },
-        body: [
-            {
-                type: 'Llamada',
-                object: {
-                    type: 'Acceso',
-                    object: {
-                        type: 'IDENTIFICADOR',
-                        value: 'consola',
-                        location: {
-                            line: 8,
-                            column: 5,
-                        },
-                    },
-                    property: 'imprimir',
-                    location: {
-                        line: 8,
-                        column: 13,
-                    },
-                },
-                params: [
-                    {
-                        type: 'IDENTIFICADOR',
-                        value: 'item',
-                        location: {
-                            line: 8,
-                            column: 22,
-                        },
-                    },
-                ],
-                location: {
-                    line: 8,
-                    column: 26,
-                },
-            },
+        "params": [
+          {
+            "type": "IDENTIFICADOR",
+            "value": "item",
+            "location": {
+              "line": 8,
+              "column": 22
+            }
+          }
         ],
-        location: {
-            line: 9,
-            column: 1,
-        },
-    },
-];
+        "location": {
+          "line": 8,
+          "column": 26
+        }
+      }
+    ],
+    "location": {
+      "line": 9,
+      "column": 1
+    }
+  }
+]

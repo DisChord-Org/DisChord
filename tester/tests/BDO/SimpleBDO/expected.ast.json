@@ -1,81 +1,81 @@
 [
-    {
-        type: 'Variable',
-        id: 'armario',
-        value: {
-            type: 'BDO',
-            mode: 0,
-            blocks: {
-                peso: {
-                    type: 'Literal',
-                    value: 26.83,
-                    raw: '26.83',
-                    location: {
-                        line: 2,
-                        column: 10,
-                    },
-                },
-                precio: {
-                    type: 'Literal',
-                    value: 100,
-                    raw: '100',
-                    location: {
-                        line: 3,
-                        column: 12,
-                    },
-                },
-                color: {
-                    type: 'Literal',
-                    value: 'marron',
-                    raw: 'marron',
-                    location: {
-                        line: 4,
-                        column: 11,
-                    },
-                },
-            },
-            body: [],
-            location: {
-                line: 5,
-                column: 1,
-            },
+  {
+    "type": "Variable",
+    "id": "armario",
+    "value": {
+      "type": "BDO",
+      "mode": 0,
+      "blocks": {
+        "peso": {
+          "type": "Literal",
+          "value": 26.83,
+          "raw": "26.83",
+          "location": {
+            "line": 2,
+            "column": 10
+          }
         },
-        location: {
-            line: 5,
-            column: 1,
+        "precio": {
+          "type": "Literal",
+          "value": 100,
+          "raw": "100",
+          "location": {
+            "line": 3,
+            "column": 12
+          }
         },
+        "color": {
+          "type": "Literal",
+          "value": "marron",
+          "raw": "marron",
+          "location": {
+            "line": 4,
+            "column": 11
+          }
+        }
+      },
+      "body": [],
+      "location": {
+        "line": 5,
+        "column": 1
+      }
     },
-    {
-        type: 'Llamada',
-        object: {
-            type: 'Acceso',
-            object: {
-                type: 'IDENTIFICADOR',
-                value: 'consola',
-                location: {
-                    line: 7,
-                    column: 1,
-                },
-            },
-            property: 'imprimir',
-            location: {
-                line: 7,
-                column: 9,
-            },
-        },
-        params: [
-            {
-                type: 'IDENTIFICADOR',
-                value: 'armario',
-                location: {
-                    line: 7,
-                    column: 18,
-                },
-            },
-        ],
-        location: {
-            line: 7,
-            column: 25,
-        },
+    "location": {
+      "line": 5,
+      "column": 1
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 7,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 7,
+        "column": 9
+      }
     },
-];
+    "params": [
+      {
+        "type": "IDENTIFICADOR",
+        "value": "armario",
+        "location": {
+          "line": 7,
+          "column": 18
+        }
+      }
+    ],
+    "location": {
+      "line": 7,
+      "column": 25
+    }
+  }
+]
