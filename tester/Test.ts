@@ -39,14 +39,13 @@ export abstract class Test {
     public abstract readonly description: string;
 
     /**
-     * Absolute or relative path to the directory containing the test fixtures.
+     * Absolute path to the directory containing test fixture files.
+     * Injected automatically by the Tester engine upon discovery.
      *
      * @type {string}
      * @public
-     * @abstract
-     * @readonly
      */
-    public abstract readonly fixturePath: string;
+    public fixturePath: string = '';
 
     /**
      * Flag indicating whether to override existing snapshot files with new outputs.

@@ -4,6 +4,27 @@ import fs from "node:fs";
 import { Test } from "./Test";
 
 /**
+ * Interface representing a discovered test entry with its file system location.
+ *
+ * @interface DiscoveredTest
+ */
+interface DiscoveredTest {
+    /**
+     * Constructor for the discovered Test class.
+     *
+     * @type {new () => Test}
+     */
+    TestClass: new () => Test;
+
+    /**
+     * Absolute path to the directory where the test class file is located.
+     *
+     * @type {string}
+     */
+    directory: string;
+}
+
+/**
  * Built-in dynamic testing engine responsible for scanning, instantiating, and executing DisChord test suites.
  *
  * @class Tester
@@ -47,9 +68,11 @@ export class Tester {
         let passedCount = 0;
         let failedCount = 0;
 
-        for (const TestClass of testClasses) {
+        for (const { TestClass, directory } of testClasses) {
             const instance = new TestClass();
+
             instance.forceUpdate = this.forceUpdate;
+            instance.fixturePath = directory;
 
             const success = await instance.execute();
 
@@ -65,11 +88,11 @@ export class Tester {
      *
      * @method discoverTestClasses
      * @param {string} [dir] - Target directory path to scan. Defaults to `this.testsDirectory` if omitted.
-     * @returns {Promise<Array<new () => Test>>} Array of discovered test class constructors extending `Test`.
+     * @returns {Promise<Array<DiscoveredTest>>} Array of discovered test class constructors extending `Test`.
      * @private
      */
-    private async discoverTestClasses(dir?: string): Promise<Array<new () => Test>> {
-        const testClasses: Array<new () => Test> = [];
+    private async discoverTestClasses(dir?: string): Promise<Array<DiscoveredTest>> {
+        const testClasses: Array<DiscoveredTest> = [];
 
         if (!dir) dir = this.testsDirectory;
         if (!fs.existsSync(dir)) return testClasses;
@@ -95,7 +118,10 @@ export class Tester {
                     const exportedItem = importedModule[exportKey];
 
                     if (typeof exportedItem === "function" && exportedItem.prototype instanceof Test && exportedItem !== Test) {
-                        testClasses.push(exportedItem as new () => Test);
+                        testClasses.push({
+                            TestClass: exportedItem as new () => Test,
+                            directory: path.dirname(fullPath)
+                        });
                     }
                 }
             }
