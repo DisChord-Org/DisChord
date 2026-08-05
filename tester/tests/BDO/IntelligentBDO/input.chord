@@ -1,0 +1,7 @@
+@BDOI
+var chainsawman es {
+    makima "narcisista";
+    denji ("mascota de una " + makima);
+}
+
+consola.imprimir(chainsawman)

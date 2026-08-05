@@ -1,0 +1,7 @@
+var armario es {
+    peso 26.83
+    precio 100
+    color "marron"
+}
+
+consola.imprimir(armario)

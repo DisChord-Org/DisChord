@@ -1,0 +1,9 @@
+var a es {
+    uno 1
+    dos 2
+    tres 3
+}
+
+para (item en a) {
+    consola.imprimir(item)
+}

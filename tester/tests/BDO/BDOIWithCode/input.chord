@@ -1,0 +1,10 @@
+var panas es {
+    Ether "está chetado";
+    JustEvil "goat";
+    ZendrYz "wen pibe";
+
+    consola.imprimir(JustEvil) // "goat"
+    JustEvil es "la cabra"
+}
+
+consola.imprimir(panas)

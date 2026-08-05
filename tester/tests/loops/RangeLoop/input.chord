@@ -1,0 +1,3 @@
+para (item en rango(3)) {
+    consola.imprimir(item)
+}

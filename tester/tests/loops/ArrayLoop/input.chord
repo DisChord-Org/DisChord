@@ -1,0 +1,5 @@
+var milista es [ "uno", "dos", "tres" ]
+
+para (item en milista) {
+    consola.imprimir(item)
+}

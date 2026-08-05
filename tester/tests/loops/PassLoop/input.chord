@@ -1,0 +1,7 @@
+para (valor en rango(10)) {
+    si (valor igual 5) {
+        pasar
+    }
+    
+    consola.imprimir(valor)
+}
