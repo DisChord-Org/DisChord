@@ -10,6 +10,7 @@ import { CodeProvider } from "../src/chord/CodeProvider";
 import { DisChordASTNode, DisChordNodeType, DisChordTokenType } from "../src/dischord/types";
 import { FileSystem } from "../src/utils/FileSystem";
 import { CompilationContext } from "../src/cli/commands/CompileCommand";
+import Prettifier from "../src/utils/Prettifier";
 
 /**
  * Base test class implementing the standard compilation pipeline execution.
@@ -143,7 +144,7 @@ export abstract class Test {
         const targetPath = path.join(this.fixturePath, targetFilename);
 
         if (this.forceUpdate || !fs.existsSync(targetPath)) {
-            fs.writeFileSync(targetPath, actualContent.trim() + '\n', 'utf-8');
+            Prettifier.savePrettified(targetPath, actualContent.trim() + '\n');
             console.log(`[SNAPSHOT UPDATED] ${targetPath}`);
             return;
         }

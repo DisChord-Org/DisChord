@@ -37,7 +37,7 @@ export class Tester {
      * @private
      * @readonly
      */
-    private readonly testsDirectory: string = path.join(process.cwd(), 'src', 'tester', 'tests');
+    private readonly testsDirectory: string = path.join(process.cwd(), 'tester', 'tests');
 
     /**
      * Global flag determined by the `UPDATE_SNAPSHOTS` environment variable to enforce snapshot file updates.
