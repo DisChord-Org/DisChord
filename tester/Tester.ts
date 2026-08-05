@@ -1,38 +1,58 @@
+import path from "node:path";
+import fs from "node:fs";
+
 import { Test } from "./Test";
 
-import { BDOIAndCodeParserTest } from "./tests/parser/bdo/BDOIAndCodeParserTest";
-import { BDOIParserTest } from "./tests/parser/bdo/BDOIParserTest";
-import { SimpleBDOParserTest } from "./tests/parser/bdo/SimpleBDOParserTest";
-
 /**
+ * Built-in dynamic testing engine responsible for scanning, instantiating, and executing DisChord test suites.
+ *
  * @class Tester
- * @description Built-in testing engine responsible for instantiating and executing DisChord test suites.
  */
 export class Tester {
     /**
-     * @type {Array<new () => Test>} List of test class constructors to be executed.
+     * Absolute path to the directory containing test definitions.
+     *
+     * @type {string}
      * @private
+     * @readonly
      */
-    private tests: Array<new () => Test> = [
-        SimpleBDOParserTest, BDOIParserTest, BDOIAndCodeParserTest
-    ];
+    private readonly testsDirectory: string = path.join(process.cwd(), 'src', 'tester', 'tests');
 
     /**
+     * Global flag determined by the `UPDATE_SNAPSHOTS` environment variable to enforce snapshot file updates.
+     *
+     * @type {boolean}
+     * @private
+     * @readonly
+     */
+    private readonly forceUpdate: boolean = process.env.UPDATE_SNAPSHOTS === "true";
+
+    /**
+     * Discovers all test classes, instantiates them, and executes them sequentially.
+     *
      * @method testAll
-     * @description Instantiates and executes every registered test case sequentially, tracking results.
-     * @returns {Promise<void>}
+     * @returns {Promise<void>} Resolves when all test execution and assertions complete.
      * @public
      */
     public async testAll(): Promise<void> {
-        console.log(`\nStarting DisChord Test Pipeline\n`);
+        console.log(`\nStarting DisChord Test Pipeline...\n`);
+
+        const testClasses = await this.discoverTestClasses();
+
+        if (testClasses.length === 0) {
+            console.warn(`[WARN] No tests found under directory: ${this.testsDirectory}`);
+            return;
+        }
 
         let passedCount = 0;
         let failedCount = 0;
 
-        for (const TestClass of this.tests) {
+        for (const TestClass of testClasses) {
             const instance = new TestClass();
+            instance.forceUpdate = this.forceUpdate;
+
             const success = await instance.execute();
-            
+
             if (success) passedCount++;
             else failedCount++;
         }
@@ -41,10 +61,55 @@ export class Tester {
     }
 
     /**
+     * Recursively walks the given directory looking for source files and dynamically imports valid `Test` classes.
+     *
+     * @method discoverTestClasses
+     * @param {string} [dir] - Target directory path to scan. Defaults to `this.testsDirectory` if omitted.
+     * @returns {Promise<Array<new () => Test>>} Array of discovered test class constructors extending `Test`.
+     * @private
+     */
+    private async discoverTestClasses(dir?: string): Promise<Array<new () => Test>> {
+        const testClasses: Array<new () => Test> = [];
+
+        if (!dir) dir = this.testsDirectory;
+        if (!fs.existsSync(dir)) return testClasses;
+
+        const entries = fs.readdirSync(dir, { withFileTypes: true });
+
+        for (const entry of entries) {
+            const fullPath = path.join(dir, entry.name);
+
+            if (entry.isDirectory()) {
+                const nestedClasses = await this.discoverTestClasses(fullPath);
+                testClasses.push(...nestedClasses);
+                continue;
+            }
+
+            const isTestFile = entry.isFile() && (entry.name.endsWith(".ts") || entry.name.endsWith(".js"));
+            const isDeclarationFile = entry.name.endsWith(".d.ts");
+
+            if (isTestFile && !isDeclarationFile) {
+                const importedModule = await import(fullPath);
+
+                for (const exportKey of Object.keys(importedModule)) {
+                    const exportedItem = importedModule[exportKey];
+
+                    if (typeof exportedItem === "function" && exportedItem.prototype instanceof Test && exportedItem !== Test) {
+                        testClasses.push(exportedItem as new () => Test);
+                    }
+                }
+            }
+        }
+
+        return testClasses;
+    }
+
+    /**
+     * Outputs the final metric reports and terminates the process with an appropriate exit code.
+     *
      * @method printSummary
-     * @description Outputs the final metric reports and terminates the process accordingly.
      * @param {number} passed - Amount of successful test cases.
-     * @param {number} failed - Amount of crashed test cases.
+     * @param {number} failed - Amount of crashed or mismatched test cases.
      * @returns {void}
      * @private
      */
@@ -56,6 +121,7 @@ export class Tester {
         console.log(`Passed       : ${passed}`);
         console.log(`Failed       : ${failed}`);
 
-        process.exit(1);
+        if (failed > 0) process.exit(1);
+        else process.exit(0);
     }
 }

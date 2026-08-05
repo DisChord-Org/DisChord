@@ -1,22 +1,27 @@
+import path from "node:path";
+import fs from "node:fs";
+
 import { DisChordGenerator } from "../src/dischord/Generator/Generator";
 import { KeyWords } from "../src/chord/KeywordsManager";
 import { Lexer } from "../src/chord/Lexer";
 import { DisChordParser } from "../src/dischord/Parser/Parser";
 import { SymbolTable } from "../src/chord/SymbolsTable";
-import { ASTNode, BaseNode, Token } from "../src/chord/types";
 import { CodeProvider } from "../src/chord/CodeProvider";
-import { DisChordNode, DisChordNodeType, DisChordTokenType } from "../src/dischord/types";
+import { DisChordASTNode, DisChordNodeType, DisChordTokenType } from "../src/dischord/types";
 import { FileSystem } from "../src/utils/FileSystem";
 import { CompilationContext } from "../src/cli/commands/CompileCommand";
 
 /**
+ * Base test class implementing the standard compilation pipeline execution.
+ *
  * @class Test
- * @description Single-class test structure utilizing overrides and polymorphism for DisChord's pipeline.
  * @abstract
  */
 export abstract class Test {
     /**
-     * @type {string} The name of the test case.
+     * The name of the test case.
+     *
+     * @type {string}
      * @public
      * @abstract
      * @readonly
@@ -24,7 +29,9 @@ export abstract class Test {
     public abstract readonly name: string;
 
     /**
-     * @type {string} A brief description of what the test validates.
+     * A brief description of what the test validates.
+     *
+     * @type {string}
      * @public
      * @abstract
      * @readonly
@@ -32,98 +39,129 @@ export abstract class Test {
     public abstract readonly description: string;
 
     /**
-     * @type {string} The raw Chord source code input for the test pipeline.
+     * Absolute or relative path to the directory containing the test fixtures.
+     *
+     * @type {string}
      * @public
      * @abstract
      * @readonly
      */
-    public abstract readonly code: string;
+    public abstract readonly fixturePath: string;
 
     /**
-     * @type {string} The expected output string (AST snapshot, token list or generated code).
-     * @public
-     * @abstract
-     * @readonly
+     * Flag indicating whether to override existing snapshot files with new outputs.
      */
-    public abstract readonly expected: string;
+    public forceUpdate: boolean = false;
 
     /**
+     * Reads the raw input .chord file for this test.
+     *
+     * @type {string}
+     * @protected
+     * @throws {Error} If the file cannot be read.
+     */
+    protected get code(): string {
+        const file = path.join(this.fixturePath, 'input.chord');
+        return fs.readFileSync(file, 'utf-8');
+    }
+
+    /**
+     * Reads the expected AST snapshot file.
+     *
+     * @type {string}
+     * @protected
+     * @throws {Error} If the file cannot be read.
+     */
+    protected get expectedAST(): string {
+        const file = path.join(this.fixturePath, 'expected.ast.json');
+        return fs.readFileSync(file, 'utf-8');
+    }
+
+    /**
+     * Reads the expected generated JS file.
+     *
+     * @type {string}
+     * @protected
+     * @throws {Error} If the file cannot be read.
+     */
+    protected get expectedCode(): string {
+        const file = path.join(this.fixturePath, 'expected.mjs');
+        return fs.readFileSync(file, 'utf-8');
+    }
+
+    /**
+     * Standard execution pipeline for tests.
+     * Executes lexing, parsing, generation, and snapshot validation.
+     * Subclasses can override this method if custom test behavior is required.
+     *
      * @method run
-     * @description Contains the assertion and pipeline execution logic. Must be overridden by subclasses.
      * @returns {void | Promise<void>}
-     * @public
-     * @abstract
-     */
-    public abstract run(): void | Promise<void>;
-
-    /**
-     * @method createMockContext
-     * @description Internal helper to abstract the CompilationContext building.
-     * @param {string} code - Raw Chord source code to load into the context.
-     * @returns {CompilationContext<DisChordNodeType>} The generated mock compilation context.
      * @protected
      */
-    protected createMockContext(code: string): CompilationContext<DisChordNodeType> {
+    protected run(): void | Promise<void> {
         const context: CompilationContext<DisChordNodeType> = {
             symbolTable: new SymbolTable(),
             keywordsManager: new KeyWords(),
             codeProvider: new CodeProvider(),
-            projectRoot: FileSystem.configure(process.cwd()).projectRoot
+            projectRoot: FileSystem.configure(this.fixturePath).projectRoot
         };
 
-        context.codeProvider.currentCode = {
-            name: this.name,
-            content: code
-        };
+        const fileName = path.basename(this.fixturePath);
+        console.log(`Compilando: ${path.relative(context.projectRoot, fileName)}`);
 
         DisChordParser.registerGrammar(context);
+        
+        const code = this.code;
+        context.codeProvider.currentCode = { name: fileName, content: code };
+        
+        const lexer = new Lexer<DisChordTokenType>(context);
+        const tokens = lexer.tokenize();
+        
+        const parser = new DisChordParser(tokens, context);
+        const ast: DisChordASTNode[] = parser.parse();
+        
+        const generator = new DisChordGenerator(context);
+        const output = generator.generate(ast);
 
-        return context;
+        const actualAstJson = JSON.stringify(ast, null, 2);
+        this.assertOrUpdateSnapshot(actualAstJson, 'ast');
+        this.assertOrUpdateSnapshot(output, 'code');
     }
 
     /**
-     * @method lex
-     * @description Runs the Lexer phase over the provided code.
-     * @param {CompilationContext<DisChordNodeType>} context - The compilation context to tokenize from.
-     * @returns {Token<DisChordTokenType>[]} Array of tokens generated by the Lexer.
+     * Validates generated output against a snapshot, or automatically updates the file if required.
+     *
+     * @method assertOrUpdateSnapshot
+     * @param {string} actualContent - Content generated by the compilation pipeline.
+     * @param {'ast' | 'code'} snapshotType - Target snapshot fixture type to compare or update.
+     * @param {boolean} [forceUpdate=false] - Optional override flag to force snapshot updating.
+     * @returns {void}
      * @protected
+     * @throws {Error} If comparison fails and not in snapshot update mode.
      */
-    protected lex(context: CompilationContext<DisChordNodeType>): Token<DisChordTokenType>[] {
-        return new Lexer(context).tokenize() as Token<DisChordTokenType>[];
+    protected assertOrUpdateSnapshot(actualContent: string, snapshotType: 'ast' | 'code'): void {
+        const targetFilename = snapshotType === 'ast' ? 'expected.ast.json' : 'expected.mjs';
+        const targetPath = path.join(this.fixturePath, targetFilename);
+
+        if (this.forceUpdate || !fs.existsSync(targetPath)) {
+            fs.writeFileSync(targetPath, actualContent.trim() + '\n', 'utf-8');
+            console.log(`[SNAPSHOT UPDATED] ${targetPath}`);
+            return;
+        }
+
+        const expectedContent = snapshotType === 'ast' ? this.expectedAST : this.expectedCode;
+        this.assertDeepEqual(actualContent, expectedContent);
     }
 
     /**
-     * @method parse
-     * @description Runs the Lexer and Parser phases to retrieve the AST body.
-     * @param {Token<DisChordTokenType>[]} tokens - Array of tokens generated during the lexing phase.
-     * @param {CompilationContext<DisChordNodeType>} context - The compilation context containing state and configs.
-     * @returns {ASTNode<string, BaseNode<string>>[]} Array of AST Nodes.
-     * @protected
-     */
-    protected parse(tokens: Token<DisChordTokenType>[], context: CompilationContext<DisChordNodeType>): ASTNode<string, BaseNode<string>>[] {
-        return new DisChordParser(tokens, context).parse();
-    }
-
-    /**
-     * @method generate
-     * @description Placeholder for the Emitter/Generator phase. Should return the transpiled JS code string.
-     * @param {ASTNode<DisChordNodeType, DisChordNode>[]} ast - The generated AST from the parser.
-     * @param {CompilationContext<DisChordNodeType>} context - The compilation context containing state and configs.
-     * @returns {string} Transpiled JavaScript/TypeScript output.
-     * @protected
-     */
-    protected generate(ast: ASTNode<DisChordNodeType, DisChordNode>[], context: CompilationContext<DisChordNodeType>): string {
-        return new DisChordGenerator(context).generate(ast);
-    }
-
-    /**
+     * Asserts strict string match between actual result and expected snapshot.
+     *
      * @method assertDeepEqual
-     * @description Asserts strict string match between actual result and expected snapshot.
      * @param {string} actual - The stringified value produced by the pipeline.
      * @param {string} expected - The expected outcome string.
      * @returns {void}
-     * @throws {Error} Throws an assertion failure error if the processed strings do not match.
      * @protected
+     * @throws {Error} Throws an assertion failure error if the processed strings do not match.
      */
     protected assertDeepEqual(actual: string, expected: string): void {
         const actualStr = JSON.stringify(actual.trim(), null, 2);
@@ -139,8 +177,9 @@ export abstract class Test {
     }
 
     /**
+     * Runner method to execute the test lifecycle wrapper.
+     *
      * @method execute
-     * @description Runner method to execute the test lifecycle wrapper.
      * @returns {Promise<boolean>} True if passed, false if failed.
      * @public
      */
