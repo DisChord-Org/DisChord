@@ -1,0 +1,112 @@
+[
+    {
+        type: 'Bucle',
+        var: 'valor',
+        iterable: {
+            type: 'Llamada',
+            object: {
+                type: 'IDENTIFICADOR',
+                value: 'rango',
+                location: {
+                    line: 1,
+                    column: 16,
+                },
+            },
+            params: [
+                {
+                    type: 'Literal',
+                    value: 10,
+                    raw: '10',
+                    location: {
+                        line: 1,
+                        column: 22,
+                    },
+                },
+            ],
+            location: {
+                line: 1,
+                column: 24,
+            },
+        },
+        body: [
+            {
+                type: 'Condicion',
+                test: {
+                    type: 'ExpresionBinaria',
+                    left: {
+                        type: 'IDENTIFICADOR',
+                        value: 'valor',
+                        location: {
+                            line: 2,
+                            column: 9,
+                        },
+                    },
+                    operator: 'igual',
+                    right: {
+                        type: 'Literal',
+                        value: 5,
+                        raw: '5',
+                        location: {
+                            line: 2,
+                            column: 21,
+                        },
+                    },
+                    location: {
+                        line: 2,
+                        column: 21,
+                    },
+                },
+                consequent: [
+                    {
+                        type: 'pasar',
+                        location: {
+                            line: 3,
+                            column: 9,
+                        },
+                    },
+                ],
+                location: {
+                    line: 4,
+                    column: 5,
+                },
+            },
+            {
+                type: 'Llamada',
+                object: {
+                    type: 'Acceso',
+                    object: {
+                        type: 'IDENTIFICADOR',
+                        value: 'consola',
+                        location: {
+                            line: 6,
+                            column: 5,
+                        },
+                    },
+                    property: 'imprimir',
+                    location: {
+                        line: 6,
+                        column: 13,
+                    },
+                },
+                params: [
+                    {
+                        type: 'IDENTIFICADOR',
+                        value: 'valor',
+                        location: {
+                            line: 6,
+                            column: 22,
+                        },
+                    },
+                ],
+                location: {
+                    line: 6,
+                    column: 27,
+                },
+            },
+        ],
+        location: {
+            line: 7,
+            column: 1,
+        },
+    },
+];

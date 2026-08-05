@@ -33,7 +33,7 @@ export default class Prettifier {
      * @param path - The destination file path.
      * @param code - The source code to process and save.
      */
-    static async savePrettified (path: string, code: string) {
+    static async savePrettified (path: string, code: string): Promise<void> {
         const prettified = await Prettifier.prettify(code);
         fs.writeFileSync(path, prettified, 'utf-8');
     }

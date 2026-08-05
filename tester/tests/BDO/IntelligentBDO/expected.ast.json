@@ -1,0 +1,95 @@
+[
+    {
+        type: 'Variable',
+        id: 'chainsawman',
+        value: {
+            type: 'BDO',
+            mode: 1,
+            blocks: {
+                makima: {
+                    type: 'Literal',
+                    value: 'narcisista',
+                    raw: 'narcisista',
+                    location: {
+                        line: 3,
+                        column: 12,
+                    },
+                },
+                denji: {
+                    type: 'Expresion',
+                    object: {
+                        type: 'ExpresionBinaria',
+                        left: {
+                            type: 'Literal',
+                            value: 'mascota de una ',
+                            raw: 'mascota de una ',
+                            location: {
+                                line: 4,
+                                column: 12,
+                            },
+                        },
+                        operator: 'mas',
+                        right: {
+                            type: 'IDENTIFICADOR',
+                            value: 'makima',
+                            location: {
+                                line: 4,
+                                column: 32,
+                            },
+                        },
+                        location: {
+                            line: 4,
+                            column: 32,
+                        },
+                    },
+                    location: {
+                        line: 4,
+                        column: 38,
+                    },
+                },
+            },
+            body: [],
+            location: {
+                line: 5,
+                column: 1,
+            },
+        },
+        location: {
+            line: 5,
+            column: 1,
+        },
+    },
+    {
+        type: 'Llamada',
+        object: {
+            type: 'Acceso',
+            object: {
+                type: 'IDENTIFICADOR',
+                value: 'consola',
+                location: {
+                    line: 7,
+                    column: 1,
+                },
+            },
+            property: 'imprimir',
+            location: {
+                line: 7,
+                column: 9,
+            },
+        },
+        params: [
+            {
+                type: 'IDENTIFICADOR',
+                value: 'chainsawman',
+                location: {
+                    line: 7,
+                    column: 18,
+                },
+            },
+        ],
+        location: {
+            line: 7,
+            column: 29,
+        },
+    },
+];

@@ -1,0 +1,139 @@
+[
+    {
+        type: 'Variable',
+        id: 'panas',
+        value: {
+            type: 'BDO',
+            mode: 1,
+            blocks: {
+                Ether: {
+                    type: 'Literal',
+                    value: 'está chetado',
+                    raw: 'está chetado',
+                    location: {
+                        line: 2,
+                        column: 11,
+                    },
+                },
+                JustEvil: {
+                    type: 'Literal',
+                    value: 'goat',
+                    raw: 'goat',
+                    location: {
+                        line: 3,
+                        column: 14,
+                    },
+                },
+                ZendrYz: {
+                    type: 'Literal',
+                    value: 'wen pibe',
+                    raw: 'wen pibe',
+                    location: {
+                        line: 4,
+                        column: 13,
+                    },
+                },
+            },
+            body: [
+                {
+                    type: 'Llamada',
+                    object: {
+                        type: 'Acceso',
+                        object: {
+                            type: 'IDENTIFICADOR',
+                            value: 'consola',
+                            location: {
+                                line: 6,
+                                column: 5,
+                            },
+                        },
+                        property: 'imprimir',
+                        location: {
+                            line: 6,
+                            column: 13,
+                        },
+                    },
+                    params: [
+                        {
+                            type: 'IDENTIFICADOR',
+                            value: 'JustEvil',
+                            location: {
+                                line: 6,
+                                column: 22,
+                            },
+                        },
+                    ],
+                    location: {
+                        line: 6,
+                        column: 30,
+                    },
+                },
+                {
+                    type: 'Asignacion',
+                    left: {
+                        type: 'IDENTIFICADOR',
+                        value: 'JustEvil',
+                        location: {
+                            line: 7,
+                            column: 5,
+                        },
+                    },
+                    assignment: {
+                        type: 'Literal',
+                        value: 'la cabra',
+                        raw: 'la cabra',
+                        location: {
+                            line: 7,
+                            column: 17,
+                        },
+                    },
+                    location: {
+                        line: 7,
+                        column: 17,
+                    },
+                },
+            ],
+            location: {
+                line: 8,
+                column: 1,
+            },
+        },
+        location: {
+            line: 8,
+            column: 1,
+        },
+    },
+    {
+        type: 'Llamada',
+        object: {
+            type: 'Acceso',
+            object: {
+                type: 'IDENTIFICADOR',
+                value: 'consola',
+                location: {
+                    line: 10,
+                    column: 1,
+                },
+            },
+            property: 'imprimir',
+            location: {
+                line: 10,
+                column: 9,
+            },
+        },
+        params: [
+            {
+                type: 'IDENTIFICADOR',
+                value: 'panas',
+                location: {
+                    line: 10,
+                    column: 18,
+                },
+            },
+        ],
+        location: {
+            line: 10,
+            column: 23,
+        },
+    },
+];
