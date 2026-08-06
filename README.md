@@ -6,6 +6,7 @@ DisChord is a modern, intuitive, and human-friendly programming language designe
 
 [![License: ISC](https://img.shields.io/badge/License-ISC-blue.svg)](https://opensource.org/licenses/ISC)
 [![Version](https://img.shields.io/badge/Version-1.0^-green.svg)](package.json)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/DisChord-Org/DisChord)
 
 ---
 
