@@ -12,6 +12,7 @@ export const corelib: Record<string, Record<string, string> | string> = {
         'nombreGlobal': 'usuario.globalName'
     },
     'cliente': {
+        'emitir': 'cliente.events.runEvent',
         'id': 'cliente.me.id',
         'nombre': 'cliente.me.username',
         'avatar': 'cliente.me.avatar',
