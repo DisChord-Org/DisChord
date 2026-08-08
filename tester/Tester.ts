@@ -1,5 +1,6 @@
 import path from "node:path";
 import fs from "node:fs";
+import { pathToFileURL } from "node:url";
 
 import { Test } from "./Test";
 
@@ -112,7 +113,7 @@ export class Tester {
             const isDeclarationFile = entry.name.endsWith(".d.ts");
 
             if (isTestFile && !isDeclarationFile) {
-                const importedModule = await import(fullPath);
+                const importedModule = await import(pathToFileURL(fullPath).href);
 
                 for (const exportKey of Object.keys(importedModule)) {
                     const exportedItem = importedModule[exportKey];
