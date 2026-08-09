@@ -1,0 +1,3 @@
+var a es 15
+
+consola.imprimir("Variable A is " mas a)

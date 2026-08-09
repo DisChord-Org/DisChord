@@ -1,0 +1,69 @@
+[
+  {
+    "type": "Variable",
+    "id": "a",
+    "value": {
+      "type": "Literal",
+      "value": 15,
+      "raw": "15",
+      "location": {
+        "line": 1,
+        "column": 10
+      }
+    },
+    "location": {
+      "line": 1,
+      "column": 10
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 3,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 3,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "ExpresionBinaria",
+        "left": {
+          "type": "Literal",
+          "value": "Variable A is ",
+          "raw": "Variable A is ",
+          "location": {
+            "line": 3,
+            "column": 18
+          }
+        },
+        "operator": "mas",
+        "right": {
+          "type": "IDENTIFICADOR",
+          "value": "a",
+          "location": {
+            "line": 3,
+            "column": 39
+          }
+        },
+        "location": {
+          "line": 3,
+          "column": 39
+        }
+      }
+    ],
+    "location": {
+      "line": 3,
+      "column": 40
+    }
+  }
+]
