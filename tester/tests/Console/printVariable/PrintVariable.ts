@@ -1,7 +1,7 @@
 import { Test } from "../../../Test";
 
 /**
- * @class ArrayLoopTest
+ * @class PrintVariable
  * @description Validates that DisChord correctly extracts an array loop.
  */
 export class PrintVariable extends Test {
