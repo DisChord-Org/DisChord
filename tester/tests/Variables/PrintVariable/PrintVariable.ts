@@ -1,10 +1,10 @@
-import { Test } from "../../../../Test";
+import { Test } from "../../../Test";
 
 /**
- * @class PrintBoolean
- * @description Validates that DisChord print a variable with a boolean
+ * @class PrintVariable
+ * @description Validates that DisChord print a variable
  */
-export class PrintBoolean extends Test {
+export class PrintVariable extends Test {
     /**
      * @type {string}
      */

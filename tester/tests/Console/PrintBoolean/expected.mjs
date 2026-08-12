@@ -12,5 +12,4 @@ console.log = (...args) => {
     originalLog(...translatedArgs);
 };
 
-let a = true;
-console.log('Variable A is ', a);
+console.log(true);
