@@ -1,0 +1,3 @@
+var a es verdadero
+
+consola.imprimir("Variable A is " a)
