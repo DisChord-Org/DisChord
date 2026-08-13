@@ -1,0 +1,104 @@
+[
+  {
+    "type": "funcion",
+    "id": "saludar",
+    "metadata": {
+      "isConstructor": false,
+      "isMethod": false,
+      "isStatic": false,
+      "isAsync": false
+    },
+    "params": [
+      "nombre"
+    ],
+    "body": [
+      {
+        "type": "devolver",
+        "object": {
+          "type": "ExpresionBinaria",
+          "left": {
+            "type": "Literal",
+            "value": "Hola, ",
+            "raw": "Hola, ",
+            "location": {
+              "line": 2,
+              "column": 14
+            }
+          },
+          "operator": "mas",
+          "right": {
+            "type": "IDENTIFICADOR",
+            "value": "nombre",
+            "location": {
+              "line": 2,
+              "column": 25
+            }
+          },
+          "location": {
+            "line": 2,
+            "column": 25
+          }
+        },
+        "location": {
+          "line": 2,
+          "column": 25
+        }
+      }
+    ],
+    "location": {
+      "line": 3,
+      "column": 1
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 5,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 5,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "Llamada",
+        "object": {
+          "type": "IDENTIFICADOR",
+          "value": "saludar",
+          "location": {
+            "line": 5,
+            "column": 18
+          }
+        },
+        "params": [
+          {
+            "type": "Literal",
+            "value": "Mundo",
+            "raw": "Mundo",
+            "location": {
+              "line": 5,
+              "column": 26
+            }
+          }
+        ],
+        "location": {
+          "line": 5,
+          "column": 33
+        }
+      }
+    ],
+    "location": {
+      "line": 5,
+      "column": 34
+    }
+  }
+]

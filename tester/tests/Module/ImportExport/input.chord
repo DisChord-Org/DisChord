@@ -1,0 +1,5 @@
+importar { algo } desde "./otro"
+
+exportar funcion saludar(nombre) {
+    devolver "Hola, " + nombre
+}

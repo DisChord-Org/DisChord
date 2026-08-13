@@ -1,0 +1,9 @@
+var nota es 7
+
+si (nota mayor_igual 9) {
+    consola.imprimir("Excelente")
+} ademas si (nota mayor_igual 6) {
+    consola.imprimir("Aprobado")
+} sino {
+    consola.imprimir("Reprobado")
+}

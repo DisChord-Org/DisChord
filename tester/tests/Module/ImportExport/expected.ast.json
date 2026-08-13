@@ -1,0 +1,72 @@
+[
+  {
+    "type": "importar",
+    "identificators": [
+      "algo"
+    ],
+    "path": "./otro",
+    "isDestructured": true,
+    "location": {
+      "line": 1,
+      "column": 25
+    }
+  },
+  {
+    "type": "exportar",
+    "object": {
+      "type": "funcion",
+      "id": "saludar",
+      "metadata": {
+        "isConstructor": false,
+        "isMethod": false,
+        "isStatic": false,
+        "isAsync": false
+      },
+      "params": [
+        "nombre"
+      ],
+      "body": [
+        {
+          "type": "devolver",
+          "object": {
+            "type": "ExpresionBinaria",
+            "left": {
+              "type": "Literal",
+              "value": "Hola, ",
+              "raw": "Hola, ",
+              "location": {
+                "line": 4,
+                "column": 14
+              }
+            },
+            "operator": "mas",
+            "right": {
+              "type": "IDENTIFICADOR",
+              "value": "nombre",
+              "location": {
+                "line": 4,
+                "column": 25
+              }
+            },
+            "location": {
+              "line": 4,
+              "column": 25
+            }
+          },
+          "location": {
+            "line": 4,
+            "column": 25
+          }
+        }
+      ],
+      "location": {
+        "line": 5,
+        "column": 1
+      }
+    },
+    "location": {
+      "line": 5,
+      "column": 1
+    }
+  }
+]

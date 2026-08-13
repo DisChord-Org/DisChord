@@ -1,0 +1,7 @@
+var edad es 20
+
+si (edad mayor_igual 18) {
+    consola.imprimir("Es mayor de edad")
+} sino {
+    consola.imprimir("Es menor de edad")
+}

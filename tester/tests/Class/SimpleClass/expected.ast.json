@@ -1,0 +1,332 @@
+[
+  {
+    "type": "clase",
+    "id": "Animal",
+    "body": [
+      {
+        "type": "funcion",
+        "id": "Animal",
+        "metadata": {
+          "isConstructor": true,
+          "isMethod": true,
+          "isStatic": false,
+          "isAsync": false
+        },
+        "params": [
+          "nombre"
+        ],
+        "body": [
+          {
+            "type": "Asignacion",
+            "left": {
+              "type": "Acceso",
+              "object": {
+                "type": "esta",
+                "value": "",
+                "location": {
+                  "line": 3,
+                  "column": 9
+                }
+              },
+              "property": "nombre",
+              "location": {
+                "line": 3,
+                "column": 14
+              }
+            },
+            "assignment": {
+              "type": "IDENTIFICADOR",
+              "value": "nombre",
+              "location": {
+                "line": 3,
+                "column": 24
+              }
+            },
+            "location": {
+              "line": 3,
+              "column": 24
+            }
+          }
+        ],
+        "location": {
+          "line": 4,
+          "column": 5
+        }
+      },
+      {
+        "type": "funcion",
+        "id": "hablar",
+        "metadata": {
+          "isConstructor": false,
+          "isMethod": true,
+          "isStatic": false,
+          "isAsync": false
+        },
+        "params": [],
+        "body": [
+          {
+            "type": "Llamada",
+            "object": {
+              "type": "Acceso",
+              "object": {
+                "type": "IDENTIFICADOR",
+                "value": "consola",
+                "location": {
+                  "line": 7,
+                  "column": 9
+                }
+              },
+              "property": "imprimir",
+              "location": {
+                "line": 7,
+                "column": 17
+              }
+            },
+            "params": [
+              {
+                "type": "ExpresionBinaria",
+                "left": {
+                  "type": "Acceso",
+                  "object": {
+                    "type": "esta",
+                    "value": "",
+                    "location": {
+                      "line": 7,
+                      "column": 26
+                    }
+                  },
+                  "property": "nombre",
+                  "location": {
+                    "line": 7,
+                    "column": 31
+                  }
+                },
+                "operator": "mas",
+                "right": {
+                  "type": "Literal",
+                  "value": " hace un sonido",
+                  "raw": " hace un sonido",
+                  "location": {
+                    "line": 7,
+                    "column": 40
+                  }
+                },
+                "location": {
+                  "line": 7,
+                  "column": 40
+                }
+              }
+            ],
+            "location": {
+              "line": 7,
+              "column": 57
+            }
+          }
+        ],
+        "location": {
+          "line": 8,
+          "column": 5
+        }
+      }
+    ],
+    "location": {
+      "line": 9,
+      "column": 1
+    }
+  },
+  {
+    "type": "clase",
+    "id": "Perro",
+    "superClass": "Animal",
+    "body": [
+      {
+        "type": "funcion",
+        "id": "Perro",
+        "metadata": {
+          "isConstructor": true,
+          "isMethod": true,
+          "isStatic": false,
+          "isAsync": false
+        },
+        "params": [
+          "nombre"
+        ],
+        "body": [
+          {
+            "type": "Llamada",
+            "object": {
+              "type": "super",
+              "value": "",
+              "location": {
+                "line": 13,
+                "column": 9
+              }
+            },
+            "params": [
+              {
+                "type": "IDENTIFICADOR",
+                "value": "nombre",
+                "location": {
+                  "line": 13,
+                  "column": 15
+                }
+              }
+            ],
+            "location": {
+              "line": 13,
+              "column": 21
+            }
+          }
+        ],
+        "location": {
+          "line": 14,
+          "column": 5
+        }
+      },
+      {
+        "type": "funcion",
+        "id": "hablar",
+        "metadata": {
+          "isConstructor": false,
+          "isMethod": true,
+          "isStatic": false,
+          "isAsync": false
+        },
+        "params": [],
+        "body": [
+          {
+            "type": "Llamada",
+            "object": {
+              "type": "Acceso",
+              "object": {
+                "type": "IDENTIFICADOR",
+                "value": "consola",
+                "location": {
+                  "line": 17,
+                  "column": 9
+                }
+              },
+              "property": "imprimir",
+              "location": {
+                "line": 17,
+                "column": 17
+              }
+            },
+            "params": [
+              {
+                "type": "ExpresionBinaria",
+                "left": {
+                  "type": "Acceso",
+                  "object": {
+                    "type": "esta",
+                    "value": "",
+                    "location": {
+                      "line": 17,
+                      "column": 26
+                    }
+                  },
+                  "property": "nombre",
+                  "location": {
+                    "line": 17,
+                    "column": 31
+                  }
+                },
+                "operator": "mas",
+                "right": {
+                  "type": "Literal",
+                  "value": " ladra",
+                  "raw": " ladra",
+                  "location": {
+                    "line": 17,
+                    "column": 40
+                  }
+                },
+                "location": {
+                  "line": 17,
+                  "column": 40
+                }
+              }
+            ],
+            "location": {
+              "line": 17,
+              "column": 48
+            }
+          }
+        ],
+        "location": {
+          "line": 18,
+          "column": 5
+        }
+      }
+    ],
+    "location": {
+      "line": 19,
+      "column": 1
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "perro",
+    "value": {
+      "type": "nuevo",
+      "object": {
+        "type": "Llamada",
+        "object": {
+          "type": "IDENTIFICADOR",
+          "value": "Perro",
+          "location": {
+            "line": 21,
+            "column": 20
+          }
+        },
+        "params": [
+          {
+            "type": "Literal",
+            "value": "Rex",
+            "raw": "Rex",
+            "location": {
+              "line": 21,
+              "column": 26
+            }
+          }
+        ],
+        "location": {
+          "line": 21,
+          "column": 31
+        }
+      },
+      "location": {
+        "line": 21,
+        "column": 31
+      }
+    },
+    "location": {
+      "line": 21,
+      "column": 31
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "perro",
+        "location": {
+          "line": 22,
+          "column": 1
+        }
+      },
+      "property": "hablar",
+      "location": {
+        "line": 22,
+        "column": 7
+      }
+    },
+    "params": [],
+    "location": {
+      "line": 22,
+      "column": 14
+    }
+  }
+]

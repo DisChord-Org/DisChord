@@ -1,0 +1,5 @@
+funcion saludar(nombre) {
+    devolver "Hola, " + nombre
+}
+
+consola.imprimir(saludar("Mundo"))

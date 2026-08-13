@@ -1,0 +1,123 @@
+[
+  {
+    "type": "Variable",
+    "id": "edad",
+    "value": {
+      "type": "Literal",
+      "value": 20,
+      "raw": "20",
+      "location": {
+        "line": 1,
+        "column": 13
+      }
+    },
+    "location": {
+      "line": 1,
+      "column": 13
+    }
+  },
+  {
+    "type": "Condicion",
+    "test": {
+      "type": "ExpresionBinaria",
+      "left": {
+        "type": "IDENTIFICADOR",
+        "value": "edad",
+        "location": {
+          "line": 3,
+          "column": 5
+        }
+      },
+      "operator": "mayor_igual",
+      "right": {
+        "type": "Literal",
+        "value": 18,
+        "raw": "18",
+        "location": {
+          "line": 3,
+          "column": 22
+        }
+      },
+      "location": {
+        "line": 3,
+        "column": 22
+      }
+    },
+    "consequent": [
+      {
+        "type": "Llamada",
+        "object": {
+          "type": "Acceso",
+          "object": {
+            "type": "IDENTIFICADOR",
+            "value": "consola",
+            "location": {
+              "line": 4,
+              "column": 5
+            }
+          },
+          "property": "imprimir",
+          "location": {
+            "line": 4,
+            "column": 13
+          }
+        },
+        "params": [
+          {
+            "type": "Literal",
+            "value": "Es mayor de edad",
+            "raw": "Es mayor de edad",
+            "location": {
+              "line": 4,
+              "column": 22
+            }
+          }
+        ],
+        "location": {
+          "line": 4,
+          "column": 40
+        }
+      }
+    ],
+    "alternate": [
+      {
+        "type": "Llamada",
+        "object": {
+          "type": "Acceso",
+          "object": {
+            "type": "IDENTIFICADOR",
+            "value": "consola",
+            "location": {
+              "line": 6,
+              "column": 5
+            }
+          },
+          "property": "imprimir",
+          "location": {
+            "line": 6,
+            "column": 13
+          }
+        },
+        "params": [
+          {
+            "type": "Literal",
+            "value": "Es menor de edad",
+            "raw": "Es menor de edad",
+            "location": {
+              "line": 6,
+              "column": 22
+            }
+          }
+        ],
+        "location": {
+          "line": 6,
+          "column": 40
+        }
+      }
+    ],
+    "location": {
+      "line": 7,
+      "column": 1
+    }
+  }
+]
