@@ -28,21 +28,25 @@ export class ClassParser<T extends string, N extends BaseNode<T>> extends SubPar
             superClass = this.consume(TokenType.IDENTIFICADOR, "Se debe especificar el nombre de la clase padre").value;
         }
 
+        this.SymbolTable.register(id, {
+            name: id,
+            kind: SymbolKind.Class
+        }, this.peek('prev').location);
+
         this.consume(TokenType.L_BRACE, "Al declarar una clase debes usar '{'");
 
         const body: ASTNode<T, N>[] = [];
         const statementParser = this.parent.get(StatementParser) as StatementParser<T, N>;
 
+        this.SymbolTable.pushScope();
+
         while (this.peek().type !== TokenType.R_BRACE && !this.isAtEnd()) {
             body.push(statementParser.parse(id));
         }
 
-        this.consume(TokenType.R_BRACE);
+        this.SymbolTable.popScope();
 
-        this.SymbolTable.register(id, {
-            name: id,
-            kind: SymbolKind.Class
-        }, this.peek('prev').location);
+        this.consume(TokenType.R_BRACE);
 
         return this.createNode<ClassNode<T, N>>({
             type: TokenType.Clase,

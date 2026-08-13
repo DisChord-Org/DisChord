@@ -47,6 +47,8 @@ export class CallVisitor<T extends string, N extends BaseNode<T>> extends SubGen
             if (symbol?.metadata.isAsync) {
                 isAsyncCall = true;
             }
+        } else if (node.object.type === TokenType.Super) {
+            translation = this.parent.visit(node.object);
         } else {
             throw new ChordError({
                 phase: ErrorLevel.Compiler,

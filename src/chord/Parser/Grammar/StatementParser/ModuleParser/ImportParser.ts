@@ -25,7 +25,7 @@ export class ImportParser<T extends string, N extends BaseNode<T>> extends SubPa
         const isDestructured = this.match(TokenType.L_BRACE);
 
         if (isDestructured) {
-            while (!this.match(TokenType.R_BRACE) && !this.isAtEnd()) {
+            while (this.peek().type !== TokenType.R_BRACE && !this.isAtEnd()) {
                 identificators.push(this.consume(TokenType.IDENTIFICADOR, "Se esperaba un nombre para importar").value);
                 this.match(TokenType.COMA);
             }

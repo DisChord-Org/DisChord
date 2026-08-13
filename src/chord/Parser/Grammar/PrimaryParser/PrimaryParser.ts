@@ -1,5 +1,5 @@
 import { SubParser } from "../../SubParser";
-import { ASTNode, BaseNode, ExpressionNode, IdentificatorNode, JSNode, ListNode, NewNode, ODBMode, TokenType, TokenTypeUnion } from "../../../types";
+import { ASTNode, BaseNode, ExpressionNode, IdentificatorNode, JSNode, ListNode, NewNode, ODBMode, SuperNode, ThisNode, TokenType, TokenTypeUnion } from "../../../types";
 import { ExpressionParser } from "../Expressions/ExpressionParser";
 import { AssignmentParser } from "../Expressions/AssignmentParser";
 import { DecoratorProcessor } from "../../../DecoratorProcessor";
@@ -85,8 +85,24 @@ export class PrimaryParser<T extends string, N extends BaseNode<T>> extends SubP
             });
         }
 
-        if (([ TokenType.IDENTIFICADOR, TokenType.Esta, TokenType.Super ] as TokenType[]).includes(token.type as TokenType)) {
-            const node = this.consume(token.type);
+        if (token.type === TokenType.Esta) {
+            this.consume(TokenType.Esta);
+            return this.createNode<ThisNode<T>>({
+                type: TokenType.Esta,
+                value: ''
+            });
+        }
+
+        if (token.type === TokenType.Super) {
+            this.consume(TokenType.Super);
+            return this.createNode<SuperNode<T>>({
+                type: TokenType.Super,
+                value: ''
+            });
+        }
+
+        if (token.type === TokenType.IDENTIFICADOR) {
+            const node = this.consume(TokenType.IDENTIFICADOR);
             return this.createNode<IdentificatorNode<T>>({
                 type: TokenType.IDENTIFICADOR,
                 value: node.value
