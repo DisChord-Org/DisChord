@@ -3,6 +3,7 @@ import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType } fr
 
 import { Parser } from '../../chord/Parser/Parser';
 import { SubParserClass } from '../../chord/Parser/SubParser';
+import { DisChordError, ErrorLevel } from '../../errors/ChordError';
 
 import CommandParser from './Grammar/architectural/CommandParser';
 import MessageParser from './Grammar/features/MessageParser';
@@ -80,6 +81,49 @@ export class DisChordParser extends Parser<DisChordNodeType, DisChordNode> {
         });
 
         super.registerInstances();
+    }
+
+    /**
+     * Node types whose generator produces a whole, standalone module (a command or event file),
+     * instead of contributing inline code to whatever file declares them. See `CommandVisitor`
+     * and `EventVisitor` in the generator: each returns the *entire* content of its target file.
+     * @private
+     * @readonly
+     */
+    private static readonly WholeFileDeclarationTypes: DisChordNodeType[] = [
+        DisChordTokenType.CREAR_COMANDO,
+        DisChordTokenType.EVENTO
+    ];
+
+    /**
+     * Parses the full token stream and validates that any whole-file declaration (`comando`,
+     * `evento`) is the sole top-level statement in the file. Since the generator emits their
+     * entire returned string as the file's content (compiled 1:1 from its source `.chord` file
+     * by `CompileCommand`), mixing one with anything else — another such declaration, or
+     * unrelated code — would silently produce a broken module (duplicate imports, more than one
+     * `export default`, etc.) that only fails much later when Node tries to load it.
+     * @override
+     * @returns {DisChordASTNode[]} The parsed top-level AST nodes.
+     * @throws {DisChordError} If a whole-file declaration shares its file with anything else.
+     */
+    override parse(): DisChordASTNode[] {
+        const nodes = super.parse();
+
+        const wholeFileNodes = nodes.filter(node => DisChordParser.WholeFileDeclarationTypes.includes(node.type));
+
+        if (wholeFileNodes.length > 1) throw new DisChordError({
+            phase: ErrorLevel.Parser,
+            message: `Solo se permite un 'comando' o 'evento' por archivo. Este archivo declara ${wholeFileNodes.length}: separalos en un archivo por cada uno.`,
+            location: wholeFileNodes[1].location
+        }).format();
+
+        if (wholeFileNodes.length === 1 && nodes.length > 1) throw new DisChordError({
+            phase: ErrorLevel.Parser,
+            message: `Un archivo que declara un 'comando' o 'evento' no puede contener ningún otro código a nivel superior. Movelo a su propio archivo.`,
+            location: nodes.find(node => node !== wholeFileNodes[0])!.location
+        }).format();
+
+        return nodes;
     }
 
     /**
