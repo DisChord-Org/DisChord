@@ -1,4 +1,4 @@
-import { ODBNode, BaseNode, TokenType, TokenTypeUnion, ODBMode, ASTNode } from "../../../types";
+import { ODBNode, BaseNode, FunctionNode, TokenType, TokenTypeUnion, ODBMode, ASTNode } from "../../../types";
 import { SubGenerator } from "../../SubGenerator";
 
 /**
@@ -38,12 +38,20 @@ export class BDOVisitor<T extends string, N extends BaseNode<T>> extends SubGene
         const executableBody = node.body
             .map(statement => this.parent.visit(statement))
             .join(';\n');
-        
-        if (Object.keys(node.blocks).length === 0) {
+
+        // Top-level functions declared inside the BDO are exposed as real members of the
+        // resulting object (referenced by name in the returned object, which is valid JS
+        // without needing method-shorthand syntax), turning them into de-facto methods
+        // whenever the BDO is actually building an object rather than just running code.
+        const functionNames = node.body
+            .filter((statement): statement is FunctionNode<T, N> => statement.type === TokenType.Funcion)
+            .map(statement => statement.id);
+
+        if (Object.keys(node.blocks).length === 0 && functionNames.length === 0) {
             return `${executableBody}`;
         }
 
-        const exports = Object.keys(node.blocks).join(', ');
+        const exports = [ ...Object.keys(node.blocks), ...functionNames ].join(', ');
 
         return `(() => {
                 ${declarations}

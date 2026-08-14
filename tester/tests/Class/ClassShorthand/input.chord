@@ -1,0 +1,22 @@
+clase Animal {
+    Animal(nombre) {
+        esta.nombre es nombre
+    }
+
+    funcion hablar() {
+        consola.imprimir(esta.nombre + " hace un sonido")
+    }
+}
+
+nuevo Animal Perro {
+    Perro(nombre) {
+        super(nombre)
+    }
+
+    funcion hablar() {
+        consola.imprimir(esta.nombre + " ladra")
+    }
+}
+
+var perro es nuevo Perro("Rex")
+perro.hablar()

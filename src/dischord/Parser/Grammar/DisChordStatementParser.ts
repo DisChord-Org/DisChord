@@ -39,6 +39,9 @@ export default class DisChordStatementParser extends SubParser<DisChordNodeType,
         if (token.type === TokenType.Nuevo) {
             this.consume(TokenType.Nuevo);
 
+            const classShorthand = this.parent.tryParseClassShorthand();
+            if (classShorthand) return classShorthand;
+
             const customStatement = this.parent.parseCustomStatement();
             if (customStatement) return customStatement;
 

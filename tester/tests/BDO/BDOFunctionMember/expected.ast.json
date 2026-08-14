@@ -1,0 +1,130 @@
+[
+  {
+    "type": "Variable",
+    "id": "persona",
+    "value": {
+      "type": "BDO",
+      "mode": 1,
+      "blocks": {
+        "nombre": {
+          "type": "Literal",
+          "value": "Juan",
+          "raw": "Juan",
+          "location": {
+            "line": 3,
+            "column": 12
+          }
+        }
+      },
+      "body": [
+        {
+          "type": "funcion",
+          "id": "saludar",
+          "metadata": {
+            "isConstructor": false,
+            "isMethod": false,
+            "isStatic": false,
+            "isAsync": false
+          },
+          "params": [],
+          "body": [
+            {
+              "type": "Llamada",
+              "object": {
+                "type": "Acceso",
+                "object": {
+                  "type": "IDENTIFICADOR",
+                  "value": "consola",
+                  "location": {
+                    "line": 6,
+                    "column": 9
+                  }
+                },
+                "property": "imprimir",
+                "location": {
+                  "line": 6,
+                  "column": 17
+                }
+              },
+              "params": [
+                {
+                  "type": "ExpresionBinaria",
+                  "left": {
+                    "type": "Literal",
+                    "value": "Hola, ",
+                    "raw": "Hola, ",
+                    "location": {
+                      "line": 6,
+                      "column": 26
+                    }
+                  },
+                  "operator": "mas",
+                  "right": {
+                    "type": "Acceso",
+                    "object": {
+                      "type": "esta",
+                      "value": "",
+                      "location": {
+                        "line": 6,
+                        "column": 37
+                      }
+                    },
+                    "property": "nombre",
+                    "location": {
+                      "line": 6,
+                      "column": 42
+                    }
+                  },
+                  "location": {
+                    "line": 6,
+                    "column": 42
+                  }
+                }
+              ],
+              "location": {
+                "line": 6,
+                "column": 48
+              }
+            }
+          ],
+          "location": {
+            "line": 7,
+            "column": 5
+          }
+        }
+      ],
+      "location": {
+        "line": 8,
+        "column": 1
+      }
+    },
+    "location": {
+      "line": 8,
+      "column": 1
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "persona",
+        "location": {
+          "line": 10,
+          "column": 1
+        }
+      },
+      "property": "saludar",
+      "location": {
+        "line": 10,
+        "column": 9
+      }
+    },
+    "params": [],
+    "location": {
+      "line": 10,
+      "column": 17
+    }
+  }
+]

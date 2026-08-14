@@ -2,7 +2,7 @@ import { SUGGESTIONS } from "./ParserErrorSuggestions";
 import { ASTNode, Token, SOF, EOF, TokenType, BaseNode, PeekType, Location, TokenTypeUnion } from "../types";
 
 import { ChordError, ErrorLevel } from "../../errors/ChordError";
-import { CompilationContext } from "../../init/Init";
+import { CompilationContext } from "../../cli/commands/CompileCommand";
 import { ParserContext } from "./ParserContext";
 import { SubParser, SubParserClass } from "./SubParser";
 import { SymbolTable } from "../SymbolsTable";
@@ -286,6 +286,29 @@ export class Parser<T extends string, N extends BaseNode<T>> extends ParserConte
             ...node,
             location: token.location
         } as NodeType;
+    }
+
+    /**
+     * Detects and parses the beginner-friendly class declaration shorthand, expected to be
+     * called right after an already-consumed `nuevo` token: `nuevo <ClaseBase> <Nombre> { ... }`,
+     * equivalent to `clase <Nombre> extiende <ClaseBase> { ... }`.
+     *
+     * Disambiguates from a regular instantiation expression (`nuevo Perro("Rex")`) by requiring
+     * two consecutive identifiers followed directly by `{`, a shape a call/access expression can
+     * never produce.
+     *
+     * @public
+     * @returns {ASTNode<T, N> | null} The parsed class declaration, or null if the upcoming tokens
+     * don't match the shorthand shape (in which case nothing is consumed).
+     */
+    public tryParseClassShorthand (): ASTNode<T, N> | null {
+        const isShorthand = this.peek().type === TokenType.IDENTIFICADOR
+            && this.peek('next').type === TokenType.IDENTIFICADOR
+            && this.peek(this.cursor + 2)?.type === TokenType.L_BRACE;
+
+        if (!isShorthand) return null;
+
+        return this.get(ClassParser).parseShorthand();
     }
 
     /**
