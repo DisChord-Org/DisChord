@@ -97,6 +97,18 @@ export class Generator<T extends string, N extends BaseNode<T>> extends Generato
     }
 
     /**
+     * Side runtime modules this generation pass needs written to disk once, alongside the main
+     * compiled file — keyed by path relative to the project's `dist` directory. Empty by default;
+     * dialect-specific generators (e.g. `DisChordGenerator`) override this to report their own
+     * shared helpers, so that `CompileCommand` (which performs all filesystem writes) can persist
+     * them without knowing anything about what a given dialect actually needs.
+     * @returns {Map<string, string>} Content keyed by output path relative to `dist/`.
+     */
+    public sharedModules (): Map<string, string> {
+        return new Map();
+    }
+
+    /**
      * Processes an individual AST Node by routing it to its matching SubGenerator.
      * @param node - The target node to be generated.
      */

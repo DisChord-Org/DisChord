@@ -36,6 +36,8 @@ export default class MessageVisitor extends SubGenerator<DisChordNodeType, DisCh
         const ComponentsData = [ Button, Embed ].join('');
         const interactionContext: string = this.parent.context.symbolTable.getMetadata<boolean>(CompilerMetadataKind.IsInteraction)? 'interaccion' : 'null';
 
-        return `await createMessage(${channel}, { content: ${content} ${ComponentsData} }, ${interactionContext})`;
+        this.parent.context.symbolTable.setMetadata(CompilerMetadataKind.RequiresMessageHelper, true);
+
+        return `await createMessage(${channel}, { content: ${content} ${ComponentsData} }, ${interactionContext}, ctx)`;
     }
 }

@@ -31,8 +31,18 @@ export const corelib: Record<string, Record<string, string> | string> = {
 } as const;
 
 /**
- * Raw JavaScript string code block injected into the transpiled output.
- * It defines the internal asynchronous helper function `createMessage` responsible for handling messaging context.
+ * Path, relative to the project's `dist` directory, where `createMessageModuleContent` is
+ * written. Shared by `CompileCommand` (which writes the file there) and any generator that
+ * needs to import it, so both sides agree on the location from a single source of truth.
+ * @type {string}
+ */
+export const createMessageModulePath = 'lib/createMessage.mjs';
+
+/**
+ * Raw JavaScript string content for the shared, standalone `createMessage` runtime module.
+ * Written once to `dist/lib/createMessage.mjs` by `CompileCommand` (only when at least one
+ * compiled file actually needs it) and imported by any command/event file that calls it,
+ * instead of every generated file duplicating the whole helper inline.
  *
  * This function evaluates channel availability, component interaction status,
  * command context, or raw message event context to properly deliver or reply to messages.
@@ -44,8 +54,9 @@ export const corelib: Record<string, Record<string, string> | string> = {
  * @throws {Error} Throws an error if no valid target channel or messaging execution context is available.
  * * @type {string}
  */
-export const createMessageFunctionInjection = `
-    const createMessage = async (channel, options, interactionContext = null) => {
+export const createMessageModuleContent = `
+    export const createMessage = async (channel, options, interactionContext, ctx) => {
+        const { cliente, contexto, mensaje } = ctx || {};
 
         // if channel
         if (channel) {
@@ -61,7 +72,7 @@ export const createMessageFunctionInjection = `
         }
 
         // if we're inside a command
-        if (typeof contexto !== 'undefined' && contexto.editOrReply) {
+        if (contexto && contexto.editOrReply) {
             if (!contexto.deferred) {
                 await contexto.deferReply().catch(() => {});
             }
@@ -69,7 +80,7 @@ export const createMessageFunctionInjection = `
         }
 
         // if we're inside a command events
-        if (typeof mensaje !== 'undefined' && mensaje.write) {
+        if (mensaje && mensaje.write) {
             return await mensaje.write(options, true);
         }
 

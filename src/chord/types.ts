@@ -52,7 +52,13 @@ export enum CompilerMetadataKind {
      * companion runtime injection (e.g. `consola.imprimir` needs the `console.log`
      * override to translate `true`/`false`/`undefined` into `verdadero`/`falso`/`indefinido`).
      */
-    RequiresConsoleRuntime = 'requiresConsoleRuntime'
+    RequiresConsoleRuntime = 'requiresConsoleRuntime',
+
+    /** Set (DisChord-specific) when the generated file calls the shared `createMessage`
+     * runtime helper (e.g. via `nuevo mensaje {...}`), so the compiler driver knows to
+     * import it from its single shared module instead of every command/event duplicating it.
+     */
+    RequiresMessageHelper = 'requiresMessageHelper'
 };
 
 /**

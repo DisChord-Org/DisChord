@@ -49,23 +49,28 @@ export class CompileCommand {
 
         console.log(`Compilando proyecto: ${this.config.projectRoot}`);
 
+        const sharedModules = new Map<string, string>();
+
         for (const file of files) {
-            await this.compileFile(file, options);
+            const fileSharedModules = await this.compileFile(file, options);
+            fileSharedModules.forEach((content, relativePath) => sharedModules.set(relativePath, content));
         }
+
+        await this.writeSharedModules(sharedModules);
 
         if (options.run) await this.executeTarget();
     }
 
     /**
      * Compiles a single .chord source file into Javascript.
-     * 
+     *
      * @private
      * @param {string} file - Absolute path to the .chord file.
      * @param {GlobalCLIOptions} options - CLI flags for debugging and output control.
-     * @returns {Promise<void>}
+     * @returns {Promise<Map<string, string>>} Shared runtime modules this file's generator reported needing (see `Generator.sharedModules`).
      */
-    private async compileFile(file: string, options: GlobalCLIOptions): Promise<void> {
-        if (!this.config) return;
+    private async compileFile(file: string, options: GlobalCLIOptions): Promise<Map<string, string>> {
+        if (!this.config) return new Map();
 
         console.log(`Compilando: ${path.relative(this.config.projectRoot, file)}`);
 
@@ -106,6 +111,31 @@ export class CompileCommand {
         }
 
         await Prettifier.savePrettified(outputPath, output);
+
+        return generator.sharedModules();
+    }
+
+    /**
+     * Writes out whatever shared runtime modules the compiled files reported needing (see
+     * `Generator.sharedModules`). Purely generic: writes path/content pairs relative to `dist/`
+     * without knowing what any of them are for — that's each dialect's own concern.
+     *
+     * @private
+     * @param {Map<string, string>} modules - Content keyed by output path relative to `dist/`.
+     * @returns {Promise<void>}
+     */
+    private async writeSharedModules(modules: Map<string, string>): Promise<void> {
+        if (!this.config) return;
+
+        for (const [relativePath, content] of modules) {
+            const modulePath = path.join(this.config.distDir, relativePath);
+
+            if (!fs.existsSync(path.dirname(modulePath))) {
+                fs.mkdirSync(path.dirname(modulePath), { recursive: true });
+            }
+
+            await Prettifier.savePrettified(modulePath, content);
+        }
     }
 
     /**
