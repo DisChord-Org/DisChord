@@ -20,6 +20,8 @@ export const corelib: Record<string, any> = {
             "static": true,
             "methods": {
                 "imprimir": "console.log",
+                "error": "console.error",
+                "advertencia": "console.warn",
                 "limpiar": "console.clear"
             }
         },
@@ -28,28 +30,47 @@ export const corelib: Record<string, any> = {
                 "limpiar": "trim",
                 "partir": "split",
                 "reemplazar": "replace",
+                "reemplazarTodo": "replaceAll",
                 "longitud": "length",
                 "terminaCon": "endsWith",
                 "empiezaCon": "startsWith",
                 "repetir": "repeat",
                 "cortar": "slice",
                 "minusculas": "toLowerCase",
-                "mayusculas": "toUpperCase"
+                "mayusculas": "toUpperCase",
+                "tiene": "includes",
+                "indiceDe": "indexOf",
+                "ultimoIndiceDe": "lastIndexOf",
+                "caracterEn": "charAt",
+                "rellenarInicio": "padStart",
+                "rellenarFinal": "padEnd",
+                "concatenar": "concat"
             }
         },
         "Lista": {
             methods: {
                 "agregar": "push",
                 "quitarUltimo": "pop",
+                "quitarPrimero": "shift",
+                "agregarInicio": "unshift",
                 "unir": "join",
                 "mapear": "map",
                 "llenar": "fill",
                 "todos": "every",
+                "algunos": "some",
                 "filtrar": "filter",
                 "encontrar": "find",
                 "tiene": "includes",
                 "longitud": "length",
-                "cortar": "slice"
+                "cortar": "slice",
+                "invertir": "reverse",
+                "ordenar": "sort",
+                "reducir": "reduce",
+                "aplanar": "flat",
+                "paraCada": "forEach",
+                "indiceDe": "indexOf",
+                "ultimoIndiceDe": "lastIndexOf",
+                "concatenar": "concat"
             }
         }
     },

@@ -1,4 +1,4 @@
-import { AccessNode, BaseNode, IdentificatorNode, TokenType, TokenTypeUnion } from "../../../types";
+import { AccessNode, BaseNode, CompilerMetadataKind, IdentificatorNode, TokenType, TokenTypeUnion } from "../../../types";
 import { SubGenerator } from "../../SubGenerator";
 import { corelib } from "../../core.lib";
 
@@ -33,7 +33,13 @@ export class AccessVisitor<T extends string, N extends BaseNode<T>> extends SubG
         const propName = node.property;
 
         if (objName && corelib.classes[objName] && corelib.classes[objName].methods[propName]) {
-            return corelib.classes[objName].methods[propName];
+            const resolved = corelib.classes[objName].methods[propName];
+
+            if (resolved === 'console.log') {
+                this.parent.context.symbolTable.setMetadata(CompilerMetadataKind.RequiresConsoleRuntime, true);
+            }
+
+            return resolved;
         }
 
         for (const className in corelib.classes) {

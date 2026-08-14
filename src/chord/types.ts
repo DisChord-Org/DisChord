@@ -46,7 +46,13 @@ export enum SymbolKind {
  */
 export enum CompilerMetadataKind {
     IsInteraction = 'isInteraction',
-    RequiresAsync = 'requiresAsync'
+    RequiresAsync = 'requiresAsync',
+
+    /** Set when the generated file actually calls a corelib helper that needs its
+     * companion runtime injection (e.g. `consola.imprimir` needs the `console.log`
+     * override to translate `true`/`false`/`undefined` into `verdadero`/`falso`/`indefinido`).
+     */
+    RequiresConsoleRuntime = 'requiresConsoleRuntime'
 };
 
 /**

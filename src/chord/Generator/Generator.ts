@@ -2,7 +2,7 @@ import { ChordError, ErrorLevel } from "../../errors/ChordError";
 import { DisChordNode, DisChordNodeType } from "../../dischord/types";
 import { CompilationContext } from "../../cli/commands/CompileCommand";
 import { runtimeInjections } from "./core.lib";
-import { ASTNode, BaseNode } from "../types";
+import { ASTNode, BaseNode, CompilerMetadataKind } from "../types";
 import { GeneratorContext } from "./GeneratorContext";
 import { SubGeneratorClass } from "./SubGenerator";
 
@@ -88,8 +88,10 @@ export class Generator<T extends string, N extends BaseNode<T>> extends Generato
             return code;
         }).join('\n');
 
+        const needsConsoleRuntime = this.context.symbolTable.getMetadata<boolean>(CompilerMetadataKind.RequiresConsoleRuntime);
+
         return `
-            ${runtimeInjections}
+            ${needsConsoleRuntime ? runtimeInjections : ''}
             ${body}
         `;
     }
