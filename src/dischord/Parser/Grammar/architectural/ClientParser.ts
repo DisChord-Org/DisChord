@@ -1,6 +1,6 @@
 import { DisChordNode, DisChordNodeType, DisChordODBNode, DisChordTokenType, StartBotNode } from "../../../types";
 import { DisChordError, ErrorLevel } from "../../../../errors/ChordError";
-import { ODBMode, TokenTypeUnion } from "../../../../chord/types";
+import { ODBMode, SymbolKind, TokenTypeUnion } from "../../../../chord/types";
 import { SubParser } from "../../../../chord/Parser/SubParser";
 import { BDOParser } from "../../../../chord/Parser/Grammar/BDOParser";
 import { Parser } from "../../../../chord/Parser/Parser";
@@ -42,7 +42,20 @@ export default class ClientParser extends SubParser<DisChordNodeType, DisChordNo
             message: `Se esperaba 'bot' después de 'encender', se encontró '${id.value}'`,
             location: this.peek().location
         }).format();
-        
+
+        try {
+            this.SymbolTable.register('@bot', {
+                name: '@bot',
+                kind: SymbolKind.Declaration
+            }, this.peek('prev').location);
+        } catch {
+            throw new DisChordError({
+                phase: ErrorLevel.Parser,
+                message: `Ya existe una declaración 'encender bot' en este archivo. Solo se permite una por archivo.`,
+                location: this.peek('prev').location
+            }).format();
+        }
+
         const configBody = this.parent.get(BDOParser).setMode(ODBMode.Simple).parse() as DisChordODBNode;
     
         return this.createNode<StartBotNode>({

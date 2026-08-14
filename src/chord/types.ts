@@ -26,7 +26,15 @@ export enum SymbolKind {
     Class,
     
     /** Represents an isolated state field or member attribute locked inside a Class context. */
-    Property
+    Property,
+
+    /**
+     * Represents a named block declared by an extension layer (e.g. DisChord's `comando`/`evento`)
+     * whose semantics are opaque to the core compiler. The engine only tracks that the name is
+     * taken in the current scope (for duplicate-declaration detection); it has no notion of
+     * inheritance, members, or instantiation like it does for `Class`.
+     */
+    Declaration
 };
 
 /**
