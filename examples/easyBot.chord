@@ -4,7 +4,7 @@ encender bot {
     intenciones [ "Servidores" ]
 }
 
-evento encendido {
+nuevo evento encendido {
     imprimir("[" mas usuario.nombre mas "] Bot Encendido")
 }
 
