@@ -1,6 +1,3 @@
-import { join } from 'path';
-import Prettifier from '../../../../utils/Prettifier';
-
 import { createMessageFunctionInjection } from "../../../core.lib";
 import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType, EventNode } from "../../../types";
 import { SubGenerator } from '../../../../chord/Generator/SubGenerator';
@@ -48,8 +45,6 @@ export default class EventVisitor extends SubGenerator<DisChordNodeType, DisChor
             });
         `;
 
-        Prettifier.savePrettified(join(this.parent.context.projectRoot, 'dist', 'events', `${eventName}.js`), eventBody);
-
-        return '';
+        return eventBody;
     }
 }

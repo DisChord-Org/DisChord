@@ -1,6 +1,3 @@
-import { join } from 'path';
-import Prettifier from '../../../../utils/Prettifier';
-
 import { createMessageFunctionInjection } from "../../../core.lib";
 import { ApplicationIntegrationType, CommandNode, DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType, InteractionContextType } from "../../../types";
 import { SubGenerator } from '../../../../chord/Generator/SubGenerator';
@@ -69,12 +66,10 @@ export default class CommandVisitor extends SubGenerator<DisChordNodeType, DisCh
             }
         `;
 
-        Prettifier.savePrettified(join(this.parent.context.projectRoot, 'dist', 'commands', `${CommandName}.js`), commandBody);
-        
         // deleting scope from symboltable
         this.parent.context.symbolTable.popScope();
-        
-        return '';
+
+        return commandBody;
     }
 
     /**
