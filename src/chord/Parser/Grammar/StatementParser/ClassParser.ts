@@ -93,16 +93,19 @@ export class ClassParser<T extends string, N extends BaseNode<T>> extends SubPar
     }
 
     /**
-     * Ensures a referenced base class was already declared before being extended.
-     * @throws {ChordError} If the identifier does not resolve to a previously declared class.
+     * Ensures a referenced base class was already declared (or imported) before being extended.
+     * Imported names are registered as `SymbolKind.Declaration` (their real kind is opaque at
+     * parse time — see `ImportParser`), so both kinds count as valid base classes here.
+     * @throws {ChordError} If the identifier does not resolve to a previously declared/imported symbol.
      */
     private assertClassExists(name: string): void {
         const symbol = this.SymbolTable.lookup(name);
+        const isValidBase = symbol && (symbol.kind === SymbolKind.Class || symbol.kind === SymbolKind.Declaration);
 
-        if (!symbol || symbol.kind !== SymbolKind.Class) {
+        if (!isValidBase) {
             throw new ChordError({
                 phase: ErrorLevel.Parser,
-                message: `Clase base '${name}' no declarada. Una clase debe declararse antes de poder ser extendida.`,
+                message: `Clase base '${name}' no declarada. Una clase debe declararse (o importarse) antes de poder ser extendida.`,
                 location: this.peek('prev').location
             }).format();
         }

@@ -1,5 +1,5 @@
 import { SubParser } from "../../../SubParser";
-import { BaseNode, ImportNode, TokenType, TokenTypeUnion } from "../../../../types";
+import { BaseNode, ImportNode, SymbolKind, TokenType, TokenTypeUnion } from "../../../../types";
 import { Parser } from "../../../Parser";
 
 export class ImportParser<T extends string, N extends BaseNode<T>> extends SubParser<T, N> {
@@ -36,6 +36,14 @@ export class ImportParser<T extends string, N extends BaseNode<T>> extends SubPa
 
         this.consume(TokenType.Desde, "Falta la palabra clave 'desde'");
         const path = this.consume(TokenType.TEXTO, "Se requiere la ruta del módulo").value;
+
+        // imported names are registered in the symbol table as declarations, but their kind is not known at parse time.
+        identificators.forEach(name => {
+            this.SymbolTable.register(name, {
+                name,
+                kind: SymbolKind.Declaration
+            }, this.peek('prev').location);
+        });
 
         return this.createNode<ImportNode<T>>({
             type: TokenType.Importar,
