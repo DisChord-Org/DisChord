@@ -131,9 +131,9 @@ export default class ClietInitVisitor extends SubGenerator<DisChordNodeType, Dis
                 intents: ${intents},
                 locations: {
                     base: "dist",
-                    commands: "commands",
-                    events: "events",
-                    components: "components"
+                    commands: "comandos",
+                    events: "eventos",
+                    components: "componentes"
                 }
             });
         `;
