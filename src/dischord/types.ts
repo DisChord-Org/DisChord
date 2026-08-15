@@ -20,7 +20,8 @@ export const DisChordTokenType = {
     EVENTO: 'Evento',
     CREAR_COMANDO: 'CrearComando',
     CREAR_MENSAJE: 'CrearMensaje',
-    CREAR_RECOLECTOR: 'CrearRecolector'
+    CREAR_RECOLECTOR: 'CrearRecolector',
+    CREAR_EMBED: 'CrearEmbed'
 } as const;
 
 /** Extract the literal string values */
@@ -37,7 +38,8 @@ export type DisChordNode =
     | EventNode
     | CommandNode
     | MessageNode
-    | CollectorNode;
+    | CollectorNode
+    | EmbedDeclarationNode;
 
 /** Specialized variant resolving highly encapsulated Object Data Block syntax layouts for Discord payloads */
 export type DisChordODBNode = ODBNode<DisChordNodeType, DisChordNode>;
@@ -97,6 +99,21 @@ export interface CollectorNode extends BaseNode<DisChordNodeType> {
 export interface MessageNode extends BaseNode<DisChordNodeType> {
     type: typeof DisChordTokenType.CREAR_MENSAJE;
     object: DisChordODBNode;
+}
+
+/**
+ * Syntactic node for an embed value: `embed <Nombre> { ... }`. Always generates a plain
+ * `new Embed()...` expression (never self-wraps in a variable) — when written as its own
+ * top-level statement (`nuevo embed <Nombre> { ... }`), `DisChordStatementParser` wraps it in a
+ * regular `VariableNode` so `<Nombre>` becomes reusable; when written inline as a value (e.g.
+ * `embed nuevo embed <Nombre> { ... }` inside `nuevo mensaje {}`), it's used as-is.
+ * @interface EmbedDeclarationNode
+ * @extends BaseNode<DisChordNodeType>
+ */
+export interface EmbedDeclarationNode extends BaseNode<DisChordNodeType> {
+    type: typeof DisChordTokenType.CREAR_EMBED;
+    name: string;
+    body: DisChordODBNode;
 }
 
 /**

@@ -1,6 +1,6 @@
-import { NewNode, TokenType, TokenTypeUnion } from '../../../chord/types';
+import { NewNode, SymbolKind, TokenType, TokenTypeUnion, VariableNode } from '../../../chord/types';
 import { SubParser } from '../../../chord/Parser/SubParser';
-import { DisChordASTNode, DisChordNode, DisChordNodeType } from '../../types';
+import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType, EmbedDeclarationNode } from '../../types';
 import { Parser } from '../../../chord/Parser/Parser';
 import { StatementParser } from '../../../chord/Parser/Grammar/StatementParser/StatementParser';
 import { AccessParser } from '../../../chord/Parser/Grammar/Expressions/AccessParser';
@@ -39,11 +39,13 @@ export default class DisChordStatementParser extends SubParser<DisChordNodeType,
         if (token.type === TokenType.Nuevo) {
             this.consume(TokenType.Nuevo);
 
+            // Dialect-specific dispatch (e.g. 'comando'/'evento'/'embed') takes priority over the
+            // generic class shorthand, since it's more specific.
+            const customStatement = this.parent.parseCustomStatement();
+            if (customStatement) return this.bindReusableName(customStatement);
+
             const classShorthand = this.parent.tryParseClassShorthand();
             if (classShorthand) return classShorthand;
-
-            const customStatement = this.parent.parseCustomStatement();
-            if (customStatement) return customStatement;
 
             const call = this.parent.get(AccessParser).parse();
             return this.createNode<NewNode<DisChordNodeType, DisChordNode>>({
@@ -53,5 +55,33 @@ export default class DisChordStatementParser extends SubParser<DisChordNodeType,
         }
 
         return this.parent.get(StatementParser).parse();
+    }
+
+    /**
+     * If the given node is a value-only declaration reached at statement level (currently just
+     * `EmbedDeclarationNode`, from `nuevo embed <Nombre> { ... }`), wraps it in a regular
+     * `VariableNode` so `<Nombre>` becomes a usable, reusable binding — mirroring `var <Nombre>
+     * es <expr>`. Left untouched otherwise.
+     *
+     * The same underlying node reached nested inside another expression (e.g. as a message's
+     * `embed` property value, via `PrimaryParser` instead of here) never goes through this
+     * method, so it stays a bare expression there rather than being bound to a name.
+     * @private
+     */
+    private bindReusableName (node: DisChordASTNode): DisChordASTNode {
+        if (node.type !== DisChordTokenType.CREAR_EMBED) return node;
+
+        const embed = node as EmbedDeclarationNode;
+
+        this.SymbolTable.register(embed.name, {
+            name: embed.name,
+            kind: SymbolKind.Variable
+        }, embed.location);
+
+        return this.createNode<VariableNode<DisChordNodeType, DisChordNode>>({
+            type: TokenType.VARIABLE,
+            id: embed.name,
+            value: embed
+        });
     }
 }

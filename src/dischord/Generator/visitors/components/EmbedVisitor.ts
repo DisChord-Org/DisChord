@@ -17,19 +17,27 @@ export default class EmbedVisitor extends SubGenerator<DisChordNodeType, DisChor
     public static triggerToken: TokenTypeUnion<DisChordTokenType> | undefined = undefined;
 
     /**
-     * Helper method to generate the embed array structure by searching for the 
+     * Helper method to generate the embed array structure by searching for the
      * 'embed' property within a given ODBNode.
-     * * It automates the extraction and generation process, returning a formatted 
-     * string ready to be injected into a JavaScript object.
-     * * @param node The parent ODBNode containing a potential 'embed' definition.
+     *
+     * The property's value can be either an anonymous inline embed (a BDO, e.g.
+     * `embed { titulo "..."; }`) — handled by this visitor's own chain-building `visit()` — or
+     * any other expression referencing a previously declared, reusable embed (e.g.
+     * `embed nuevo Bienvenida()`), which is delegated to the generic dispatcher instead, since
+     * it's already a complete, valid Embed-producing expression on its own.
+     *
+     * @param node The parent ODBNode containing a potential 'embed' definition.
      * @returns A string containing the embeds or an empty string if no embed property is defined.
      */
     visitIfNodeExists (node: DisChordODBNode | undefined): string {
         if (!node) return '';
 
         const embed = this.parent.get(BDOVisitor).getODBProperty(node, 'embed');
+        if (!embed) return '';
 
-        return embed ? `, embeds: [ ${this.visit(embed)} ] ` : '';
+        const embedCode = embed.type === 'BDO' ? this.visit(embed) : this.parent.visit(embed);
+
+        return `, embeds: [ ${embedCode} ] `;
     }
 
     /**
@@ -40,12 +48,24 @@ export default class EmbedVisitor extends SubGenerator<DisChordNodeType, DisChor
      * @returns A string representing the instantiation and configuration of a new Embed.
      */
     visit (node: DisChordASTNode): string {
+        return `new Embed()${this.buildChain(node)}`;
+    }
+
+    /**
+     * Resolves a BDO's properties into the `.setX(...)` method chain alone, without the leading
+     * `new Embed()`. Shared by `visit()` (the anonymous inline form) and `EmbedDeclarationVisitor`
+     * (the named, reusable `embed <Nombre> { ... }` form), so both produce identical output.
+     * @param node The AST node (must be of type 'BDO') containing embed definitions.
+     * @throws Error if the node is not a BDO.
+     * @returns The `.setX(...)` method chain, without the `new Embed()` prefix.
+     */
+    buildChain (node: DisChordASTNode): string {
         if (node.type != 'BDO') throw new DisChordError({
             phase: ErrorLevel.Parser,
             message: `Se esperaba un BDO, se recibió '${node.type}'`,
             location: node.location
         }).format();
-        
+
         const ResolvedColor = this.resolveColors(node);
         const ResolvedTitle = this.resolveTitle(node);
         const ResolvedAuthor = this.resolveAuthor(node);
@@ -57,7 +77,6 @@ export default class EmbedVisitor extends SubGenerator<DisChordNodeType, DisChor
         const ResolvedFooter = this.resolveFooter(node);
 
         return `
-            new Embed()
                 ${ResolvedColor}
                 ${ResolvedTitle}
                 ${ResolvedAuthor}

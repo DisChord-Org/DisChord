@@ -1,4 +1,4 @@
-import { Token, TokenTypeUnion } from '../../chord/types';
+import { Token, TokenType, TokenTypeUnion } from '../../chord/types';
 import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType } from '../types';
 
 import { Parser } from '../../chord/Parser/Parser';
@@ -10,6 +10,7 @@ import MessageParser from './Grammar/features/MessageParser';
 import CollectorParser from './Grammar/features/CollectorParser';
 import ClientParser from './Grammar/architectural/ClientParser';
 import EventParser from './Grammar/architectural/EventParser';
+import EmbedDeclarationParser from './Grammar/components/EmbedDeclarationParser';
 import { CompilationContext } from '../../cli/commands/CompileCommand';
 import DisChordStatementParser from './Grammar/DisChordStatementParser';
 
@@ -96,15 +97,17 @@ export class DisChordParser extends Parser<DisChordNodeType, DisChordNode> {
     ];
 
     /**
-     * Parses the full token stream and validates that any whole-file declaration (`comando`,
-     * `evento`) is the sole top-level statement in the file. Since the generator emits their
-     * entire returned string as the file's content (compiled 1:1 from its source `.chord` file
-     * by `CompileCommand`), mixing one with anything else — another such declaration, or
-     * unrelated code — would silently produce a broken module (duplicate imports, more than one
-     * `export default`, etc.) that only fails much later when Node tries to load it.
+     * Parses the full token stream and validates that at most one whole-file declaration
+     * (`comando`, `evento`) exists per file. Since the generator emits each one's entire
+     * returned string as the file's content (compiled 1:1 from its source `.chord` file by
+     * `CompileCommand`), a *second* one would produce a broken module (duplicate `export
+     * default`, duplicate imports of the same name). Other top-level code (imports, reusable
+     * classes, etc.) alongside a single whole-file declaration is fine — ES modules don't
+     * require `import`/`export` to be textually first, so nothing about the generated output
+     * actually breaks by mixing them.
      * @override
      * @returns {DisChordASTNode[]} The parsed top-level AST nodes.
-     * @throws {DisChordError} If a whole-file declaration shares its file with anything else.
+     * @throws {DisChordError} If more than one whole-file declaration exists in the same file.
      */
     override parse(): DisChordASTNode[] {
         const nodes = super.parse();
@@ -115,12 +118,6 @@ export class DisChordParser extends Parser<DisChordNodeType, DisChordNode> {
             phase: ErrorLevel.Parser,
             message: `Solo se permite un 'comando' o 'evento' por archivo. Este archivo declara ${wholeFileNodes.length}: separalos en un archivo por cada uno.`,
             location: wholeFileNodes[1].location
-        }).format();
-
-        if (wholeFileNodes.length === 1 && nodes.length > 1) throw new DisChordError({
-            phase: ErrorLevel.Parser,
-            message: `Un archivo que declara un 'comando' o 'evento' no puede contener ningún otro código a nivel superior. Movelo a su propio archivo.`,
-            location: nodes.find(node => node !== wholeFileNodes[0])!.location
         }).format();
 
         return nodes;
@@ -134,6 +131,17 @@ export class DisChordParser extends Parser<DisChordNodeType, DisChordNode> {
      */
     override parseCustomStatement(): DisChordASTNode | null {
         const token = this.peek();
+
+        // 'embed' deliberately stays an unreserved identifier (see EmbedDeclarationParser), so
+        // it can't be matched by the triggerToken dispatch below — it's matched by literal value
+        // here instead, requiring the `<Nombre> {` shape so it can't be confused with 'embed'
+        // used as an ordinary BDO property key elsewhere (e.g. inside `nuevo mensaje {}`).
+        if (token.type === TokenType.IDENTIFICADOR && token.value === 'embed'
+            && this.peek('next').type === TokenType.IDENTIFICADOR
+            && this.peek(this.cursor + 2)?.type === TokenType.L_BRACE) {
+            this.consume(TokenType.IDENTIFICADOR);
+            return new EmbedDeclarationParser(this).parse();
+        }
 
         const ParserClass = DisChordParser.DisChordSubParsers.find(SubParser =>
             SubParser.triggerToken !== undefined &&

@@ -12,6 +12,7 @@ import { createMessageModuleContent, createMessageModulePath } from "../core.lib
 import ButtonVisitor from "./visitors/components/ButtonVisitor";
 import CommandOptionVisitor from "./visitors/components/CommandOptionVisitor";
 import EmbedVisitor from "./visitors/components/EmbedVisitor";
+import EmbedDeclarationVisitor from "./visitors/components/EmbedDeclarationVisitor";
 import CollectorVisitor from "./visitors/features/CollectorVisitor";
 import MessageVisitor from "./visitors/features/MessageVisitor";
 import { DisChordAccessVisitor } from "./visitors/variables/DisChordAccessVisitor";
@@ -28,7 +29,7 @@ export class DisChordGenerator extends Generator<DisChordNodeType, DisChordNode>
      */
     private static readonly DisChordSubGenerators: SubGeneratorClass<DisChordNodeType, DisChordNode>[] = [
         ClientInitVisitor, CommandVisitor, EventVisitor,
-        ButtonVisitor, CommandOptionVisitor, EmbedVisitor,
+        ButtonVisitor, CommandOptionVisitor, EmbedVisitor, EmbedDeclarationVisitor,
         CollectorVisitor, MessageVisitor,
         DisChordAccessVisitor, DisChordCallVisitor
     ];
