@@ -5,6 +5,7 @@ import { DisChordGenerator } from "../src/dischord/Generator/Generator";
 import { KeyWords } from "../src/chord/KeywordsManager";
 import { Lexer } from "../src/chord/Lexer";
 import { DisChordParser } from "../src/dischord/Parser/Parser";
+import { DisChordAnalyzer } from "../src/dischord/Analyzer/Analyzer";
 import { SymbolTable } from "../src/chord/SymbolsTable";
 import { CodeProvider } from "../src/chord/CodeProvider";
 import { DisChordASTNode, DisChordNodeType, DisChordTokenType } from "../src/dischord/types";
@@ -119,7 +120,9 @@ export abstract class Test {
         
         const parser = new DisChordParser(tokens, context);
         const ast: DisChordASTNode[] = parser.parse();
-        
+
+        new DisChordAnalyzer(context).analyze(ast);
+
         const generator = new DisChordGenerator(context);
         const output = generator.generate(ast);
 

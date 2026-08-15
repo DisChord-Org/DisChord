@@ -4,6 +4,7 @@ import { Location } from "../chord/types";
 export enum ErrorLevel {
     Lexer = 'Lexer',
     Parser = 'Parser',
+    Analysis = 'Análisis',
     Compiler = 'Compilador',
     Execution = 'Ejecución'
 }
@@ -69,7 +70,7 @@ abstract class BaseChordError extends Error {
 }
 
 /** Allowed error levels for the core Chord engine. */
-type ChordErrorLevels = ErrorLevel.Lexer | ErrorLevel.Parser | ErrorLevel.Compiler;
+type ChordErrorLevels = ErrorLevel.Lexer | ErrorLevel.Parser | ErrorLevel.Analysis | ErrorLevel.Compiler;
 
 /** Critical core engine error. Defaults to FATAL. */
 export class ChordError extends BaseChordError {
@@ -80,7 +81,7 @@ export class ChordError extends BaseChordError {
 }
 
 /** Allowed error levels for the DisChord abstraction layer. */
-type DisChordErrorLevels = ErrorLevel.Parser | ErrorLevel.Compiler | ErrorLevel.Execution;
+type DisChordErrorLevels = ErrorLevel.Parser | ErrorLevel.Analysis | ErrorLevel.Compiler | ErrorLevel.Execution;
 
 /** Abstraction layer error. Defaults to ERROR. */
 export class DisChordError extends BaseChordError {

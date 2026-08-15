@@ -9,6 +9,7 @@ import { SymbolTable } from '../../chord/SymbolsTable';
 import { KeyWords } from '../../chord/KeywordsManager';
 import { Lexer } from '../../chord/Lexer';
 import { DisChordParser } from '../../dischord/Parser/Parser';
+import { DisChordAnalyzer } from '../../dischord/Analyzer/Analyzer';
 import { DisChordGenerator } from '../../dischord/Generator/Generator';
 import { DisChordASTNode, DisChordNodeType, DisChordTokenType } from '../../dischord/types';
 import { RunCommand } from './RunCommand';
@@ -101,6 +102,8 @@ export class CompileCommand {
         const parser = new DisChordParser(tokens, context);
         const ast: DisChordASTNode[] = parser.parse();
         this.logDebug(DebugFlags.Parser, options, ast);
+
+        new DisChordAnalyzer(context).analyze(ast);
 
         const generator = new DisChordGenerator(context);
         const output = generator.generate(ast);
