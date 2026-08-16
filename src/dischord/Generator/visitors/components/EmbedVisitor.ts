@@ -2,7 +2,7 @@ import { DisChordError, ErrorLevel } from "../../../../errors/ChordError";
 import { EmbedColors } from "../../constants/mappings";
 import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordODBNode, DisChordTokenType } from "../../../types";
 import { SubGenerator } from "../../../../chord/Generator/SubGenerator";
-import { TokenTypeUnion } from "../../../../chord/types";
+import { TokenType, TokenTypeUnion } from "../../../../chord/types";
 import { BDOVisitor } from "../../../../chord/Generator/visitors/expressions/BDOVisitor";
 
 /**
@@ -20,11 +20,14 @@ export default class EmbedVisitor extends SubGenerator<DisChordNodeType, DisChor
      * Helper method to generate the embed array structure by searching for the
      * 'embed' property within a given ODBNode.
      *
-     * The property's value can be either an anonymous inline embed (a BDO, e.g.
-     * `embed { titulo "..."; }`) — handled by this visitor's own chain-building `visit()` — or
-     * any other expression referencing a previously declared, reusable embed (e.g.
-     * `embed nuevo Bienvenida()`), which is delegated to the generic dispatcher instead, since
-     * it's already a complete, valid Embed-producing expression on its own.
+     * The property's value can be:
+     * - an anonymous inline embed (a BDO, e.g. `embed { titulo "..."; }`), wrapped into
+     *   `new Embed()...` by this visitor's own chain-building `visit()`;
+     * - any other expression referencing a previously declared, reusable embed (e.g. `embed
+     *   Bienvenida`), delegated to the generic dispatcher instead, since it's already a complete,
+     *   valid Embed-producing expression on its own;
+     * - or a list mixing either of the above (`embed [ { titulo "Uno" } Bienvenida ]`), for
+     *   sending more than one embed in the same message — each element resolved the same way.
      *
      * @param node The parent ODBNode containing a potential 'embed' definition.
      * @returns A string containing the embeds or an empty string if no embed property is defined.
@@ -35,9 +38,21 @@ export default class EmbedVisitor extends SubGenerator<DisChordNodeType, DisChor
         const embed = this.parent.get(BDOVisitor).getODBProperty(node, 'embed');
         if (!embed) return '';
 
-        const embedCode = embed.type === 'BDO' ? this.visit(embed) : this.parent.visit(embed);
+        const embedsCode = embed.type === TokenType.LISTA
+            ? (embed as unknown as { body: DisChordASTNode[] }).body.map(item => this.resolveEmbedExpression(item)).join(', ')
+            : this.resolveEmbedExpression(embed);
 
-        return `, embeds: [ ${embedCode} ] `;
+        return `, embeds: [ ${embedsCode} ] `;
+    }
+
+    /**
+     * Resolves a single embed-producing expression: an anonymous inline BDO gets wrapped via
+     * `visit()`, anything else (a reference to an already-declared embed) is passed through as-is.
+     * Shared by `visitIfNodeExists`'s single-embed and list-of-embeds paths.
+     * @private
+     */
+    private resolveEmbedExpression (embed: DisChordASTNode): string {
+        return embed.type === TokenType.BDO ? this.visit(embed) : this.parent.visit(embed);
     }
 
     /**
