@@ -1,0 +1,8 @@
+nuevo embed Bienvenida {
+    titulo "Bienvenido"
+    descripcion "Gracias por unirte"
+}
+
+var msg es nuevo mensaje {
+    embed Bienvenida
+}

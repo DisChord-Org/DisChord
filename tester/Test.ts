@@ -55,6 +55,18 @@ export abstract class Test {
     public forceUpdate: boolean = false;
 
     /**
+     * When set, this test expects compilation to *fail* with an error whose message contains
+     * this substring, instead of succeeding and matching output snapshots. No `expected.ast.json`
+     * or `expected.mjs` fixture is needed for this kind of test — the assertion is "it throws",
+     * not "it produces this exact output". Useful for validating that invalid input (duplicate
+     * declarations, an unresolved base class, etc.) is correctly rejected.
+     *
+     * @type {string | undefined}
+     * @public
+     */
+    public readonly expectedError?: string;
+
+    /**
      * Reads the raw input .chord file for this test.
      *
      * @type {string}
@@ -92,14 +104,39 @@ export abstract class Test {
 
     /**
      * Standard execution pipeline for tests.
-     * Executes lexing, parsing, generation, and snapshot validation.
-     * Subclasses can override this method if custom test behavior is required.
+     * Executes lexing, parsing, analysis and generation, then either validates the result against
+     * snapshots (the default) or, if `expectedError` is set, asserts that compilation throws
+     * instead. Subclasses can override this method if custom test behavior is required.
      *
      * @method run
      * @returns {Promise<void>}
      * @protected
      */
     protected async run(): Promise<void> {
+        if (this.expectedError !== undefined) {
+            await this.assertThrows(this.expectedError);
+            return;
+        }
+
+        const { ast, output } = await this.compile();
+
+        const prettifiedOutput = await Prettifier.prettify(output);
+        const actualAstJson = JSON.stringify(ast, null, 2);
+
+        await this.assertOrUpdateSnapshot(actualAstJson, 'ast');
+        await this.assertOrUpdateSnapshot(prettifiedOutput, 'code');
+    }
+
+    /**
+     * Runs the full compilation pipeline (lexer → parser → analyzer → generator) for this test's
+     * `input.chord`, without prettifying or comparing against any snapshot — the shared step both
+     * the snapshot-comparison path and the error-expectation path in `run()` build on.
+     *
+     * @method compile
+     * @returns {Promise<{ ast: DisChordASTNode[]; output: string }>}
+     * @protected
+     */
+    protected async compile(): Promise<{ ast: DisChordASTNode[]; output: string }> {
         const context: CompilationContext<DisChordNodeType> = {
             symbolTable: new SymbolTable(),
             keywordsManager: new KeyWords(),
@@ -111,13 +148,13 @@ export abstract class Test {
         console.log(`Compilando: ${path.relative(context.projectRoot, fileName)}`);
 
         DisChordParser.registerGrammar(context);
-        
+
         const code = this.code;
         context.codeProvider.currentCode = { name: fileName, content: code };
-        
+
         const lexer = new Lexer<DisChordTokenType>(context);
         const tokens = lexer.tokenize();
-        
+
         const parser = new DisChordParser(tokens, context);
         const ast: DisChordASTNode[] = parser.parse();
 
@@ -126,11 +163,35 @@ export abstract class Test {
         const generator = new DisChordGenerator(context);
         const output = generator.generate(ast);
 
-        const prettifiedOutput = await Prettifier.prettify(output);
-        const actualAstJson = JSON.stringify(ast, null, 2);
+        return { ast, output };
+    }
 
-        await this.assertOrUpdateSnapshot(actualAstJson, 'ast');
-        await this.assertOrUpdateSnapshot(prettifiedOutput, 'code');
+    /**
+     * Runs `compile()` and asserts it throws an error whose message contains `substring`. Used by
+     * `run()` when `expectedError` is set.
+     *
+     * @method assertThrows
+     * @param {string} substring - Text the thrown error's message must contain.
+     * @returns {Promise<void>}
+     * @protected
+     * @throws {Error} If compilation succeeds, or throws an error not containing `substring`.
+     */
+    protected async assertThrows(substring: string): Promise<void> {
+        let thrownMessage: string | undefined;
+
+        try {
+            await this.compile();
+        } catch (error) {
+            thrownMessage = error instanceof Error ? error.message : String(error);
+        }
+
+        if (thrownMessage === undefined) {
+            throw new Error(`Se esperaba que la compilación lanzara un error, pero tuvo éxito.`);
+        }
+
+        if (!thrownMessage.includes(substring)) {
+            throw new Error(`El error lanzado no contiene el texto esperado ('${substring}').\nRecibido: ${thrownMessage}`);
+        }
     }
 
     /**

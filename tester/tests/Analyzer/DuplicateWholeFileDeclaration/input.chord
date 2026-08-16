@@ -1,0 +1,7 @@
+nuevo comando Uno {
+    descripcion "primer comando"
+}
+
+nuevo evento encendido {
+    imprimir("hola")
+}

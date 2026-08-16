@@ -1,0 +1,93 @@
+[
+  {
+    "type": "importar",
+    "identificators": [
+      "createMessage"
+    ],
+    "isDestructured": true,
+    "path": "./lib/createMessage.mjs",
+    "location": {
+      "line": 0,
+      "column": 0
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "Bienvenida",
+    "value": {
+      "type": "CrearEmbed",
+      "name": "Bienvenida",
+      "body": {
+        "type": "BDO",
+        "mode": 0,
+        "blocks": {
+          "titulo": {
+            "type": "Literal",
+            "value": "Bienvenido",
+            "raw": "Bienvenido",
+            "location": {
+              "line": 2,
+              "column": 12
+            }
+          },
+          "descripcion": {
+            "type": "Literal",
+            "value": "Gracias por unirte",
+            "raw": "Gracias por unirte",
+            "location": {
+              "line": 3,
+              "column": 17
+            }
+          }
+        },
+        "body": [],
+        "location": {
+          "line": 4,
+          "column": 1
+        }
+      },
+      "location": {
+        "line": 4,
+        "column": 1
+      }
+    },
+    "location": {
+      "line": 4,
+      "column": 1
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "msg",
+    "value": {
+      "type": "CrearMensaje",
+      "object": {
+        "type": "BDO",
+        "mode": 0,
+        "blocks": {
+          "embed": {
+            "type": "IDENTIFICADOR",
+            "value": "Bienvenida",
+            "location": {
+              "line": 7,
+              "column": 11
+            }
+          }
+        },
+        "body": [],
+        "location": {
+          "line": 8,
+          "column": 1
+        }
+      },
+      "location": {
+        "line": 8,
+        "column": 1
+      }
+    },
+    "location": {
+      "line": 8,
+      "column": 1
+    }
+  }
+]

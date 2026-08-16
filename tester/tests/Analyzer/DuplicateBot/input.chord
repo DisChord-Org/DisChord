@@ -1,0 +1,7 @@
+encender bot {
+    token "primer-token"
+}
+
+encender bot {
+    token "segundo-token"
+}
