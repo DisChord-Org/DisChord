@@ -16,17 +16,26 @@ export default class ButtonVisitor extends SubGenerator<DisChordNodeType, DisCho
     public static triggerToken: TokenTypeUnion<DisChordTokenType> | undefined = undefined;
 
     /**
-     * Helper method to generate the ActionRow and Button structure by searching 
+     * Helper method to generate the ActionRow and Button structure by searching
      * for the 'boton' property within a given ODBNode.
-     * * @param node The parent ODBNode that may contain a 'boton' definition.
+     *
+     * The property's value can be either an anonymous inline button (a BDO, e.g.
+     * `boton { id "..."; }`) — handled by this visitor's own `visit()` — or any other expression
+     * referencing a previously declared, reusable button (e.g. `boton Confirmar`), which is
+     * delegated to the generic dispatcher instead, since it's already a complete, valid
+     * Button-producing expression on its own. Mirrors `EmbedVisitor.visitIfNodeExists`.
+     * @param node The parent ODBNode that may contain a 'boton' definition.
      * @returns A string representing the 'components array or an empty string if no button property is defined.
      */
     visitIfNodeExists (node: DisChordODBNode | undefined): string {
         if (!node) return '';
 
         const button = this.parent.get(BDOVisitor).getODBProperty(node, 'boton');
+        if (!button) return '';
 
-        return button ? `, components: [ new ActionRow().setComponents([ ${this.visit(button)} ]) ]` : '';
+        const buttonCode = button.type === 'BDO' ? this.visit(button) : this.parent.visit(button);
+
+        return `, components: [ new ActionRow().setComponents([ ${buttonCode} ]) ]`;
     }
 
     /**

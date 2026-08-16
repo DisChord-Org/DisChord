@@ -17,12 +17,16 @@ export const DisChordTokenType = {
     Encender: 'encender',
     Bot: 'bot',
 
+    Embed: 'embed',
+    Boton: 'boton',
+
     ENCENDER_BOT: 'EncenderBot',
     EVENTO: 'Evento',
     CREAR_COMANDO: 'CrearComando',
     CREAR_MENSAJE: 'CrearMensaje',
     CREAR_RECOLECTOR: 'CrearRecolector',
-    CREAR_EMBED: 'CrearEmbed'
+    CREAR_EMBED: 'CrearEmbed',
+    CREAR_BOTON: 'CrearBoton'
 } as const;
 
 /** Extract the literal string values */
@@ -40,7 +44,8 @@ export type DisChordNode =
     | CommandNode
     | MessageNode
     | CollectorNode
-    | EmbedDeclarationNode;
+    | EmbedDeclarationNode
+    | ButtonDeclarationNode;
 
 /** Specialized variant resolving highly encapsulated Object Data Block syntax layouts for Discord payloads */
 export type DisChordODBNode = ODBNode<DisChordNodeType, DisChordNode>;
@@ -106,13 +111,28 @@ export interface MessageNode extends BaseNode<DisChordNodeType> {
  * Syntactic node for an embed value: `embed <Nombre> { ... }`. Always generates a plain
  * `new Embed()...` expression (never self-wraps in a variable) — when written as its own
  * top-level statement (`nuevo embed <Nombre> { ... }`), `DisChordStatementParser` wraps it in a
- * regular `VariableNode` so `<Nombre>` becomes reusable; when written inline as a value (e.g.
- * `embed nuevo embed <Nombre> { ... }` inside `nuevo mensaje {}`), it's used as-is.
+ * regular `VariableNode` so `<Nombre>` becomes reusable; when written inline as a value (e.g. as
+ * the `embed` property of an `enviar mensaje {}`), it's used as-is. See
+ * `UnreservedComponentDeclarations` for how `embed <Nombre> {` gets dispatched here in the first
+ * place, without `embed` being a reserved keyword.
  * @interface EmbedDeclarationNode
  * @extends BaseNode<DisChordNodeType>
  */
 export interface EmbedDeclarationNode extends BaseNode<DisChordNodeType> {
     type: typeof DisChordTokenType.CREAR_EMBED;
+    name: string;
+    body: DisChordODBNode;
+}
+
+/**
+ * Syntactic node for a button value: `boton <Nombre> { ... }`. Same shape and lifecycle as
+ * `EmbedDeclarationNode` — always generates a plain `new Button()...` expression; gets wrapped in
+ * a `VariableNode` by `DisChordStatementParser` only when reached at statement level.
+ * @interface ButtonDeclarationNode
+ * @extends BaseNode<DisChordNodeType>
+ */
+export interface ButtonDeclarationNode extends BaseNode<DisChordNodeType> {
+    type: typeof DisChordTokenType.CREAR_BOTON;
     name: string;
     body: DisChordODBNode;
 }

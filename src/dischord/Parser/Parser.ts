@@ -1,4 +1,4 @@
-import { Token, TokenType, TokenTypeUnion } from '../../chord/types';
+import { Token, TokenTypeUnion } from '../../chord/types';
 import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType } from '../types';
 
 import { Parser } from '../../chord/Parser/Parser';
@@ -9,9 +9,9 @@ import MessageParser from './Grammar/features/MessageParser';
 import CollectorParser from './Grammar/features/CollectorParser';
 import ClientParser from './Grammar/architectural/ClientParser';
 import EventParser from './Grammar/architectural/EventParser';
-import EmbedDeclarationParser from './Grammar/components/EmbedDeclarationParser';
 import { CompilationContext } from '../../cli/commands/CompileCommand';
 import DisChordStatementParser from './Grammar/DisChordStatementParser';
+import { UnreservedComponentDeclarations } from './Grammar/UnreservedComponentDeclarations';
 
 /**
  * Main Orchestrator for DisChord's syntactic analysis.
@@ -92,12 +92,8 @@ export class DisChordParser extends Parser<DisChordNodeType, DisChordNode> {
     override parseCustomStatement(): DisChordASTNode | null {
         const token = this.peek();
 
-        if (token.type === TokenType.IDENTIFICADOR && token.value === 'embed'
-            && this.peek('next').type === TokenType.IDENTIFICADOR
-            && this.peek(this.cursor + 2)?.type === TokenType.L_BRACE) {
-            this.consume(TokenType.IDENTIFICADOR);
-            return new EmbedDeclarationParser(this).parse();
-        }
+        const componentDeclaration = this.tryParseUnreservedComponentDeclaration(UnreservedComponentDeclarations);
+        if (componentDeclaration) return componentDeclaration;
 
         const ParserClass = DisChordParser.DisChordSubParsers.find(SubParser =>
             SubParser.triggerToken !== undefined &&

@@ -1,9 +1,10 @@
 import { NewNode, TokenType, TokenTypeUnion, VariableNode } from '../../../chord/types';
 import { SubParser } from '../../../chord/Parser/SubParser';
-import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType, EmbedDeclarationNode } from '../../types';
+import { DisChordASTNode, DisChordNode, DisChordNodeType } from '../../types';
 import { Parser } from '../../../chord/Parser/Parser';
 import { StatementParser } from '../../../chord/Parser/Grammar/StatementParser/StatementParser';
 import { AccessParser } from '../../../chord/Parser/Grammar/Expressions/AccessParser';
+import { UnreservedComponentDeclarations } from './UnreservedComponentDeclarations';
 
 /**
  * @class DisChordStatementParser
@@ -58,10 +59,10 @@ export default class DisChordStatementParser extends SubParser<DisChordNodeType,
     }
 
     /**
-     * If the given node is a value-only declaration reached at statement level (currently just
-     * `EmbedDeclarationNode`, from `nuevo embed <Nombre> { ... }`), wraps it in a regular
-     * `VariableNode` so `<Nombre>` becomes a usable, reusable binding — mirroring `var <Nombre>
-     * es <expr>`. Left untouched otherwise.
+     * If the given node is a value-only component declaration reached at statement level (any of
+     * `UnreservedComponentDeclarations`' node types — `embed`, `boton`, ...), wraps it in a
+     * regular `VariableNode` so `<Nombre>` becomes a usable, reusable binding — mirroring `var
+     * <Nombre> es <expr>`. Left untouched otherwise.
      *
      * The same underlying node reached nested inside another expression (e.g. as a message's
      * `embed` property value, via `PrimaryParser` instead of here) never goes through this
@@ -69,14 +70,15 @@ export default class DisChordStatementParser extends SubParser<DisChordNodeType,
      * @private
      */
     private bindReusableName (node: DisChordASTNode): DisChordASTNode {
-        if (node.type !== DisChordTokenType.CREAR_EMBED) return node;
+        const isComponentDeclaration = UnreservedComponentDeclarations.some(declaration => declaration.nodeType === node.type);
+        if (!isComponentDeclaration) return node;
 
-        const embed = node as EmbedDeclarationNode;
+        const declaration = node as unknown as { name: string };
 
         return this.createNode<VariableNode<DisChordNodeType, DisChordNode>>({
             type: TokenType.VARIABLE,
-            id: embed.name,
-            value: embed
+            id: declaration.name,
+            value: node
         });
     }
 }

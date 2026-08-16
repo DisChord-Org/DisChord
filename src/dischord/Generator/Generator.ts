@@ -8,6 +8,7 @@ import CommandVisitor from '../Generator/visitors/architectural/CommandVisitor';
 import EventVisitor from '../Generator/visitors/architectural/EventVisitor';
 import { CompilationContext } from "../../cli/commands/CompileCommand";
 import ButtonVisitor from "./visitors/components/ButtonVisitor";
+import ButtonDeclarationVisitor from "./visitors/components/ButtonDeclarationVisitor";
 import CommandOptionVisitor from "./visitors/components/CommandOptionVisitor";
 import EmbedVisitor from "./visitors/components/EmbedVisitor";
 import EmbedDeclarationVisitor from "./visitors/components/EmbedDeclarationVisitor";
@@ -27,7 +28,7 @@ export class DisChordGenerator extends Generator<DisChordNodeType, DisChordNode>
      */
     private static readonly DisChordSubGenerators: SubGeneratorClass<DisChordNodeType, DisChordNode>[] = [
         ClientInitVisitor, CommandVisitor, EventVisitor,
-        ButtonVisitor, CommandOptionVisitor, EmbedVisitor, EmbedDeclarationVisitor,
+        ButtonVisitor, ButtonDeclarationVisitor, CommandOptionVisitor, EmbedVisitor, EmbedDeclarationVisitor,
         CollectorVisitor, MessageVisitor,
         DisChordAccessVisitor, DisChordCallVisitor
     ];

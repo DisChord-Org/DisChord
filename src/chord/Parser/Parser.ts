@@ -312,6 +312,39 @@ export class Parser<T extends string, N extends BaseNode<T>> extends ParserConte
     }
 
     /**
+     * Detects and parses an unreserved-keyword component declaration: `<keyword> <Nombre> { ... }`
+     * — for keywords a dialect deliberately keeps as ordinary identifiers instead of registering
+     * them as real reserved tokens (so the same word still works as an ordinary property key
+     * elsewhere), which means they can't be matched by the normal `triggerToken`-based dispatch.
+     * Matched by literal value instead, requiring the shared `<Nombre> {` shape so it can't be
+     * confused with the same word used as a property key (e.g. dischord's `embed <Nombre> {}`,
+     * `boton <Nombre> {}` vs. `embed { ... }` as a message's `embed` property).
+     *
+     * A dialect calls this from its own `parseCustomStatement` override, passing whichever
+     * `{ keyword, ParserClass }` pairs it wants recognized this way — chord itself doesn't know
+     * what any of those keywords mean, only how to recognize and dispatch the shared shape.
+     * @public
+     * @param registrations - Table of `{ keyword, ParserClass }` pairs to match against.
+     * @returns {ASTNode<T, N> | null} The parsed component declaration, or null if the upcoming
+     * tokens don't match the shape or don't match any registered keyword (nothing is consumed).
+     */
+    public tryParseUnreservedComponentDeclaration (registrations: { keyword: string; ParserClass: SubParserClass<T, N> }[]): ASTNode<T, N> | null {
+        const token = this.peek();
+
+        const isDeclarationShape = token.type === TokenType.IDENTIFICADOR
+            && this.peek('next').type === TokenType.IDENTIFICADOR
+            && this.peek(this.cursor + 2)?.type === TokenType.L_BRACE;
+
+        if (!isDeclarationShape) return null;
+
+        const registration = registrations.find(r => r.keyword === token.value);
+        if (!registration) return null;
+
+        this.consume(TokenType.IDENTIFICADOR);
+        return new registration.ParserClass(this).parse();
+    }
+
+    /**
      * Extensibility hook intended for parsing custom dialect elements or macro statements.
      *
      * @public
