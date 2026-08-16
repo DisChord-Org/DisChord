@@ -1,6 +1,6 @@
 import { Token, TokenType } from './types';
 import { ChordError, ErrorLevel } from '../errors/ChordError';
-import { CompilationContext } from '../init/Init';
+import { CompilationContext } from '../cli/commands/CompileCommand';
 import { SymbolTranslationMap } from './Symbols';
 
 export class Lexer<T extends string> {
