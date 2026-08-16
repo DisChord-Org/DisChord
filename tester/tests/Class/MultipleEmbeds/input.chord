@@ -1,0 +1,12 @@
+nuevo embed Bienvenida {
+    titulo "Bienvenido"
+}
+
+var msg es enviar mensaje {
+    contenido "hola"
+    embed [
+        { titulo "Uno" }
+        { titulo "Dos" }
+        Bienvenida
+    ]
+}

@@ -1,0 +1,10 @@
+nuevo boton Confirmar {
+    id "confirmar"
+    etiqueta "Confirmar"
+    estilo "verde"
+}
+
+var msg es enviar mensaje {
+    contenido "hola"
+    boton Confirmar
+}

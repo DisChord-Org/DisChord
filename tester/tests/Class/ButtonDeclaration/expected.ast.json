@@ -1,0 +1,111 @@
+[
+  {
+    "type": "importar",
+    "identificators": [
+      "createMessage"
+    ],
+    "isDestructured": true,
+    "path": "./lib/createMessage.mjs",
+    "location": {
+      "line": 0,
+      "column": 0
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "Confirmar",
+    "value": {
+      "type": "CrearBoton",
+      "name": "Confirmar",
+      "body": {
+        "type": "BDO",
+        "mode": 0,
+        "blocks": {
+          "id": {
+            "type": "Literal",
+            "value": "confirmar",
+            "raw": "confirmar",
+            "location": {
+              "line": 2,
+              "column": 8
+            }
+          },
+          "etiqueta": {
+            "type": "Literal",
+            "value": "Confirmar",
+            "raw": "Confirmar",
+            "location": {
+              "line": 3,
+              "column": 14
+            }
+          },
+          "estilo": {
+            "type": "Literal",
+            "value": "verde",
+            "raw": "verde",
+            "location": {
+              "line": 4,
+              "column": 12
+            }
+          }
+        },
+        "body": [],
+        "location": {
+          "line": 5,
+          "column": 1
+        }
+      },
+      "location": {
+        "line": 5,
+        "column": 1
+      }
+    },
+    "location": {
+      "line": 5,
+      "column": 1
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "msg",
+    "value": {
+      "type": "CrearMensaje",
+      "object": {
+        "type": "BDO",
+        "mode": 0,
+        "blocks": {
+          "contenido": {
+            "type": "Literal",
+            "value": "hola",
+            "raw": "hola",
+            "location": {
+              "line": 8,
+              "column": 15
+            }
+          },
+          "boton": {
+            "type": "IDENTIFICADOR",
+            "value": "Confirmar",
+            "location": {
+              "line": 9,
+              "column": 11
+            }
+          }
+        },
+        "body": [],
+        "location": {
+          "line": 10,
+          "column": 1
+        }
+      },
+      "location": {
+        "line": 10,
+        "column": 1
+      }
+    },
+    "location": {
+      "line": 10,
+      "column": 1
+    }
+  }
+]

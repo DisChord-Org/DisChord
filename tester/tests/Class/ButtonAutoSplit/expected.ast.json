@@ -1,0 +1,324 @@
+[
+  {
+    "type": "importar",
+    "identificators": [
+      "createMessage"
+    ],
+    "isDestructured": true,
+    "path": "./lib/createMessage.mjs",
+    "location": {
+      "line": 0,
+      "column": 0
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "msg",
+    "value": {
+      "type": "CrearMensaje",
+      "object": {
+        "type": "BDO",
+        "mode": 0,
+        "blocks": {
+          "contenido": {
+            "type": "Literal",
+            "value": "hola",
+            "raw": "hola",
+            "location": {
+              "line": 2,
+              "column": 15
+            }
+          },
+          "boton": {
+            "type": "Lista",
+            "body": [
+              {
+                "type": "BDO",
+                "mode": 0,
+                "blocks": {
+                  "id": {
+                    "type": "Literal",
+                    "value": "1",
+                    "raw": "1",
+                    "location": {
+                      "line": 4,
+                      "column": 14
+                    }
+                  },
+                  "etiqueta": {
+                    "type": "Literal",
+                    "value": "1",
+                    "raw": "1",
+                    "location": {
+                      "line": 4,
+                      "column": 27
+                    }
+                  },
+                  "estilo": {
+                    "type": "Literal",
+                    "value": "verde",
+                    "raw": "verde",
+                    "location": {
+                      "line": 4,
+                      "column": 38
+                    }
+                  }
+                },
+                "body": [],
+                "location": {
+                  "line": 4,
+                  "column": 46
+                }
+              },
+              {
+                "type": "BDO",
+                "mode": 0,
+                "blocks": {
+                  "id": {
+                    "type": "Literal",
+                    "value": "2",
+                    "raw": "2",
+                    "location": {
+                      "line": 5,
+                      "column": 14
+                    }
+                  },
+                  "etiqueta": {
+                    "type": "Literal",
+                    "value": "2",
+                    "raw": "2",
+                    "location": {
+                      "line": 5,
+                      "column": 27
+                    }
+                  },
+                  "estilo": {
+                    "type": "Literal",
+                    "value": "verde",
+                    "raw": "verde",
+                    "location": {
+                      "line": 5,
+                      "column": 38
+                    }
+                  }
+                },
+                "body": [],
+                "location": {
+                  "line": 5,
+                  "column": 46
+                }
+              },
+              {
+                "type": "BDO",
+                "mode": 0,
+                "blocks": {
+                  "id": {
+                    "type": "Literal",
+                    "value": "3",
+                    "raw": "3",
+                    "location": {
+                      "line": 6,
+                      "column": 14
+                    }
+                  },
+                  "etiqueta": {
+                    "type": "Literal",
+                    "value": "3",
+                    "raw": "3",
+                    "location": {
+                      "line": 6,
+                      "column": 27
+                    }
+                  },
+                  "estilo": {
+                    "type": "Literal",
+                    "value": "verde",
+                    "raw": "verde",
+                    "location": {
+                      "line": 6,
+                      "column": 38
+                    }
+                  }
+                },
+                "body": [],
+                "location": {
+                  "line": 6,
+                  "column": 46
+                }
+              },
+              {
+                "type": "BDO",
+                "mode": 0,
+                "blocks": {
+                  "id": {
+                    "type": "Literal",
+                    "value": "4",
+                    "raw": "4",
+                    "location": {
+                      "line": 7,
+                      "column": 14
+                    }
+                  },
+                  "etiqueta": {
+                    "type": "Literal",
+                    "value": "4",
+                    "raw": "4",
+                    "location": {
+                      "line": 7,
+                      "column": 27
+                    }
+                  },
+                  "estilo": {
+                    "type": "Literal",
+                    "value": "verde",
+                    "raw": "verde",
+                    "location": {
+                      "line": 7,
+                      "column": 38
+                    }
+                  }
+                },
+                "body": [],
+                "location": {
+                  "line": 7,
+                  "column": 46
+                }
+              },
+              {
+                "type": "BDO",
+                "mode": 0,
+                "blocks": {
+                  "id": {
+                    "type": "Literal",
+                    "value": "5",
+                    "raw": "5",
+                    "location": {
+                      "line": 8,
+                      "column": 14
+                    }
+                  },
+                  "etiqueta": {
+                    "type": "Literal",
+                    "value": "5",
+                    "raw": "5",
+                    "location": {
+                      "line": 8,
+                      "column": 27
+                    }
+                  },
+                  "estilo": {
+                    "type": "Literal",
+                    "value": "verde",
+                    "raw": "verde",
+                    "location": {
+                      "line": 8,
+                      "column": 38
+                    }
+                  }
+                },
+                "body": [],
+                "location": {
+                  "line": 8,
+                  "column": 46
+                }
+              },
+              {
+                "type": "BDO",
+                "mode": 0,
+                "blocks": {
+                  "id": {
+                    "type": "Literal",
+                    "value": "6",
+                    "raw": "6",
+                    "location": {
+                      "line": 9,
+                      "column": 14
+                    }
+                  },
+                  "etiqueta": {
+                    "type": "Literal",
+                    "value": "6",
+                    "raw": "6",
+                    "location": {
+                      "line": 9,
+                      "column": 27
+                    }
+                  },
+                  "estilo": {
+                    "type": "Literal",
+                    "value": "verde",
+                    "raw": "verde",
+                    "location": {
+                      "line": 9,
+                      "column": 38
+                    }
+                  }
+                },
+                "body": [],
+                "location": {
+                  "line": 9,
+                  "column": 46
+                }
+              },
+              {
+                "type": "BDO",
+                "mode": 0,
+                "blocks": {
+                  "id": {
+                    "type": "Literal",
+                    "value": "7",
+                    "raw": "7",
+                    "location": {
+                      "line": 10,
+                      "column": 14
+                    }
+                  },
+                  "etiqueta": {
+                    "type": "Literal",
+                    "value": "7",
+                    "raw": "7",
+                    "location": {
+                      "line": 10,
+                      "column": 27
+                    }
+                  },
+                  "estilo": {
+                    "type": "Literal",
+                    "value": "verde",
+                    "raw": "verde",
+                    "location": {
+                      "line": 10,
+                      "column": 38
+                    }
+                  }
+                },
+                "body": [],
+                "location": {
+                  "line": 10,
+                  "column": 46
+                }
+              }
+            ],
+            "location": {
+              "line": 11,
+              "column": 5
+            }
+          }
+        },
+        "body": [],
+        "location": {
+          "line": 12,
+          "column": 1
+        }
+      },
+      "location": {
+        "line": 12,
+        "column": 1
+      }
+    },
+    "location": {
+      "line": 12,
+      "column": 1
+    }
+  }
+]

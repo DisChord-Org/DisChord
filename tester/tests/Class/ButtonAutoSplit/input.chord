@@ -1,0 +1,12 @@
+var msg es enviar mensaje {
+    contenido "hola"
+    boton [
+        { id "1" etiqueta "1" estilo "verde" }
+        { id "2" etiqueta "2" estilo "verde" }
+        { id "3" etiqueta "3" estilo "verde" }
+        { id "4" etiqueta "4" estilo "verde" }
+        { id "5" etiqueta "5" estilo "verde" }
+        { id "6" etiqueta "6" estilo "verde" }
+        { id "7" etiqueta "7" estilo "verde" }
+    ]
+}

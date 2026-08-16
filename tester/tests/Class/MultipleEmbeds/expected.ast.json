@@ -1,0 +1,142 @@
+[
+  {
+    "type": "importar",
+    "identificators": [
+      "createMessage"
+    ],
+    "isDestructured": true,
+    "path": "./lib/createMessage.mjs",
+    "location": {
+      "line": 0,
+      "column": 0
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "Bienvenida",
+    "value": {
+      "type": "CrearEmbed",
+      "name": "Bienvenida",
+      "body": {
+        "type": "BDO",
+        "mode": 0,
+        "blocks": {
+          "titulo": {
+            "type": "Literal",
+            "value": "Bienvenido",
+            "raw": "Bienvenido",
+            "location": {
+              "line": 2,
+              "column": 12
+            }
+          }
+        },
+        "body": [],
+        "location": {
+          "line": 3,
+          "column": 1
+        }
+      },
+      "location": {
+        "line": 3,
+        "column": 1
+      }
+    },
+    "location": {
+      "line": 3,
+      "column": 1
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "msg",
+    "value": {
+      "type": "CrearMensaje",
+      "object": {
+        "type": "BDO",
+        "mode": 0,
+        "blocks": {
+          "contenido": {
+            "type": "Literal",
+            "value": "hola",
+            "raw": "hola",
+            "location": {
+              "line": 6,
+              "column": 15
+            }
+          },
+          "embed": {
+            "type": "Lista",
+            "body": [
+              {
+                "type": "BDO",
+                "mode": 0,
+                "blocks": {
+                  "titulo": {
+                    "type": "Literal",
+                    "value": "Uno",
+                    "raw": "Uno",
+                    "location": {
+                      "line": 8,
+                      "column": 18
+                    }
+                  }
+                },
+                "body": [],
+                "location": {
+                  "line": 8,
+                  "column": 24
+                }
+              },
+              {
+                "type": "BDO",
+                "mode": 0,
+                "blocks": {
+                  "titulo": {
+                    "type": "Literal",
+                    "value": "Dos",
+                    "raw": "Dos",
+                    "location": {
+                      "line": 9,
+                      "column": 18
+                    }
+                  }
+                },
+                "body": [],
+                "location": {
+                  "line": 9,
+                  "column": 24
+                }
+              },
+              {
+                "type": "IDENTIFICADOR",
+                "value": "Bienvenida",
+                "location": {
+                  "line": 10,
+                  "column": 9
+                }
+              }
+            ],
+            "location": {
+              "line": 11,
+              "column": 5
+            }
+          }
+        },
+        "body": [],
+        "location": {
+          "line": 12,
+          "column": 1
+        }
+      },
+      "location": {
+        "line": 12,
+        "column": 1
+      }
+    },
+    "location": {
+      "line": 12,
+      "column": 1
+    }
+  }
+]
