@@ -44,11 +44,21 @@ import { AssignmentVisitor } from "./visitors/variables/AssignmentVisitor";
  * to registered SubGenerators.
  */
 export class Generator<T extends string, N extends BaseNode<T>> extends GeneratorContext<T, N> {
+    /**
+     * @param context - The active compilation context (symbol table, project paths, etc.).
+     * @param nodes - The current file's complete top-level AST, captured once here (mirroring how
+     * a TS `TransformationContext` closes over its `SourceFile` at transform setup) instead of
+     * being set later as a side effect of calling `generate()`. Exposed as `this.nodes` so a
+     * visitor that needs to look at its *siblings* — not just its own node — can do so (e.g.
+     * `ClientInitVisitor`, writing its own separate output file, which still needs to know what
+     * the file imports).
+     */
     constructor(
-        public readonly context: CompilationContext<T>
+        public readonly context: CompilationContext<T>,
+        public readonly nodes: ASTNode<T, N>[]
     ) {
         super();
-        
+
         this.setOwner(this);
         this.registerVisitors();
     }
@@ -77,12 +87,11 @@ export class Generator<T extends string, N extends BaseNode<T>> extends Generato
     }
 
     /**
-     * Entry-point that takes a full chunk of top-level AST nodes 
-     * and compiles them into a runnable JavaScript string.
-     * @param nodes - Array of abstract syntax tree nodes.
+     * Compiles `this.nodes` — the full top-level AST passed in at construction — into a runnable
+     * JavaScript string.
      */
-    public generate(nodes: ASTNode<T, N>[]): string {
-        const body = nodes.map(node => {
+    public generate(): string {
+        const body = this.nodes.map(node => {
             const code = this.visit(node);
             return code;
         }).join('\n');

@@ -21,11 +21,12 @@ export abstract class AnalysisRule<T extends string, N extends BaseNode<T>> {
     /**
      * Runs this rule against a file's complete top-level AST. May mutate `nodes` directly (e.g.
      * inserting a synthetic import) — that's a normal compiler "lowering" step, not a side effect
-     * to avoid, since `nodes` is what `Generator` renders next.
+     * to avoid, since `nodes` is what `Generator` renders next. If the rule determines the file
+     * now needs an extra file written (a shared runtime module, ...), it registers it via
+     * `this.context.extraFiles.set(absolutePath, content)` — see `CompilationContext.extraFiles`.
      * @param {ASTNode<T, N>[]} nodes - The parsed top-level AST nodes for one file.
-     * @returns {Map<string, string>} Any shared runtime modules this rule determined the file now
-     * needs — content keyed by path relative to `dist/`. Empty for rules that only validate.
+     * @returns {void}
      * @throws {ChordError} For any violation this rule finds.
      */
-    abstract check (nodes: ASTNode<T, N>[]): Map<string, string>;
+    abstract check (nodes: ASTNode<T, N>[]): void;
 }

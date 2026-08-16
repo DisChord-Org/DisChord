@@ -1,3 +1,4 @@
+import path from "node:path";
 import { AnalysisRule } from "../AnalysisRule";
 import { walkAST } from "../walkAST";
 import { ASTNode, BaseNode, ImportNode, TokenType } from "../../types";
@@ -11,14 +12,15 @@ import { buildSharedModuleImportSpecifier } from "../sharedModulePath";
  * `ImportNode` for the shared `console.log` override module at the front of `nodes` — a standard
  * compiler "lowering" step: by the time `Generator` runs, the import is just another statement in
  * the AST, rendered by the existing `ImportVisitor` like any user-written import. `Generator`
- * itself needs zero special-casing for this, and reports needing the module's *content* written
- * to `dist/` the same way it reports the import — as a plain return value, not a side channel.
+ * itself needs zero special-casing for this. The module's *content* is registered into
+ * `context.extraFiles` (see `CompilationContext.extraFiles`) so `CompileCommand` writes it once,
+ * the same generic path any phase uses to ask for an extra file.
  */
 export class RequiresConsoleRuntimeRule<T extends string, N extends BaseNode<T>> extends AnalysisRule<T, N> {
     /**
      * @override
      */
-    check (nodes: ASTNode<T, N>[]): Map<string, string> {
+    check (nodes: ASTNode<T, N>[]): void {
         let needsConsoleRuntime = false;
 
         nodes.forEach(node => walkAST<T, N>(node, current => {
@@ -34,7 +36,7 @@ export class RequiresConsoleRuntimeRule<T extends string, N extends BaseNode<T>>
             }
         }));
 
-        if (!needsConsoleRuntime) return new Map();
+        if (!needsConsoleRuntime) return;
 
         const importNode: ImportNode<T> = {
             type: TokenType.Importar,
@@ -46,6 +48,6 @@ export class RequiresConsoleRuntimeRule<T extends string, N extends BaseNode<T>>
 
         nodes.unshift(importNode);
 
-        return new Map([[ consoleRuntimeModulePath, consoleRuntimeModuleContent ]]);
+        this.context.extraFiles.set(path.join(this.context.projectRoot, 'dist', consoleRuntimeModulePath), consoleRuntimeModuleContent);
     }
 }

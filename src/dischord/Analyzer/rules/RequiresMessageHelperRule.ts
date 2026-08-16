@@ -1,3 +1,4 @@
+import path from "node:path";
 import { AnalysisRule } from "../../../chord/Analyzer/AnalysisRule";
 import { walkAST } from "../../../chord/Analyzer/walkAST";
 import { buildSharedModuleImportSpecifier } from "../../../chord/Analyzer/sharedModulePath";
@@ -16,14 +17,14 @@ export class RequiresMessageHelperRule extends AnalysisRule<DisChordNodeType, Di
     /**
      * @override
      */
-    check (nodes: DisChordASTNode[]): Map<string, string> {
+    check (nodes: DisChordASTNode[]): void {
         let needsMessageHelper = false;
 
         nodes.forEach(node => walkAST<DisChordNodeType, DisChordNode>(node, current => {
             if (current.type === DisChordTokenType.CREAR_MENSAJE) needsMessageHelper = true;
         }));
 
-        if (!needsMessageHelper) return new Map();
+        if (!needsMessageHelper) return;
 
         const importNode: ImportNode<DisChordNodeType> = {
             type: TokenType.Importar,
@@ -35,6 +36,6 @@ export class RequiresMessageHelperRule extends AnalysisRule<DisChordNodeType, Di
 
         nodes.unshift(importNode);
 
-        return new Map([[ createMessageModulePath, createMessageModuleContent ]]);
+        this.context.extraFiles.set(path.join(this.context.projectRoot, 'dist', createMessageModulePath), createMessageModuleContent);
     }
 }

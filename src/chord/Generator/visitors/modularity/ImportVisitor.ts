@@ -22,7 +22,7 @@ export class ImportVisitor<T extends string, N extends BaseNode<T>> extends SubG
      * @returns {string} The fully compiled inline ESM import statement or IIFE block wrapper string.
      * @public
      */
-    public visit(node: ImportNode<T>): string {        
+    public visit(node: ImportNode<T>): string {
         let path = node.path.replace(/\.chord$/, '');
 
         if (path.startsWith('lib:')) {
@@ -38,16 +38,32 @@ export class ImportVisitor<T extends string, N extends BaseNode<T>> extends SubG
             path += '.mjs';
         }
 
+        return this.renderImportStatement(node, path);
+    }
+
+    /**
+     * Renders the final `import ...` statement text for an already-resolved module specifier.
+     * Separated from path resolution so callers that resolve the specifier differently — e.g.
+     * `ClientInitVisitor`, re-emitting an import into `seyfert.config.mjs`, a file written outside
+     * the normal per-file `dist/` output location — can still produce identical import syntax
+     * (via `this.parent.get(ImportVisitor).renderImportStatement(...)`) without duplicating the
+     * destructured/namespace/side-effect-only branching below.
+     * @param {Pick<ImportNode<T>, 'identificators' | 'isDestructured'>} node - The import's identifiers and form.
+     * @param {string} specifier - The already-resolved module specifier (e.g. `"./lib/foo.mjs"`).
+     * @returns {string} The fully compiled inline ESM import statement.
+     * @public
+     */
+    public renderImportStatement (node: Pick<ImportNode<T>, 'identificators' | 'isDestructured'>, specifier: string): string {
         // if the import has no identifiers, it's a side-effect-only import.
         if (node.identificators.length === 0) {
-            return `import "${path}"`;
+            return `import "${specifier}"`;
         }
 
         if (node.isDestructured) {
             const ids = node.identificators.join(', ');
-            return `import { ${ids} } from "${path}"`;
+            return `import { ${ids} } from "${specifier}"`;
         }
 
-        return `import * as _${node.identificators[0]} from "${path}";\nconst ${node.identificators[0]} = _${node.identificators[0]}.default || _${node.identificators[0]};`;
+        return `import * as _${node.identificators[0]} from "${specifier}";\nconst ${node.identificators[0]} = _${node.identificators[0]}.default || _${node.identificators[0]};`;
     }
 }

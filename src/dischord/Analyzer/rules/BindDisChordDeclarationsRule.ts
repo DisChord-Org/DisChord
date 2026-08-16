@@ -14,7 +14,7 @@ export class BindDisChordDeclarationsRule extends AnalysisRule<DisChordNodeType,
     /**
      * @override
      */
-    check (nodes: DisChordASTNode[]): Map<string, string> {
+    check (nodes: DisChordASTNode[]): void {
         nodes.forEach(node => walkAST<DisChordNodeType, DisChordNode>(node, current => {
             if (current.type === DisChordTokenType.EVENTO) {
                 const eventNode = current as EventNode;
@@ -36,7 +36,5 @@ export class BindDisChordDeclarationsRule extends AnalysisRule<DisChordNodeType,
                 }
             }
         }));
-
-        return new Map();
     }
 }

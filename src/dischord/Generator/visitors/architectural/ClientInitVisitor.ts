@@ -1,12 +1,13 @@
-import { join } from "node:path";
+import path, { join } from "node:path";
 import fs from "fs";
-import Prettifier from "../../../../utils/Prettifier";
 
 import { DisChordNode, DisChordNodeType, DisChordTokenType, StartBotNode } from "../../../types";
 import { intentsMap } from "../../constants/mappings";
 import { SubGenerator } from "../../../../chord/Generator/SubGenerator";
 import { DisChordError, ErrorLevel } from "../../../../errors/ChordError";
-import { TokenTypeUnion } from "../../../../chord/types";
+import { IdentificatorNode, ImportNode, TokenType, TokenTypeUnion } from "../../../../chord/types";
+import { walkAST } from "../../../../chord/Analyzer/walkAST";
+import { ImportVisitor } from "../../../../chord/Generator/visitors/modularity/ImportVisitor";
 
 /**
  * Generator class responsible for generating code related to starting the bot and setting up the client in DisChrod.
@@ -54,7 +55,7 @@ export default class ClietInitVisitor extends SubGenerator<DisChordNodeType, Dis
         }
 
         const seyfertConfig = this.generateSeyfertConfig(node);
-        Prettifier.savePrettified(join(this.parent.context.projectRoot, 'seyfert.config.mjs'), seyfertConfig)
+        this.parent.context.extraFiles.set(join(this.parent.context.projectRoot, 'seyfert.config.mjs'), seyfertConfig);
 
         this.ensureDirectories();
 
@@ -106,6 +107,7 @@ export default class ClietInitVisitor extends SubGenerator<DisChordNodeType, Dis
         }).format();
         
         const token = this.parent.visit(tokenNode);
+        const forwardedImports = this.forwardReferencedImports(node);
         let intents = "[]";
         
         if (intentsNode && intentsNode.type === 'Lista') {
@@ -125,6 +127,7 @@ export default class ClietInitVisitor extends SubGenerator<DisChordNodeType, Dis
         return `
             import { GatewayIntentBits } from "seyfert/lib/types/index.js";
             import { config } from "seyfert";
+            ${forwardedImports}
 
             export default config.bot({
                 token: ${token},
@@ -140,13 +143,73 @@ export default class ClietInitVisitor extends SubGenerator<DisChordNodeType, Dis
     }
 
     /**
+     * `seyfert.config.mjs` is written directly to disk here, outside the normal per-file
+     * generation pipeline (see `visit()`) — so unlike the main compiled file, it never picks up
+     * the source file's own `importar` statements just by being part of the same AST render.
+     * This re-emits whichever of those imports the `encender bot` block actually references (any
+     * of them — not just one identifier in particular), so a project can `token ent.BOT_TOKEN`,
+     * `token miLibreria.leerToken()`, or anything else built on a real `importar`, the same way it
+     * already works in every other compiled file.
+     * @private
+     */
+    private forwardReferencedImports (node: StartBotNode): string {
+        const importNodes = this.parent.nodes.filter(
+            (n): n is ImportNode<DisChordNodeType> => n.type === TokenType.Importar
+        );
+
+        if (importNodes.length === 0) return '';
+
+        const referencedNames = new Set<string>();
+        walkAST<DisChordNodeType, DisChordNode>(node, current => {
+            if (current.type === TokenType.IDENTIFICADOR) {
+                referencedNames.add((current as unknown as IdentificatorNode<DisChordNodeType>).value);
+            }
+        });
+
+        const importVisitor = this.parent.get(ImportVisitor);
+
+        return importNodes
+            .filter(importNode => importNode.identificators.some(id => referencedNames.has(id)))
+            .map(importNode => importVisitor.renderImportStatement(importNode, this.resolveSpecifierFromProjectRoot(importNode.path)))
+            .join('\n');
+    }
+
+    /**
+     * Resolves an import's target module the same way `ImportVisitor` does (the `lib:` installed-
+     * library convention, or a plain relative path) but re-relativizes the result from
+     * `projectRoot` instead of the originating file's own `dist/` output directory, since that's
+     * where `seyfert.config.mjs` actually lives.
+     * @private
+     */
+    private resolveSpecifierFromProjectRoot (rawPath: string): string {
+        const cleanPath = rawPath.replace(/\.chord$/, '');
+        const projectRoot = this.parent.context.projectRoot;
+
+        let absoluteTarget: string;
+
+        if (cleanPath.startsWith('lib:')) {
+            const libName = cleanPath.split(':')[1];
+            absoluteTarget = path.join(projectRoot, 'lib', libName, 'src', `${libName}.mjs`);
+        } else {
+            const originalDir = this.parent.context.outputDir ?? path.join(projectRoot, 'dist');
+            absoluteTarget = path.join(originalDir, cleanPath);
+            if (!absoluteTarget.endsWith('.mjs')) absoluteTarget += '.mjs';
+        }
+
+        let specifier = path.relative(projectRoot, absoluteTarget).split(path.sep).join('/');
+        if (!specifier.startsWith('.')) specifier = `./${specifier}`;
+
+        return specifier;
+    }
+
+    /**
      * Helper to ensure the output directories exist.
      */
     private ensureDirectories() {
-        const dirs = ['commands', 'events', 'components'];
+        const dirs = ['comandos', 'eventos', 'componentes'];
         dirs.forEach(dir => {
-            const path = join(this.parent.context.projectRoot, 'dist', dir);
-            if (!fs.existsSync(path)) fs.mkdirSync(path, { recursive: true });
+            const targetPath = join(this.parent.context.projectRoot, 'dist', dir);
+            if (!fs.existsSync(targetPath)) fs.mkdirSync(targetPath, { recursive: true });
         });
     }
 }

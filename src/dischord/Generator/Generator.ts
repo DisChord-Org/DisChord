@@ -34,12 +34,12 @@ export class DisChordGenerator extends Generator<DisChordNodeType, DisChordNode>
 
     /**
      * Constructor for the DisChordGenerator class.
-     * @param symbols A map of symbols used for code generation, typically containing variable and function definitions.
-     * @param projectRoot The root directory of the project, used for resolving imports and file paths during code generation.
+     * @param context The active compilation context (symbol table, project paths, etc.).
+     * @param nodes The current file's complete top-level AST.
      */
-    constructor(context: CompilationContext<DisChordNodeType>) {
-        super(context);
-        
+    constructor(context: CompilationContext<DisChordNodeType>, nodes: DisChordASTNode[]) {
+        super(context, nodes);
+
         this.registerVisitors();
     }
 

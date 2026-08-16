@@ -12,7 +12,7 @@ export class BindImportsRule<T extends string, N extends BaseNode<T>> extends An
     /**
      * @override
      */
-    check (nodes: ASTNode<T, N>[]): Map<string, string> {
+    check (nodes: ASTNode<T, N>[]): void {
         nodes.forEach(node => walkAST<T, N>(node, current => {
             if (current.type !== TokenType.Importar) return;
 
@@ -25,7 +25,5 @@ export class BindImportsRule<T extends string, N extends BaseNode<T>> extends An
                 }, current.location);
             });
         }));
-
-        return new Map();
     }
 }

@@ -26,6 +26,7 @@ export interface CompilationContext<T extends string = string> {
     codeProvider: CodeProvider;
     projectRoot: string;
     outputDir?: string;
+    extraFiles: Map<string, string>;
 }
 
 /**
@@ -51,14 +52,14 @@ export class CompileCommand {
 
         console.log(`Compilando proyecto: ${this.config.projectRoot}`);
 
-        const sharedModules = new Map<string, string>();
+        const extraFiles = new Map<string, string>();
 
         for (const file of files) {
-            const fileSharedModules = await this.compileFile(file, options);
-            fileSharedModules.forEach((content, relativePath) => sharedModules.set(relativePath, content));
+            const fileExtraFiles = await this.compileFile(file, options);
+            fileExtraFiles.forEach((content, absolutePath) => extraFiles.set(absolutePath, content));
         }
 
-        await this.writeSharedModules(sharedModules);
+        await this.writeExtraFiles(extraFiles);
 
         if (options.run) await this.executeTarget();
     }
@@ -69,7 +70,9 @@ export class CompileCommand {
      * @private
      * @param {string} file - Absolute path to the .chord file.
      * @param {GlobalCLIOptions} options - CLI flags for debugging and output control.
-     * @returns {Promise<Map<string, string>>} Shared runtime modules the analysis phase reported this file needing (see `Analyzer.analyze`).
+     * @returns {Promise<Map<string, string>>} Extra files (shared runtime modules, project-level
+     * config files, ...) any phase determined this file's compilation needs written, keyed by
+     * absolute path — see `CompilationContext.extraFiles`.
      */
     private async compileFile(file: string, options: GlobalCLIOptions): Promise<Map<string, string>> {
         if (!this.config) return new Map();
@@ -89,7 +92,8 @@ export class CompileCommand {
             keywordsManager: new KeyWords(),
             codeProvider: new CodeProvider(),
             projectRoot: this.config.projectRoot,
-            outputDir: targetDir
+            outputDir: targetDir,
+            extraFiles: new Map()
         };
 
         DisChordParser.registerGrammar(context);
@@ -105,10 +109,10 @@ export class CompileCommand {
         const ast: DisChordASTNode[] = parser.parse();
         this.logDebug(DebugFlags.Parser, options, ast);
 
-        const sharedModules = new DisChordAnalyzer(context).analyze(ast);
+        new DisChordAnalyzer(context).analyze(ast);
 
-        const generator = new DisChordGenerator(context);
-        const output = generator.generate(ast);
+        const generator = new DisChordGenerator(context, ast);
+        const output = generator.generate();
         this.logDebug(DebugFlags.Generator, options, output);
 
         if (!fs.existsSync(targetDir)) {
@@ -117,29 +121,26 @@ export class CompileCommand {
 
         await Prettifier.savePrettified(outputPath, output);
 
-        return sharedModules;
+        return context.extraFiles;
     }
 
     /**
-     * Writes out whatever shared runtime modules the analysis phase reported the compiled files
-     * needing (see `Analyzer.analyze`). Purely generic: writes path/content pairs relative to
-     * `dist/` without knowing what any of them are for — that's each dialect's own concern.
+     * Writes out whatever extra files any phase determined the compiled project needs (see
+     * `CompilationContext.extraFiles`) — shared runtime modules, project-level config files,
+     * anything. Purely generic: writes absolute path/content pairs without knowing what any of
+     * them are for or which phase asked for them — that's each rule/visitor's own concern.
      *
      * @private
-     * @param {Map<string, string>} modules - Content keyed by output path relative to `dist/`.
+     * @param {Map<string, string>} files - Content keyed by absolute output path.
      * @returns {Promise<void>}
      */
-    private async writeSharedModules(modules: Map<string, string>): Promise<void> {
-        if (!this.config) return;
-
-        for (const [relativePath, content] of modules) {
-            const modulePath = path.join(this.config.distDir, relativePath);
-
-            if (!fs.existsSync(path.dirname(modulePath))) {
-                fs.mkdirSync(path.dirname(modulePath), { recursive: true });
+    private async writeExtraFiles(files: Map<string, string>): Promise<void> {
+        for (const [absolutePath, content] of files) {
+            if (!fs.existsSync(path.dirname(absolutePath))) {
+                fs.mkdirSync(path.dirname(absolutePath), { recursive: true });
             }
 
-            await Prettifier.savePrettified(modulePath, content);
+            await Prettifier.savePrettified(absolutePath, content);
         }
     }
 

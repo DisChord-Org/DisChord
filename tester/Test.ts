@@ -141,7 +141,8 @@ export abstract class Test {
             symbolTable: new SymbolTable(),
             keywordsManager: new KeyWords(),
             codeProvider: new CodeProvider(),
-            projectRoot: FileSystem.configure(this.fixturePath).projectRoot
+            projectRoot: FileSystem.configure(this.fixturePath).projectRoot,
+            extraFiles: new Map()
         };
 
         const fileName = path.basename(this.fixturePath);
@@ -160,8 +161,8 @@ export abstract class Test {
 
         new DisChordAnalyzer(context).analyze(ast);
 
-        const generator = new DisChordGenerator(context);
-        const output = generator.generate(ast);
+        const generator = new DisChordGenerator(context, ast);
+        const output = generator.generate();
 
         return { ast, output };
     }

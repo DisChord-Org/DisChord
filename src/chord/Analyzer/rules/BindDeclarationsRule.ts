@@ -17,10 +17,8 @@ export class BindDeclarationsRule<T extends string, N extends BaseNode<T>> exten
     /**
      * @override
      */
-    check (nodes: ASTNode<T, N>[]): Map<string, string> {
+    check (nodes: ASTNode<T, N>[]): void {
         nodes.forEach(node => walkAST<T, N>(node, current => this.enter(current), current => this.exit(current)));
-
-        return new Map();
     }
 
     private enter (node: ASTNode<T, N>): void {

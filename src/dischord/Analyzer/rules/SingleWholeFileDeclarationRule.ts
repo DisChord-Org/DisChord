@@ -28,7 +28,7 @@ export class SingleWholeFileDeclarationRule extends AnalysisRule<DisChordNodeTyp
      * @override
      * @throws {DisChordError} If more than one whole-file declaration exists in the same file.
      */
-    check (nodes: DisChordASTNode[]): Map<string, string> {
+    check (nodes: DisChordASTNode[]): void {
         const wholeFileNodes = nodes.filter(node => SingleWholeFileDeclarationRule.WholeFileDeclarationTypes.includes(node.type));
 
         if (wholeFileNodes.length > 1) throw new DisChordError({
@@ -36,7 +36,5 @@ export class SingleWholeFileDeclarationRule extends AnalysisRule<DisChordNodeTyp
             message: `Solo se permite un 'comando' o 'evento' por archivo. Este archivo declara ${wholeFileNodes.length}: separalos en un archivo por cada uno.`,
             location: wholeFileNodes[1].location
         }).format();
-
-        return new Map();
     }
 }

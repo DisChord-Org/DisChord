@@ -9,8 +9,8 @@ import { RequiresConsoleRuntimeRule } from "./rules/RequiresConsoleRuntimeRule";
  * Engine for the semantic analysis phase, run once per file between parsing and generation:
  *
  *     const ast = parser.parse();
- *     new Analyzer(context).analyze(ast);   // <- this phase
- *     const output = generator.generate(ast);
+ *     new Analyzer(context).analyze(ast);          // <- this phase
+ *     const output = new Generator(context, ast).generate();
  *
  * This class is the tool chord provides for the phase — a generic registry that runs whatever
  * `AnalysisRule`s are registered, in order. Chord registers its own rules in the constructor;
@@ -50,19 +50,14 @@ export class Analyzer<T extends string, N extends BaseNode<T>> {
     }
 
     /**
-     * Runs every registered rule over a file's complete AST, aggregating whatever shared runtime
-     * modules any of them determined the file now needs.
+     * Runs every registered rule over a file's complete AST, in order. Any extra files a rule
+     * determines the file now needs go straight into `context.extraFiles` (see `AnalysisRule`) —
+     * there's nothing left for this method to aggregate.
      * @param {ASTNode<T, N>[]} nodes - The parsed top-level AST nodes for one file.
-     * @returns {Map<string, string>} Combined shared-module content, keyed by path relative to `dist/`.
+     * @returns {void}
      * @throws {ChordError} Whatever the first violated rule throws.
      */
-    public analyze (nodes: ASTNode<T, N>[]): Map<string, string> {
-        const modules = new Map<string, string>();
-
-        this.rules.forEach(rule => {
-            rule.check(nodes).forEach((content, relativePath) => modules.set(relativePath, content));
-        });
-
-        return modules;
+    public analyze (nodes: ASTNode<T, N>[]): void {
+        this.rules.forEach(rule => rule.check(nodes));
     }
 }
