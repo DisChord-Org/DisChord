@@ -3,6 +3,7 @@ import { ButtonStyles, DisChordASTNode, DisChordNode, DisChordNodeType, DisChord
 import { SubGenerator } from "../../../../chord/Generator/SubGenerator";
 import { TokenTypeUnion } from "../../../../chord/types";
 import { BDOVisitor } from "../../../../chord/Generator/visitors/expressions/BDOVisitor";
+import ActionRowVisitor from "./ActionRowVisitor";
 
 /**
  * Generator class responsible for generating code related to message buttons in DisChord.
@@ -19,11 +20,10 @@ export default class ButtonVisitor extends SubGenerator<DisChordNodeType, DisCho
      * Helper method to generate the ActionRow and Button structure by searching
      * for the 'boton' property within a given ODBNode.
      *
-     * The property's value can be either an anonymous inline button (a BDO, e.g.
-     * `boton { id "..."; }`) — handled by this visitor's own `visit()` — or any other expression
-     * referencing a previously declared, reusable button (e.g. `boton Confirmar`), which is
-     * delegated to the generic dispatcher instead, since it's already a complete, valid
-     * Button-producing expression on its own. Mirrors `EmbedVisitor.visitIfNodeExists`.
+     * The property's value can be a single button (inline BDO or a reference to an already
+     * declared one, e.g. `boton Confirmar`), a flat list of several, or a list of lists for
+     * manually laid-out rows — see `ActionRowVisitor.visit`, which owns turning any of
+     * those into the actual `new ActionRow()...` call(s), including Discord's 5-per-row limit.
      * @param node The parent ODBNode that may contain a 'boton' definition.
      * @returns A string representing the 'components array or an empty string if no button property is defined.
      */
@@ -33,9 +33,9 @@ export default class ButtonVisitor extends SubGenerator<DisChordNodeType, DisCho
         const button = this.parent.get(BDOVisitor).getODBProperty(node, 'boton');
         if (!button) return '';
 
-        const buttonCode = button.type === 'BDO' ? this.visit(button) : this.parent.visit(button);
+        const rows = this.parent.get(ActionRowVisitor).visit(button);
 
-        return `, components: [ new ActionRow().setComponents([ ${buttonCode} ]) ]`;
+        return `, components: [ ${rows} ] `;
     }
 
     /**
