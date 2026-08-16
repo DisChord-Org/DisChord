@@ -1,8 +1,7 @@
-import { createMessageModulePath } from "../../../core.lib";
 import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType, EventNode } from "../../../types";
 import { SubGenerator } from '../../../../chord/Generator/SubGenerator';
 import { DisChordError, ErrorLevel } from '../../../../errors/ChordError';
-import { CompilerMetadataKind, TokenTypeUnion } from '../../../../chord/types';
+import { TokenTypeUnion } from '../../../../chord/types';
 import { eventsMap } from '../../constants/mappings';
 
 /**
@@ -33,15 +32,11 @@ export default class EventVisitor extends SubGenerator<DisChordNodeType, DisChor
             .map((n: DisChordASTNode): string => "    " + this.parent.visit(n) + ";")
             .join('\n');
 
-        const needsMessageHelper = this.parent.context.symbolTable.getMetadata<boolean>(CompilerMetadataKind.RequiresMessageHelper);
-
-        const messageImport = needsMessageHelper ? `import { createMessage } from '../${createMessageModulePath}';` : '';
         const ctxParams = eventsMap[node.name].params.filter(param => param === 'cliente' || param === 'mensaje');
         const ctxDeclaration = `const ctx = { ${ctxParams.join(', ')} };`;
 
         const eventBody: string = `
             import { createEvent, Embed, ActionRow, Button } from 'seyfert';
-            ${messageImport}
 
             export default createEvent({
                 data: { name: '${eventName}' },

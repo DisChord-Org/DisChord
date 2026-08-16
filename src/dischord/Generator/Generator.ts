@@ -2,13 +2,11 @@ import { DisChordASTNode, DisChordNode, DisChordNodeType } from "../types";
 
 import { Generator } from "../../chord/Generator/Generator";
 import { SubGeneratorClass } from "../../chord/Generator/SubGenerator";
-import { CompilerMetadataKind } from "../../chord/types";
 
 import ClientInitVisitor from '../Generator/visitors/architectural/ClientInitVisitor';
 import CommandVisitor from '../Generator/visitors/architectural/CommandVisitor';
 import EventVisitor from '../Generator/visitors/architectural/EventVisitor';
-import { CompilationContext } from "../../init/Init";
-import { createMessageModuleContent, createMessageModulePath } from "../core.lib";
+import { CompilationContext } from "../../cli/commands/CompileCommand";
 import ButtonVisitor from "./visitors/components/ButtonVisitor";
 import CommandOptionVisitor from "./visitors/components/CommandOptionVisitor";
 import EmbedVisitor from "./visitors/components/EmbedVisitor";
@@ -76,21 +74,5 @@ export class DisChordGenerator extends Generator<DisChordNodeType, DisChordNode>
         }
 
         return super.visit(node);
-    }
-
-    /**
-     * Reports DisChord's own shared runtime modules alongside whatever the base Generator
-     * already reports, so `CompileCommand` can write them without knowing about either dialect.
-     * @override
-     * @returns {Map<string, string>} Content keyed by output path relative to `dist/`.
-     */
-    override sharedModules (): Map<string, string> {
-        const modules = super.sharedModules();
-
-        if (this.context.symbolTable.getMetadata<boolean>(CompilerMetadataKind.RequiresMessageHelper)) {
-            modules.set(createMessageModulePath, createMessageModuleContent);
-        }
-
-        return modules;
     }
 }

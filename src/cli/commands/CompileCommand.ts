@@ -25,6 +25,7 @@ export interface CompilationContext<T extends string = string> {
     keywordsManager: KeyWords<T>;
     codeProvider: CodeProvider;
     projectRoot: string;
+    outputDir?: string;
 }
 
 /**
@@ -68,7 +69,7 @@ export class CompileCommand {
      * @private
      * @param {string} file - Absolute path to the .chord file.
      * @param {GlobalCLIOptions} options - CLI flags for debugging and output control.
-     * @returns {Promise<Map<string, string>>} Shared runtime modules this file's generator reported needing (see `Generator.sharedModules`).
+     * @returns {Promise<Map<string, string>>} Shared runtime modules the analysis phase reported this file needing (see `Analyzer.analyze`).
      */
     private async compileFile(file: string, options: GlobalCLIOptions): Promise<Map<string, string>> {
         if (!this.config) return new Map();
@@ -87,7 +88,8 @@ export class CompileCommand {
             symbolTable: new SymbolTable(),
             keywordsManager: new KeyWords(),
             codeProvider: new CodeProvider(),
-            projectRoot: this.config.projectRoot
+            projectRoot: this.config.projectRoot,
+            outputDir: targetDir
         };
 
         DisChordParser.registerGrammar(context);
@@ -103,7 +105,7 @@ export class CompileCommand {
         const ast: DisChordASTNode[] = parser.parse();
         this.logDebug(DebugFlags.Parser, options, ast);
 
-        new DisChordAnalyzer(context).analyze(ast);
+        const sharedModules = new DisChordAnalyzer(context).analyze(ast);
 
         const generator = new DisChordGenerator(context);
         const output = generator.generate(ast);
@@ -115,13 +117,13 @@ export class CompileCommand {
 
         await Prettifier.savePrettified(outputPath, output);
 
-        return generator.sharedModules();
+        return sharedModules;
     }
 
     /**
-     * Writes out whatever shared runtime modules the compiled files reported needing (see
-     * `Generator.sharedModules`). Purely generic: writes path/content pairs relative to `dist/`
-     * without knowing what any of them are for — that's each dialect's own concern.
+     * Writes out whatever shared runtime modules the analysis phase reported the compiled files
+     * needing (see `Analyzer.analyze`). Purely generic: writes path/content pairs relative to
+     * `dist/` without knowing what any of them are for — that's each dialect's own concern.
      *
      * @private
      * @param {Map<string, string>} modules - Content keyed by output path relative to `dist/`.

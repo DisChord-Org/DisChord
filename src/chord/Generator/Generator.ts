@@ -1,8 +1,7 @@
 import { ChordError, ErrorLevel } from "../../errors/ChordError";
 import { DisChordNode, DisChordNodeType } from "../../dischord/types";
 import { CompilationContext } from "../../cli/commands/CompileCommand";
-import { runtimeInjections } from "./core.lib";
-import { ASTNode, BaseNode, CompilerMetadataKind } from "../types";
+import { ASTNode, BaseNode } from "../types";
 import { GeneratorContext } from "./GeneratorContext";
 import { SubGeneratorClass } from "./SubGenerator";
 
@@ -88,24 +87,7 @@ export class Generator<T extends string, N extends BaseNode<T>> extends Generato
             return code;
         }).join('\n');
 
-        const needsConsoleRuntime = this.context.symbolTable.getMetadata<boolean>(CompilerMetadataKind.RequiresConsoleRuntime);
-
-        return `
-            ${needsConsoleRuntime ? runtimeInjections : ''}
-            ${body}
-        `;
-    }
-
-    /**
-     * Side runtime modules this generation pass needs written to disk once, alongside the main
-     * compiled file — keyed by path relative to the project's `dist` directory. Empty by default;
-     * dialect-specific generators (e.g. `DisChordGenerator`) override this to report their own
-     * shared helpers, so that `CompileCommand` (which performs all filesystem writes) can persist
-     * them without knowing anything about what a given dialect actually needs.
-     * @returns {Map<string, string>} Content keyed by output path relative to `dist/`.
-     */
-    public sharedModules (): Map<string, string> {
-        return new Map();
+        return `\n${body}\n`;
     }
 
     /**

@@ -1,5 +1,15 @@
 [
   {
+    "type": "importar",
+    "identificators": [],
+    "path": "./lib/consoleRuntime.mjs",
+    "isDestructured": false,
+    "location": {
+      "line": 0,
+      "column": 0
+    }
+  },
+  {
     "type": "Variable",
     "id": "chainsawman",
     "value": {

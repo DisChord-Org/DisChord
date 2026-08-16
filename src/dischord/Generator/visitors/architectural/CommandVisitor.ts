@@ -1,4 +1,3 @@
-import { createMessageModulePath } from "../../../core.lib";
 import { ApplicationIntegrationType, CommandNode, DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType, InteractionContextType } from "../../../types";
 import { SubGenerator } from '../../../../chord/Generator/SubGenerator';
 import { DisChordError, ErrorLevel } from '../../../../errors/ChordError';
@@ -42,14 +41,8 @@ export default class CommandVisitor extends SubGenerator<DisChordNodeType, DisCh
             .map((n: DisChordASTNode): string => "    " + this.parent.visit(n) + ";")
             .join('\n');
 
-        // must be read before popping the scope: MessageVisitor sets it while generating 'body' above
-        const needsMessageHelper = this.parent.context.symbolTable.getMetadata<boolean>(CompilerMetadataKind.RequiresMessageHelper);
-
-        const messageImport = needsMessageHelper ? `import { createMessage } from '../${createMessageModulePath}';` : '';
-
         const commandBody: string = `
             import { Command, IgnoreCommand, Embed, ActionRow, Button, createStringOption } from 'seyfert';
-            ${messageImport}
 
             ${OptionsData}
 
@@ -73,9 +66,6 @@ export default class CommandVisitor extends SubGenerator<DisChordNodeType, DisCh
 
         // deleting scope from symboltable
         this.parent.context.symbolTable.popScope();
-
-        // bubble the flag up so DisChordGenerator.sharedModules() can still see it after this command's own scope is gone
-        if (needsMessageHelper) this.parent.context.symbolTable.setMetadata(CompilerMetadataKind.RequiresMessageHelper, true);
 
         return commandBody;
     }

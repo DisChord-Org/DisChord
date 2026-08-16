@@ -38,11 +38,16 @@ export class ImportVisitor<T extends string, N extends BaseNode<T>> extends SubG
             path += '.mjs';
         }
 
+        // if the import has no identifiers, it's a side-effect-only import.
+        if (node.identificators.length === 0) {
+            return `import "${path}"`;
+        }
+
         if (node.isDestructured) {
             const ids = node.identificators.join(', ');
             return `import { ${ids} } from "${path}"`;
         }
-        
+
         return `import * as _${node.identificators[0]} from "${path}";\nconst ${node.identificators[0]} = _${node.identificators[0]}.default || _${node.identificators[0]};`;
     }
 }
