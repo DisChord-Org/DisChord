@@ -47,6 +47,7 @@ export class CompileCommand {
      */
     public async execute(rawPath: string, options: GlobalCLIOptions): Promise<void> {
         this.config = FileSystem.configure(rawPath);
+        FileSystem.assertEsmProject(this.config.projectRoot);
 
         const files = FileSystem.getChordFiles(this.config.inputPath, this.config.isDirectory);
 
@@ -85,8 +86,6 @@ export class CompileCommand {
             ? path.resolve(options.outDir)
             : path.join(this.config.distDir, path.dirname(relativePath));
 
-        const outputPath = path.join(targetDir, `${fileName}.mjs`);
-
         const context: CompilationContext<DisChordNodeType> = {
             symbolTable: new SymbolTable(),
             keywordsManager: new KeyWords(),
@@ -119,6 +118,7 @@ export class CompileCommand {
             fs.mkdirSync(targetDir, { recursive: true });
         }
 
+        const outputPath = path.join(targetDir, `${fileName}.js`);
         await Prettifier.savePrettified(outputPath, output);
 
         return context.extraFiles;
@@ -154,8 +154,8 @@ export class CompileCommand {
         if (!this.config) return;
 
         const runTarget = this.config.isDirectory
-            ? path.join(this.config.distDir, 'index.mjs')
-            : path.join(this.config.distDir, `${path.basename(this.config.inputPath, '.chord')}.mjs`);
+            ? path.join(this.config.distDir, 'index.js')
+            : path.join(this.config.distDir, `${path.basename(this.config.inputPath, '.chord')}.js`);
 
         const runner = new RunCommand();
         await runner.execute(runTarget, { projectRoot: this.config.projectRoot });

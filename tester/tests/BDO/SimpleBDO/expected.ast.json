@@ -2,7 +2,7 @@
   {
     "type": "importar",
     "identificators": [],
-    "path": "./lib/consoleRuntime.mjs",
+    "path": "./lib/consoleRuntime.js",
     "isDestructured": false,
     "location": {
       "line": 0,

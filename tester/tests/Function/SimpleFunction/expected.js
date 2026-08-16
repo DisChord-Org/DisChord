@@ -1,4 +1,4 @@
-import './lib/consoleRuntime.mjs';
+import './lib/consoleRuntime.js';
 function saludar(nombre) {
     return 'Hola, ' + nombre;
 }

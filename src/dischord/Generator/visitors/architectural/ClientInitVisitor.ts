@@ -193,7 +193,7 @@ export default class ClietInitVisitor extends SubGenerator<DisChordNodeType, Dis
         } else {
             const originalDir = this.parent.context.outputDir ?? path.join(projectRoot, 'dist');
             absoluteTarget = path.join(originalDir, cleanPath);
-            if (!absoluteTarget.endsWith('.mjs')) absoluteTarget += '.mjs';
+            if (!absoluteTarget.endsWith('.js')) absoluteTarget += '.js';
         }
 
         let specifier = path.relative(projectRoot, absoluteTarget).split(path.sep).join('/');

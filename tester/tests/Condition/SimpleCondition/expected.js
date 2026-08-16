@@ -1,4 +1,4 @@
-import './lib/consoleRuntime.mjs';
+import './lib/consoleRuntime.js';
 let edad = 20;
 if (edad >= 18) {
     console.log('Es mayor de edad');

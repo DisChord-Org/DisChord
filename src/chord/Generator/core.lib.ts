@@ -4,11 +4,11 @@
  * imports it), so both sides agree on the location from a single source of truth.
  * @type {string}
  */
-export const consoleRuntimeModulePath = 'lib/consoleRuntime.mjs';
+export const consoleRuntimeModulePath = 'lib/consoleRuntime.js';
 
 /**
  * Raw JavaScript string content for the shared `console.log` override module. Written once to
- * `dist/lib/consoleRuntime.mjs` (only when at least one compiled file actually calls
+ * `dist/lib/consoleRuntime.js` (only when at least one compiled file actually calls
  * `consola.imprimir`) and imported — for its side effect only — by any file that does, instead of
  * every generated file duplicating the override inline.
  * @type {string}

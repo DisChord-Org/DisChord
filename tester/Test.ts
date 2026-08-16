@@ -57,7 +57,7 @@ export abstract class Test {
     /**
      * When set, this test expects compilation to *fail* with an error whose message contains
      * this substring, instead of succeeding and matching output snapshots. No `expected.ast.json`
-     * or `expected.mjs` fixture is needed for this kind of test — the assertion is "it throws",
+     * or `expected.js` fixture is needed for this kind of test — the assertion is "it throws",
      * not "it produces this exact output". Useful for validating that invalid input (duplicate
      * declarations, an unresolved base class, etc.) is correctly rejected.
      *
@@ -98,7 +98,7 @@ export abstract class Test {
      * @throws {Error} If the file cannot be read.
      */
     protected get expectedCode(): string {
-        const file = path.join(this.fixturePath, 'expected.mjs');
+        const file = path.join(this.fixturePath, 'expected.js');
         return fs.readFileSync(file, 'utf-8');
     }
 
@@ -206,7 +206,7 @@ export abstract class Test {
      * @throws {Error} If comparison fails and not in snapshot update mode.
      */
     protected async assertOrUpdateSnapshot(actualContent: string, snapshotType: 'ast' | 'code'): Promise<void> {
-        const targetFilename = snapshotType === 'ast' ? 'expected.ast.json' : 'expected.mjs';
+        const targetFilename = snapshotType === 'ast' ? 'expected.ast.json' : 'expected.js';
         const targetPath = path.join(this.fixturePath, targetFilename);
 
         if (this.forceUpdate || !fs.existsSync(targetPath)) {

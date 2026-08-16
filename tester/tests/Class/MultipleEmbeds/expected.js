@@ -1,4 +1,4 @@
-import { createMessage } from './lib/createMessage.mjs';
+import { createMessage } from './lib/createMessage.js';
 let Bienvenida = new Embed().setTitle('Bienvenido');
 
 let msg = await createMessage(

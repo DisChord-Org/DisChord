@@ -1,4 +1,4 @@
-import './lib/consoleRuntime.mjs';
+import './lib/consoleRuntime.js';
 let nota = 7;
 if (nota >= 9) {
     console.log('Excelente');

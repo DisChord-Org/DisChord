@@ -1,4 +1,4 @@
-import './lib/consoleRuntime.mjs';
+import './lib/consoleRuntime.js';
 class Animal {
     constructor(nombre) {
         this.nombre = nombre;

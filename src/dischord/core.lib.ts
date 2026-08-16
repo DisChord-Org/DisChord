@@ -36,11 +36,11 @@ export const corelib: Record<string, Record<string, string> | string> = {
  * needs to import it, so both sides agree on the location from a single source of truth.
  * @type {string}
  */
-export const createMessageModulePath = 'lib/createMessage.mjs';
+export const createMessageModulePath = 'lib/createMessage.js';
 
 /**
  * Raw JavaScript string content for the shared, standalone `createMessage` runtime module.
- * Written once to `dist/lib/createMessage.mjs` by `CompileCommand` (only when at least one
+ * Written once to `dist/lib/createMessage.js` by `CompileCommand` (only when at least one
  * compiled file actually needs it) and imported by any command/event file that calls it,
  * instead of every generated file duplicating the whole helper inline.
  *

@@ -1,4 +1,4 @@
-import './lib/consoleRuntime.mjs';
+import './lib/consoleRuntime.js';
 let panas = (() => {
     let Ether = 'está chetado';
     let JustEvil = 'goat';

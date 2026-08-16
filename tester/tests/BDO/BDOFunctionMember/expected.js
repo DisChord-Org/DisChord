@@ -1,4 +1,4 @@
-import './lib/consoleRuntime.mjs';
+import './lib/consoleRuntime.js';
 let persona = (() => {
     let nombre = 'Juan';
     function saludar() {

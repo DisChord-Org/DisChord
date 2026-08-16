@@ -1,4 +1,4 @@
-import { createMessage } from './lib/createMessage.mjs';
+import { createMessage } from './lib/createMessage.js';
 let msg = await createMessage(
     undefined,
     {

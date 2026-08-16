@@ -27,15 +27,15 @@ export class ImportVisitor<T extends string, N extends BaseNode<T>> extends SubG
 
         if (path.startsWith('lib:')) {
             const libName = path.split(':')[1];
-            path = `../lib/${libName}/src/${libName}.mjs`;
+            return this.renderImportStatement(node, `../lib/${libName}/src/${libName}.mjs`);
         }
 
         if (!path.startsWith('./') && !path.startsWith('../') && !path.startsWith('/')) {
             path = `./${path}`;
         }
 
-        if (!path.endsWith('.mjs')) {
-            path += '.mjs';
+        if (!path.endsWith('.js')) {
+            path += '.js';
         }
 
         return this.renderImportStatement(node, path);

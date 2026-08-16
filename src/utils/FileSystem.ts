@@ -7,7 +7,7 @@ import path from 'path';
 export interface CompilerConfig {
     inputPath: string;      // The entry path
     projectRoot: string;    // The project root (where the dist directory is located)
-    distDir: string;        // Output path for the .mjs files
+    distDir: string;        // Output path for the compiled .js files
     isDirectory: boolean;   // Are we compiling an entire project or a single script?
 }
 
@@ -24,7 +24,7 @@ export class FileSystem {
     static configure(rawInput: string): CompilerConfig {
         const inputPath = path.resolve(rawInput);
         const isDirectory = fs.statSync(inputPath).isDirectory();
-        
+
         const baseDir = isDirectory ? inputPath : path.dirname(inputPath);
         const projectRoot = path.basename(baseDir) === 'src' ? path.join(baseDir, '..') : baseDir;
 
@@ -34,6 +34,34 @@ export class FileSystem {
             distDir: path.join(projectRoot, 'dist'),
             isDirectory
         };
+    }
+
+    /**
+     * Compiled output is plain `.js` (matching what Seyfert's own command/event file loader
+     * recognizes — it only scans for `.js`/`.ts`, never `.mjs`), which only runs as ESM
+     * (`import`/`export`) if the project's `package.json` declares `"type": "module"`. Without
+     * it, Node would try to run the compiled `.js` files as CommonJS and fail on the first
+     * `import` statement — so this is checked once, upfront, with a clear message, instead of
+     * letting that surface later as a confusing Node syntax error.
+     *
+     * Called by `CompileCommand` for a real project compile — not part of `configure()` itself,
+     * since the internal test harness (`tester/Test.ts`) also calls `configure()` against bare
+     * fixture directories that have no `package.json` of their own and never actually run.
+     * @param projectRoot - The project's root directory (where `package.json` is expected).
+     * @throws {Error} If `package.json` is missing, unreadable, or lacks `"type": "module"`.
+     */
+    static assertEsmProject (projectRoot: string): void {
+        const packageJsonPath = path.join(projectRoot, 'package.json');
+
+        if (!fs.existsSync(packageJsonPath)) {
+            throw new Error(`No se encontró 'package.json' en '${projectRoot}'. DisChord necesita que el proyecto tenga uno con "type": "module".`);
+        }
+
+        const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
+
+        if (packageJson.type !== 'module') {
+            throw new Error(`El 'package.json' del proyecto necesita "type": "module" para poder ejecutar el código compilado (Seyfert carga los archivos de 'comandos'/'eventos' como .js, y Node solo los trata como ESM con esa opción activada). Añádela en '${packageJsonPath}'.`);
+        }
     }
 
     /**

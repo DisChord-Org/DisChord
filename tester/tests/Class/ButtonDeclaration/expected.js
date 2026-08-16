@@ -1,4 +1,4 @@
-import { createMessage } from './lib/createMessage.mjs';
+import { createMessage } from './lib/createMessage.js';
 let Confirmar = new Button().setCustomId('confirmar').setLabel('Confirmar').setStyle(3);
 
 let msg = await createMessage(

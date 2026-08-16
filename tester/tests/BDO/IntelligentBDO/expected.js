@@ -1,4 +1,4 @@
-import './lib/consoleRuntime.mjs';
+import './lib/consoleRuntime.js';
 let chainsawman = (() => {
     let makima = 'narcisista';
     let denji = 'mascota de una ' + makima;

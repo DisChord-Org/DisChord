@@ -109,7 +109,11 @@ export class Tester {
                 continue;
             }
 
-            const isTestFile = entry.isFile() && (entry.name.endsWith(".ts") || entry.name.endsWith(".js"));
+            // Excludes `expected.js` specifically — a fixture's own code snapshot, not a test
+            // module — since not every test file follows the `*Test.ts` naming convention (some
+            // predate it), so matching on that suffix alone would miss real tests too.
+            const isTestFile = entry.isFile() && (entry.name.endsWith(".ts") || entry.name.endsWith(".js"))
+                && !entry.name.startsWith("expected.");
             const isDeclarationFile = entry.name.endsWith(".d.ts");
 
             if (isTestFile && !isDeclarationFile) {

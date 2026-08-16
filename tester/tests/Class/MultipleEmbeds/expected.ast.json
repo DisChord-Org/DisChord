@@ -5,7 +5,7 @@
       "createMessage"
     ],
     "isDestructured": true,
-    "path": "./lib/createMessage.mjs",
+    "path": "./lib/createMessage.js",
     "location": {
       "line": 0,
       "column": 0
