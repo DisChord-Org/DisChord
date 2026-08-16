@@ -1,4 +1,4 @@
-import { NewNode, SymbolKind, TokenType, TokenTypeUnion, VariableNode } from '../../../chord/types';
+import { NewNode, TokenType, TokenTypeUnion, VariableNode } from '../../../chord/types';
 import { SubParser } from '../../../chord/Parser/SubParser';
 import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType, EmbedDeclarationNode } from '../../types';
 import { Parser } from '../../../chord/Parser/Parser';
@@ -72,11 +72,6 @@ export default class DisChordStatementParser extends SubParser<DisChordNodeType,
         if (node.type !== DisChordTokenType.CREAR_EMBED) return node;
 
         const embed = node as EmbedDeclarationNode;
-
-        this.SymbolTable.register(embed.name, {
-            name: embed.name,
-            kind: SymbolKind.Variable
-        }, embed.location);
 
         return this.createNode<VariableNode<DisChordNodeType, DisChordNode>>({
             type: TokenType.VARIABLE,

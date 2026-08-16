@@ -1,6 +1,8 @@
 import { ASTNode, BaseNode } from "../types";
 import { CompilationContext } from "../../cli/commands/CompileCommand";
 import { AnalysisRule } from "./AnalysisRule";
+import { BindImportsRule } from "./rules/BindImportsRule";
+import { BindDeclarationsRule } from "./rules/BindDeclarationsRule";
 import { RequiresConsoleRuntimeRule } from "./rules/RequiresConsoleRuntimeRule";
 
 /**
@@ -31,6 +33,19 @@ export class Analyzer<T extends string, N extends BaseNode<T>> {
      * @param context - The active compilation context (symbol table, project paths, etc.).
      */
     constructor (protected context: CompilationContext<T>) {
+        // Pass 1 ("Imports"): bind every imported name before anything else needs to see it.
+        this.rules.push(new BindImportsRule(context));
+
+        // Pass 2 ("Variables"): bind every declaration (classes, functions, variables,
+        // properties) across the whole file, so forward references resolve regardless of
+        // source order.
+        this.rules.push(new BindDeclarationsRule(context));
+
+        // Pass 3 ("Tipos"): reference/type validation against the now-complete symbol table.
+        // Intentionally empty for now — rules land here next.
+
+        // Lowering rules — independent of the 3-pass binding model above, they don't touch
+        // SymbolTable at all.
         this.rules.push(new RequiresConsoleRuntimeRule(context));
     }
 

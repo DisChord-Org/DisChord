@@ -55,7 +55,7 @@ export class SymbolTable {
         
         if (currentScope.has(name)) {
             throw new ChordError({
-                phase: ErrorLevel.Parser,
+                phase: ErrorLevel.Analysis,
                 message: `Identificador duplicado: '${name}' ya ha sido declarado en este ámbito.`,
                 location
             }).format();

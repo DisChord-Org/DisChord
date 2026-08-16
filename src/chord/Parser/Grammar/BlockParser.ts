@@ -25,24 +25,19 @@ export class BlockParser<T extends string, N extends BaseNode<T>> extends SubPar
     }
 
     /**
-     * Parses a block of statements
-     * Automatically manages lexical scoping.
+     * Parses a block of statements enclosed in braces.
      * @returns {BlockNode<T, N>[]} An array of nodes representing the block's body.
      */
     public parse (): BlockNode<T, N> {
         const body: ASTNode<T, N>[] = [];
 
         this.consume(TokenType.L_BRACE);
-        
-        this.SymbolTable.pushScope();
 
         while (!this.isAtEnd() && this.peek().type !== TokenType.R_BRACE) {
             body.push(this.parent.get(StatementParser).parse());
         }
 
         this.consume(TokenType.R_BRACE);
-        
-        this.SymbolTable.popScope();
 
         return this.createNode<BlockNode<T, N>>({
             type: TokenType.BLOQUE,

@@ -1,5 +1,5 @@
 import { SubParser } from "../../SubParser";
-import { PropertyNode, SymbolKind, LiteralNode, ASTNode, BaseNode, TokenType, TokenTypeUnion } from "../../../types";
+import { PropertyNode, LiteralNode, ASTNode, BaseNode, TokenType, TokenTypeUnion } from "../../../types";
 import { Parser } from "../../Parser";
 import { DecoratorProcessor } from "../../../DecoratorProcessor";
 
@@ -32,11 +32,6 @@ export class PropertyParser<T extends string, N extends BaseNode<T>> extends Sub
         if (this.match(TokenType.Es)) {
             value = this.parent.parseExpression();
         }
-
-        this.SymbolTable.register(id, {
-            name: id,
-            kind: SymbolKind.Property
-        }, this.peek('prev').location);
 
         const isStatic: boolean = DecoratorProcessor.matchAndDelete('fijar', true);
 

@@ -1,6 +1,7 @@
 import { Analyzer } from "../../chord/Analyzer/Analyzer";
 import { DisChordNode, DisChordNodeType } from "../types";
 import { CompilationContext } from "../../cli/commands/CompileCommand";
+import { BindDisChordDeclarationsRule } from "./rules/BindDisChordDeclarationsRule";
 import { SingleWholeFileDeclarationRule } from "./rules/SingleWholeFileDeclarationRule";
 import { RequiresMessageHelperRule } from "./rules/RequiresMessageHelperRule";
 
@@ -15,6 +16,9 @@ export class DisChordAnalyzer extends Analyzer<DisChordNodeType, DisChordNode> {
      */
     constructor (context: CompilationContext<DisChordNodeType>) {
         super(context);
+
+        // Pass 2 ("Variables"), dischord's own declarations: comando/evento/encender bot.
+        this.rules.push(new BindDisChordDeclarationsRule(context));
 
         this.rules.push(new SingleWholeFileDeclarationRule(context));
         this.rules.push(new RequiresMessageHelperRule(context));

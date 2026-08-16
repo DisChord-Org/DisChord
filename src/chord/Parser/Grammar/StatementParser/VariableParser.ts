@@ -1,4 +1,4 @@
-import { ASTNode, BaseNode, LiteralNode, SymbolKind, TokenType, TokenTypeUnion, VariableNode } from "../../../types";
+import { ASTNode, BaseNode, LiteralNode, TokenType, TokenTypeUnion, VariableNode } from "../../../types";
 import { Parser } from "../../Parser";
 import { SubParser } from "../../SubParser";
 import { ExpressionParser } from "../Expressions/ExpressionParser";
@@ -32,11 +32,6 @@ export class VariableParser<T extends string, N extends BaseNode<T>> extends Sub
         if (this.match(TokenType.Es)) {
             value = this.parent.get(ExpressionParser).parse();
         }
-
-        this.parent.SymbolTable.register(id, {
-            name: id,
-            kind: SymbolKind.Variable
-        }, this.peek().location);
 
         return this.createNode<VariableNode<T, N>>({
             type: TokenType.VARIABLE,

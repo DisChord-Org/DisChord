@@ -1,6 +1,6 @@
 import { DisChordNode, DisChordNodeType, DisChordTokenType, EventNode } from "../../../types";
 import { SubParser } from "../../../../chord/Parser/SubParser";
-import { SymbolKind, TokenType, TokenTypeUnion } from "../../../../chord/types";
+import { TokenType, TokenTypeUnion } from "../../../../chord/types";
 import { BlockParser } from "../../../../chord/Parser/Grammar/BlockParser";
 import { Parser } from "../../../../chord/Parser/Parser";
 
@@ -33,11 +33,6 @@ export default class EventParser extends SubParser<DisChordNodeType, DisChordNod
         this.consume(DisChordTokenType.Evento);
 
         const eventName = this.consume(TokenType.IDENTIFICADOR).value;
-
-        this.SymbolTable.register(eventName, {
-            name: eventName,
-            kind: SymbolKind.Declaration
-        }, this.peek('prev').location);
 
         const body = this.parent.get(BlockParser).parse().body;
     

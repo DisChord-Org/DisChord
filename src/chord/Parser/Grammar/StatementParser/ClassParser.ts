@@ -1,8 +1,7 @@
 import { SubParser } from "../../SubParser";
-import { ClassNode, SymbolKind, ASTNode, BaseNode, TokenType, TokenTypeUnion } from "../../../types";
+import { ClassNode, ASTNode, BaseNode, TokenType, TokenTypeUnion } from "../../../types";
 import { StatementParser } from "./StatementParser";
 import { Parser } from "../../Parser";
-import { ChordError, ErrorLevel } from "../../../../errors/ChordError";
 
 export class ClassParser<T extends string, N extends BaseNode<T>> extends SubParser<T, N> {
     /** To identify when this parser should be used */
@@ -30,7 +29,6 @@ export class ClassParser<T extends string, N extends BaseNode<T>> extends SubPar
         let superClass: string | undefined = undefined;
         if (this.match(TokenType.Extiende)) {
             superClass = this.consume(TokenType.IDENTIFICADOR, "Se debe especificar el nombre de la clase padre").value;
-            this.assertClassExists(superClass);
         }
 
         return this.buildClassNode(id, superClass);
@@ -43,23 +41,17 @@ export class ClassParser<T extends string, N extends BaseNode<T>> extends SubPar
      */
     public parseShorthand(): ClassNode<T, N> {
         const superClass = this.consume(TokenType.IDENTIFICADOR, "Se debe especificar el nombre de la clase base").value;
-        this.assertClassExists(superClass);
-
         const id = this.consume(TokenType.IDENTIFICADOR, "Se debe especificar el nombre de la nueva clase").value;
 
         return this.buildClassNode(id, superClass);
     }
 
     /**
-     * Registers the class symbol and parses its `{ ... }` body, shared by both the
-     * traditional and shorthand declaration forms.
+     * Parses the class's `{ ... }` body, shared by both the traditional and shorthand
+     * declaration forms. Registering the class symbol and validating `superClass` (if any) is now
+     * the Analyzer's job (`BindDeclarationsRule`) — see that class for why.
      */
     private buildClassNode(id: string, superClass: string | undefined): ClassNode<T, N> {
-        this.SymbolTable.register(id, {
-            name: id,
-            kind: SymbolKind.Class
-        }, this.peek('prev').location);
-
         this.consume(TokenType.L_BRACE, "Al declarar una clase debes usar '{'");
 
         const body = this.parseBody(id);
@@ -75,39 +67,16 @@ export class ClassParser<T extends string, N extends BaseNode<T>> extends SubPar
     }
 
     /**
-     * Parses the statements composing a class body inside its own lexical scope.
+     * Parses the statements composing a class body.
      */
     private parseBody(id: string): ASTNode<T, N>[] {
         const body: ASTNode<T, N>[] = [];
         const statementParser = this.parent.get(StatementParser) as StatementParser<T, N>;
 
-        this.SymbolTable.pushScope();
-
         while (this.peek().type !== TokenType.R_BRACE && !this.isAtEnd()) {
             body.push(statementParser.parse(id));
         }
 
-        this.SymbolTable.popScope();
-
         return body;
-    }
-
-    /**
-     * Ensures a referenced base class was already declared (or imported) before being extended.
-     * Imported names are registered as `SymbolKind.Declaration` (their real kind is opaque at
-     * parse time — see `ImportParser`), so both kinds count as valid base classes here.
-     * @throws {ChordError} If the identifier does not resolve to a previously declared/imported symbol.
-     */
-    private assertClassExists(name: string): void {
-        const symbol = this.SymbolTable.lookup(name);
-        const isValidBase = symbol && (symbol.kind === SymbolKind.Class || symbol.kind === SymbolKind.Declaration);
-
-        if (!isValidBase) {
-            throw new ChordError({
-                phase: ErrorLevel.Parser,
-                message: `Clase base '${name}' no declarada. Una clase debe declararse (o importarse) antes de poder ser extendida.`,
-                location: this.peek('prev').location
-            }).format();
-        }
     }
 }

@@ -1,5 +1,5 @@
 import { SubParser } from "../../SubParser";
-import { BaseNode, FunctionNode, SymbolKind, TokenType, TokenTypeUnion } from "../../../types";
+import { BaseNode, FunctionNode, TokenType, TokenTypeUnion } from "../../../types";
 import { BlockParser } from "../BlockParser";
 import { Parser } from "../../Parser";
 import { DecoratorProcessor } from "../../../DecoratorProcessor";
@@ -60,11 +60,6 @@ export class FunctionParser<T extends string, N extends BaseNode<T>> extends Sub
         this.consume(TokenType.R_PAREN);
 
         const body = (this.parent.get(BlockParser) as BlockParser<T, N>).parse().body;
-
-        this.SymbolTable.register(id, {
-            name: id,
-            kind: SymbolKind.Function
-        }, this.peek('prev').location);
 
         const isAsync: boolean = DecoratorProcessor.matchAndDelete('asincrono', true);
         const isStatic: boolean = DecoratorProcessor.matchAndDelete('fijar', true);
