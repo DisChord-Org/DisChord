@@ -3,6 +3,6 @@ nuevo embed Bienvenida {
     descripcion "Gracias por unirte"
 }
 
-var msg es nuevo mensaje {
+var msg es enviar mensaje {
     embed Bienvenida
 }

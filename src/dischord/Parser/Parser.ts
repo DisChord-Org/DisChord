@@ -92,10 +92,6 @@ export class DisChordParser extends Parser<DisChordNodeType, DisChordNode> {
     override parseCustomStatement(): DisChordASTNode | null {
         const token = this.peek();
 
-        // 'embed' deliberately stays an unreserved identifier (see EmbedDeclarationParser), so
-        // it can't be matched by the triggerToken dispatch below — it's matched by literal value
-        // here instead, requiring the `<Nombre> {` shape so it can't be confused with 'embed'
-        // used as an ordinary BDO property key elsewhere (e.g. inside `nuevo mensaje {}`).
         if (token.type === TokenType.IDENTIFICADOR && token.value === 'embed'
             && this.peek('next').type === TokenType.IDENTIFICADOR
             && this.peek(this.cursor + 2)?.type === TokenType.L_BRACE) {

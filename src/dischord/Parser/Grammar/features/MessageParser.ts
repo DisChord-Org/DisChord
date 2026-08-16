@@ -8,15 +8,20 @@ import { Parser } from "../../../../chord/Parser/Parser";
  * The Message Parser.
  * This class is responsible for parsing message creation blocks, which include the message content, channel, embeds and buttons.
  * It constructs a MessageNode in the AST that represents the entire message definition.
+ *
+ * Triggers on `enviar mensaje { ... }`, not `nuevo mensaje { ... }` — sending a message is an
+ * action with a side effect (it dispatches the message right there), not the construction of an
+ * instance, so `nuevo` (reserved for actual instantiation, e.g. `nuevo Embed()`-style values) was
+ * the wrong verb for it. Same two-token trigger shape as `encender bot` (`ClientParser`).
  */
 export default class MessageParser extends SubParser<DisChordNodeType, DisChordNode> {
     /** To identify when this parser should be used */
-    static triggerToken: DisChordNodeType | undefined = DisChordTokenType.Mensaje;
+    static triggerToken: DisChordNodeType | undefined = DisChordTokenType.Enviar;
 
     /**
      * Collection of reserved keywords this specific sub-parser registers
      */
-    static keywords: TokenTypeUnion<DisChordNodeType>[] = [ DisChordTokenType.Mensaje ];
+    static keywords: TokenTypeUnion<DisChordNodeType>[] = [ DisChordTokenType.Enviar, DisChordTokenType.Mensaje ];
 
     /**
      * Initializes the MessageParser with the main DisChordParser context for token expression handling.
@@ -28,9 +33,11 @@ export default class MessageParser extends SubParser<DisChordNodeType, DisChordN
 
     /**
      * Parses a message creation block.
+     * Expected structure: `enviar mensaje {...}`
      * @returns {MessageNode} The AST node representing the message definition.
      */
     parse (): MessageNode {
+        this.consume(DisChordTokenType.Enviar);
         this.consume(DisChordTokenType.Mensaje);
 
         const object = this.parent.get(BDOParser).setMode(ODBMode.Simple).parse() as DisChordODBNode;

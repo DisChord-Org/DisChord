@@ -87,7 +87,7 @@ nuevo comando Ping {
     consola.imprimir("Ejecutando ping...")
     
     var pingMensaje es "¡Pong " mas cliente.ping mas "ms!"
-    nuevo mensaje {
+    enviar mensaje {
         contenido "¡Pong!"
     }
 }

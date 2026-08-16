@@ -19,7 +19,7 @@ nuevo comando StringTest {
         }
     }
 
-    nuevo mensaje {
+    enviar mensaje {
         contenido repetir
     }
 }

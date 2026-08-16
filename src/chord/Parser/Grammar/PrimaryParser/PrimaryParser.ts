@@ -44,6 +44,12 @@ export class PrimaryParser<T extends string, N extends BaseNode<T>> extends SubP
             });
         }
 
+        // A dialect's custom statement (e.g. dischord's `enviar mensaje {}`) is reachable here too,
+        // not just from statement position — so its result can be used as a value directly
+        // (`var msg es enviar mensaje {...}`), the same way it already works after `nuevo`.
+        const customStatement = this.parent.parseCustomStatement();
+        if (customStatement) return customStatement;
+
         if (token.type === TokenType.L_SQUARE) {
             this.consume(TokenType.L_SQUARE);
             const elements: ASTNode<T, N>[] = [];

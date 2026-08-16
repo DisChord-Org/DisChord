@@ -8,7 +8,7 @@ import { createMessageModuleContent, createMessageModulePath } from "../../core.
 
 /**
  * Detects, over the *complete* AST (any nesting depth — inside a `comando`/`evento`'s body, etc.),
- * whether the file declares a `nuevo mensaje {}`. If so, inserts a real, synthetic `ImportNode`
+ * whether the file declares an `enviar mensaje {}`. If so, inserts a real, synthetic `ImportNode`
  * for the shared `createMessage` helper at the front of `nodes` — the same "lowering" step
  * `RequiresConsoleRuntimeRule` already does for chord's own console runtime — so `MessageVisitor`
  * (which emits the `createMessage(...)` call) never has to also decide whether to import it.

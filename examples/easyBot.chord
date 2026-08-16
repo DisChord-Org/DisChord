@@ -13,7 +13,7 @@ nuevo comando Ping {
     descripcion "comando ping";
 
     var msgContenido es "pong! " mas cliente.ping mas "ms"
-    nuevo mensaje {
+    enviar mensaje {
         contenido msgContenido
     }
 }

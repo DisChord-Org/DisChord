@@ -11,7 +11,7 @@ nuevo evento encendido {
 nuevo comando HolaMundo {
     descripcion "un hola mundo desde DisChord";
 
-    var msg es nuevo mensaje {
+    var msg es enviar mensaje {
         embed {
             descripcion "hola"
         }

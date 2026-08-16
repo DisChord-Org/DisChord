@@ -12,6 +12,7 @@ export const DisChordTokenType = {
     Comando: 'comando',
     Evento: 'evento',
     Mensaje: 'mensaje',
+    Enviar: 'enviar',
     Recolector: 'recolector',
     Encender: 'encender',
     Bot: 'bot',
