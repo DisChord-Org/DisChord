@@ -38,15 +38,49 @@ export class FileSystem {
 
     /**
      * Recursively retrieves all .chord files from a directory or returns the single file path.
-     * * @param dir - The starting directory or file path.
+     *
+     * A single file living directly inside a conventional `src/` folder (e.g. `src/index.chord`)
+     * is treated as a project's entry point rather than a standalone script: pointing the CLI at
+     * just that file — the natural thing to do, since it's the designated entry — would otherwise
+     * silently compile only that one file and skip every sibling `.chord` under `src/` (commands,
+     * events, ...), with no indication anything was left out. A file that *isn't* inside a `src/`
+     * folder (e.g. one of the standalone scripts under `examples/`) keeps the original, literal
+     * single-file behavior.
+     * @param dir - The starting directory or file path.
      * @param isDirectory - Boolean flag to determine search mode.
      * @returns An array of absolute paths to all discovered .chord files.
      */
     static getChordFiles(dir: string, isDirectory: boolean): string[] {
-        if (!isDirectory) return [dir];
-        return fs.readdirSync(dir, { recursive: true })
-            .filter(file => typeof file === 'string' && file.endsWith('.chord'))
-            .map(file => path.resolve(dir, file as string));
+        if (!isDirectory) {
+            const parentDir = path.dirname(dir);
+            if (path.basename(parentDir) === 'src') return FileSystem.getChordFiles(parentDir, true);
+
+            return [dir];
+        }
+
+        return FileSystem.walkChordFiles(dir);
+    }
+
+    /**
+     * Manually walks a directory tree collecting `.chord` files, rather than relying on
+     * `fs.readdirSync`'s `recursive` option (only available from Node 20.1 onward, and silently
+     * ignored — not an error — on older runtimes, which would quietly turn this into a shallow,
+     * non-recursive scan).
+     * @private
+     * @param dir - The directory to walk.
+     * @returns An array of absolute paths to every `.chord` file found under `dir`.
+     */
+    private static walkChordFiles (dir: string): string[] {
+        const entries = fs.readdirSync(dir, { withFileTypes: true });
+
+        return entries.flatMap(entry => {
+            const entryPath = path.join(dir, entry.name);
+
+            if (entry.isDirectory()) return FileSystem.walkChordFiles(entryPath);
+            if (entry.isFile() && entry.name.endsWith('.chord')) return [entryPath];
+
+            return [];
+        });
     }
 
     /**
