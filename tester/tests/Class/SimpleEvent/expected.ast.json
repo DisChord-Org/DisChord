@@ -1,0 +1,79 @@
+[
+  {
+    "type": "Evento",
+    "name": "encendido",
+    "body": [
+      {
+        "type": "Llamada",
+        "object": {
+          "type": "IDENTIFICADOR",
+          "value": "imprimir",
+          "location": {
+            "line": 2,
+            "column": 5
+          }
+        },
+        "params": [
+          {
+            "type": "ExpresionBinaria",
+            "left": {
+              "type": "ExpresionBinaria",
+              "left": {
+                "type": "Literal",
+                "value": "[",
+                "raw": "[",
+                "location": {
+                  "line": 2,
+                  "column": 14
+                }
+              },
+              "operator": "mas",
+              "right": {
+                "type": "Acceso",
+                "object": {
+                  "type": "IDENTIFICADOR",
+                  "value": "usuario",
+                  "location": {
+                    "line": 2,
+                    "column": 22
+                  }
+                },
+                "property": "nombre",
+                "location": {
+                  "line": 2,
+                  "column": 30
+                }
+              },
+              "location": {
+                "line": 2,
+                "column": 30
+              }
+            },
+            "operator": "mas",
+            "right": {
+              "type": "Literal",
+              "value": "] Bot Encendido",
+              "raw": "] Bot Encendido",
+              "location": {
+                "line": 2,
+                "column": 41
+              }
+            },
+            "location": {
+              "line": 2,
+              "column": 41
+            }
+          }
+        ],
+        "location": {
+          "line": 2,
+          "column": 58
+        }
+      }
+    ],
+    "location": {
+      "line": 3,
+      "column": 1
+    }
+  }
+]

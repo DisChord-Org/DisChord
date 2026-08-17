@@ -73,7 +73,10 @@ export class BDOParser<T extends string, N extends BaseNode<T>> extends SubParse
                 if (this.peek().type === TokenType.SEPARADOR) {
                     if (mode === ODBMode.Simple) mode = ODBMode.Intelligent;
                     this.consume(TokenType.SEPARADOR, 'En un BDOI, las definiciones deben terminar con ";"');
-                } else if (mode === ODBMode.Intelligent) {
+                } else if (mode === ODBMode.Intelligent && value.type !== TokenType.BDO) {
+                    // A BDO-valued property (`opciones { ... }`) is self-delimited by its own
+                    // matching brace — exempt from the mandatory ';', same as `checkPropertyPattern`
+                    // already treats it as unambiguously a property regardless of mode.
                     throw new ChordError({
                         phase: ErrorLevel.Parser,
                         message: `En un BDO inteligente, la propiedad '${key}' debe terminar en ';'`,
@@ -123,6 +126,8 @@ export class BDOParser<T extends string, N extends BaseNode<T>> extends SubParse
         if (this.parent.KeywordsManager.isKeyword(current.value)) return false;
         // if (this.parent.KeywordsManager.isKeyword(next.value)) return false;
         if (next.type === TokenType.Punto) return false;
+        if (next.type === TokenType.L_PAREN) return this.lookAheadForToken(TokenType.SEPARADOR);
+        if (next.type === TokenType.L_BRACE) return true;
         if (mode === ODBMode.Simple && this.lookAheadForToken(TokenType.SEPARADOR)) return true;
         if (mode === ODBMode.Intelligent) return this.lookAheadForToken(TokenType.SEPARADOR);
 

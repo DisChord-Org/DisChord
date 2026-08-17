@@ -1,0 +1,15 @@
+nuevo comando StringTest {
+    descripcion "Test de Strings";
+
+    opciones {
+        repetir {
+            opcion "texto"
+            descripcion "El bot responde con lo que escribas"
+            requerido verdadero
+        }
+    }
+
+    enviar mensaje {
+        contenido repetir
+    }
+}

@@ -1,0 +1,9 @@
+var contenedor es {
+    exterior {
+        interior {
+            consola.imprimir("mensaje")
+        }
+    }
+}
+
+consola.imprimir(contenedor)

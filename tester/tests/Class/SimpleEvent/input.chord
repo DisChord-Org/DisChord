@@ -1,0 +1,3 @@
+nuevo evento encendido {
+    imprimir("[" mas usuario.nombre mas "] Bot Encendido")
+}
