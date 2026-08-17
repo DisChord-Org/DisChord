@@ -1,0 +1,210 @@
+[
+  {
+    "type": "importar",
+    "identificators": [
+      "createMessage"
+    ],
+    "isDestructured": true,
+    "path": "./lib/createMessage.js",
+    "location": {
+      "line": 0,
+      "column": 0
+    }
+  },
+  {
+    "type": "CrearComando",
+    "value": "HolaMundo",
+    "body": {
+      "type": "BDO",
+      "mode": 1,
+      "blocks": {
+        "descripcion": {
+          "type": "Literal",
+          "value": "un hola mundo desde DisChord",
+          "raw": "un hola mundo desde DisChord",
+          "location": {
+            "line": 2,
+            "column": 17
+          }
+        }
+      },
+      "body": [
+        {
+          "type": "Variable",
+          "id": "msg",
+          "value": {
+            "type": "CrearMensaje",
+            "object": {
+              "type": "BDO",
+              "mode": 0,
+              "blocks": {
+                "embed": {
+                  "type": "BDO",
+                  "mode": 0,
+                  "blocks": {
+                    "descripcion": {
+                      "type": "Literal",
+                      "value": "hola",
+                      "raw": "hola",
+                      "location": {
+                        "line": 6,
+                        "column": 25
+                      }
+                    }
+                  },
+                  "body": [],
+                  "location": {
+                    "line": 7,
+                    "column": 9
+                  }
+                },
+                "boton": {
+                  "type": "BDO",
+                  "mode": 0,
+                  "blocks": {
+                    "id": {
+                      "type": "Literal",
+                      "value": "miid",
+                      "raw": "miid",
+                      "location": {
+                        "line": 9,
+                        "column": 16
+                      }
+                    },
+                    "etiqueta": {
+                      "type": "Literal",
+                      "value": "mi boton",
+                      "raw": "mi boton",
+                      "location": {
+                        "line": 10,
+                        "column": 22
+                      }
+                    },
+                    "emoji": {
+                      "type": "Literal",
+                      "value": "🔥",
+                      "raw": "🔥",
+                      "location": {
+                        "line": 11,
+                        "column": 19
+                      }
+                    },
+                    "estilo": {
+                      "type": "Literal",
+                      "value": "azul",
+                      "raw": "azul",
+                      "location": {
+                        "line": 12,
+                        "column": 20
+                      }
+                    }
+                  },
+                  "body": [],
+                  "location": {
+                    "line": 13,
+                    "column": 9
+                  }
+                }
+              },
+              "body": [],
+              "location": {
+                "line": 14,
+                "column": 5
+              }
+            },
+            "location": {
+              "line": 14,
+              "column": 5
+            }
+          },
+          "location": {
+            "line": 14,
+            "column": 5
+          }
+        },
+        {
+          "type": "CrearRecolector",
+          "variable": {
+            "type": "IDENTIFICADOR",
+            "value": "msg",
+            "location": {
+              "line": 16,
+              "column": 22
+            }
+          },
+          "methods": {
+            "type": "BDO",
+            "mode": 0,
+            "blocks": {
+              "alPulsarId": {
+                "type": "BDO",
+                "mode": 0,
+                "blocks": {
+                  "miid": {
+                    "type": "BDO",
+                    "mode": 1,
+                    "blocks": {},
+                    "body": [
+                      {
+                        "type": "Llamada",
+                        "object": {
+                          "type": "IDENTIFICADOR",
+                          "value": "imprimir",
+                          "location": {
+                            "line": 19,
+                            "column": 17
+                          }
+                        },
+                        "params": [
+                          {
+                            "type": "Literal",
+                            "value": "Se ha pulsado el boton con id miid",
+                            "raw": "Se ha pulsado el boton con id miid",
+                            "location": {
+                              "line": 19,
+                              "column": 26
+                            }
+                          }
+                        ],
+                        "location": {
+                          "line": 19,
+                          "column": 62
+                        }
+                      }
+                    ],
+                    "location": {
+                      "line": 20,
+                      "column": 13
+                    }
+                  }
+                },
+                "body": [],
+                "location": {
+                  "line": 21,
+                  "column": 9
+                }
+              }
+            },
+            "body": [],
+            "location": {
+              "line": 22,
+              "column": 5
+            }
+          },
+          "location": {
+            "line": 22,
+            "column": 5
+          }
+        }
+      ],
+      "location": {
+        "line": 23,
+        "column": 1
+      }
+    },
+    "location": {
+      "line": 23,
+      "column": 1
+    }
+  }
+]

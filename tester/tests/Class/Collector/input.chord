@@ -1,0 +1,23 @@
+nuevo comando HolaMundo {
+    descripcion "un hola mundo desde DisChord";
+
+    var msg es enviar mensaje {
+        embed {
+            descripcion "hola"
+        }
+        boton {
+            id "miid"
+            etiqueta "mi boton"
+            emoji "🔥"
+            estilo "azul"
+        }
+    }
+
+    nuevo recolector msg {
+        alPulsarId {
+            miid {
+                imprimir("Se ha pulsado el boton con id miid")
+            }
+        }
+    }
+}

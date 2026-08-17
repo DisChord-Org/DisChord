@@ -1,0 +1,8 @@
+enviar mensaje {
+    embed {
+        pie {
+            texto "DisChord Bot v1.0"
+            icono "https://ejemplo.com/logo.png"
+        }
+    }
+}
