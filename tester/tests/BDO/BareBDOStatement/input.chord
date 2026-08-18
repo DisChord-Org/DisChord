@@ -1,0 +1,6 @@
+var mibdo es {
+    bdoA {};
+
+    { bdoC [] }
+    consola.imprimir("después del bloque")
+}

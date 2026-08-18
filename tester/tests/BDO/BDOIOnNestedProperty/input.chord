@@ -1,0 +1,8 @@
+var mibdo es {
+    bdoA {
+        @BDOI
+        bdoB { bool verdadero };
+    };
+
+    consola.imprimir(bdoA.bdoB.bool)
+}

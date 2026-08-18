@@ -1,0 +1,119 @@
+[
+  {
+    "type": "importar",
+    "identificators": [],
+    "path": "./lib/consoleRuntime.js",
+    "isDestructured": false,
+    "location": {
+      "line": 0,
+      "column": 0
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "mibdo",
+    "value": {
+      "type": "BDO",
+      "mode": 1,
+      "blocks": {
+        "bdoA": {
+          "type": "BDO",
+          "mode": 1,
+          "blocks": {
+            "bdoB": {
+              "type": "BDO",
+              "mode": 0,
+              "blocks": {
+                "bool": {
+                  "type": "Literal",
+                  "value": true,
+                  "raw": "verdadero",
+                  "location": {
+                    "line": 3,
+                    "column": 21
+                  }
+                }
+              },
+              "body": [],
+              "location": {
+                "line": 3,
+                "column": 31
+              }
+            }
+          },
+          "body": [],
+          "location": {
+            "line": 4,
+            "column": 5
+          }
+        }
+      },
+      "body": [],
+      "location": {
+        "line": 5,
+        "column": 1
+      }
+    },
+    "location": {
+      "line": 5,
+      "column": 1
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 7,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 7,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "Acceso",
+        "object": {
+          "type": "Acceso",
+          "object": {
+            "type": "Acceso",
+            "object": {
+              "type": "IDENTIFICADOR",
+              "value": "mibdo",
+              "location": {
+                "line": 7,
+                "column": 18
+              }
+            },
+            "property": "bdoA",
+            "location": {
+              "line": 7,
+              "column": 24
+            }
+          },
+          "property": "bdoB",
+          "location": {
+            "line": 7,
+            "column": 29
+          }
+        },
+        "property": "bool",
+        "location": {
+          "line": 7,
+          "column": 34
+        }
+      }
+    ],
+    "location": {
+      "line": 7,
+      "column": 38
+    }
+  }
+]

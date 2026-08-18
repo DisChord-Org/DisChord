@@ -26,7 +26,7 @@ export class FunctionVisitor<T extends string, N extends BaseNode<T>> extends Su
         const params = node.params.join(', ');
         
         const body = node.body
-            .map((n: ASTNode<T, N>) => '    ' + this.parent.visit(n) + ";")
+            .map((n: ASTNode<T, N>) => '    ' + this.parent.visitStatement(n) + ";")
             .join('\n');
 
         const asyncPrefix = node.metadata.isAsync ? 'async ' : '';

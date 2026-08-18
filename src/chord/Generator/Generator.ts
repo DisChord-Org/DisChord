@@ -91,16 +91,16 @@ export class Generator<T extends string, N extends BaseNode<T>> extends Generato
      * JavaScript string.
      */
     public generate(): string {
-        const body = this.nodes.map(node => {
-            const code = this.visit(node);
-            return code;
-        }).join('\n');
+        const body = this.nodes.map(node => this.visitStatement(node)).join('\n');
 
         return `\n${body}\n`;
     }
 
     /**
      * Processes an individual AST Node by routing it to its matching SubGenerator.
+     * Subclasses (e.g. `DisChordGenerator`) override this to extend the registry with their own
+     * node types, falling back to this base implementation — so this stays the single source of
+     * truth for the native Chord registry, and any override must keep calling `super.visit`.
      * @param node - The target node to be generated.
      */
     public visit(node: ASTNode<T, N>): string {
@@ -121,5 +121,28 @@ export class Generator<T extends string, N extends BaseNode<T>> extends Generato
      */
     public visitIfExists(node: ASTNode<T, N> | undefined): string | undefined {
         return node ? this.visit(node) : undefined;
+    }
+
+    /**
+     * Visits a node known to sit in *statement* position (a top-level program node, or an entry
+     * in a block/loop/condition/function body) rather than expression position — deferring to the
+     * responsible SubGenerator's `needsStatementParens` to decide whether its output needs
+     * wrapping there (see `SubGenerator.needsStatementParens` / `BDOVisitor.needsStatementParens`).
+     *
+     * Goes through the polymorphic `visit` (so subclass-registered node types, e.g. DisChord's,
+     * still resolve correctly) for the actual code, and separately checks the native Chord
+     * registry for `needsStatementParens` — safe because only a native Chord node type (BDO)
+     * currently overrides it; anything not in that registry simply doesn't need wrapping.
+     * @param node - The target statement-position node to be generated.
+     */
+    public visitStatement(node: ASTNode<T, N>): string {
+        const code = this.visit(node);
+
+        const VisitorClass = Generator.SubGenerators.find(cls => cls.triggerToken === node.type);
+        const needsParens = VisitorClass
+            ? this.get(VisitorClass as unknown as SubGeneratorClass<T, N>).needsStatementParens(node)
+            : false;
+
+        return needsParens ? `(${code})` : code;
     }
 }

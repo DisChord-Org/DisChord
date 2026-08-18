@@ -28,7 +28,7 @@ export class LoopVisitor<T extends string, N extends BaseNode<T>> extends SubGen
         const varName = node.var;
         
         const body = node.body
-            .map((n: ASTNode<T, N>) => "    " + this.parent.visit(n) + ";")
+            .map((n: ASTNode<T, N>) => "    " + this.parent.visitStatement(n) + ";")
             .join('\n');
             
         const iterable = this.parent.visit(node.iterable);

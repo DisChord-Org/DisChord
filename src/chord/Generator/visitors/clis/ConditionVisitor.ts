@@ -27,7 +27,7 @@ export class ConditionVisitor<T extends string, N extends BaseNode<T>> extends S
         const test = this.parent.visit(node.test);
         
         const consequent = node.consequent
-            .map((n: ASTNode<T, N>) => "    " + this.parent.visit(n) + ";")
+            .map((n: ASTNode<T, N>) => "    " + this.parent.visitStatement(n) + ";")
             .join('\n');
         
         let result = `if (${test}) {\n${consequent}\n}`;
@@ -37,7 +37,7 @@ export class ConditionVisitor<T extends string, N extends BaseNode<T>> extends S
                 result += ` else ${this.parent.visit(node.alternate as unknown as ASTNode<T, N>)}`;
             } else {
                 const alternate = (node.alternate as ASTNode<T, N>[])
-                    .map((n: ASTNode<T, N>) => "    " + this.parent.visit(n) + ";")
+                    .map((n: ASTNode<T, N>) => "    " + this.parent.visitStatement(n) + ";")
                     .join('\n');
                 result += ` else {\n${alternate}\n}`;
             }

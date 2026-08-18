@@ -36,13 +36,9 @@ export class BDOVisitor<T extends string, N extends BaseNode<T>> extends SubGene
         }).join('\n');
 
         const executableBody = node.body
-            .map(statement => this.parent.visit(statement))
+            .map(statement => this.parent.visitStatement(statement))
             .join(';\n');
 
-        // Top-level functions declared inside the BDO are exposed as real members of the
-        // resulting object (referenced by name in the returned object, which is valid JS
-        // without needing method-shorthand syntax), turning them into de-facto methods
-        // whenever the BDO is actually building an object rather than just running code.
         const functionNames = node.body
             .filter((statement): statement is FunctionNode<T, N> => statement.type === TokenType.Funcion)
             .map(statement => statement.id);
@@ -58,6 +54,20 @@ export class BDOVisitor<T extends string, N extends BaseNode<T>> extends SubGene
                 ${executableBody}
                 return { ${exports} }
             })()`;
+    }
+
+    /**
+     * A Simple-mode BDO renders as a bare `{ key: value }` object-literal string (see `visit`).
+     * That's safe wherever it's embedded as a value, but as a standalone statement JavaScript
+     * parses a leading `{` as a block, not an object literal — the same footgun real JS has,
+     * which is why `({ a: 1 })` is the idiomatic way to force an object literal in statement
+     * position. Without this, `{ bdoC: [] };` as a statement silently collapses into an empty
+     * block containing a `bdoC:` labeled expression, discarding `bdoC` entirely.
+     * @param node - The specific BDO node about to be rendered as a statement.
+     * @override
+     */
+    public needsStatementParens(node: ODBNode<T, N>): boolean {
+        return node.mode === ODBMode.Simple;
     }
 
     /**

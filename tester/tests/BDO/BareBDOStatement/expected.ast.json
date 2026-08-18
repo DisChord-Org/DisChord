@@ -1,0 +1,95 @@
+[
+  {
+    "type": "importar",
+    "identificators": [],
+    "path": "./lib/consoleRuntime.js",
+    "isDestructured": false,
+    "location": {
+      "line": 0,
+      "column": 0
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "mibdo",
+    "value": {
+      "type": "BDO",
+      "mode": 1,
+      "blocks": {
+        "bdoA": {
+          "type": "BDO",
+          "mode": 0,
+          "blocks": {},
+          "body": [],
+          "location": {
+            "line": 2,
+            "column": 11
+          }
+        }
+      },
+      "body": [
+        {
+          "type": "BDO",
+          "mode": 0,
+          "blocks": {
+            "bdoC": {
+              "type": "Lista",
+              "body": [],
+              "location": {
+                "line": 4,
+                "column": 13
+              }
+            }
+          },
+          "body": [],
+          "location": {
+            "line": 4,
+            "column": 15
+          }
+        },
+        {
+          "type": "Llamada",
+          "object": {
+            "type": "Acceso",
+            "object": {
+              "type": "IDENTIFICADOR",
+              "value": "consola",
+              "location": {
+                "line": 5,
+                "column": 5
+              }
+            },
+            "property": "imprimir",
+            "location": {
+              "line": 5,
+              "column": 13
+            }
+          },
+          "params": [
+            {
+              "type": "Literal",
+              "value": "después del bloque",
+              "raw": "después del bloque",
+              "location": {
+                "line": 5,
+                "column": 22
+              }
+            }
+          ],
+          "location": {
+            "line": 5,
+            "column": 42
+          }
+        }
+      ],
+      "location": {
+        "line": 6,
+        "column": 1
+      }
+    },
+    "location": {
+      "line": 6,
+      "column": 1
+    }
+  }
+]
