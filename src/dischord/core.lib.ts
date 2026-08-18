@@ -89,6 +89,15 @@ export const createMessageModuleContent = `
  * getters straight from this map (so the two can never drift apart), and
  * `RequiresUserExtensionsRule` scans for these same keys to decide whether a file needs the
  * import — no separate list to keep in sync by hand.
+ *
+ * Keys must never equal a raw field name Seyfert assigns internally while constructing its own
+ * `User`/`ClientUser`/`GuildMember` objects (`Object.assign(this, rawData)` in
+ * `ClientUser`/`DiscordBase`) — a getter-only accessor of the same name on the prototype blocks
+ * that assignment outright (`Cannot set property flags of [object Object] which has only a
+ * getter`), breaking construction of every such object, not just property access. This is why
+ * the keys below are `avatarUrl`/`bannerUrl`/`insignias` rather than the more literal
+ * `avatar`/`banner`/`flags` — those three collide with real raw fields; everything else here is a
+ * genuinely new word with nothing to collide with.
  * @type {Readonly<Record<string, string>>}
  */
 export const userPropertyNames: Record<string, string> = {
@@ -96,11 +105,11 @@ export const userPropertyNames: Record<string, string> = {
     'nombreGlobal': 'globalName',
     'etiqueta': 'tag',
     'discriminador': 'discriminator',
-    'flags': 'publicFlags',
+    'insignias': 'publicFlags',
     'esBot': 'bot',
     'esSistema': 'system',
-    'avatar': 'avatarURL()',
-    'banner': 'bannerURL()',
+    'avatarUrl': 'avatarURL()',
+    'bannerUrl': 'bannerURL()',
     'colorPerfil': 'accentColor',
     'tipoPremium': 'premiumType'
 } as const;
