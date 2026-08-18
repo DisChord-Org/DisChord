@@ -1,0 +1,129 @@
+[
+  {
+    "type": "importar",
+    "identificators": [
+      "createMessage"
+    ],
+    "isDestructured": true,
+    "path": "./lib/createMessage.js",
+    "location": {
+      "line": 0,
+      "column": 0
+    }
+  },
+  {
+    "type": "CrearComando",
+    "value": "Avatar",
+    "body": {
+      "type": "BDO",
+      "mode": 1,
+      "blocks": {
+        "descripcion": {
+          "type": "Literal",
+          "value": "Obtener el avatar de un usuario",
+          "raw": "Obtener el avatar de un usuario",
+          "location": {
+            "line": 2,
+            "column": 17
+          }
+        }
+      },
+      "body": [
+        {
+          "type": "Variable",
+          "id": "AvatarEmbed",
+          "value": {
+            "type": "CrearEmbed",
+            "name": "AvatarEmbed",
+            "body": {
+              "type": "BDO",
+              "mode": 0,
+              "blocks": {
+                "titulo": {
+                  "type": "ExpresionBinaria",
+                  "left": {
+                    "type": "Literal",
+                    "value": "Avatar de ",
+                    "raw": "Avatar de ",
+                    "location": {
+                      "line": 5,
+                      "column": 16
+                    }
+                  },
+                  "operator": "mas",
+                  "right": {
+                    "type": "Acceso",
+                    "object": {
+                      "type": "IDENTIFICADOR",
+                      "value": "usuario",
+                      "location": {
+                        "line": 5,
+                        "column": 33
+                      }
+                    },
+                    "property": "nombre",
+                    "location": {
+                      "line": 5,
+                      "column": 41
+                    }
+                  },
+                  "location": {
+                    "line": 5,
+                    "column": 41
+                  }
+                }
+              },
+              "body": [],
+              "location": {
+                "line": 6,
+                "column": 5
+              }
+            },
+            "location": {
+              "line": 6,
+              "column": 5
+            }
+          },
+          "location": {
+            "line": 6,
+            "column": 5
+          }
+        },
+        {
+          "type": "CrearMensaje",
+          "object": {
+            "type": "BDO",
+            "mode": 0,
+            "blocks": {
+              "embed": {
+                "type": "IDENTIFICADOR",
+                "value": "AvatarEmbed",
+                "location": {
+                  "line": 9,
+                  "column": 15
+                }
+              }
+            },
+            "body": [],
+            "location": {
+              "line": 10,
+              "column": 5
+            }
+          },
+          "location": {
+            "line": 10,
+            "column": 5
+          }
+        }
+      ],
+      "location": {
+        "line": 11,
+        "column": 1
+      }
+    },
+    "location": {
+      "line": 11,
+      "column": 1
+    }
+  }
+]

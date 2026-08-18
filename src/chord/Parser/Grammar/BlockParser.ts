@@ -1,7 +1,6 @@
 import { ASTNode, BaseNode, BlockNode, TokenType, TokenTypeUnion } from "../../types";
 import { Parser } from "../Parser";
 import { SubParser } from "../SubParser";
-import { StatementParser } from "./StatementParser/StatementParser";
 
 /**
  * @class BlockParser
@@ -34,7 +33,7 @@ export class BlockParser<T extends string, N extends BaseNode<T>> extends SubPar
         this.consume(TokenType.L_BRACE);
 
         while (!this.isAtEnd() && this.peek().type !== TokenType.R_BRACE) {
-            body.push(this.parent.get(StatementParser).parse());
+            body.push(this.parent.parseStatement());
         }
 
         this.consume(TokenType.R_BRACE);

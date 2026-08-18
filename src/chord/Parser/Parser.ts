@@ -354,7 +354,18 @@ export class Parser<T extends string, N extends BaseNode<T>> extends ParserConte
         return null;
     }
 
-    protected parseStatement (): ASTNode<T, N> {
+    /**
+     * Parses a single statement, polymorphic over dialect overrides (e.g. `DisChordParser`
+     * routes this through `DisChordStatementParser` to apply its own statement-level handling —
+     * notably, binding a reusable name to a `nuevo embed`/`nuevo boton` declaration). Any
+     * SubParser that needs "parse whatever comes next as a statement" (a block body, a BDO's
+     * executable statements, an exported declaration, ...) should call this — not
+     * `this.parent.get(StatementParser).parse()` directly, which always resolves to the native
+     * Chord StatementParser and silently skips dialect-level statement handling.
+     *
+     * @public
+     */
+    public parseStatement (): ASTNode<T, N> {
         return this.get(StatementParser).parse();
     }
 

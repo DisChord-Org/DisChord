@@ -1,0 +1,11 @@
+nuevo comando Avatar {
+    descripcion "Obtener el avatar de un usuario";
+
+    nuevo embed AvatarEmbed {
+        titulo "Avatar de " mas usuario.nombre
+    }
+
+    enviar mensaje {
+        embed AvatarEmbed
+    }
+}

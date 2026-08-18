@@ -1,6 +1,5 @@
 import { SubParser } from "../../../SubParser";
 import { BaseNode, ExportNode, TokenType, TokenTypeUnion } from "../../../../types";
-import { StatementParser } from "../StatementParser";
 import { Parser } from "../../../Parser";
 
 export class ExportParser<T extends string, N extends BaseNode<T>> extends SubParser<T, N> {
@@ -22,7 +21,7 @@ export class ExportParser<T extends string, N extends BaseNode<T>> extends SubPa
     public parse(): ExportNode<T, N> {
         this.consume(TokenType.Exportar);
         
-        const object = this.parent.get(StatementParser).parse();
+        const object = this.parent.parseStatement();
 
         return this.createNode<ExportNode<T, N>>({
             type: TokenType.Exportar,

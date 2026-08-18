@@ -3,7 +3,6 @@ import { ASTNode, BaseNode, ODBMode, ODBNode, TokenType, TokenTypeUnion } from "
 import { Parser } from "../Parser";
 import { SubParser } from "../SubParser";
 import { ExpressionParser } from "./Expressions/ExpressionParser";
-import { StatementParser } from "./StatementParser/StatementParser";
 
 /**
  * Specialized SubParser for Object Data Blocks (BDO).
@@ -98,7 +97,7 @@ export class BDOParser<T extends string, N extends BaseNode<T>> extends SubParse
                 }
                 definitionMode = false;
 
-                const statement = this.parent.get(StatementParser).parse();
+                const statement = this.parent.parseStatement();
                 if (statement) body.push(statement);
             }
         }
