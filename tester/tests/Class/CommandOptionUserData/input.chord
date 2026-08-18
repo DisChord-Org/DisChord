@@ -12,7 +12,7 @@ nuevo comando Avatar {
     nuevo embed AvatarEmbed {
         titulo "Avatar de " mas mencion.nombre
         color mencion.colorPerfil
-        imagen mencion.avatar
+        imagen mencion.avatarUrl
     }
 
     enviar mensaje {

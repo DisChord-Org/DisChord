@@ -33,10 +33,10 @@ export default class AvatarCommand extends Command {
         const { mencion } = contexto.options;
 
         let AvatarEmbed = new Embed()
-
+            .setColor(mencion.colorPerfil)
             .setTitle('Avatar de ' + mencion.nombre)
 
-            .setImage(mencion.avatar);
+            .setImage(mencion.avatarUrl);
 
         await createMessage(undefined, { content: undefined, embeds: [AvatarEmbed] }, null, ctx);
     }

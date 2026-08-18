@@ -105,7 +105,11 @@ export default class EmbedVisitor extends SubGenerator<DisChordNodeType, DisChor
     }
 
     /**
-     * Resolves the 'color' property using the core library mapping.
+     * Resolves the 'color' property. A quoted string (`color "Verde"`) is looked up in the
+     * Spanish named-color mapping; anything else (a variable, a property access like
+     * `mencion.colorPerfil`, a hex/decimal literal, ...) is passed straight through to
+     * `setColor`, since Discord's color field already accepts a raw resolvable value and there's
+     * no fixed Spanish name to translate for an arbitrary expression.
      * @private
      * @returns The generated setColor call or an empty string if the color is not defined.
      */
@@ -116,8 +120,11 @@ export default class EmbedVisitor extends SubGenerator<DisChordNodeType, DisChor
 
         if (!color) return '';
 
+        const isStringLiteral = color.startsWith('"') && color.endsWith('"');
+        if (!isStringLiteral) return `.setColor(${color})`;
+
         const RawColor = color.slice(1, -1);
-        
+
         if (!Object.keys(EmbedColors).includes(RawColor)) return '';
 
         return `.setColor("${EmbedColors[RawColor]}")`;

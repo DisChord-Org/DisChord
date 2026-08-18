@@ -157,7 +157,7 @@
                       "column": 16
                     }
                   },
-                  "property": "avatar",
+                  "property": "avatarUrl",
                   "location": {
                     "line": 15,
                     "column": 24
