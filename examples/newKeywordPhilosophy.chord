@@ -1,0 +1,69 @@
+// ============================================================================
+// QUÉ SIGNIFICA REALMENTE "nuevo" EN DISCHORD
+// ============================================================================
+//
+// "nuevo" NO significa "voy a crear una clase". Significa "voy a declarar
+// algo con un nombre, reusable en el resto del archivo". Lo que hay detrás
+// de ese nombre depende de QUÉ estés declarando:
+//
+//   - nuevo comando X {}   -> genera una CLASE real (extiende Command de
+//                             Seyfert, porque la propia librería lo exige)
+//   - nuevo evento X {}    -> NO es una clase, es un handler de función
+//   - nuevo embed X {}     -> NO es una clase, es un DATO con nombre
+//   - nuevo boton X {}     -> NO es una clase, es un DATO con nombre
+//
+// Por dentro, "nuevo embed X {}" y "nuevo boton X {}" se compilan
+// literalmente igual que "var X es <algo>" (mira DisChordStatementParser
+// .bindReusableName): el compilador envuelve la declaración en un
+// VariableNode normal. La palabra "nuevo" es solo azúcar sintáctica para
+// que TODA declaración con nombre se vea igual de cara al usuario, aunque
+// lo que haya debajo sea una clase o simplemente un objeto de datos.
+//
+// Esto es intencional y no es una inconsistencia a arreglar: no hace falta
+// que "nuevo" implique OOP, solo que implique "esto tiene nombre y lo
+// puedo reusar más abajo".
+
+nuevo embed bienvenida {
+    titulo "¡Bienvenido!"
+    descripcion "Gracias por unirte al servidor"
+    color "Verde"
+}
+
+// NOTA: "var despedida es embed {...}" (sin "nuevo") NO es sintaxis válida
+// hoy — se discutió como posible simplificación futura ("nuevo embed X {}"
+// pasaría a ser azúcar de "var X es embed {...}"), pero se decidió
+// dejarlo pendiente y no implementarlo todavía. "nuevo embed X {}" sigue
+// siendo la única forma soportada de declarar un embed con nombre.
+
+// ----------------------------------------------------------------------------
+// En cambio, "nuevo comando X {}" SÍ es una clase real. Se compila a
+// "class XCommand extends Command { ... run(contexto) {...} }" porque
+// Seyfert (la librería que dischord traduce por debajo) exige que cada
+// comando SEA una clase que extiende Command — no es una elección de
+// dischord, es un requisito de la API real.
+// ----------------------------------------------------------------------------
+
+nuevo comando Saludo {
+    descripcion "Saluda a alguien";
+
+    enviar mensaje {
+        embed bienvenida
+    }
+}
+
+// ----------------------------------------------------------------------------
+// Por qué no unificamos todo bajo el parser de clases de verdad (con
+// "funcion" como método, herencia, etc.):
+//
+// Porque "embed"/"boton" nunca han necesitado métodos ni herencia — solo
+// propiedades y, a veces, algo de lógica de configuración mezclada. Forzar
+// el parser de clases ahí no elimina ninguna complejidad real, solo la
+// traslada: seguiría haciendo falta decidir, línea a línea, si algo es
+// una propiedad o código (eso ya lo hace BDOParser.checkPropertyPattern,
+// compartido por embed/boton/comando/mensajes/recolectores), y encima
+// añadiríamos superficie de lenguaje (métodos con nombre) que ningún caso
+// real usa hoy.
+//
+// Conclusión: "nuevo" se queda como está. Es coherente siempre y cuando
+// se entienda como "declaración con nombre", no como "instancia de clase".
+// ============================================================================
