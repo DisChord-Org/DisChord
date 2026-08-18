@@ -1,0 +1,21 @@
+nuevo comando Avatar {
+    descripcion "Obtener el avatar de un usuario";
+
+    opciones {
+        mencion {
+            opcion "usuario"
+            descripcion "El usuario cuyo avatar quieres ver"
+            requerido verdadero
+        }
+    }
+
+    nuevo embed AvatarEmbed {
+        titulo "Avatar de " mas mencion.nombre
+        color mencion.colorPerfil
+        imagen mencion.avatar
+    }
+
+    enviar mensaje {
+        embed AvatarEmbed
+    }
+}

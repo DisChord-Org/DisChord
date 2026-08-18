@@ -1,5 +1,15 @@
 [
   {
+    "type": "importar",
+    "identificators": [],
+    "isDestructured": false,
+    "path": "./lib/userExtensions.js",
+    "location": {
+      "line": 0,
+      "column": 0
+    }
+  },
+  {
     "type": "Evento",
     "name": "encendido",
     "body": [

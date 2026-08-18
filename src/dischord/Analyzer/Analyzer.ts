@@ -4,6 +4,7 @@ import { CompilationContext } from "../../cli/commands/CompileCommand";
 import { BindDisChordDeclarationsRule } from "./rules/BindDisChordDeclarationsRule";
 import { SingleWholeFileDeclarationRule } from "./rules/SingleWholeFileDeclarationRule";
 import { RequiresMessageHelperRule } from "./rules/RequiresMessageHelperRule";
+import { RequiresUserExtensionsRule } from "./rules/RequiresUserExtensionsRule";
 
 /**
  * DisChord's semantic analysis rules, run over a file's complete AST between parsing and
@@ -22,5 +23,6 @@ export class DisChordAnalyzer extends Analyzer<DisChordNodeType, DisChordNode> {
 
         this.rules.push(new SingleWholeFileDeclarationRule(context));
         this.rules.push(new RequiresMessageHelperRule(context));
+        this.rules.push(new RequiresUserExtensionsRule(context));
     }
 }

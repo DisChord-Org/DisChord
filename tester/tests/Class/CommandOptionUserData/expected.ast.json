@@ -36,6 +36,55 @@
             "line": 2,
             "column": 17
           }
+        },
+        "opciones": {
+          "type": "BDO",
+          "mode": 0,
+          "blocks": {
+            "mencion": {
+              "type": "BDO",
+              "mode": 0,
+              "blocks": {
+                "opcion": {
+                  "type": "Literal",
+                  "value": "usuario",
+                  "raw": "usuario",
+                  "location": {
+                    "line": 6,
+                    "column": 20
+                  }
+                },
+                "descripcion": {
+                  "type": "Literal",
+                  "value": "El usuario cuyo avatar quieres ver",
+                  "raw": "El usuario cuyo avatar quieres ver",
+                  "location": {
+                    "line": 7,
+                    "column": 25
+                  }
+                },
+                "requerido": {
+                  "type": "Literal",
+                  "value": true,
+                  "raw": "verdadero",
+                  "location": {
+                    "line": 8,
+                    "column": 23
+                  }
+                }
+              },
+              "body": [],
+              "location": {
+                "line": 9,
+                "column": 9
+              }
+            }
+          },
+          "body": [],
+          "location": {
+            "line": 10,
+            "column": 5
+          }
         }
       },
       "body": [
@@ -56,7 +105,7 @@
                     "value": "Avatar de ",
                     "raw": "Avatar de ",
                     "location": {
-                      "line": 5,
+                      "line": 13,
                       "column": 16
                     }
                   },
@@ -65,37 +114,69 @@
                     "type": "Acceso",
                     "object": {
                       "type": "IDENTIFICADOR",
-                      "value": "usuario",
+                      "value": "mencion",
                       "location": {
-                        "line": 5,
+                        "line": 13,
                         "column": 33
                       }
                     },
                     "property": "nombre",
                     "location": {
-                      "line": 5,
+                      "line": 13,
                       "column": 41
                     }
                   },
                   "location": {
-                    "line": 5,
+                    "line": 13,
                     "column": 41
+                  }
+                },
+                "color": {
+                  "type": "Acceso",
+                  "object": {
+                    "type": "IDENTIFICADOR",
+                    "value": "mencion",
+                    "location": {
+                      "line": 14,
+                      "column": 15
+                    }
+                  },
+                  "property": "colorPerfil",
+                  "location": {
+                    "line": 14,
+                    "column": 23
+                  }
+                },
+                "imagen": {
+                  "type": "Acceso",
+                  "object": {
+                    "type": "IDENTIFICADOR",
+                    "value": "mencion",
+                    "location": {
+                      "line": 15,
+                      "column": 16
+                    }
+                  },
+                  "property": "avatar",
+                  "location": {
+                    "line": 15,
+                    "column": 24
                   }
                 }
               },
               "body": [],
               "location": {
-                "line": 6,
+                "line": 16,
                 "column": 5
               }
             },
             "location": {
-              "line": 6,
+              "line": 16,
               "column": 5
             }
           },
           "location": {
-            "line": 6,
+            "line": 16,
             "column": 5
           }
         },
@@ -109,30 +190,30 @@
                 "type": "IDENTIFICADOR",
                 "value": "AvatarEmbed",
                 "location": {
-                  "line": 9,
+                  "line": 19,
                   "column": 15
                 }
               }
             },
             "body": [],
             "location": {
-              "line": 10,
+              "line": 20,
               "column": 5
             }
           },
           "location": {
-            "line": 10,
+            "line": 20,
             "column": 5
           }
         }
       ],
       "location": {
-        "line": 11,
+        "line": 21,
         "column": 1
       }
     },
     "location": {
-      "line": 11,
+      "line": 21,
       "column": 1
     }
   }
