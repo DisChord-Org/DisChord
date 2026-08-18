@@ -7,9 +7,18 @@
  */
 export const corelib: Record<string, Record<string, string> | string> = {
     'usuario': {
+        'id': 'usuario.id',
         'nombre': 'usuario.username',
+        'nombreGlobal': 'usuario.globalName',
+        'etiqueta': 'usuario.tag',
+        'discriminador': 'usuario.discriminator',
         'flags': 'usuario.publicFlags',
-        'nombreGlobal': 'usuario.globalName'
+        'esBot': 'usuario.bot',
+        'esSistema': 'usuario.system',
+        'avatar': 'usuario.avatarURL()',
+        'banner': 'usuario.bannerURL()',
+        'colorPerfil': 'usuario.accentColor',
+        'tipoPremium': 'usuario.premiumType'
     },
     'cliente': {
         'emitir': 'cliente.events.runEvent',
