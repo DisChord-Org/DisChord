@@ -1,0 +1,381 @@
+[
+  {
+    "type": "importar",
+    "identificators": [
+      "createMessage"
+    ],
+    "isDestructured": true,
+    "path": "./lib/createMessage.js",
+    "location": {
+      "line": 0,
+      "column": 0
+    }
+  },
+  {
+    "type": "funcion",
+    "id": "soloAutor",
+    "metadata": {
+      "isConstructor": false,
+      "isMethod": false,
+      "isStatic": false,
+      "isAsync": false
+    },
+    "params": [
+      "interaccion",
+      "cliente",
+      "contexto"
+    ],
+    "body": [
+      {
+        "type": "devolver",
+        "object": {
+          "type": "ExpresionBinaria",
+          "left": {
+            "type": "Acceso",
+            "object": {
+              "type": "Acceso",
+              "object": {
+                "type": "IDENTIFICADOR",
+                "value": "interaccion",
+                "location": {
+                  "line": 2,
+                  "column": 14
+                }
+              },
+              "property": "user",
+              "location": {
+                "line": 2,
+                "column": 26
+              }
+            },
+            "property": "id",
+            "location": {
+              "line": 2,
+              "column": 31
+            }
+          },
+          "operator": "igual_tipado",
+          "right": {
+            "type": "Acceso",
+            "object": {
+              "type": "Acceso",
+              "object": {
+                "type": "IDENTIFICADOR",
+                "value": "contexto",
+                "location": {
+                  "line": 2,
+                  "column": 47
+                }
+              },
+              "property": "author",
+              "location": {
+                "line": 2,
+                "column": 56
+              }
+            },
+            "property": "id",
+            "location": {
+              "line": 2,
+              "column": 63
+            }
+          },
+          "location": {
+            "line": 2,
+            "column": 63
+          }
+        },
+        "location": {
+          "line": 2,
+          "column": 63
+        }
+      }
+    ],
+    "location": {
+      "line": 3,
+      "column": 1
+    }
+  },
+  {
+    "type": "funcion",
+    "id": "cuandoTermine",
+    "metadata": {
+      "isConstructor": false,
+      "isMethod": false,
+      "isStatic": false,
+      "isAsync": false
+    },
+    "params": [
+      "razon",
+      "reiniciar",
+      "cliente",
+      "contexto"
+    ],
+    "body": [
+      {
+        "type": "Llamada",
+        "object": {
+          "type": "IDENTIFICADOR",
+          "value": "imprimir",
+          "location": {
+            "line": 6,
+            "column": 5
+          }
+        },
+        "params": [
+          {
+            "type": "ExpresionBinaria",
+            "left": {
+              "type": "Literal",
+              "value": "El recolector terminó: ",
+              "raw": "El recolector terminó: ",
+              "location": {
+                "line": 6,
+                "column": 14
+              }
+            },
+            "operator": "mas",
+            "right": {
+              "type": "IDENTIFICADOR",
+              "value": "razon",
+              "location": {
+                "line": 6,
+                "column": 44
+              }
+            },
+            "location": {
+              "line": 6,
+              "column": 44
+            }
+          }
+        ],
+        "location": {
+          "line": 6,
+          "column": 49
+        }
+      }
+    ],
+    "location": {
+      "line": 7,
+      "column": 1
+    }
+  },
+  {
+    "type": "funcion",
+    "id": "alPulsarMiId",
+    "metadata": {
+      "isConstructor": false,
+      "isMethod": false,
+      "isStatic": false,
+      "isAsync": false
+    },
+    "params": [
+      "interaccion",
+      "cliente",
+      "contexto"
+    ],
+    "body": [
+      {
+        "type": "Llamada",
+        "object": {
+          "type": "IDENTIFICADOR",
+          "value": "imprimir",
+          "location": {
+            "line": 10,
+            "column": 5
+          }
+        },
+        "params": [
+          {
+            "type": "Literal",
+            "value": "Se ha pulsado el boton con id miid",
+            "raw": "Se ha pulsado el boton con id miid",
+            "location": {
+              "line": 10,
+              "column": 14
+            }
+          }
+        ],
+        "location": {
+          "line": 10,
+          "column": 50
+        }
+      }
+    ],
+    "location": {
+      "line": 11,
+      "column": 1
+    }
+  },
+  {
+    "type": "CrearComando",
+    "value": "HolaMundo",
+    "body": {
+      "type": "BDO",
+      "mode": 1,
+      "blocks": {
+        "descripcion": {
+          "type": "Literal",
+          "value": "un hola mundo desde DisChord",
+          "raw": "un hola mundo desde DisChord",
+          "location": {
+            "line": 14,
+            "column": 17
+          }
+        }
+      },
+      "body": [
+        {
+          "type": "Variable",
+          "id": "msg",
+          "value": {
+            "type": "CrearMensaje",
+            "object": {
+              "type": "BDO",
+              "mode": 0,
+              "blocks": {
+                "contenido": {
+                  "type": "Literal",
+                  "value": "hola",
+                  "raw": "hola",
+                  "location": {
+                    "line": 17,
+                    "column": 19
+                  }
+                },
+                "boton": {
+                  "type": "BDO",
+                  "mode": 0,
+                  "blocks": {
+                    "id": {
+                      "type": "Literal",
+                      "value": "miid",
+                      "raw": "miid",
+                      "location": {
+                        "line": 19,
+                        "column": 16
+                      }
+                    },
+                    "etiqueta": {
+                      "type": "Literal",
+                      "value": "mi boton",
+                      "raw": "mi boton",
+                      "location": {
+                        "line": 20,
+                        "column": 22
+                      }
+                    },
+                    "estilo": {
+                      "type": "Literal",
+                      "value": "azul",
+                      "raw": "azul",
+                      "location": {
+                        "line": 21,
+                        "column": 20
+                      }
+                    }
+                  },
+                  "body": [],
+                  "location": {
+                    "line": 22,
+                    "column": 9
+                  }
+                }
+              },
+              "body": [],
+              "location": {
+                "line": 23,
+                "column": 5
+              }
+            },
+            "location": {
+              "line": 23,
+              "column": 5
+            }
+          },
+          "location": {
+            "line": 23,
+            "column": 5
+          }
+        },
+        {
+          "type": "CrearRecolector",
+          "variable": {
+            "type": "IDENTIFICADOR",
+            "value": "msg",
+            "location": {
+              "line": 25,
+              "column": 16
+            }
+          },
+          "methods": {
+            "type": "BDO",
+            "mode": 0,
+            "blocks": {
+              "filtro": {
+                "type": "IDENTIFICADOR",
+                "value": "soloAutor",
+                "location": {
+                  "line": 26,
+                  "column": 16
+                }
+              },
+              "tiempo": {
+                "type": "Literal",
+                "value": 30000,
+                "raw": "30000",
+                "location": {
+                  "line": 27,
+                  "column": 16
+                }
+              },
+              "alFinalizar": {
+                "type": "IDENTIFICADOR",
+                "value": "cuandoTermine",
+                "location": {
+                  "line": 28,
+                  "column": 21
+                }
+              },
+              "alPulsarId": {
+                "type": "BDO",
+                "mode": 0,
+                "blocks": {
+                  "miid": {
+                    "type": "IDENTIFICADOR",
+                    "value": "alPulsarMiId",
+                    "location": {
+                      "line": 31,
+                      "column": 18
+                    }
+                  }
+                },
+                "body": [],
+                "location": {
+                  "line": 32,
+                  "column": 9
+                }
+              }
+            },
+            "body": [],
+            "location": {
+              "line": 33,
+              "column": 5
+            }
+          },
+          "location": {
+            "line": 33,
+            "column": 5
+          }
+        }
+      ],
+      "location": {
+        "line": 34,
+        "column": 1
+      }
+    },
+    "location": {
+      "line": 34,
+      "column": 1
+    }
+  }
+]

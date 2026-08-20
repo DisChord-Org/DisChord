@@ -27,8 +27,11 @@ export default class CollectorParser extends SubParser<DisChordNodeType, DisChor
     }
 
     /**
-     * Parses a collector creation block.
-     * Expected structure: `crear recolector <variable> {...}`
+     * Parses a collector attachment block.
+     * Expected structure: `recolector <variable> {...}`. Unlike every other DisChord `nuevo X Y
+     * {}` form, this never declares a new name — it attaches behavior to an existing variable —
+     * so it's rejected when preceded by `nuevo` (see `DisChordStatementParser`) to avoid reading
+     * like the unrelated class-inheritance shorthand.
      * @returns The parsed collector node.
      */
     parse (): CollectorNode {

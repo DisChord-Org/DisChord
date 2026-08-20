@@ -1,5 +1,11 @@
 import { createMessage } from './lib/createMessage.js';
-function alPulsarMiId(interaccion, cliente) {
+function soloAutor(interaccion, cliente, contexto) {
+    return interaccion.user.id === contexto.author.id;
+}
+function cuandoTermine(razon, reiniciar, cliente, contexto) {
+    cliente.logger.info('El recolector terminó: ' + razon);
+}
+function alPulsarMiId(interaccion, cliente, contexto) {
     cliente.logger.info('Se ha pulsado el boton con id miid');
 }
 
@@ -24,21 +30,19 @@ export default class HolaMundoCommand extends Command {
         let msg = await createMessage(
             undefined,
             {
-                content: undefined,
+                content: 'hola',
                 components: [
-                    new ActionRow().setComponents([
-                        new Button().setCustomId('miid').setLabel('mi boton').setStyle(1).setEmoji('🔥'),
-                    ]),
+                    new ActionRow().setComponents([new Button().setCustomId('miid').setLabel('mi boton').setStyle(1)]),
                 ],
-                embeds: [new Embed().setDescription('hola')],
             },
             null,
             ctx,
         );
 
         let collector = msg.createComponentCollector({
-            filter: (interaccion) => interaccion.user.id === contexto.author.id,
-            idle: 60000,
+            filter: (interaccion) => soloAutor(interaccion, cliente, contexto),
+            idle: 30000,
+            onStop: (razon, reiniciar) => cuandoTermine(razon, reiniciar, cliente, contexto),
         });
 
         collector.run('miid', (interaccion) => alPulsarMiId(interaccion, cliente, contexto));

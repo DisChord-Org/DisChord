@@ -1,0 +1,34 @@
+funcion soloAutor (interaccion, cliente, contexto) {
+    devolver interaccion.user.id igual_tipado contexto.author.id
+}
+
+funcion cuandoTermine (razon, reiniciar, cliente, contexto) {
+    imprimir("El recolector terminó: " mas razon)
+}
+
+funcion alPulsarMiId (interaccion, cliente, contexto) {
+    imprimir("Se ha pulsado el boton con id miid")
+}
+
+nuevo comando HolaMundo {
+    descripcion "un hola mundo desde DisChord";
+
+    var msg es enviar mensaje {
+        contenido "hola"
+        boton {
+            id "miid"
+            etiqueta "mi boton"
+            estilo "azul"
+        }
+    }
+
+    recolector msg {
+        filtro soloAutor
+        tiempo 30000
+        alFinalizar cuandoTermine
+
+        alPulsarId {
+            miid alPulsarMiId
+        }
+    }
+}

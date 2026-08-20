@@ -2,11 +2,12 @@ import { Test } from "../../../Test";
 
 /**
  * @class CollectorTest
- * @description Validates that a component collector (`nuevo recolector <mensaje> { alPulsarId { <id> { <código> } } }`)
- * generates the `createComponentCollector(...)` call plus a `.run(id, handler)` for each button
- * ID — mirrors `examples/botCollectorExample.chord`. Also guards against a real bug found in this
- * area: `BDOParser` used to swallow a bare call statement like `imprimir(...)` (no trailing ';')
- * as if it were a property, silently dropping the collector's handler body entirely.
+ * @description Validates that a component collector (`recolector <mensaje> { alPulsarId { <id>
+ * <funcionReferenciada> } } }`) generates the `createComponentCollector(...)` call plus a
+ * `.run(id, handler)` per button id, wiring each id to a standalone `funcion` referenced by name
+ * — mirrors `examples/botCollectorExample.chord`. Also guards the `cliente`/`contexto` forwarding
+ * those referenced callbacks need since, unlike an inline body, they don't close over the
+ * command's `run(contexto)` scope.
  */
 export class CollectorTest extends Test {
     /**

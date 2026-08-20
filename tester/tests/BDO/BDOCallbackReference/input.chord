@@ -1,0 +1,9 @@
+funcion bruh () {
+    consola.imprimir("bruh")
+}
+
+var bdo es {
+    memear bruh
+}
+
+bdo.memear()

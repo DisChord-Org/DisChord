@@ -1,19 +1,33 @@
 import { DisChordError, ErrorLevel } from "../../../../errors/ChordError";
 import { CollectorNode, DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType } from "../../../types";
 import { SubGenerator } from "./../../../../chord/Generator/SubGenerator";
-import { CompilerMetadataKind, TokenTypeUnion } from "../../../../chord/types";
+import { TokenTypeUnion } from "../../../../chord/types";
 import { BDOVisitor } from "../../../../chord/Generator/visitors/expressions/BDOVisitor";
-import { DisChordGenerator } from "../../Generator";
 
 /** Config for the Collector Generator param. */
 interface CollectorConfig {
     variable: string;
     filter: string;
-    time: string;
+    idle: string;
+    onStop: string | undefined;
 }
 
 /**
  * Generator class responsible for generating code related to component collectors and their event handling in DisChord.
+ *
+ * Every behavioral property here (`filtro`, `alFinalizar`, and each id inside `alPulsarId`) is a
+ * *reference* to a `funcion` declared elsewhere — never inline code. That mirrors how any other
+ * BDO property takes a value (`memear bruh`), so a collector reads as plain data binding named
+ * callbacks, not as a block of code disguised as a property.
+ *
+ * Unlike the old inline body, a referenced callback is compiled as a standalone function and
+ * can't close over the command's `run(contexto)` preamble — so it loses `contexto`, `cliente`,
+ * `usuario`, etc. for free. `cliente` specifically also backs `imprimir` (`corelib.imprimir ===
+ * 'cliente.logger.info'`), a plain compile-time text substitution that assumes a variable
+ * literally named `cliente` is in scope wherever it's used — same requirement `eventsMap` already
+ * satisfies for event handlers by injecting a fixed `cliente` parameter. Every callback here is
+ * called with `(..., cliente, contexto)` trailing its own arguments for that reason; extra call
+ * arguments a callback doesn't declare are simply ignored, same as anywhere else in JS.
  */
 export default class CollectorVisitor extends SubGenerator<DisChordNodeType, DisChordNode> {
     /**
@@ -30,39 +44,38 @@ export default class CollectorVisitor extends SubGenerator<DisChordNodeType, Dis
      */
     visit (node: CollectorNode): string {
         const variable = this.parent.visit(node.variable);
+        const bdo = this.parent.get(BDOVisitor);
 
-        const body = this.visitPulseIdMethod(
-            this.parent.get(BDOVisitor).getODBProperty(node.methods, 'alPulsarId')
-        );
+        const filterCallback = this.parent.visitIfExists(bdo.getODBProperty(node.methods, 'filtro'));
+        const filter = filterCallback
+            ? `(interaccion) => ${filterCallback}(interaccion, cliente, contexto)`
+            : '(interaccion) => interaccion.user.id === contexto.author.id';
 
-        const filter = this.parent.visitIfExists(
-            this.parent.get(BDOVisitor).getODBProperty(node.methods, 'filtro')
-        ) || 'interaccion.user.id === contexto.author.id';
+        const idle = this.parent.visitIfExists(bdo.getODBProperty(node.methods, 'tiempo')) || '60000';
 
-        const time = this.parent.visitIfExists(
-            this.parent.get(BDOVisitor).getODBProperty(node.methods, 'tiempo')
-        ) || '60000';
+        const onStopCallback = this.parent.visitIfExists(bdo.getODBProperty(node.methods, 'alFinalizar'));
+        const onStop = onStopCallback
+            ? `(razon, reiniciar) => ${onStopCallback}(razon, reiniciar, cliente, contexto)`
+            : undefined;
 
-        const collectorConfig: CollectorConfig = {
-            variable,
-            filter,
-            time
-        };
+        const body = this.visitPulseIdMethod(bdo.getODBProperty(node.methods, 'alPulsarId'));
 
-        return this.generateCollector(collectorConfig, body);
+        return this.generateCollector({ variable, filter, idle, onStop }, body);
     }
 
     /**
-     * Generates the base collector initialization with a default author filter and 1-minute timeout.
+     * Generates the base collector initialization with a default author filter and 60s idle timeout.
      * @private
-     * @param variable The message variable name to attach the collector to.
+     * @param config The resolved collector configuration (variable, filter, idle, onStop).
      * @param body The generated event listener methods.
      */
     private generateCollector (config: CollectorConfig, body: string): string {
+        const onStopProperty = config.onStop ? `,\n                onStop: ${config.onStop}` : '';
+
         return `
             let collector = ${config.variable}.createComponentCollector({
-                filter: (interaccion) => ${config.filter},
-                timeout: ${config.time}
+                filter: ${config.filter},
+                idle: ${config.idle}${onStopProperty}
             });
 
             ${body}
@@ -70,27 +83,11 @@ export default class CollectorVisitor extends SubGenerator<DisChordNodeType, Dis
     }
 
     /**
-     * Maps a specific DisChord interaction method to the underlying framework listener.
-     * @private
-     * @param methodName The internal Seyfert collector method.
-     * @param methodId The stringified custom_id to listen for.
-     * @param code The visited code block to execute on interaction.
-     */
-    private generateMethod (methodName: 'run', methodId: string, code: string): string {
-        return `
-            collector.${methodName}(${methodId}, async (interaccion) => {
-                ${code}
-            })
-        `;
-
-    }
-
-    /**
      * Traverses the nested BDO within 'alPulsarId'.
-     * Maps each key (button ID) to its respective block of code.
+     * Maps each button id to a call to its referenced callback function.
      * @private
-     * @param node The AST node containing ID keys and code block values.
-     * @throws {DisChordError} If the node is not a valid BDO or lacks a body.
+     * @param node The AST node containing id keys and callback-reference values.
+     * @throws {DisChordError} If the node is not a valid BDO.
      * @returns Concatenated event listener code for all IDs in the block.
      */
     private visitPulseIdMethod (node: DisChordASTNode | undefined): string {
@@ -98,32 +95,15 @@ export default class CollectorVisitor extends SubGenerator<DisChordNodeType, Dis
 
         if (node.type != 'BDO') throw new DisChordError({
             phase: ErrorLevel.Compiler,
-            message: `Se esperaba un BDO con las ids a ejecutar después del 'alPulsarId'`,
+            message: `Se esperaba un BDO con las ids y sus funciones asociadas después de 'alPulsarId'`,
             location: node.location
         }).format();
 
-        // adding scope & interaction context in the symboltable
-        this.parent.context.symbolTable.pushScope();
-        this.parent.context.symbolTable.setMetadata(CompilerMetadataKind.IsInteraction, true);
+        const pulseCodes: string[] = Object.entries(node.blocks).map(([identificator, callbackNode]) => {
+            const callback = this.parent.visit(callbackNode as DisChordASTNode);
 
-        const pulseCodes: string[] = Object.keys(node.blocks).map(identificator => {
-            const idBody = node.blocks[identificator];
-
-            if (!idBody || idBody.type != 'BDO' || idBody.body.length < 1) throw new DisChordError({
-                phase: ErrorLevel.Compiler,
-                message: `Después de definir una ID para detectar pulsos, se esperaba un BDO con código.`,
-                location: node.location
-            }).format();
-            
-            return this.generateMethod(
-                'run',
-                `"${identificator}"`,
-                (this.parent as DisChordGenerator).visit(idBody)
-            );
+            return `collector.run(${JSON.stringify(identificator)}, (interaccion) => ${callback}(interaccion, cliente, contexto));`;
         });
-
-        // deleting scope from symboltable
-        this.parent.context.symbolTable.popScope();
 
         return pulseCodes.join('\n');
     }

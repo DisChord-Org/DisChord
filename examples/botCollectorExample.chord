@@ -8,6 +8,10 @@ nuevo evento encendido {
     imprimir("[" mas usuario.nombre mas "] Bot Encendido")
 }
 
+funcion alPulsarMiId (interaccion, cliente) {
+    imprimir("Se ha pulsado el boton con id miid")
+}
+
 nuevo comando HolaMundo {
     descripcion "un hola mundo desde DisChord";
 
@@ -23,11 +27,9 @@ nuevo comando HolaMundo {
         }
     }
 
-    nuevo recolector msg {
+    recolector msg {
         alPulsarId {
-            miid {
-                imprimir("Se ha pulsado el boton con id miid")
-            }
+            miid alPulsarMiId
         }
     }
 }

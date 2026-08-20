@@ -1,10 +1,11 @@
 import { NewNode, TokenType, TokenTypeUnion, VariableNode } from '../../../chord/types';
 import { SubParser } from '../../../chord/Parser/SubParser';
-import { DisChordASTNode, DisChordNode, DisChordNodeType } from '../../types';
+import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType } from '../../types';
 import { Parser } from '../../../chord/Parser/Parser';
 import { StatementParser } from '../../../chord/Parser/Grammar/StatementParser/StatementParser';
 import { AccessParser } from '../../../chord/Parser/Grammar/Expressions/AccessParser';
 import { UnreservedComponentDeclarations } from './UnreservedComponentDeclarations';
+import { DisChordError, ErrorLevel } from '../../../errors/ChordError';
 
 /**
  * @class DisChordStatementParser
@@ -40,8 +41,6 @@ export default class DisChordStatementParser extends SubParser<DisChordNodeType,
         if (token.type === TokenType.Nuevo) {
             this.consume(TokenType.Nuevo);
 
-            // Dialect-specific dispatch (e.g. 'comando'/'evento'/'embed') takes priority over the
-            // generic class shorthand, since it's more specific.
             const customStatement = this.parent.parseCustomStatement();
             if (customStatement) return this.bindReusableName(customStatement);
 

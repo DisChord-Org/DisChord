@@ -1,0 +1,114 @@
+[
+  {
+    "type": "importar",
+    "identificators": [],
+    "path": "./lib/consoleRuntime.js",
+    "isDestructured": false,
+    "location": {
+      "line": 0,
+      "column": 0
+    }
+  },
+  {
+    "type": "funcion",
+    "id": "bruh",
+    "metadata": {
+      "isConstructor": false,
+      "isMethod": false,
+      "isStatic": false,
+      "isAsync": false
+    },
+    "params": [],
+    "body": [
+      {
+        "type": "Llamada",
+        "object": {
+          "type": "Acceso",
+          "object": {
+            "type": "IDENTIFICADOR",
+            "value": "consola",
+            "location": {
+              "line": 2,
+              "column": 5
+            }
+          },
+          "property": "imprimir",
+          "location": {
+            "line": 2,
+            "column": 13
+          }
+        },
+        "params": [
+          {
+            "type": "Literal",
+            "value": "bruh",
+            "raw": "bruh",
+            "location": {
+              "line": 2,
+              "column": 22
+            }
+          }
+        ],
+        "location": {
+          "line": 2,
+          "column": 28
+        }
+      }
+    ],
+    "location": {
+      "line": 3,
+      "column": 1
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "bdo",
+    "value": {
+      "type": "BDO",
+      "mode": 0,
+      "blocks": {
+        "memear": {
+          "type": "IDENTIFICADOR",
+          "value": "bruh",
+          "location": {
+            "line": 6,
+            "column": 12
+          }
+        }
+      },
+      "body": [],
+      "location": {
+        "line": 7,
+        "column": 1
+      }
+    },
+    "location": {
+      "line": 7,
+      "column": 1
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "bdo",
+        "location": {
+          "line": 9,
+          "column": 1
+        }
+      },
+      "property": "memear",
+      "location": {
+        "line": 9,
+        "column": 5
+      }
+    },
+    "params": [],
+    "location": {
+      "line": 9,
+      "column": 12
+    }
+  }
+]

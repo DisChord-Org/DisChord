@@ -12,6 +12,52 @@
     }
   },
   {
+    "type": "funcion",
+    "id": "alPulsarMiId",
+    "metadata": {
+      "isConstructor": false,
+      "isMethod": false,
+      "isStatic": false,
+      "isAsync": false
+    },
+    "params": [
+      "interaccion",
+      "cliente"
+    ],
+    "body": [
+      {
+        "type": "Llamada",
+        "object": {
+          "type": "IDENTIFICADOR",
+          "value": "imprimir",
+          "location": {
+            "line": 2,
+            "column": 5
+          }
+        },
+        "params": [
+          {
+            "type": "Literal",
+            "value": "Se ha pulsado el boton con id miid",
+            "raw": "Se ha pulsado el boton con id miid",
+            "location": {
+              "line": 2,
+              "column": 14
+            }
+          }
+        ],
+        "location": {
+          "line": 2,
+          "column": 50
+        }
+      }
+    ],
+    "location": {
+      "line": 3,
+      "column": 1
+    }
+  },
+  {
     "type": "CrearComando",
     "value": "HolaMundo",
     "body": {
@@ -23,7 +69,7 @@
           "value": "un hola mundo desde DisChord",
           "raw": "un hola mundo desde DisChord",
           "location": {
-            "line": 2,
+            "line": 6,
             "column": 17
           }
         }
@@ -47,14 +93,14 @@
                       "value": "hola",
                       "raw": "hola",
                       "location": {
-                        "line": 6,
+                        "line": 10,
                         "column": 25
                       }
                     }
                   },
                   "body": [],
                   "location": {
-                    "line": 7,
+                    "line": 11,
                     "column": 9
                   }
                 },
@@ -67,7 +113,7 @@
                       "value": "miid",
                       "raw": "miid",
                       "location": {
-                        "line": 9,
+                        "line": 13,
                         "column": 16
                       }
                     },
@@ -76,7 +122,7 @@
                       "value": "mi boton",
                       "raw": "mi boton",
                       "location": {
-                        "line": 10,
+                        "line": 14,
                         "column": 22
                       }
                     },
@@ -85,7 +131,7 @@
                       "value": "🔥",
                       "raw": "🔥",
                       "location": {
-                        "line": 11,
+                        "line": 15,
                         "column": 19
                       }
                     },
@@ -94,31 +140,31 @@
                       "value": "azul",
                       "raw": "azul",
                       "location": {
-                        "line": 12,
+                        "line": 16,
                         "column": 20
                       }
                     }
                   },
                   "body": [],
                   "location": {
-                    "line": 13,
+                    "line": 17,
                     "column": 9
                   }
                 }
               },
               "body": [],
               "location": {
-                "line": 14,
+                "line": 18,
                 "column": 5
               }
             },
             "location": {
-              "line": 14,
+              "line": 18,
               "column": 5
             }
           },
           "location": {
-            "line": 14,
+            "line": 18,
             "column": 5
           }
         },
@@ -128,8 +174,8 @@
             "type": "IDENTIFICADOR",
             "value": "msg",
             "location": {
-              "line": 16,
-              "column": 22
+              "line": 20,
+              "column": 16
             }
           },
           "methods": {
@@ -141,69 +187,40 @@
                 "mode": 0,
                 "blocks": {
                   "miid": {
-                    "type": "BDO",
-                    "mode": 1,
-                    "blocks": {},
-                    "body": [
-                      {
-                        "type": "Llamada",
-                        "object": {
-                          "type": "IDENTIFICADOR",
-                          "value": "imprimir",
-                          "location": {
-                            "line": 19,
-                            "column": 17
-                          }
-                        },
-                        "params": [
-                          {
-                            "type": "Literal",
-                            "value": "Se ha pulsado el boton con id miid",
-                            "raw": "Se ha pulsado el boton con id miid",
-                            "location": {
-                              "line": 19,
-                              "column": 26
-                            }
-                          }
-                        ],
-                        "location": {
-                          "line": 19,
-                          "column": 62
-                        }
-                      }
-                    ],
+                    "type": "IDENTIFICADOR",
+                    "value": "alPulsarMiId",
                     "location": {
-                      "line": 20,
-                      "column": 13
+                      "line": 22,
+                      "column": 18
                     }
                   }
                 },
                 "body": [],
                 "location": {
-                  "line": 21,
+                  "line": 23,
                   "column": 9
                 }
               }
             },
             "body": [],
             "location": {
-              "line": 22,
+              "line": 24,
               "column": 5
             }
           },
           "location": {
-            "line": 22,
+            "line": 24,
             "column": 5
           }
         }
       ],
       "location": {
-        "line": 23,
+        "line": 25,
         "column": 1
       }
     },
     "location": {
-      "line": 23,
+      "line": 25,
       "column": 1
     }
   }
