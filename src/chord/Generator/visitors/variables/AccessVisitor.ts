@@ -37,7 +37,12 @@ export class AccessVisitor<T extends string, N extends BaseNode<T>> extends SubG
         }
 
         for (const className in corelib.classes) {
-            const methods = corelib.classes[className].methods;
+            const classEntry = corelib.classes[className];
+
+            // if the class is static, skip it
+            if (classEntry.static) continue;
+
+            const methods = classEntry.methods;
             if (methods && methods[propName]) {
                 return `${this.parent.visit(node.object)}.${methods[propName]}`;
             }
