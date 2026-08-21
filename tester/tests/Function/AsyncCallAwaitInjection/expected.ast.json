@@ -1,0 +1,102 @@
+[
+  {
+    "type": "importar",
+    "identificators": [],
+    "path": "./lib/consoleRuntime.js",
+    "isDestructured": false,
+    "location": {
+      "line": 0,
+      "column": 0
+    }
+  },
+  {
+    "type": "funcion",
+    "id": "cargar",
+    "metadata": {
+      "isConstructor": false,
+      "isMethod": false,
+      "isStatic": false,
+      "isAsync": true
+    },
+    "params": [],
+    "body": [
+      {
+        "type": "devolver",
+        "object": {
+          "type": "Literal",
+          "value": 5,
+          "raw": "5",
+          "location": {
+            "line": 2,
+            "column": 29
+          }
+        },
+        "location": {
+          "line": 2,
+          "column": 29
+        }
+      }
+    ],
+    "location": {
+      "line": 2,
+      "column": 31
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "r",
+    "value": {
+      "type": "Llamada",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "cargar",
+        "location": {
+          "line": 4,
+          "column": 10
+        }
+      },
+      "params": [],
+      "location": {
+        "line": 4,
+        "column": 17
+      }
+    },
+    "location": {
+      "line": 4,
+      "column": 17
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 5,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 5,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "IDENTIFICADOR",
+        "value": "r",
+        "location": {
+          "line": 5,
+          "column": 18
+        }
+      }
+    ],
+    "location": {
+      "line": 5,
+      "column": 19
+    }
+  }
+]

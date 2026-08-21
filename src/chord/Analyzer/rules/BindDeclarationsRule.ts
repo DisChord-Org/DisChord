@@ -23,28 +23,31 @@ export class BindDeclarationsRule<T extends string, N extends BaseNode<T>> exten
 
     private enter (node: ASTNode<T, N>): void {
         switch (node.type) {
-            case TokenType.Clase: {
+            case TokenType.Clase:
                 const classNode = node as unknown as ClassNode<T, N>;
                 this.context.symbolTable.register(classNode.id, { name: classNode.id, kind: SymbolKind.Class }, node.location);
                 this.context.symbolTable.pushScope();
                 break;
-            }
-            case TokenType.Funcion: {
+
+            case TokenType.Funcion:
                 const functionNode = node as unknown as FunctionNode<T, N>;
-                this.context.symbolTable.register(functionNode.id, { name: functionNode.id, kind: SymbolKind.Function }, node.location);
+                this.context.symbolTable.register(
+                    functionNode.id,
+                    { name: functionNode.id, kind: SymbolKind.Function, metadata: { isAsync: functionNode.metadata.isAsync } },
+                    node.location
+                );
                 this.context.symbolTable.pushScope();
                 break;
-            }
-            case TokenType.VARIABLE: {
+
+            case TokenType.VARIABLE:
                 const variableNode = node as unknown as VariableNode<T, N>;
                 this.context.symbolTable.register(variableNode.id, { name: variableNode.id, kind: SymbolKind.Variable }, node.location);
                 break;
-            }
-            case TokenType.PROPIEDAD: {
+                
+            case TokenType.PROPIEDAD:
                 const propertyNode = node as unknown as PropertyNode<T, N>;
                 this.context.symbolTable.register(propertyNode.id, { name: propertyNode.id, kind: SymbolKind.Property }, node.location);
                 break;
-            }
         }
     }
 

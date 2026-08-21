@@ -1,0 +1,5 @@
+@asincrono
+funcion cargar() { devolver 5 }
+
+var r es cargar()
+consola.imprimir(r)
