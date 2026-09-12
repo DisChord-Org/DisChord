@@ -50,6 +50,36 @@ export enum CompilerMetadataKind {
 };
 
 /**
+ * Registry of every primitive type name DisChord's compile-time type system currently recognizes,
+ * in Spanish, for a `var` declaration's `dataType` — either written explicitly after `tipo`
+ * (`VariableParser`) or inferred from a literal initializer's native JS type
+ * (`ResolveVariableTypesRule`). Also the closed vocabulary the runtime `tipo x` unary operator
+ * (`UnaryVisitor`) translates a JS `typeof` result into. Named exactly like `TokenType` above (a
+ * `const` registry plus a type extracting its values) instead of writing the bare Spanish words
+ * inline wherever they're needed, for the same reason `TokenType.Var` is preferred over a raw
+ * `'var'` literal: a typo in `PrimitiveType.Texto` is a compiler error, a typo in a raw `'texto'`
+ * string is a silent runtime mismatch.
+ * @type {const}
+ */
+export const PrimitiveType = {
+    Texto: 'texto',
+    Numero: 'numero',
+    Booleano: 'booleano',
+    Objeto: 'objeto',
+    Indefinido: 'indefinido'
+} as const;
+
+/**
+ * Unified type extracting values from the `PrimitiveType` constant registry — each consumer
+ * (`UnaryVisitor.primitiveTypeNames`, `ResolveVariableTypesRule.primitiveTypeNames`,
+ * `VariableParser.primitiveTypeNames`) keeps its own small lookup table typed against this union
+ * (mirroring `BinaryExpressionVisitor.operatorsMap`) rather than sharing one runtime map/file, but
+ * they all type-check against this single source, so adding or renaming a primitive here is a
+ * compiler error everywhere a table is missing an entry — not a silent runtime mismatch.
+ */
+export type PrimitiveTypeName = typeof PrimitiveType[keyof typeof PrimitiveType];
+
+/**
  * Represents an entry in the compiler's Symbol Table.
  * @interface Symbol
  */
@@ -64,6 +94,15 @@ export interface Symbol {
         isExported?: boolean;
         isStatic?: boolean;
     };
+    /**
+     * The symbol's resolved primitive type, if any. Unlike `VariableNode.dataType` — which only
+     * ever holds what the user literally wrote after `tipo` — this is the *final* answer: an
+     * explicit annotation, or the type inferred from a literal initializer when no annotation was
+     * written. Left `undefined` at registration time (Analyzer Pass 2, `BindDeclarationsRule`) and
+     * filled in afterwards by Pass 3 (`ResolveVariableTypesRule`, via `SymbolTable.setDataType`),
+     * once the whole file's declarations are visible.
+     */
+    dataType?: PrimitiveTypeName;
 };
 
 /**
@@ -313,6 +352,15 @@ export interface VariableNode<T extends string, N extends BaseNode<T>> extends B
     value: ASTNode<T, N>;
     /** Meta flag tracking class-bound context availability scopes */
     isStatic?: boolean;
+    /**
+     * The primitive type name (e.g. `'texto'`, `'numero'`) explicitly written after `tipo` in
+     * this declaration — parsed and validated against the known primitive set by
+     * `VariableParser.parseTypeAnnotation`, but not yet cross-checked against `value` here (that
+     * happens later, in the Analyzer's `ResolveVariableTypesRule`). `undefined` when no `tipo`
+     * clause was written; the resulting `Symbol.dataType` may still end up populated in that case
+     * via inference from a literal `value`.
+     */
+    dataType?: PrimitiveTypeName;
 }
 
 /**

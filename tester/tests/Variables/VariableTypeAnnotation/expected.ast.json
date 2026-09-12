@@ -1,0 +1,164 @@
+[
+  {
+    "type": "importar",
+    "identificators": [],
+    "path": "./lib/consoleRuntime.js",
+    "isDestructured": false,
+    "location": {
+      "line": 0,
+      "column": 0
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "mitexto",
+    "value": {
+      "type": "Literal",
+      "value": "hola mundo",
+      "raw": "hola mundo",
+      "location": {
+        "line": 1,
+        "column": 27
+      }
+    },
+    "dataType": "texto",
+    "location": {
+      "line": 1,
+      "column": 27
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "minumero",
+    "value": {
+      "type": "Literal",
+      "value": 5,
+      "raw": "5",
+      "location": {
+        "line": 2,
+        "column": 29
+      }
+    },
+    "dataType": "numero",
+    "location": {
+      "line": 2,
+      "column": 29
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "miauto",
+    "value": {
+      "type": "Literal",
+      "value": 10,
+      "raw": "10",
+      "location": {
+        "line": 3,
+        "column": 15
+      }
+    },
+    "location": {
+      "line": 3,
+      "column": 15
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 5,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 5,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "IDENTIFICADOR",
+        "value": "mitexto",
+        "location": {
+          "line": 5,
+          "column": 18
+        }
+      }
+    ],
+    "location": {
+      "line": 5,
+      "column": 25
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 6,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 6,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "IDENTIFICADOR",
+        "value": "minumero",
+        "location": {
+          "line": 6,
+          "column": 18
+        }
+      }
+    ],
+    "location": {
+      "line": 6,
+      "column": 26
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 7,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 7,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "IDENTIFICADOR",
+        "value": "miauto",
+        "location": {
+          "line": 7,
+          "column": 18
+        }
+      }
+    ],
+    "location": {
+      "line": 7,
+      "column": 24
+    }
+  }
+]

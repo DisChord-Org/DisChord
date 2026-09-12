@@ -1,0 +1,7 @@
+var mitexto tipo texto es "hola mundo"
+var minumero tipo numero es 5
+var miauto es 10
+
+consola.imprimir(mitexto)
+consola.imprimir(minumero)
+consola.imprimir(miauto)
