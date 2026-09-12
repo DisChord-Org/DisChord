@@ -1,5 +1,5 @@
 import { SubParser } from "../../SubParser";
-import { BaseNode, ReturnNode, TokenType, TokenTypeUnion } from "../../../types";
+import { ASTNode, BaseNode, ReturnNode, TokenType, TokenTypeUnion } from "../../../types";
 import { Parser } from "../../Parser";
 import { ExpressionParser } from "../Expressions/ExpressionParser";
 
@@ -22,7 +22,7 @@ export class ReturnParser<T extends string, N extends BaseNode<T>> extends SubPa
     public parse(): ReturnNode<T, N> {
         this.consume(TokenType.Devolver);
         
-        let value = undefined;
+        let value: ASTNode<T, N> | undefined = undefined;
         const next = this.peek();
 
         const isEndOfStatement = ([ TokenType.R_BRACE, TokenType.Sino, TokenType.Ademas, TokenType.EOF ] as TokenType[]).includes(next.type as TokenType);
