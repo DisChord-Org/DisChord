@@ -1,0 +1,103 @@
+[
+  {
+    "type": "importar",
+    "identificators": [
+      "createMessage"
+    ],
+    "isDestructured": true,
+    "path": "./lib/createMessage.js",
+    "location": {
+      "line": 0,
+      "column": 0
+    }
+  },
+  {
+    "type": "CrearComando",
+    "value": "X",
+    "body": {
+      "type": "BDO",
+      "mode": 1,
+      "blocks": {
+        "descripcion": {
+          "type": "Literal",
+          "value": "x",
+          "raw": "x",
+          "location": {
+            "line": 2,
+            "column": 17
+          }
+        }
+      },
+      "body": [
+        {
+          "type": "Variable",
+          "id": "msg",
+          "value": {
+            "type": "CrearMensaje",
+            "object": {
+              "type": "BDO",
+              "mode": 0,
+              "blocks": {
+                "contenido": {
+                  "type": "Literal",
+                  "value": "hola",
+                  "raw": "hola",
+                  "location": {
+                    "line": 5,
+                    "column": 19
+                  }
+                }
+              },
+              "body": [],
+              "location": {
+                "line": 6,
+                "column": 5
+              }
+            },
+            "location": {
+              "line": 6,
+              "column": 5
+            }
+          },
+          "location": {
+            "line": 6,
+            "column": 5
+          }
+        },
+        {
+          "type": "CrearRecolector",
+          "variable": {
+            "type": "IDENTIFICADOR",
+            "value": "msg",
+            "location": {
+              "line": 8,
+              "column": 22
+            }
+          },
+          "methods": {
+            "type": "BDO",
+            "mode": 0,
+            "blocks": {},
+            "body": [],
+            "location": {
+              "line": 9,
+              "column": 5
+            }
+          },
+          "location": {
+            "line": 9,
+            "column": 5
+          }
+        }
+      ],
+      "location": {
+        "line": 10,
+        "column": 1
+      }
+    },
+    "location": {
+      "line": 10,
+      "column": 1
+    }
+  }
+]
