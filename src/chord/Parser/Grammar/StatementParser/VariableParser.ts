@@ -1,4 +1,4 @@
-import { ASTNode, BaseNode, LiteralNode, PrimitiveType, PrimitiveTypeName, TokenType, TokenTypeUnion, VariableNode } from "../../../types";
+import { ASTNode, BaseNode, LiteralNode, PrimitiveType, PrimitiveTypeName, TokenType, TokenTypeUnion, VariableDataType, VariableNode } from "../../../types";
 import { Parser } from "../../Parser";
 import { SubParser } from "../../SubParser";
 import { ExpressionParser } from "../Expressions/ExpressionParser";
@@ -97,11 +97,17 @@ export class VariableParser<T extends string, N extends BaseNode<T>> extends Sub
      * So instead, the word after `tipo` is read as a plain `IDENTIFICADOR` (or `Indefinido`, which
      * *is* already reserved) and validated here, contextually, against the known primitive set —
      * exactly the same effect for this one grammatical slot, with zero blast radius elsewhere.
-     * @returns {PrimitiveTypeName | undefined} The annotated type name, or `undefined` if no
-     * `tipo` clause is present.
+     *
+     * A trailing `[]` right after the type name (`tipo texto[]`, no space) marks a homogeneous
+     * array of that primitive instead of a bare scalar — reusing the same `L_SQUARE`/`R_SQUARE`
+     * tokens the array-literal grammar itself already registers (`PrimaryParser`), so again no new
+     * keyword or bracket token is introduced for this feature. Nesting (`texto[][]`) isn't
+     * supported: only one trailing `[]` is consumed.
+     * @returns {VariableDataType | undefined} The annotated type (scalar or array), or `undefined`
+     * if no `tipo` clause is present.
      * @throws {ChordError} If the word after `tipo` isn't one of `this.primitiveTypeNames`.
      */
-    private parseTypeAnnotation(): PrimitiveTypeName | undefined {
+    private parseTypeAnnotation(): VariableDataType | undefined {
         if (!this.match(TokenType.TIPO)) return undefined;
 
         const typeToken = this.consume(
@@ -118,6 +124,14 @@ export class VariableParser<T extends string, N extends BaseNode<T>> extends Sub
             location: typeToken.location
         }).format();
 
-        return typeName as PrimitiveTypeName;
+        const primitiveType = typeName as PrimitiveTypeName;
+        const isArray = this.peek().type === TokenType.L_SQUARE && this.peek('next').type === TokenType.R_SQUARE;
+
+        if (!isArray) return primitiveType;
+
+        this.consume(TokenType.L_SQUARE);
+        this.consume(TokenType.R_SQUARE);
+
+        return `${primitiveType}[]`;
     }
 }

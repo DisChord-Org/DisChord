@@ -80,6 +80,21 @@ export const PrimitiveType = {
 export type PrimitiveTypeName = typeof PrimitiveType[keyof typeof PrimitiveType];
 
 /**
+ * The name of a homogeneous array of some `PrimitiveTypeName`, written `<nombre>[]` after `tipo`
+ * (e.g. `tipo texto[]`) — a template literal type derived directly from `PrimitiveTypeName`, so
+ * `'texto[]'` type-checks but `'text[]'` or `'texto[][]'` (nested arrays aren't supported) don't,
+ * with no separate registry to keep in sync by hand.
+ */
+export type ArrayTypeName = `${PrimitiveTypeName}[]`;
+
+/**
+ * Every `dataType` a `var` declaration can resolve to: a bare primitive, or a homogeneous array of
+ * one. Used by both `VariableNode.dataType` (what was written/parsed) and `Symbol.dataType` (what
+ * was ultimately resolved) — see each field's own doc comment for how their meanings differ.
+ */
+export type VariableDataType = PrimitiveTypeName | ArrayTypeName;
+
+/**
  * Represents an entry in the compiler's Symbol Table.
  * @interface Symbol
  */
@@ -95,14 +110,14 @@ export interface Symbol {
         isStatic?: boolean;
     };
     /**
-     * The symbol's resolved primitive type, if any. Unlike `VariableNode.dataType` — which only
-     * ever holds what the user literally wrote after `tipo` — this is the *final* answer: an
-     * explicit annotation, or the type inferred from a literal initializer when no annotation was
-     * written. Left `undefined` at registration time (Analyzer Pass 2, `BindDeclarationsRule`) and
-     * filled in afterwards by Pass 3 (`ResolveVariableTypesRule`, via `SymbolTable.setDataType`),
-     * once the whole file's declarations are visible.
+     * The symbol's resolved type, if any. Unlike `VariableNode.dataType` — which only ever holds
+     * what the user literally wrote after `tipo` — this is the *final* answer: an explicit
+     * annotation, or the type inferred from a literal (or homogeneous array literal) initializer
+     * when no annotation was written. Left `undefined` at registration time (Analyzer Pass 2,
+     * `BindDeclarationsRule`) and filled in afterwards by Pass 3 (`ResolveVariableTypesRule`, via
+     * `SymbolTable.setDataType`), once the whole file's declarations are visible.
      */
-    dataType?: PrimitiveTypeName;
+    dataType?: VariableDataType;
 };
 
 /**
@@ -353,14 +368,14 @@ export interface VariableNode<T extends string, N extends BaseNode<T>> extends B
     /** Meta flag tracking class-bound context availability scopes */
     isStatic?: boolean;
     /**
-     * The primitive type name (e.g. `'texto'`, `'numero'`) explicitly written after `tipo` in
-     * this declaration — parsed and validated against the known primitive set by
+     * The type (e.g. `'texto'`, `'numero[]'`) explicitly written after `tipo` in this declaration
+     * — parsed and validated against the known primitive set (plus the optional trailing `[]`) by
      * `VariableParser.parseTypeAnnotation`, but not yet cross-checked against `value` here (that
      * happens later, in the Analyzer's `ResolveVariableTypesRule`). `undefined` when no `tipo`
      * clause was written; the resulting `Symbol.dataType` may still end up populated in that case
-     * via inference from a literal `value`.
+     * via inference from a literal (or homogeneous array literal) `value`.
      */
-    dataType?: PrimitiveTypeName;
+    dataType?: VariableDataType;
 }
 
 /**

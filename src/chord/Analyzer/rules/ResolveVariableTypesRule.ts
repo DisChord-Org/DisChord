@@ -1,23 +1,27 @@
 import { AnalysisRule } from "../AnalysisRule";
 import { walkAST } from "../walkAST";
-import { ASTNode, BaseNode, LiteralNode, PrimitiveType, PrimitiveTypeName, TokenType, VariableNode } from "../../types";
+import { ASTNode, BaseNode, ListNode, LiteralNode, PrimitiveType, PrimitiveTypeName, TokenType, VariableDataType, VariableNode } from "../../types";
 import { ChordError, ErrorLevel } from "../../../errors/ChordError";
 
 /**
  * Pass 3 of the Analyzer's binding model ("Tipos"): resolves and validates each variable's
- * primitive `dataType` now that every declaration from Pass 2 ({@link BindDeclarationsRule}) is
- * already registered in the `SymbolTable`. Runs as its own pass, after binding, rather than being
- * folded into Pass 2 itself, so that a future type check needing to see *other* variables' types
- * (not just the one currently being declared) always finds a fully populated table — the same
- * reason `BindDeclarationsRule` itself is a separate pass from reference validation.
+ * `dataType` now that every declaration from Pass 2 ({@link BindDeclarationsRule}) is already
+ * registered in the `SymbolTable`. Runs as its own pass, after binding, rather than being folded
+ * into Pass 2 itself, so that a future type check needing to see *other* variables' types (not
+ * just the one currently being declared) always finds a fully populated table — the same reason
+ * `BindDeclarationsRule` itself is a separate pass from reference validation.
  *
- * For now this only handles the primitive case: a variable's `dataType` is either
- *  - inferred from its initializer, when that initializer is a literal (`var x es 5` -> `numero`),
+ * For now this only handles the primitive (scalar and homogeneous-array) case: a variable's
+ * `dataType` is either
+ *  - inferred from its initializer, when that initializer is a literal (`var x es 5` -> `numero`)
+ *    or a list literal whose elements are all literals of the same type
+ *    (`var x es [1, 2]` -> `numero[]`),
  *  - validated against an explicit `tipo` annotation, when both are present and disagree
- *    (`var x tipo texto es 5` is rejected), or
- *  - left as-is (the explicit annotation, or `undefined`) when the initializer isn't a literal —
- *    inferring the type of an arbitrary expression, function return, or component declaration
- *    (embed, comando, ...) is future work, not implemented by this rule.
+ *    (`var x tipo texto es 5` and `var x tipo texto[] es [1, 2]` are both rejected), or
+ *  - left as-is (the explicit annotation, or `undefined`) when the initializer isn't a literal or
+ *    a homogeneous list literal — inferring the type of an arbitrary expression, function return,
+ *    a mixed-type list, or a component declaration (embed, comando, ...) is future work, not
+ *    implemented by this rule.
  *
  * Mirrors `BindDeclarationsRule`'s own traversal: classes and functions get their own lexical
  * scope for their body, entered/exited via `walkAST`'s `exit` hook, so a variable's resolved type
@@ -81,22 +85,21 @@ export class ResolveVariableTypesRule<T extends string, N extends BaseNode<T>> e
     }
 
     /**
-     * Resolves a variable's primitive `dataType`: if its initializer is a literal, the type is
-     * inferred from the literal's native JS value (via {@link primitiveTypeNames}); if an explicit
-     * `tipo` annotation is also present, it must match the inferred type. Non-literal initializers
-     * (expressions, calls, component declarations, ...) can't be inferred yet, so only the
+     * Resolves a variable's `dataType`: if its initializer is a literal, the type is inferred from
+     * the literal's native JS value (via {@link primitiveTypeNames}); if it's a list literal whose
+     * elements are all literals of the same type, the array type is inferred via
+     * {@link inferArrayElementType}. If an explicit `tipo` annotation is also present, it must
+     * match the inferred type. Any other initializer shape (expressions, calls, component
+     * declarations, a mixed-type or non-literal list, ...) can't be inferred yet, so only the
      * explicit annotation (if any) is kept.
      * @param {VariableNode<T, N>} variableNode - The variable declaration to resolve.
-     * @returns {PrimitiveTypeName | undefined} The resolved primitive type, or `undefined` if
-     * neither an annotation nor a literal initializer is present.
-     * @throws {ChordError} If the explicit `tipo` annotation contradicts the inferred literal type.
+     * @returns {VariableDataType | undefined} The resolved type, or `undefined` if neither an
+     * annotation nor an inferrable initializer is present.
+     * @throws {ChordError} If the explicit `tipo` annotation contradicts the inferred type.
      * @private
      */
-    private resolveDataType (variableNode: VariableNode<T, N>): PrimitiveTypeName | undefined {
-        const isLiteral = variableNode.value.type === TokenType.LITERAL;
-        const inferredType = isLiteral
-            ? this.primitiveTypeNames[typeof (variableNode.value as LiteralNode<T>).value]
-            : undefined;
+    private resolveDataType (variableNode: VariableNode<T, N>): VariableDataType | undefined {
+        const inferredType = this.inferDataType(variableNode.value);
 
         if (variableNode.dataType && inferredType && variableNode.dataType !== inferredType) throw new ChordError({
             phase: ErrorLevel.Analysis,
@@ -105,5 +108,51 @@ export class ResolveVariableTypesRule<T extends string, N extends BaseNode<T>> e
         }).format();
 
         return variableNode.dataType ?? inferredType;
+    }
+
+    /**
+     * Infers a `VariableDataType` from an initializer expression, when its shape allows it: a
+     * literal infers its scalar primitive directly; a list literal infers a homogeneous array type
+     * via {@link inferArrayElementType}. Any other expression shape can't be inferred yet.
+     * @param {ASTNode<T, N>} value - The initializer expression to inspect.
+     * @returns {VariableDataType | undefined} The inferred type, or `undefined` if this
+     * initializer shape isn't inferrable.
+     * @private
+     */
+    private inferDataType (value: ASTNode<T, N>): VariableDataType | undefined {
+        if (value.type === TokenType.LITERAL) {
+            return this.primitiveTypeNames[typeof (value as LiteralNode<T>).value];
+        }
+
+        if (value.type === TokenType.LISTA) {
+            const elementType = this.inferArrayElementType(value as ListNode<T, N>);
+            return elementType && `${elementType}[]`;
+        }
+
+        return undefined;
+    }
+
+    /**
+     * Infers the common element type of a list literal, when every element is itself a literal of
+     * the exact same primitive type (e.g. `[1, 2, 3]` -> `numero`). An empty list, a list with a
+     * non-literal element (a nested list, an expression, ...), or a list mixing element types
+     * (`[1, "dos"]`) all return `undefined` — there is no single element type to report.
+     * @param {ListNode<T, N>} listNode - The list literal to inspect.
+     * @returns {PrimitiveTypeName | undefined} The shared element type, or `undefined` if the list
+     * isn't homogeneous (or is empty, or holds non-literal elements).
+     * @private
+     */
+    private inferArrayElementType (listNode: ListNode<T, N>): PrimitiveTypeName | undefined {
+        if (listNode.body.length === 0) return undefined;
+
+        const elementTypes = listNode.body.map(element => element.type === TokenType.LITERAL
+            ? this.primitiveTypeNames[typeof (element as LiteralNode<T>).value]
+            : undefined
+        );
+
+        const [ firstType, ...restTypes ] = elementTypes;
+        const isHomogeneous = firstType !== undefined && restTypes.every(elementType => elementType === firstType);
+
+        return isHomogeneous ? firstType : undefined;
     }
 }
