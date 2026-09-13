@@ -67,58 +67,43 @@ export default class ButtonVisitor extends SubGenerator<DisChordNodeType, DisCho
     }
 
     /**
-     * Resolves the 'id' property and maps it to setCustomId.
+     * Resolves the 'id' property and maps it to setCustomId. Its presence is guaranteed by the
+     * Analyzer's `ValidateButtonsRule`.
      * @private
-     * @throws {Error} If the 'id' property is missing.
      */
     private resolveCustomId (node: DisChordODBNode): string {
         const customId = this.parent.visitIfExists(
             this.parent.get(BDOVisitor).getODBProperty(node, 'id')
         );
 
-        if (!customId) throw new DisChordError({
-            phase: ErrorLevel.Compiler,
-            message: `Se debe especificar una id en el botón`,
-            location: node.location
-        }).format();
-
         return `.setCustomId(${customId})`;
     }
 
     /**
-     * Resolves the 'etiqueta' property and maps it to setLabel.
+     * Resolves the 'etiqueta' property and maps it to setLabel. Its presence is guaranteed by the
+     * Analyzer's `ValidateButtonsRule`.
      * @private
-     * @throws {Error} If the 'etiqueta' property is missing.
      */
     private resolveLabel (node: DisChordODBNode): string {
         const label = this.parent.visitIfExists(
             this.parent.get(BDOVisitor).getODBProperty(node, 'etiqueta')
         );
 
-        if (!label) throw new DisChordError({
-            phase: ErrorLevel.Compiler,
-            message: `Se debe especificar una etiqueta en el botón`,
-            location: node.location
-        }).format();
-
         return `.setLabel(${label})`;
     }
 
     /**
-     * Resolves the 'estilo' property using the ButtonStyles mapping.
+     * Resolves the 'estilo' property using the ButtonStyles mapping. Its presence, and validity
+     * when it's a plain string literal, is already checked by the Analyzer's
+     * `ValidateButtonsRule` — the invalid-value check stays here too, since a
+     * non-literal `estilo` (a variable, an expression, ...) can't be resolved until generation.
      * @private
-     * @throws {Error} If the 'estilo' property is missing or if the style value is not recognized.
+     * @throws {DisChordError} If the resolved style value isn't a recognized `ButtonStyles` entry.
      */
     private resolveStyle (node: DisChordODBNode): string {
         const style = this.parent.visitIfExists(
             this.parent.get(BDOVisitor).getODBProperty(node, 'estilo')
-        );
-        
-        if (!style) throw new DisChordError({
-            phase: ErrorLevel.Compiler,
-            message: `Se debe especificar el estilo en el botón`,
-            location: node.location
-        }).format();
+        )!;
 
         const SlicedStyle = style.slice(1, -1);
 

@@ -226,10 +226,10 @@ export default class EmbedVisitor extends SubGenerator<DisChordNodeType, DisChor
     }
 
     /**
-     * Resolves the 'campos' list. 
-     * Iterates through a list of BDOs to generate an array of field objects.
+     * Resolves the 'campos' list.
+     * Iterates through a list of BDOs to generate an array of field objects. That every field is
+     * a BDO naming a 'titulo' is guaranteed by the Analyzer's `ValidateEmbedsRule`.
      * @private
-     * @throws Error if a field is not a BDO or lacks a 'titulo'.
      * @returns The generated addFields call with an array of field objects or an empty string if no fields are defined.
      */
     private resolveFields (node: DisChordODBNode): string {
@@ -238,28 +238,18 @@ export default class EmbedVisitor extends SubGenerator<DisChordNodeType, DisChor
         if (!fields || fields.type != 'Lista' || fields.body.length < 1) return '';
 
         const FieldsResolved: string = fields.body.map((Field: DisChordASTNode): string => {
-            if (Field.type != 'BDO') throw new DisChordError({
-                phase: ErrorLevel.Compiler,
-                message: `Se esperaba un BDO para el campo, se recibió '${Field.type}'`,
-                location: node.location
-            }).format();
-            
+            const fieldBDO = Field as DisChordODBNode;
+
             const name = this.parent.visitIfExists(
-                this.parent.get(BDOVisitor).getODBProperty(Field, 'titulo')
+                this.parent.get(BDOVisitor).getODBProperty(fieldBDO, 'titulo')
             );
 
-            if (!name) throw new DisChordError({
-                phase: ErrorLevel.Compiler,
-                message: `El campo requiere una propiedad 'titulo'`,
-                location: node.location
-            }).format();
-
             const value = this.parent.visitIfExists(
-                this.parent.get(BDOVisitor).getODBProperty(Field, 'descripcion')
+                this.parent.get(BDOVisitor).getODBProperty(fieldBDO, 'descripcion')
             ) || '';
 
             const inline = this.parent.visitIfExists(
-                this.parent.get(BDOVisitor).getODBProperty(Field, 'lineado')
+                this.parent.get(BDOVisitor).getODBProperty(fieldBDO, 'lineado')
             ) || 'false';
 
             return `{ name: ${name}, value: ${value}, inline: ${inline} }`;
@@ -269,9 +259,9 @@ export default class EmbedVisitor extends SubGenerator<DisChordNodeType, DisChor
     }
 
     /**
-     * Resolves the 'pie' block, requiring a 'texto' property.
+     * Resolves the 'pie' block, requiring a 'texto' property. That 'texto' is present when 'pie'
+     * is defined is guaranteed by the Analyzer's `ValidateEmbedsRule`.
      * @private
-     * @throws Error if 'pie' is present but lacks 'texto'.
      * @returns The generated setFooter call with the specified text and optional iconUrl, or an empty string if 'pie' is not defined.
      */
     private resolveFooter (node: DisChordODBNode): string {
@@ -282,12 +272,6 @@ export default class EmbedVisitor extends SubGenerator<DisChordNodeType, DisChor
         const text = this.parent.visitIfExists(
             this.parent.get(BDOVisitor).getODBProperty(footer, 'texto')
         );
-
-        if (!text) throw new DisChordError({
-            phase: ErrorLevel.Compiler,
-            message: `El pie de página requiere una propiedad 'text'`,
-            location: node.location
-        }).format();
 
         const iconUrl = this.parent.visitIfExists(
             this.parent.get(BDOVisitor).getODBProperty(footer, 'icono')

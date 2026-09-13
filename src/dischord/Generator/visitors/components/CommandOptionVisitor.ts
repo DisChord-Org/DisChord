@@ -1,15 +1,8 @@
-import { DisChordError, ErrorLevel } from "../../../../errors/ChordError";
 import { DisChordTypeMap } from "../../constants/mappings";
 import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordODBNode, DisChordTokenType, DiscordOptionType } from "../../../types";
 import { SubGenerator } from "../../../../chord/Generator/SubGenerator";
 import { TokenTypeUnion } from "../../../../chord/types";
 import { BDOVisitor } from "../../../../chord/Generator/visitors/expressions/BDOVisitor";
-
-/**
- * 
- * THIS FILE WILL BE REFACTOR, DONT HORRIFY.
- * 
- */
 
 /**
  * Data structure representing the complete output of the command option processing phase.
@@ -54,34 +47,22 @@ export default class CommandOptionVisitor extends SubGenerator<DisChordNodeType,
     }
 
     /**
-     * Iterates through the options defined in the DisChord source and maps them 
-     * to their respective Discord types.
+     * Iterates through the options defined in the DisChord source and maps them
+     * to their respective Discord types. `node` is only ever reached here already confirmed to be
+     * a BDO by `visitIfNodeExists`; that each option names a recognized type is guaranteed by the
+     * Analyzer's `ValidateCommandRule`.
      * @param node The AST node containing the options map.
-     * @throws {DisChordError} If the node is not a BDO or an option type is invalid.
      * @returns {string} A stringified array of Discord option objects.
      * @override
      */
     public visit (node: DisChordASTNode): string {
-        if (node.type != 'BDO') throw new DisChordError({
-            phase: ErrorLevel.Compiler,
-            message: `Se esperaba un BDO, se recibió '${node.type}'`,
-            location: node.location
-        }).format();
+        const optionsNode = node as DisChordODBNode;
+        const optionNames = Object.keys(optionsNode.blocks);
 
-        const optionNames = Object.keys(node.blocks);
-    
         const results = optionNames.map(OptionName => {
-            const OptionNode = node.blocks[OptionName] as DisChordODBNode;
+            const OptionNode = optionsNode.blocks[OptionName] as DisChordODBNode;
             const OptionType = this.getOptionType(OptionNode);
             const MappedOptionType = DisChordTypeMap[OptionType];
-
-            if (!MappedOptionType) {
-                throw new DisChordError({
-                    phase: ErrorLevel.Compiler,
-                    message: `Tipo de opción no reconocido en '${OptionName}'`,
-                    location: OptionNode.location
-                }).format();
-            }
 
             return this.generateOption({
                 name: OptionName,
@@ -132,25 +113,14 @@ export default class CommandOptionVisitor extends SubGenerator<DisChordNodeType,
     }): string {
         const { name, node, optionType, mappedOption } = options;
 
+        // Both 'descripcion' and 'requerido' are guaranteed present by the Analyzer's
         const description = this.parent.visitIfExists(
             this.parent.get(BDOVisitor).getODBProperty(node, 'descripcion')
         );
 
-        if (!description) throw new DisChordError({
-            phase: ErrorLevel.Compiler,
-            message: `En la declaración de la opción tipo '${optionType}', se esperaba 'descripcion'.`,
-            location: node.location
-        }).format();
-
         const required = this.parent.visitIfExists(
             this.parent.get(BDOVisitor).getODBProperty(node, 'requerido')
         );
-
-        if (!required) throw new DisChordError({
-            phase: ErrorLevel.Compiler,
-            message: `En la declaración de la opción tipo '${optionType}', se esperaba 'requerido'.`,
-            location: node.location
-        }).format();
 
         return `
             {

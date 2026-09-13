@@ -4,7 +4,6 @@ import fs from "fs";
 import { DisChordNode, DisChordNodeType, DisChordTokenType, StartBotNode } from "../../../types";
 import { intentsMap } from "../../constants/mappings";
 import { SubGenerator } from "../../../../chord/Generator/SubGenerator";
-import { DisChordError, ErrorLevel } from "../../../../errors/ChordError";
 import { IdentificatorNode, ImportNode, TokenType, TokenTypeUnion } from "../../../../chord/types";
 import { walkAST } from "../../../../chord/Analyzer/walkAST";
 import { ImportVisitor } from "../../../../chord/Generator/visitors/modularity/ImportVisitor";
@@ -27,20 +26,8 @@ export default class ClietInitVisitor extends SubGenerator<DisChordNodeType, Dis
      * @returns The generated code for starting the bot.
      */
     visit (node: StartBotNode): string {
-        if (node.object.type != 'BDO') throw new DisChordError({
-            phase: ErrorLevel.Compiler,
-            message: `Se encontró '${node.object.type}', se esperaba 'Objeto'`,
-            location: node.location
-        }).format();
-
         const { blocks } = node.object;
-        const prefixNode = blocks['prefijo'] || blocks['prefijos'];
-
-        if (!prefixNode) throw new DisChordError({
-            phase: ErrorLevel.Compiler,
-            message: `No se ha especificado el prefijo en el bloque 'encender bot'`,
-            location: node.location
-        }).format();
+        const prefixNode = (blocks['prefijo'] || blocks['prefijos'])!;
 
         const prefix = this.parent.visit(prefixNode);
         const isArray = prefixNode.type === 'Lista';
@@ -90,35 +77,18 @@ export default class ClietInitVisitor extends SubGenerator<DisChordNodeType, Dis
      * @returns The generated Seyfert configuration file content.
      */
     private generateSeyfertConfig(node: StartBotNode): string {
-        if (node.object.type != 'BDO') throw new DisChordError({
-            phase: ErrorLevel.Compiler,
-            message: `Se encontró '${node.object.type}', se esperaba 'BDO'`,
-            location: node.location
-        }).format();
-
         const { blocks } = node.object;
-        const tokenNode = blocks['token'];
+        const tokenNode = blocks['token']!;
         const intentsNode = blocks['intenciones'];
 
-        if (!tokenNode) throw new DisChordError({
-            phase: ErrorLevel.Compiler,
-            message: `Falta el bloque 'token' en la configuración del bot.`,
-            location: node.location
-        }).format();
-        
         const token = this.parent.visit(tokenNode);
         const forwardedImports = this.forwardReferencedImports(node);
         let intents = "[]";
-        
+
         if (intentsNode && intentsNode.type === 'Lista') {
             const list = intentsNode.body.map((item: any) => {
                 const val = item.value?.toString().replace(/"/g, '');
                 const mapped = intentsMap[val];
-                if (!mapped) throw new DisChordError({
-                    phase: ErrorLevel.Compiler,
-                    message: `Intención desconocida: ${val}`,
-                    location: node.location
-                }).format();
                 return `"${mapped}"`;
             });
             intents = `[ ${list.join(',')} ]`;

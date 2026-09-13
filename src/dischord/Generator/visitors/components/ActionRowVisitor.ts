@@ -1,4 +1,3 @@
-import { DisChordError, ErrorLevel } from "../../../../errors/ChordError";
 import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType } from "../../../types";
 import { SubGenerator } from "../../../../chord/Generator/SubGenerator";
 import { ListNode, TokenType, TokenTypeUnion } from "../../../../chord/types";
@@ -71,17 +70,12 @@ export default class ActionRowVisitor extends SubGenerator<DisChordNodeType, Dis
     }
 
     /**
-     * Builds a single `new ActionRow().setComponents([...])` call from its buttons.
+     * Builds a single `new ActionRow().setComponents([...])` call from its buttons. An explicit
+     * manual row exceeding {@link MAX_PER_ROW} is already rejected by the Analyzer's
+     * `ValidateButtonsRule` before generation runs.
      * @private
-     * @throws {DisChordError} If `buttons` exceeds {@link MAX_PER_ROW}.
      */
     private buildRow (buttons: DisChordASTNode[]): string {
-        if (buttons.length > ActionRowVisitor.MAX_PER_ROW) throw new DisChordError({
-            phase: ErrorLevel.Compiler,
-            message: `Una fila de botones admite como máximo ${ActionRowVisitor.MAX_PER_ROW}, se han especificado ${buttons.length}.`,
-            location: buttons[0].location
-        }).format();
-
         const buttonsCode = buttons.map(button => this.resolveButtonExpression(button)).join(', ');
 
         return `new ActionRow().setComponents([ ${buttonsCode} ])`;

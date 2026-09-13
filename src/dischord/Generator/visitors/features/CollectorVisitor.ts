@@ -1,5 +1,4 @@
-import { DisChordError, ErrorLevel } from "../../../../errors/ChordError";
-import { CollectorNode, DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType } from "../../../types";
+import { CollectorNode, DisChordNode, DisChordNodeType, DisChordODBNode, DisChordTokenType } from "../../../types";
 import { SubGenerator } from "./../../../../chord/Generator/SubGenerator";
 import { TokenTypeUnion } from "../../../../chord/types";
 import { BDOVisitor } from "../../../../chord/Generator/visitors/expressions/BDOVisitor";
@@ -58,7 +57,9 @@ export default class CollectorVisitor extends SubGenerator<DisChordNodeType, Dis
             ? `(razon, reiniciar) => ${onStopCallback}(razon, reiniciar, cliente, contexto)`
             : undefined;
 
-        const body = this.visitPulseIdMethod(bdo.getODBProperty(node.methods, 'alPulsarId'));
+        // 'alPulsarId', when present, is already guaranteed to be a BDO by the Analyzer's
+        // `ValidateCollectorRule`.
+        const body = this.visitPulseIdMethod(bdo.getODBProperty(node.methods, 'alPulsarId') as DisChordODBNode | undefined);
 
         return this.generateCollector({ variable, filter, idle, onStop }, body);
     }
@@ -84,23 +85,19 @@ export default class CollectorVisitor extends SubGenerator<DisChordNodeType, Dis
 
     /**
      * Traverses the nested BDO within 'alPulsarId'.
-     * Maps each button id to a call to its referenced callback function.
+     * Maps each button id to a call to its referenced callback function. That the 'alPulsarId'
+     * value is a BDO (rather than some other expression), when present, is already guaranteed by
+     * the Analyzer's `ValidateCollectorRule` — the caller casts it there, once, instead of this
+     * method accepting a broader `DisChordASTNode` and re-asserting the shape internally.
      * @private
-     * @param node The AST node containing id keys and callback-reference values.
-     * @throws {DisChordError} If the node is not a valid BDO.
+     * @param node The BDO mapping button ids to their callback-reference values.
      * @returns Concatenated event listener code for all IDs in the block.
      */
-    private visitPulseIdMethod (node: DisChordASTNode | undefined): string {
+    private visitPulseIdMethod (node: DisChordODBNode | undefined): string {
         if (!node) return '';
 
-        if (node.type != 'BDO') throw new DisChordError({
-            phase: ErrorLevel.Compiler,
-            message: `Se esperaba un BDO con las ids y sus funciones asociadas después de 'alPulsarId'`,
-            location: node.location
-        }).format();
-
         const pulseCodes: string[] = Object.entries(node.blocks).map(([identificator, callbackNode]) => {
-            const callback = this.parent.visit(callbackNode as DisChordASTNode);
+            const callback = this.parent.visit(callbackNode);
 
             return `collector.run(${JSON.stringify(identificator)}, (interaccion) => ${callback}(interaccion, cliente, contexto));`;
         });

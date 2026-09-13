@@ -1,7 +1,6 @@
 import { ApplicationIntegrationType, CommandNode, DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType, InteractionContextType } from "../../../types";
 import { SubGenerator } from '../../../../chord/Generator/SubGenerator';
-import { DisChordError, ErrorLevel } from '../../../../errors/ChordError';
-import { CompilerMetadataKind, TokenTypeUnion } from '../../../../chord/types';
+import { CompilerMetadataKind, TokenType, TokenTypeUnion } from '../../../../chord/types';
 import { BDOVisitor } from '../../../../chord/Generator/visitors/expressions/BDOVisitor';
 import CommandOptionVisitor from '../components/CommandOptionVisitor';
 import { ContextTypes, IgnoreCommandTypes, IntegrationTypes } from '../../constants/mappings';
@@ -26,7 +25,7 @@ export default class CommandVisitor extends SubGenerator<DisChordNodeType, DisCh
         // first we just add a new scope in the symboltable
         this.parent.context.symbolTable.pushScope();
         // adding interaction context
-        this.parent.context.symbolTable.setMetadata(CompilerMetadataKind.IsInteraction, false);
+        this.parent.context.symbolTable.setMetadata(CompilerMetadataKind.IsInteraction, false); // is this necccessary yet? I need to check it
 
         // generating command flags & body
         const CommandName = this.getCommandName(node);
@@ -111,21 +110,15 @@ export default class CommandVisitor extends SubGenerator<DisChordNodeType, DisCh
     }
 
     /**
-     * Retrieves and parses the command description from the AST node body.
+     * Retrieves and parses the command description from the AST node body. Its presence is
+     * guaranteed by the Analyzer's `ValidateCommandRule`.
      *
      * @private
      * @param {CommandNode} node - The target command AST node.
      * @returns {string} Generated expression representing the command description.
-     * @throws {DisChordError} Throws a compiler error if the description property is missing.
      */
     private getCommandDescription (node: CommandNode): string {
-        const CommandDescription = this.parent.get(BDOVisitor).getODBProperty(node.body, 'descripcion');
-
-        if (!CommandDescription) throw new DisChordError({
-            phase: ErrorLevel.Compiler,
-            message: `Se requiere descripción para el comando`,
-            location: node.location
-        }).format();
+        const CommandDescription = this.parent.get(BDOVisitor).getODBProperty(node.body, 'descripcion')!;
 
         return this.parent.visit(CommandDescription);
     }
@@ -155,7 +148,6 @@ export default class CommandVisitor extends SubGenerator<DisChordNodeType, DisCh
      * @param {Record<string, InteractionContextType | ApplicationIntegrationType>} config.mapping - Mapping table to validate and convert string tokens to enum values.
      * @param {InteractionContextType | ApplicationIntegrationType} config.defaultValue - Default enum value fallback if property is omitted.
      * @returns {string} String representation of array containing resolved numeric enum values.
-     * @throws {DisChordError} Throws a compiler error if the property is not a list, contains non-string elements, or uses unsupported option tokens.
      */
     private getMappedListOption (config: {
         node: CommandNode,
@@ -168,29 +160,10 @@ export default class CommandVisitor extends SubGenerator<DisChordNodeType, DisCh
         const field = this.parent.get(BDOVisitor).getODBProperty(node.body, fieldName);
         if (!field) return `[ ${defaultValue} ]`;
 
-        if (field.type !== 'Lista') throw new DisChordError({
-            phase: ErrorLevel.Compiler,
-            message: `El campo '${fieldName}' debe ser una lista de opciones`,
-            location: field.location
-        }).format();
-
-        const translatedValues = field.body.map((literal): number => {
-            if (literal.type !== 'Literal' || typeof literal.value !== 'string') throw new DisChordError({
-                phase: ErrorLevel.Compiler,
-                message: `Solo se permite especificar tipo TEXTO en ${fieldName}`,
-                location: literal.location
-            }).format();
-
-            const mappedValue = mapping[literal.value];
-
-            if (mappedValue === undefined) throw new DisChordError({
-                phase: ErrorLevel.Compiler,
-                message: `En las integraciones solo se puede especificar: ${Object.keys(mapping).join(' / ')}`,
-                location: literal.location
-            }).format();
-
-            return mappedValue;
-        });
+        // translate each literal value in the list to its corresponding enum value using the provided mapping.
+        const translatedValues = field.type === TokenType.LISTA
+            ? field.body.map(literal => literal.type === TokenType.LITERAL && typeof literal.value === 'string' ? mapping[literal.value] : undefined)
+            : [];
 
         return `[ ${translatedValues.join(', ')} ]`;
     }
@@ -248,25 +221,15 @@ export default class CommandVisitor extends SubGenerator<DisChordNodeType, DisCh
      * @private
      * @param {CommandNode} node - The target command AST node.
      * @returns {string} Stringified mapped ignore type enum value or 'undefined'.
-     * @throws {DisChordError} Throws a compiler error if value is not string or not present in mapping.
      */
     private getIgnoredContext (node: CommandNode): string {
         const literal = this.parent.get(BDOVisitor).getODBProperty(node.body, 'ignorar');
         if (!literal) return 'undefined';
 
-        if (literal.type != 'Literal' || typeof literal.value != 'string') throw new DisChordError({
-            phase: ErrorLevel.Compiler,
-            message: `Solo se permite tipo TEXTO en 'ignorar'`,
-            location: literal.location
-        }).format();
-
-        const mappedValue = IgnoreCommandTypes[literal.value];
-
-        if (mappedValue === undefined) throw new DisChordError({
-            phase: ErrorLevel.Compiler,
-            message: `En 'ignorar' solo se puede especificar un TEXTO de: ${Object.keys(IgnoreCommandTypes).join(' / ')}`,
-            location: literal.location
-        }).format();
+        // the mapping table `IgnoreCommandTypes` converts the string to its corresponding enum value.
+        const mappedValue = literal.type === TokenType.LITERAL && typeof literal.value === 'string'
+            ? IgnoreCommandTypes[literal.value]
+            : undefined;
 
         return `${mappedValue}`;
     }
@@ -277,18 +240,12 @@ export default class CommandVisitor extends SubGenerator<DisChordNodeType, DisCh
      * @private
      * @param {CommandNode} node - The target command AST node.
      * @returns {string} Generated array expression containing aliases or 'undefined'.
-     * @throws {DisChordError} Throws a compiler error if aliases property is not a list node.
      */
     private getAliases (node: CommandNode): string {
         const literal = this.parent.get(BDOVisitor).getODBProperty(node.body, 'alias');
         if (!literal) return 'undefined';
 
-        if (literal.type != 'Lista') throw new DisChordError({
-            phase: ErrorLevel.Compiler,
-            message: `Los alias deben ser una LISTA con valores tipo TEXTO`,
-            location: literal.location
-        }).format();
-
+        // That `literal` is a list is guaranteed by the Analyzer's `ValidateCommandRule`.
         return this.parent.visit(literal);
     }
 }

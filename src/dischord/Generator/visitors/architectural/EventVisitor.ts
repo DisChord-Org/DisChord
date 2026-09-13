@@ -1,6 +1,5 @@
 import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType, EventNode } from "../../../types";
 import { SubGenerator } from '../../../../chord/Generator/SubGenerator';
-import { DisChordError, ErrorLevel } from '../../../../errors/ChordError';
 import { TokenTypeUnion } from '../../../../chord/types';
 import { eventsMap } from '../../constants/mappings';
 
@@ -16,17 +15,13 @@ export default class EventVisitor extends SubGenerator<DisChordNodeType, DisChor
     public static triggerToken: TokenTypeUnion<DisChordTokenType> | undefined = DisChordTokenType.EVENTO;
     
     /**
-     * Generates code for a EventNode, which represents a listener in DisChord.
+     * Generates code for a EventNode, which represents a listener in DisChord. `node.name`'s
+     * validity is guaranteed by the Analyzer's `ValidateEventRule`.
      * @param node The EventNode representing the listener to generate code for.
      * @returns The generated code for the listener.
      */
     visit (node: EventNode): string {
-        const eventName = eventsMap[node.name]?.name;
-        if (!eventName) throw new DisChordError({
-            phase: ErrorLevel.Compiler,
-            message: `El evento '${node.name}' no existe`,
-            location: node.location
-        }).format();
+        const eventName = eventsMap[node.name].name;
 
         const body = node.body
             .map((n: DisChordASTNode): string => "    " + this.parent.visit(n) + ";")
