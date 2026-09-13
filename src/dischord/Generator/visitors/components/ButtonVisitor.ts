@@ -1,9 +1,11 @@
 import { DisChordError, ErrorLevel } from "../../../../errors/ChordError";
-import { ButtonStyles, DisChordASTNode, DisChordNode, DisChordNodeType, DisChordODBNode, DisChordTokenType } from "../../../types";
+import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordODBNode, DisChordTokenType } from "../../../types";
 import { SubGenerator } from "../../../../chord/Generator/SubGenerator";
+import { BDOResolver } from "../../../../chord/Generator/BDOResolver";
 import { TokenTypeUnion } from "../../../../chord/types";
 import { BDOVisitor } from "../../../../chord/Generator/visitors/expressions/BDOVisitor";
 import ActionRowVisitor from "./ActionRowVisitor";
+import { ButtonSchema } from "../../constants/schemas";
 
 /**
  * Generator class responsible for generating code related to message buttons in DisChord.
@@ -41,8 +43,13 @@ export default class ButtonVisitor extends SubGenerator<DisChordNodeType, DisCho
     /**
      * Entry point for button code generation.
      * Maps the BDO (Object Data Block) properties to their corresponding Button builder methods.
+     * `id`/`etiqueta`/`estilo` are resolved straight from {@link ButtonSchema} — the same schema
+     * the Analyzer's `ValidateButtonsRule` already validated this BDO against.
      * @param node The ODBNode containing button definitions.
-     * @throws {Error} If the node is not a BDO or if mandatory properties (id, etiqueta, estilo) are missing.
+     * @throws {DisChordError} If the node is not a BDO (an internal consistency assertion — every
+     * caller of `visit` already confirmed this itself, so a malformed `.chord` file can never
+     * reach this check; see `ValidateCallTargetsRule` for why this kind of check stays here rather
+     * than moving to the Analyzer).
      * @returns A string representing the instantiation and configuration of a new Button.
      */
     visit (node: DisChordASTNode): string {
@@ -52,70 +59,17 @@ export default class ButtonVisitor extends SubGenerator<DisChordNodeType, DisCho
             location: node.location
         }).format();
 
-        const ResolvedCustomId = this.resolveCustomId(node);
-        const ResolvedLabel = this.resolveLabel(node);
-        const ResolvedStyle = this.resolveStyle(node);
+        const resolver = new BDOResolver<DisChordNodeType, DisChordNode>(expression => this.parent.visit(expression));
+        const button = resolver.resolve(node, ButtonSchema);
         const ResolvedEmoji = this.resolveEmoji(node);
 
         return `
             new Button()
-                ${ResolvedCustomId}
-                ${ResolvedLabel}
-                ${ResolvedStyle}
+                .setCustomId(${button['id']})
+                .setLabel(${button['etiqueta']})
+                .setStyle(${button['estilo']})
                 ${ResolvedEmoji}
         `;
-    }
-
-    /**
-     * Resolves the 'id' property and maps it to setCustomId. Its presence is guaranteed by the
-     * Analyzer's `ValidateButtonsRule`.
-     * @private
-     */
-    private resolveCustomId (node: DisChordODBNode): string {
-        const customId = this.parent.visitIfExists(
-            this.parent.get(BDOVisitor).getODBProperty(node, 'id')
-        );
-
-        return `.setCustomId(${customId})`;
-    }
-
-    /**
-     * Resolves the 'etiqueta' property and maps it to setLabel. Its presence is guaranteed by the
-     * Analyzer's `ValidateButtonsRule`.
-     * @private
-     */
-    private resolveLabel (node: DisChordODBNode): string {
-        const label = this.parent.visitIfExists(
-            this.parent.get(BDOVisitor).getODBProperty(node, 'etiqueta')
-        );
-
-        return `.setLabel(${label})`;
-    }
-
-    /**
-     * Resolves the 'estilo' property using the ButtonStyles mapping. Its presence, and validity
-     * when it's a plain string literal, is already checked by the Analyzer's
-     * `ValidateButtonsRule` — the invalid-value check stays here too, since a
-     * non-literal `estilo` (a variable, an expression, ...) can't be resolved until generation.
-     * @private
-     * @throws {DisChordError} If the resolved style value isn't a recognized `ButtonStyles` entry.
-     */
-    private resolveStyle (node: DisChordODBNode): string {
-        const style = this.parent.visitIfExists(
-            this.parent.get(BDOVisitor).getODBProperty(node, 'estilo')
-        )!;
-
-        const SlicedStyle = style.slice(1, -1);
-
-        if (!(SlicedStyle in ButtonStyles)) throw new DisChordError({
-            phase: ErrorLevel.Compiler,
-            message: `Estilo inválido: '${SlicedStyle}'`,
-            location: node.location
-        }).format();
-
-        const ButtonStyle = ButtonStyles[SlicedStyle as keyof typeof ButtonStyles];
-
-        return `.setStyle(${ButtonStyle})`;
     }
 
     /**

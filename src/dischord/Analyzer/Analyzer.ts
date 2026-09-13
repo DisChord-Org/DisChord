@@ -3,6 +3,12 @@ import { DisChordNode, DisChordNodeType } from "../types";
 import { CompilationContext } from "../../cli/commands/CompileCommand";
 import { BindDisChordDeclarationsRule } from "./rules/BindDisChordDeclarationsRule";
 import { SingleWholeFileDeclarationRule } from "./rules/SingleWholeFileDeclarationRule";
+import { ValidateStartBotRule } from "./rules/ValidateStartBotRule";
+import { ValidateEventRule } from "./rules/ValidateEventRule";
+import { ValidateCommandRule } from "./rules/ValidateCommandRule";
+import { ValidateCollectorRule } from "./rules/ValidateCollectorRule";
+import { ValidateButtonsRule } from "./rules/ValidateButtonsRule";
+import { ValidateEmbedsRule } from "./rules/ValidateEmbedsRule";
 import { RequiresMessageHelperRule } from "./rules/RequiresMessageHelperRule";
 import { RequiresUserExtensionsRule } from "./rules/RequiresUserExtensionsRule";
 
@@ -22,6 +28,12 @@ export class DisChordAnalyzer extends Analyzer<DisChordNodeType, DisChordNode> {
         this.rules.push(new BindDisChordDeclarationsRule(context));
 
         this.rules.push(new SingleWholeFileDeclarationRule(context));
+        this.rules.push(new ValidateStartBotRule(context));
+        this.rules.push(new ValidateEventRule(context));
+        this.rules.push(new ValidateCommandRule(context));
+        this.rules.push(new ValidateCollectorRule(context));
+        this.rules.push(new ValidateButtonsRule(context));
+        this.rules.push(new ValidateEmbedsRule(context));
         this.rules.push(new RequiresMessageHelperRule(context));
         this.rules.push(new RequiresUserExtensionsRule(context));
     }

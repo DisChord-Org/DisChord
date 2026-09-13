@@ -1,8 +1,9 @@
-import { DisChordTypeMap } from "../../constants/mappings";
-import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordODBNode, DisChordTokenType, DiscordOptionType } from "../../../types";
+import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordODBNode, DisChordTokenType } from "../../../types";
 import { SubGenerator } from "../../../../chord/Generator/SubGenerator";
+import { BDOResolver } from "../../../../chord/Generator/BDOResolver";
 import { TokenTypeUnion } from "../../../../chord/types";
 import { BDOVisitor } from "../../../../chord/Generator/visitors/expressions/BDOVisitor";
+import { OptionSchema } from "../../constants/schemas";
 
 /**
  * Data structure representing the complete output of the command option processing phase.
@@ -15,7 +16,7 @@ export interface CommandOptionsOutput {
 }
 
 /**
- * Specialist generator responsible for parsing and translating DisChord command options 
+ * Specialist generator responsible for parsing and translating DisChord command options
  * into Discord-compatible API structures.
  */
 export default class CommandOptionVisitor extends SubGenerator<DisChordNodeType, DisChordNode> {
@@ -27,7 +28,7 @@ export default class CommandOptionVisitor extends SubGenerator<DisChordNodeType,
     public static triggerToken: TokenTypeUnion<DisChordTokenType> | undefined = undefined;
 
     /**
-     * Entry point for the CommandGenerator. Checks if the 'opciones' block exists 
+     * Entry point for the CommandGenerator. Checks if the 'opciones' block exists
      * within the provided ODB and initiates generation.
      * @param node The Object Definition Block (BDO) of the command.
      * @returns {CommandOptionsOutput} The 'options' and 'variables' constants as object.
@@ -47,29 +48,29 @@ export default class CommandOptionVisitor extends SubGenerator<DisChordNodeType,
     }
 
     /**
-     * Iterates through the options defined in the DisChord source and maps them
-     * to their respective Discord types. `node` is only ever reached here already confirmed to be
-     * a BDO by `visitIfNodeExists`; that each option names a recognized type is guaranteed by the
-     * Analyzer's `ValidateCommandRule`.
+     * Iterates through the options defined in the DisChord source and resolves each one against
+     * its own `OptionSchema` (the same schema the Analyzer's `ValidateCommandRule` already
+     * validated every entry against) — `node` is only ever reached here already confirmed to be a
+     * BDO by `visitIfNodeExists`.
      * @param node The AST node containing the options map.
      * @returns {string} A stringified array of Discord option objects.
      * @override
      */
     public visit (node: DisChordASTNode): string {
         const optionsNode = node as DisChordODBNode;
-        const optionNames = Object.keys(optionsNode.blocks);
+        const resolver = new BDOResolver<DisChordNodeType, DisChordNode>(expression => this.parent.visit(expression));
 
-        const results = optionNames.map(OptionName => {
-            const OptionNode = optionsNode.blocks[OptionName] as DisChordODBNode;
-            const OptionType = this.getOptionType(OptionNode);
-            const MappedOptionType = DisChordTypeMap[OptionType];
+        const results = Object.entries(optionsNode.blocks).map(([ optionName, optionNode ]) => {
+            const resolved = resolver.resolve(optionNode as DisChordODBNode, OptionSchema(optionName, optionNode as DisChordODBNode));
 
-            return this.generateOption({
-                name: OptionName,
-                node: OptionNode,
-                optionType: OptionType,
-                mappedOption: MappedOptionType
-            });
+            return `
+                {
+                    name: "${optionName}",
+                    description: ${resolved['descripcion']},
+                    required: ${resolved['requerido']},
+                    type: ${resolved['opcion']}
+                }
+            `;
         });
 
         return results.join(', ');
@@ -82,53 +83,10 @@ export default class CommandOptionVisitor extends SubGenerator<DisChordNodeType,
      */
     public generateVariables (node: DisChordASTNode): string {
         if (node.type != 'BDO') return '';
-        
+
         const optionNames = Object.keys(node.blocks);
         if (optionNames.length === 0) return '';
 
         return `const { ${optionNames.join(', ')} } = contexto.options;`;
-    }
-
-    /**
-     * Extracts and normalizes the option type from the ODB properties.
-     * @private
-     */
-    private getOptionType (node: DisChordODBNode): string {
-        const OptionType = this.parent.visitIfExists(
-            this.parent.get(BDOVisitor).getODBProperty(node, 'opcion')
-        );
-
-        return (OptionType ?? '').replace(/"/g, '').toLowerCase();
-    }
-
-    /**
-     * Generates the configuration object for a option-type Discord option.
-     * @private
-     */
-    private generateOption (options: {
-        name: string,
-        node: DisChordODBNode,
-        optionType: keyof typeof DisChordTypeMap,
-        mappedOption: DiscordOptionType
-    }): string {
-        const { name, node, optionType, mappedOption } = options;
-
-        // Both 'descripcion' and 'requerido' are guaranteed present by the Analyzer's
-        const description = this.parent.visitIfExists(
-            this.parent.get(BDOVisitor).getODBProperty(node, 'descripcion')
-        );
-
-        const required = this.parent.visitIfExists(
-            this.parent.get(BDOVisitor).getODBProperty(node, 'requerido')
-        );
-
-        return `
-            {
-                name: "${name}",
-                description: ${description},
-                required: ${required},
-                type: ${mappedOption}
-            }
-        `;
     }
 }

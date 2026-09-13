@@ -2,8 +2,10 @@ import { DisChordError, ErrorLevel } from "../../../../errors/ChordError";
 import { EmbedColors } from "../../constants/mappings";
 import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordODBNode, DisChordTokenType } from "../../../types";
 import { SubGenerator } from "../../../../chord/Generator/SubGenerator";
+import { BDOResolver } from "../../../../chord/Generator/BDOResolver";
 import { TokenType, TokenTypeUnion } from "../../../../chord/types";
 import { BDOVisitor } from "../../../../chord/Generator/visitors/expressions/BDOVisitor";
+import { EmbedSchema } from "../../constants/schemas";
 
 /**
  * Generator class responsible for generating code related to message embeds in DisChord.
@@ -39,7 +41,7 @@ export default class EmbedVisitor extends SubGenerator<DisChordNodeType, DisChor
         if (!embed) return '';
 
         const embedsCode = embed.type === TokenType.LISTA
-            ? (embed as unknown as { body: DisChordASTNode[] }).body.map(item => this.resolveEmbedExpression(item)).join(', ')
+            ? embed.body.map(item => this.resolveEmbedExpression(item)).join(', ')
             : this.resolveEmbedExpression(embed);
 
         return `, embeds: [ ${embedsCode} ] `;
@@ -70,6 +72,14 @@ export default class EmbedVisitor extends SubGenerator<DisChordNodeType, DisChor
      * Resolves a BDO's properties into the `.setX(...)` method chain alone, without the leading
      * `new Embed()`. Shared by `visit()` (the anonymous inline form) and `EmbedDeclarationVisitor`
      * (the named, reusable `embed <Nombre> { ... }` form), so both produce identical output.
+     *
+     * The simple pass-through fields (`titulo`, `descripcion`, `imagen`, `cartel`, and `color`'s
+     * raw value before its named-color lookup) come straight out of {@link EmbedSchema} via
+     * `BDOResolver` in one call — the same schema the Analyzer's `ValidateEmbedsRule` already
+     * validated `node` against (which also covers `campos`/`pie`'s own requirements, resolved here
+     * by hand since their output shape — a list of objects, a nested `setFooter` call — doesn't
+     * reduce to a single value the way the others do). `autor` (two sub-properties plus a default)
+     * and `hora` (presence alone, no value at all) don't fit that shape either.
      * @param node The AST node (must be of type 'BDO') containing embed definitions.
      * @throws Error if the node is not a BDO.
      * @returns The `.setX(...)` method chain, without the `new Embed()` prefix.
@@ -81,43 +91,42 @@ export default class EmbedVisitor extends SubGenerator<DisChordNodeType, DisChor
             location: node.location
         }).format();
 
-        const ResolvedColor = this.resolveColors(node);
-        const ResolvedTitle = this.resolveTitle(node);
+        const resolver = new BDOResolver<DisChordNodeType, DisChordNode>(expression => this.parent.visit(expression));
+        const fields = resolver.resolve(node, EmbedSchema);
+
+        const ResolvedColor = this.resolveColor(fields['color']);
+        const ResolvedTitle = fields['titulo'] ? `.setTitle(${fields['titulo']})` : '';
         const ResolvedAuthor = this.resolveAuthor(node);
-        const ResolvedDescription = this.resolveDescription(node);
-        const ResolvedTimestamp = this.resolveTimestamp(node);
-        const ResolvedImage = this.resolveImage(node);
-        const ResolvedThumbnail = this.resolveThumbnail(node);
+        const ResolvedDescription = fields['descripcion'] ? `.setDescription(${fields['descripcion']})` : '';
+        const ResolvedTimestamp = node.blocks['hora'] ? '.setTimestamp()' : '';
+        const ResolvedImage = fields['imagen'] ? `.setImage(${fields['imagen']})` : '';
+        const ResolvedThumbnail = fields['cartel'] ? `.setThumbnail(${fields['cartel']})` : '';
         const ResolvedFields = this.resolveFields(node);
         const ResolvedFooter = this.resolveFooter(node);
 
         return `
-                ${ResolvedColor}
-                ${ResolvedTitle}
-                ${ResolvedAuthor}
-                ${ResolvedDescription}
-                ${ResolvedTimestamp}
-                ${ResolvedImage}
-                ${ResolvedThumbnail}
-                ${ResolvedFields}
-                ${ResolvedFooter}
+            ${ResolvedColor}
+            ${ResolvedTitle}
+            ${ResolvedAuthor}
+            ${ResolvedDescription}
+            ${ResolvedTimestamp}
+            ${ResolvedImage}
+            ${ResolvedThumbnail}
+            ${ResolvedFields}
+            ${ResolvedFooter}
         `;
     }
 
     /**
-     * Resolves the 'color' property. A quoted string (`color "Verde"`) is looked up in the
-     * Spanish named-color mapping; anything else (a variable, a property access like
-     * `mencion.colorPerfil`, a hex/decimal literal, ...) is passed straight through to
-     * `setColor`, since Discord's color field already accepts a raw resolvable value and there's
-     * no fixed Spanish name to translate for an arbitrary expression.
+     * Resolves the already-visited 'color' value: a quoted string (`color "Verde"`) is looked up
+     * in the Spanish named-color mapping; anything else (a variable, a property access like
+     * `mencion.colorPerfil`, a hex/decimal literal, ...) is passed straight through to `setColor`,
+     * since Discord's color field already accepts a raw resolvable value and there's no fixed
+     * Spanish name to translate for an arbitrary expression.
      * @private
      * @returns The generated setColor call or an empty string if the color is not defined.
      */
-    private resolveColors (node: DisChordODBNode): string {
-        const color = this.parent.visitIfExists(
-            this.parent.get(BDOVisitor).getODBProperty(node, 'color')
-        );
-
+    private resolveColor (color: string): string {
         if (!color) return '';
 
         const isStringLiteral = color.startsWith('"') && color.endsWith('"');
@@ -128,21 +137,6 @@ export default class EmbedVisitor extends SubGenerator<DisChordNodeType, DisChor
         if (!Object.keys(EmbedColors).includes(RawColor)) return '';
 
         return `.setColor("${EmbedColors[RawColor]}")`;
-    }
-
-    /**
-     * Resolves the 'titulo' property.
-     * @private
-     * @returns The generated setTitle call or an empty string if the title is not defined.
-     */
-    private resolveTitle (node: DisChordODBNode): string {
-        const title = this.parent.visitIfExists(
-            this.parent.get(BDOVisitor).getODBProperty(node, 'titulo')
-        );
-
-        if (!title) return '';
-
-        return `.setTitle(${title})`;
     }
 
     /**
@@ -164,65 +158,6 @@ export default class EmbedVisitor extends SubGenerator<DisChordNodeType, DisChor
         );
 
         return `.setAuthor({ text: ${name}, iconUrl: ${iconUrl} })`
-    }
-
-    /**
-     * Resolves the 'descripcion' property.
-     * @private
-     * @returns The generated setDescription call or an empty string if the description is not defined.
-     */
-    private resolveDescription (node: DisChordODBNode): string {
-        const description = this.parent.visitIfExists(
-            this.parent.get(BDOVisitor).getODBProperty(node, 'descripcion')
-        );
-
-        if (!description) return '';
-        
-        return `.setDescription(${description})`;
-    }
-
-    /**
-     * Resolves the 'hora' property. 
-     * If present, triggers the setTimestamp() method.
-     * @private
-     * @return The generated setTimestamp call or an empty string if the timestamp is not defined.
-     */
-    private resolveTimestamp (node: DisChordODBNode): string {
-        const timestamp = this.parent.get(BDOVisitor).getODBProperty(node, 'hora');
-
-        if (!timestamp) return '';
-
-        return '.setTimestamp()';
-    }
-
-    /**
-     * Resolves the 'imagen' URL property.
-     * @private
-     * @returns The generated setImage call or an empty string if the image is not defined.
-     */
-    private resolveImage (node: DisChordODBNode): string {
-        const image = this.parent.visitIfExists(
-            this.parent.get(BDOVisitor).getODBProperty(node, 'imagen')
-        );
-
-        if (!image) return '';
-
-        return `.setImage(${image})`;
-    }
-
-    /**
-     * Resolves the 'cartel' URL property.
-     * @private
-     * @returns The generated setThumbnail call or an empty string if the thumbnail is not defined.
-     */
-    private resolveThumbnail (node: DisChordODBNode): string {
-        const thumbnail = this.parent.visitIfExists(
-            this.parent.get(BDOVisitor).getODBProperty(node, 'cartel')
-        );
-
-        if (!thumbnail) return '';
-
-        return `.setThumbnail(${thumbnail})`;
     }
 
     /**
