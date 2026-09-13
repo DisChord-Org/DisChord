@@ -1,5 +1,5 @@
 import { Location, Symbol, SymbolKind, CompilerMetadataKind } from "./types";
-import { VariableDataType } from "./DataType";
+import { DataType } from "./DataType";
 import { ChordError, ErrorLevel } from "../errors/ChordError";
 
 /**
@@ -78,19 +78,19 @@ export class SymbolTable {
     }
 
     /**
-     * Assigns the resolved `dataType` (e.g. `'texto'`, `'numero[]'`) to an already registered
-     * symbol, searching bottom-up from the current scope to the global scope just like
+     * Assigns the resolved `dataType` to an already registered symbol, searching bottom-up from
+     * the current scope to the global scope just like
      * {@link lookup}. Used by later analysis passes (e.g. the "Tipos" pass) that need the symbol
      * table fully populated by {@link register} before they can infer or validate a variable's
      * type — mutating the stored `Symbol` in place rather than re-registering it, since
      * `register` would reject the name as a duplicate.
      *
      * @param {string} name - The identifier name of the already registered symbol.
-     * @param {VariableDataType | undefined} dataType - The resolved type, or `undefined` if none
+     * @param {DataType | undefined} dataType - The resolved type, or `undefined` if none
      * could be determined.
      * @returns {void} Silently does nothing if no symbol with that name is currently in scope.
      */
-    public setDataType(name: string, dataType: VariableDataType | undefined): void {
+    public setDataType(name: string, dataType: DataType | undefined): void {
         for (let i = this.scopes.length - 1; i >= 0; i--) {
             const symbol = this.scopes[i].get(name);
 

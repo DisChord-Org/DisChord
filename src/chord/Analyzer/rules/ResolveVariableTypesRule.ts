@@ -1,7 +1,7 @@
 import { AnalysisRule } from "../AnalysisRule";
 import { walkAST } from "../walkAST";
 import { ASTNode, BaseNode, BinaryExpressionNode, IdentificatorNode, ListNode, LiteralNode, PrimitiveType, PrimitiveTypeName, TokenType, VariableNode } from "../../types";
-import { buildDataTypeName, parseDataTypeName, VariableDataType } from "../../DataType";
+import { arrayOf, DataType, DataTypeKind, formatDataType, isAssignable, primitive, unionOf } from "../../DataType";
 import { ChordError, ErrorLevel } from "../../../errors/ChordError";
 
 /**
@@ -17,9 +17,8 @@ import { ChordError, ErrorLevel } from "../../../errors/ChordError";
  *    already-resolved variable, arithmetic/comparison/logical binary expressions, and list
  *    literals, recursively combining element types into a union when they differ),
  *  - validated against an explicit `tipo` annotation, when both are present: the inferred type
- *    must be a *subset* of the declared one (`tipo (texto|numero)` accepts a `numero`-only value
- *    fine — the annotation only needs to cover what's actually possible), and array-ness must
- *    match exactly (`tipo texto` rejects `[1, 2]` regardless of element types), or
+ *    must be `isAssignable` to the declared one (`tipo (texto|numero)` accepts a `numero`-only
+ *    value fine — the annotation only needs to cover what's actually possible), or
  *  - left as-is (the explicit annotation, or `undefined`) when the initializer isn't inferrable at
  *    all — a function call, a property/index access, a component declaration (embed, comando,
  *    ...), or a function's return value (functions have no declared return type yet).
@@ -114,23 +113,20 @@ export class ResolveVariableTypesRule<T extends string, N extends BaseNode<T>> e
     /**
      * Resolves a variable's `dataType` by inferring it from the initializer (see
      * {@link inferDataType}) and, if an explicit `tipo` annotation is also present, checking the
-     * inferred type is compatible with it: array-ness must match exactly, and every inferred
-     * primitive kind must be a member of the declared union (the declared union may name more
-     * kinds than the initializer actually produces — `tipo (texto|numero)` happily accepts a
-     * `numero`-only value).
+     * inferred type is {@link isAssignable} to it.
      * @param {VariableNode<T, N>} variableNode - The variable declaration to resolve.
-     * @returns {VariableDataType | undefined} The resolved type, or `undefined` if neither an
-     * annotation nor an inferrable initializer is present.
-     * @throws {ChordError} If the explicit `tipo` annotation isn't compatible with the inferred
+     * @returns {DataType | undefined} The resolved type, or `undefined` if neither an annotation
+     * nor an inferrable initializer is present.
+     * @throws {ChordError} If the explicit `tipo` annotation isn't assignable from the inferred
      * type.
      * @private
      */
-    private resolveDataType (variableNode: VariableNode<T, N>): VariableDataType | undefined {
+    private resolveDataType (variableNode: VariableNode<T, N>): DataType | undefined {
         const inferredType = this.inferDataType(variableNode.value);
 
-        if (variableNode.dataType && inferredType && !this.isCompatible(variableNode.dataType, inferredType)) throw new ChordError({
+        if (variableNode.dataType && inferredType && !isAssignable(variableNode.dataType, inferredType)) throw new ChordError({
             phase: ErrorLevel.Analysis,
-            message: `La variable '${variableNode.id}' se declaró con tipo '${variableNode.dataType}' pero se le asignó un valor de tipo '${inferredType}'`,
+            message: `La variable '${variableNode.id}' se declaró con tipo '${formatDataType(variableNode.dataType)}' pero se le asignó un valor de tipo '${formatDataType(inferredType)}'`,
             location: variableNode.location
         }).format();
 
@@ -138,20 +134,7 @@ export class ResolveVariableTypesRule<T extends string, N extends BaseNode<T>> e
     }
 
     /**
-     * Whether every primitive kind `inferred` names is also named by `declared`, and both agree on
-     * array-ness — i.e. `inferred` describes a value `declared` is broad enough to accept.
-     * @private
-     */
-    private isCompatible (declared: VariableDataType, inferred: VariableDataType): boolean {
-        const declaredType = parseDataTypeName(declared);
-        const inferredType = parseDataTypeName(inferred);
-
-        return declaredType.isArray === inferredType.isArray
-            && inferredType.kinds.every(kind => declaredType.kinds.includes(kind));
-    }
-
-    /**
-     * Infers a `VariableDataType` from an expression, recursively:
+     * Infers a `DataType` from an expression, recursively:
      *  - a literal infers its scalar primitive directly;
      *  - an identifier infers whatever `dataType` the `SymbolTable` already resolved for it (only
      *    meaningful for a variable declared earlier in the same pass, or in an enclosing scope);
@@ -160,13 +143,14 @@ export class ResolveVariableTypesRule<T extends string, N extends BaseNode<T>> e
      * Any other expression shape (a call, a property/index access, a component declaration, ...)
      * can't be inferred yet.
      * @param {ASTNode<T, N>} value - The expression to inspect.
-     * @returns {VariableDataType | undefined} The inferred type, or `undefined` if this expression
-     * shape isn't inferrable.
+     * @returns {DataType | undefined} The inferred type, or `undefined` if this expression shape
+     * isn't inferrable.
      * @private
      */
-    private inferDataType (value: ASTNode<T, N>): VariableDataType | undefined {
+    private inferDataType (value: ASTNode<T, N>): DataType | undefined {
         if (value.type === TokenType.LITERAL) {
-            return this.primitiveTypeNames[typeof (value as LiteralNode<T>).value];
+            const kind = this.primitiveTypeNames[typeof (value as LiteralNode<T>).value];
+            return kind && primitive(kind);
         }
 
         if (value.type === TokenType.IDENTIFICADOR) {
@@ -191,29 +175,30 @@ export class ResolveVariableTypesRule<T extends string, N extends BaseNode<T>> e
      * comparisonOperators}'s own doc comments for why the rest don't need that.
      * @private
      */
-    private inferBinaryType (node: BinaryExpressionNode<T, N>): VariableDataType | undefined {
-        if (this.numericOperators.includes(node.operator)) return PrimitiveType.Numero;
-        if (this.comparisonOperators.includes(node.operator)) return PrimitiveType.Booleano;
+    private inferBinaryType (node: BinaryExpressionNode<T, N>): DataType | undefined {
+        if (this.numericOperators.includes(node.operator)) return primitive(PrimitiveType.Numero);
+        if (this.comparisonOperators.includes(node.operator)) return primitive(PrimitiveType.Booleano);
 
         if (node.operator === TokenType.Mas) {
             const left = this.inferDataType(node.left);
             const right = this.inferDataType(node.right);
             if (left === undefined || right === undefined) return undefined;
 
-            const leftKinds = parseDataTypeName(left).kinds;
-            const rightKinds = parseDataTypeName(right).kinds;
+            const textLike = primitive(PrimitiveType.Texto);
+            if (isAssignable(textLike, left) || isAssignable(textLike, right)) return textLike;
 
-            if (leftKinds.includes(PrimitiveType.Texto) || rightKinds.includes(PrimitiveType.Texto)) return PrimitiveType.Texto;
-            if ([ ...leftKinds, ...rightKinds ].every(kind => kind === PrimitiveType.Numero)) return PrimitiveType.Numero;
+            const numberLike = primitive(PrimitiveType.Numero);
+            if (isAssignable(numberLike, left) && isAssignable(numberLike, right)) return numberLike;
 
             return undefined;
         }
 
         if (node.operator === TokenType.Y || node.operator === TokenType.O) {
+            const boolLike = primitive(PrimitiveType.Booleano);
             const left = this.inferDataType(node.left);
             const right = this.inferDataType(node.right);
 
-            return left === PrimitiveType.Booleano && right === PrimitiveType.Booleano ? PrimitiveType.Booleano : undefined;
+            return left && right && isAssignable(boolLike, left) && isAssignable(boolLike, right) ? boolLike : undefined;
         }
 
         return undefined;
@@ -226,11 +211,11 @@ export class ResolveVariableTypesRule<T extends string, N extends BaseNode<T>> e
      * or a refusal to infer at all). Returns `undefined` for an empty list, one with any
      * non-inferrable element, or one with a nested list (arrays of arrays aren't supported).
      * @param {ListNode<T, N>} listNode - The list literal to inspect.
-     * @returns {VariableDataType | undefined} The inferred array type, or `undefined` if the list
-     * isn't inferrable.
+     * @returns {DataType | undefined} The inferred array type, or `undefined` if the list isn't
+     * inferrable.
      * @private
      */
-    private inferArrayType (listNode: ListNode<T, N>): VariableDataType | undefined {
+    private inferArrayType (listNode: ListNode<T, N>): DataType | undefined {
         if (listNode.body.length === 0) return undefined;
 
         const elementTypes = listNode.body.map(element => this.inferDataType(element));
@@ -238,13 +223,13 @@ export class ResolveVariableTypesRule<T extends string, N extends BaseNode<T>> e
 
         const kinds = new Set<PrimitiveTypeName>();
 
-        for (const elementType of elementTypes as VariableDataType[]) {
-            const { kinds: elementKinds, isArray } = parseDataTypeName(elementType);
-            if (isArray) return undefined;
+        for (const elementType of elementTypes as DataType[]) {
+            if (elementType.kind === DataTypeKind.Array) return undefined;
 
-            elementKinds.forEach(kind => kinds.add(kind));
+            if (elementType.kind === DataTypeKind.Primitive) kinds.add(elementType.name);
+            else elementType.members.forEach(member => kinds.add(member.name));
         }
 
-        return buildDataTypeName([ ...kinds ], true);
+        return arrayOf(unionOf([ ...kinds ]));
     }
 }

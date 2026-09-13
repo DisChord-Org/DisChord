@@ -39,7 +39,22 @@
         "column": 50
       }
     },
-    "dataType": "numero|texto[]",
+    "dataType": {
+      "kind": "array",
+      "element": {
+        "kind": "union",
+        "members": [
+          {
+            "kind": "primitive",
+            "name": "texto"
+          },
+          {
+            "kind": "primitive",
+            "name": "numero"
+          }
+        ]
+      }
+    },
     "location": {
       "line": 1,
       "column": 50
@@ -57,7 +72,19 @@
         "column": 31
       }
     },
-    "dataType": "numero|texto",
+    "dataType": {
+      "kind": "union",
+      "members": [
+        {
+          "kind": "primitive",
+          "name": "texto"
+        },
+        {
+          "kind": "primitive",
+          "name": "numero"
+        }
+      ]
+    },
     "location": {
       "line": 2,
       "column": 31

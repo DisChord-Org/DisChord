@@ -3,7 +3,7 @@
  * @description Core AST node type definitions and generic structural bindings for the DisChord compiler.
  */
 
-import { VariableDataType } from "./DataType";
+import { DataType } from "./DataType";
 
 /**
  * Valid variant token lookup strategies allowed within the parser stream inspection pipeline.
@@ -104,7 +104,7 @@ export interface Symbol {
      * `BindDeclarationsRule`) and filled in afterwards by Pass 3 (`ResolveVariableTypesRule`, via
      * `SymbolTable.setDataType`), once the whole file's declarations are visible.
      */
-    dataType?: VariableDataType;
+    dataType?: DataType;
 };
 
 /**
@@ -356,14 +356,14 @@ export interface VariableNode<T extends string, N extends BaseNode<T>> extends B
     /** Meta flag tracking class-bound context availability scopes */
     isStatic?: boolean;
     /**
-     * The type (e.g. `'texto'`, `'numero[]'`) explicitly written after `tipo` in this declaration
-     * — parsed and validated against the known primitive set (plus the optional trailing `[]`) by
-     * `VariableParser.parseTypeAnnotation`, but not yet cross-checked against `value` here (that
-     * happens later, in the Analyzer's `ResolveVariableTypesRule`). `undefined` when no `tipo`
-     * clause was written; the resulting `Symbol.dataType` may still end up populated in that case
-     * via inference from a literal (or homogeneous array literal) `value`.
+     * The type explicitly written after `tipo` in this declaration (e.g. `texto`, `numero[]`) —
+     * parsed and validated against the known primitive set (plus the optional union/array shape)
+     * by `VariableParser.parseTypeAnnotation`, but not yet cross-checked against `value` here
+     * (that happens later, in the Analyzer's `ResolveVariableTypesRule`, via `isAssignable`).
+     * `undefined` when no `tipo` clause was written; the resulting `Symbol.dataType` may still end
+     * up populated in that case via inference from `value`.
      */
-    dataType?: VariableDataType;
+    dataType?: DataType;
 }
 
 /**

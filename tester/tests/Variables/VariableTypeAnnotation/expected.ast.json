@@ -21,7 +21,10 @@
         "column": 27
       }
     },
-    "dataType": "texto",
+    "dataType": {
+      "kind": "primitive",
+      "name": "texto"
+    },
     "location": {
       "line": 1,
       "column": 27
@@ -39,7 +42,10 @@
         "column": 29
       }
     },
-    "dataType": "numero",
+    "dataType": {
+      "kind": "primitive",
+      "name": "numero"
+    },
     "location": {
       "line": 2,
       "column": 29

@@ -39,7 +39,13 @@
         "column": 51
       }
     },
-    "dataType": "texto[]",
+    "dataType": {
+      "kind": "array",
+      "element": {
+        "kind": "primitive",
+        "name": "texto"
+      }
+    },
     "location": {
       "line": 1,
       "column": 51

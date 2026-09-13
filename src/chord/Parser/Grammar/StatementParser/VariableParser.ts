@@ -1,5 +1,5 @@
 import { ASTNode, BaseNode, LiteralNode, PrimitiveType, PrimitiveTypeName, TokenType, TokenTypeUnion, VariableNode } from "../../../types";
-import { buildDataTypeName, VariableDataType } from "../../../DataType";
+import { arrayOf, DataType, formatDataType, unionOf } from "../../../DataType";
 import { Parser } from "../../Parser";
 import { SubParser } from "../../SubParser";
 import { ExpressionParser } from "../Expressions/ExpressionParser";
@@ -112,12 +112,12 @@ export class VariableParser<T extends string, N extends BaseNode<T>> extends Sub
      * `(string | number)[]`, not `string | number[]`, for the same shape). Parentheses are optional
      * everywhere else: a bare union with no `[]` (`tipo texto|numero`) is never ambiguous, and
      * neither is a single type with `[]` (`tipo texto[]`).
-     * @returns {VariableDataType | undefined} The annotated type (scalar, union, or array of
-     * either), or `undefined` if no `tipo` clause is present.
+     * @returns {DataType | undefined} The annotated type (scalar, union, or array of either), or
+     * `undefined` if no `tipo` clause is present.
      * @throws {ChordError} If a type name in the annotation isn't one of `this.primitiveTypeNames`,
      * or if a multi-member union is combined with `[]` without parentheses.
      */
-    private parseTypeAnnotation(): VariableDataType | undefined {
+    private parseTypeAnnotation(): DataType | undefined {
         if (!this.match(TokenType.TIPO)) return undefined;
 
         const hasParens = this.match(TokenType.L_PAREN);
@@ -127,20 +127,21 @@ export class VariableParser<T extends string, N extends BaseNode<T>> extends Sub
 
         if (hasParens) this.consume(TokenType.R_PAREN, `Se esperaba ')' para cerrar la unión de tipos`);
 
+        const scalarType = unionOf(kinds);
         const isArray = this.peek().type === TokenType.L_SQUARE && this.peek('next').type === TokenType.R_SQUARE;
 
-        if (isArray) {
-            if (kinds.length > 1 && !hasParens) throw new ChordError({
-                phase: ErrorLevel.Parser,
-                message: `Una unión de tipos usada como array debe ir entre paréntesis: (${kinds.join('|')})[]`,
-                location: this.peek().location
-            }).format();
+        if (!isArray) return scalarType;
 
-            this.consume(TokenType.L_SQUARE);
-            this.consume(TokenType.R_SQUARE);
-        }
+        if (kinds.length > 1 && !hasParens) throw new ChordError({
+            phase: ErrorLevel.Parser,
+            message: `Una unión de tipos usada como array debe ir entre paréntesis: (${formatDataType(scalarType)})[]`,
+            location: this.peek().location
+        }).format();
 
-        return buildDataTypeName(kinds, isArray);
+        this.consume(TokenType.L_SQUARE);
+        this.consume(TokenType.R_SQUARE);
+
+        return arrayOf(scalarType);
     }
 
     /**
