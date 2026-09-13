@@ -1,4 +1,5 @@
-import { ASTNode, BaseNode, LiteralNode, PrimitiveType, PrimitiveTypeName, TokenType, TokenTypeUnion, VariableDataType, VariableNode } from "../../../types";
+import { ASTNode, BaseNode, LiteralNode, PrimitiveType, PrimitiveTypeName, TokenType, TokenTypeUnion, VariableNode } from "../../../types";
+import { buildDataTypeName, VariableDataType } from "../../../DataType";
 import { Parser } from "../../Parser";
 import { SubParser } from "../../SubParser";
 import { ExpressionParser } from "../Expressions/ExpressionParser";
@@ -98,18 +99,58 @@ export class VariableParser<T extends string, N extends BaseNode<T>> extends Sub
      * *is* already reserved) and validated here, contextually, against the known primitive set —
      * exactly the same effect for this one grammatical slot, with zero blast radius elsewhere.
      *
-     * A trailing `[]` right after the type name (`tipo texto[]`, no space) marks a homogeneous
-     * array of that primitive instead of a bare scalar — reusing the same `L_SQUARE`/`R_SQUARE`
-     * tokens the array-literal grammar itself already registers (`PrimaryParser`), so again no new
-     * keyword or bracket token is introduced for this feature. Nesting (`texto[][]`) isn't
-     * supported: only one trailing `[]` is consumed.
-     * @returns {VariableDataType | undefined} The annotated type (scalar or array), or `undefined`
-     * if no `tipo` clause is present.
-     * @throws {ChordError} If the word after `tipo` isn't one of `this.primitiveTypeNames`.
+     * A trailing `[]` right after the type name or union (`tipo texto[]`, `tipo (texto|numero)[]`,
+     * no space) marks a homogeneous array of it instead of a bare scalar — reusing the same
+     * `L_SQUARE`/`R_SQUARE` tokens the array-literal grammar itself already registers
+     * (`PrimaryParser`), so again no new keyword or bracket token is introduced for this feature.
+     * Nesting (`texto[][]`) isn't supported: only one trailing `[]` is consumed.
+     *
+     * A union of two or more primitives (`tipo texto|numero`) must be wrapped in parentheses when
+     * combined with `[]` (`tipo (texto|numero)[]`) — `tipo texto|numero[]`, without parentheses,
+     * is rejected rather than guessed at, since it's genuinely ambiguous whether `[]` binds to just
+     * `numero` or to the whole union (exactly the reason TypeScript itself requires
+     * `(string | number)[]`, not `string | number[]`, for the same shape). Parentheses are optional
+     * everywhere else: a bare union with no `[]` (`tipo texto|numero`) is never ambiguous, and
+     * neither is a single type with `[]` (`tipo texto[]`).
+     * @returns {VariableDataType | undefined} The annotated type (scalar, union, or array of
+     * either), or `undefined` if no `tipo` clause is present.
+     * @throws {ChordError} If a type name in the annotation isn't one of `this.primitiveTypeNames`,
+     * or if a multi-member union is combined with `[]` without parentheses.
      */
     private parseTypeAnnotation(): VariableDataType | undefined {
         if (!this.match(TokenType.TIPO)) return undefined;
 
+        const hasParens = this.match(TokenType.L_PAREN);
+        const kinds: PrimitiveTypeName[] = [ this.parsePrimitiveKind() ];
+
+        while (this.match(TokenType.PIPE)) kinds.push(this.parsePrimitiveKind());
+
+        if (hasParens) this.consume(TokenType.R_PAREN, `Se esperaba ')' para cerrar la unión de tipos`);
+
+        const isArray = this.peek().type === TokenType.L_SQUARE && this.peek('next').type === TokenType.R_SQUARE;
+
+        if (isArray) {
+            if (kinds.length > 1 && !hasParens) throw new ChordError({
+                phase: ErrorLevel.Parser,
+                message: `Una unión de tipos usada como array debe ir entre paréntesis: (${kinds.join('|')})[]`,
+                location: this.peek().location
+            }).format();
+
+            this.consume(TokenType.L_SQUARE);
+            this.consume(TokenType.R_SQUARE);
+        }
+
+        return buildDataTypeName(kinds, isArray);
+    }
+
+    /**
+     * Parses and validates a single primitive type name within a `tipo` annotation (one member of
+     * a union, or the whole annotation when there's no union at all).
+     * @returns {PrimitiveTypeName} The validated primitive type name.
+     * @throws {ChordError} If the word isn't one of `this.primitiveTypeNames`.
+     * @private
+     */
+    private parsePrimitiveKind(): PrimitiveTypeName {
         const typeToken = this.consume(
             [ TokenType.IDENTIFICADOR, TokenType.Indefinido ],
             `Se esperaba un tipo válido después de 'tipo' (${this.primitiveTypeNames.join(', ')})`
@@ -124,14 +165,6 @@ export class VariableParser<T extends string, N extends BaseNode<T>> extends Sub
             location: typeToken.location
         }).format();
 
-        const primitiveType = typeName as PrimitiveTypeName;
-        const isArray = this.peek().type === TokenType.L_SQUARE && this.peek('next').type === TokenType.R_SQUARE;
-
-        if (!isArray) return primitiveType;
-
-        this.consume(TokenType.L_SQUARE);
-        this.consume(TokenType.R_SQUARE);
-
-        return `${primitiveType}[]`;
+        return typeName as PrimitiveTypeName;
     }
 }

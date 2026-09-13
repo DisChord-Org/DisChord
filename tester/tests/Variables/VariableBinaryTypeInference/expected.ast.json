@@ -1,0 +1,344 @@
+[
+  {
+    "type": "importar",
+    "identificators": [],
+    "path": "./lib/consoleRuntime.js",
+    "isDestructured": false,
+    "location": {
+      "line": 0,
+      "column": 0
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "a",
+    "value": {
+      "type": "Literal",
+      "value": 5,
+      "raw": "5",
+      "location": {
+        "line": 1,
+        "column": 10
+      }
+    },
+    "location": {
+      "line": 1,
+      "column": 10
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "b",
+    "value": {
+      "type": "IDENTIFICADOR",
+      "value": "a",
+      "location": {
+        "line": 2,
+        "column": 10
+      }
+    },
+    "location": {
+      "line": 2,
+      "column": 10
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "c",
+    "value": {
+      "type": "ExpresionBinaria",
+      "left": {
+        "type": "IDENTIFICADOR",
+        "value": "a",
+        "location": {
+          "line": 3,
+          "column": 10
+        }
+      },
+      "operator": "mas",
+      "right": {
+        "type": "Literal",
+        "value": 3,
+        "raw": "3",
+        "location": {
+          "line": 3,
+          "column": 16
+        }
+      },
+      "location": {
+        "line": 3,
+        "column": 16
+      }
+    },
+    "location": {
+      "line": 3,
+      "column": 16
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "d",
+    "value": {
+      "type": "ExpresionBinaria",
+      "left": {
+        "type": "Literal",
+        "value": "hola ",
+        "raw": "hola ",
+        "location": {
+          "line": 4,
+          "column": 10
+        }
+      },
+      "operator": "mas",
+      "right": {
+        "type": "Literal",
+        "value": "mundo",
+        "raw": "mundo",
+        "location": {
+          "line": 4,
+          "column": 22
+        }
+      },
+      "location": {
+        "line": 4,
+        "column": 22
+      }
+    },
+    "location": {
+      "line": 4,
+      "column": 22
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "e",
+    "value": {
+      "type": "ExpresionBinaria",
+      "left": {
+        "type": "IDENTIFICADOR",
+        "value": "a",
+        "location": {
+          "line": 5,
+          "column": 10
+        }
+      },
+      "operator": "mayor",
+      "right": {
+        "type": "Literal",
+        "value": 3,
+        "raw": "3",
+        "location": {
+          "line": 5,
+          "column": 18
+        }
+      },
+      "location": {
+        "line": 5,
+        "column": 18
+      }
+    },
+    "location": {
+      "line": 5,
+      "column": 18
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "f",
+    "value": {
+      "type": "ExpresionBinaria",
+      "left": {
+        "type": "Literal",
+        "value": true,
+        "raw": "verdadero",
+        "location": {
+          "line": 6,
+          "column": 10
+        }
+      },
+      "operator": "y",
+      "right": {
+        "type": "Literal",
+        "value": false,
+        "raw": "falso",
+        "location": {
+          "line": 6,
+          "column": 22
+        }
+      },
+      "location": {
+        "line": 6,
+        "column": 22
+      }
+    },
+    "location": {
+      "line": 6,
+      "column": 22
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 8,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 8,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "IDENTIFICADOR",
+        "value": "b",
+        "location": {
+          "line": 8,
+          "column": 18
+        }
+      }
+    ],
+    "location": {
+      "line": 8,
+      "column": 19
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 9,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 9,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "IDENTIFICADOR",
+        "value": "c",
+        "location": {
+          "line": 9,
+          "column": 18
+        }
+      }
+    ],
+    "location": {
+      "line": 9,
+      "column": 19
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 10,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 10,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "IDENTIFICADOR",
+        "value": "d",
+        "location": {
+          "line": 10,
+          "column": 18
+        }
+      }
+    ],
+    "location": {
+      "line": 10,
+      "column": 19
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 11,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 11,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "IDENTIFICADOR",
+        "value": "e",
+        "location": {
+          "line": 11,
+          "column": 18
+        }
+      }
+    ],
+    "location": {
+      "line": 11,
+      "column": 19
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 12,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 12,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "IDENTIFICADOR",
+        "value": "f",
+        "location": {
+          "line": 12,
+          "column": 18
+        }
+      }
+    ],
+    "location": {
+      "line": 12,
+      "column": 19
+    }
+  }
+]

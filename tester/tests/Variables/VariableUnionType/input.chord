@@ -1,0 +1,5 @@
+var nombre tipo (texto|numero)[] es [ "ether", 5 ]
+var edad tipo texto|numero es 5
+
+consola.imprimir(nombre)
+consola.imprimir(edad)

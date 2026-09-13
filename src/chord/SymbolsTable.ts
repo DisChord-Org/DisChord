@@ -1,4 +1,5 @@
-import { Location, Symbol, SymbolKind, CompilerMetadataKind, VariableDataType } from "./types";
+import { Location, Symbol, SymbolKind, CompilerMetadataKind } from "./types";
+import { VariableDataType } from "./DataType";
 import { ChordError, ErrorLevel } from "../errors/ChordError";
 
 /**

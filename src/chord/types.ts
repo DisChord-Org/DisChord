@@ -3,6 +3,8 @@
  * @description Core AST node type definitions and generic structural bindings for the DisChord compiler.
  */
 
+import { VariableDataType } from "./DataType";
+
 /**
  * Valid variant token lookup strategies allowed within the parser stream inspection pipeline.
  * Supports relative numerical index offsets or explicit descriptive semantic aliases.
@@ -78,21 +80,6 @@ export const PrimitiveType = {
  * compiler error everywhere a table is missing an entry — not a silent runtime mismatch.
  */
 export type PrimitiveTypeName = typeof PrimitiveType[keyof typeof PrimitiveType];
-
-/**
- * The name of a homogeneous array of some `PrimitiveTypeName`, written `<nombre>[]` after `tipo`
- * (e.g. `tipo texto[]`) — a template literal type derived directly from `PrimitiveTypeName`, so
- * `'texto[]'` type-checks but `'text[]'` or `'texto[][]'` (nested arrays aren't supported) don't,
- * with no separate registry to keep in sync by hand.
- */
-export type ArrayTypeName = `${PrimitiveTypeName}[]`;
-
-/**
- * Every `dataType` a `var` declaration can resolve to: a bare primitive, or a homogeneous array of
- * one. Used by both `VariableNode.dataType` (what was written/parsed) and `Symbol.dataType` (what
- * was ultimately resolved) — see each field's own doc comment for how their meanings differ.
- */
-export type VariableDataType = PrimitiveTypeName | ArrayTypeName;
 
 /**
  * Represents an entry in the compiler's Symbol Table.
@@ -199,6 +186,7 @@ export const TokenType = {
     COMA: 'COMA',
     DOS_PUNTOS: 'DOS_PUNTOS',
     SEPARADOR: 'SEPARADOR',
+    PIPE: 'PIPE',   // | (type union separator, e.g. `tipo (texto|numero)`)
 
     // Dynamic Literals & Identifiers
     IDENTIFICADOR: 'IDENTIFICADOR',

@@ -1,0 +1,12 @@
+var a es 5
+var b es a
+var c es a mas 3
+var d es "hola " mas "mundo"
+var e es a mayor 3
+var f es verdadero y falso
+
+consola.imprimir(b)
+consola.imprimir(c)
+consola.imprimir(d)
+consola.imprimir(e)
+consola.imprimir(f)

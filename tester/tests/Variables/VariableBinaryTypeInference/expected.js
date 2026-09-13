@@ -1,0 +1,12 @@
+import './lib/consoleRuntime.js';
+let a = 5;
+let b = a;
+let c = a + 3;
+let d = 'hola ' + 'mundo';
+let e = a > 3;
+let f = true && false;
+console.log(b);
+console.log(c);
+console.log(d);
+console.log(e);
+console.log(f);

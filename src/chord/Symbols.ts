@@ -21,6 +21,7 @@ export const SymbolTranslationMap: Record<string, typeof TokenType[keyof typeof 
     ".": TokenType.Punto,
     ":": TokenType.DOS_PUNTOS,
     ";": TokenType.SEPARADOR,
+    "|": TokenType.PIPE,
 
     "+": TokenType.Mas,
     "-": TokenType.Menos,
