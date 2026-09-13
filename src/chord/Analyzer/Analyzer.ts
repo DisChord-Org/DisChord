@@ -4,6 +4,7 @@ import { AnalysisRule } from "./AnalysisRule";
 import { BindImportsRule } from "./rules/BindImportsRule";
 import { BindDeclarationsRule } from "./rules/BindDeclarationsRule";
 import { ResolveVariableTypesRule } from "./rules/ResolveVariableTypesRule";
+import { ValidateCallTargetsRule } from "./rules/ValidateCallTargetsRule";
 import { RequiresConsoleRuntimeRule } from "./rules/RequiresConsoleRuntimeRule";
 
 /**
@@ -44,6 +45,7 @@ export class Analyzer<T extends string, N extends BaseNode<T>> {
 
         // Pass 3 ("Tipos"): reference/type validation against the now-complete symbol table.
         this.rules.push(new ResolveVariableTypesRule(context));
+        this.rules.push(new ValidateCallTargetsRule(context));
 
         // Lowering rules — independent of the 3-pass binding model above, they don't touch
         // SymbolTable at all.

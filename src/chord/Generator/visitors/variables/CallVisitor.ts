@@ -1,4 +1,3 @@
-import { ChordError, ErrorLevel } from "../../../../errors/ChordError";
 import { CallNode, BaseNode, TokenType, TokenTypeUnion, IdentificatorNode, AccessNode } from "../../../types";
 import { SubGenerator } from "../../SubGenerator";
 
@@ -20,9 +19,11 @@ export class CallVisitor<T extends string, N extends BaseNode<T>> extends SubGen
 
     /**
      * Resolves routine execution nodes by evaluating arguments and looking up async signatures.
+     * `node.object`'s shape (identifier, property access, or `super`) is guaranteed by the
+     * Analyzer's `ValidateCallTargetsRule`, which runs before generation ever starts — this visitor
+     * only has to translate, not validate.
      * @param {CallNode<T, N>} node - The target routine invocation syntax tree node.
      * @returns {string} The fully compiled JavaScript function call expression string.
-     * @throws {ChordError} If the invocation target lacks a resolvable value placeholder.
      * @public
      */
     public visit(node: CallNode<T, N>): string {
@@ -47,14 +48,8 @@ export class CallVisitor<T extends string, N extends BaseNode<T>> extends SubGen
             if (symbol?.metadata.isAsync) {
                 isAsyncCall = true;
             }
-        } else if (node.object.type === TokenType.Super) {
-            translation = this.parent.visit(node.object);
         } else {
-            throw new ChordError({
-                phase: ErrorLevel.Compiler,
-                message: "Se esperaba un identificador o un acceso de propiedad válido para ejecutar la llamada.",
-                location: node.location
-            }).format();
+            translation = this.parent.visit(node.object);
         }
 
         const awaitPrefix = isAsyncCall ? 'await ' : '';
