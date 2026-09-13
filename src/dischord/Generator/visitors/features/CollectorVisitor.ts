@@ -1,7 +1,9 @@
 import { CollectorNode, DisChordNode, DisChordNodeType, DisChordODBNode, DisChordTokenType } from "../../../types";
 import { SubGenerator } from "./../../../../chord/Generator/SubGenerator";
+import { BDOResolver } from "../../../../chord/Generator/BDOResolver";
 import { TokenTypeUnion } from "../../../../chord/types";
 import { BDOVisitor } from "../../../../chord/Generator/visitors/expressions/BDOVisitor";
+import { CollectorSchema } from "../../constants/schemas";
 
 /** Config for the Collector Generator param. */
 interface CollectorConfig {
@@ -45,20 +47,20 @@ export default class CollectorVisitor extends SubGenerator<DisChordNodeType, Dis
         const variable = this.parent.visit(node.variable);
         const bdo = this.parent.get(BDOVisitor);
 
-        const filterCallback = this.parent.visitIfExists(bdo.getODBProperty(node.methods, 'filtro'));
-        const filter = filterCallback
-            ? `(interaccion) => ${filterCallback}(interaccion, cliente, contexto)`
+        const resolver = new BDOResolver<DisChordNodeType, DisChordNode>(expression => this.parent.visit(expression));
+        const properties = resolver.resolve(node.methods, CollectorSchema);
+
+        const filter = properties['filtro']
+            ? `(interaccion) => ${properties['filtro']}(interaccion, cliente, contexto)`
             : '(interaccion) => interaccion.user.id === contexto.author.id';
 
-        const idle = this.parent.visitIfExists(bdo.getODBProperty(node.methods, 'tiempo')) || '60000';
+        const idle = properties['tiempo'];
 
-        const onStopCallback = this.parent.visitIfExists(bdo.getODBProperty(node.methods, 'alFinalizar'));
-        const onStop = onStopCallback
-            ? `(razon, reiniciar) => ${onStopCallback}(razon, reiniciar, cliente, contexto)`
+        const onStop = properties['alFinalizar']
+            ? `(razon, reiniciar) => ${properties['alFinalizar']}(razon, reiniciar, cliente, contexto)`
             : undefined;
 
         // 'alPulsarId', when present, is already guaranteed to be a BDO by the Analyzer's
-        // `ValidateCollectorRule`.
         const body = this.visitPulseIdMethod(bdo.getODBProperty(node.methods, 'alPulsarId') as DisChordODBNode | undefined);
 
         return this.generateCollector({ variable, filter, idle, onStop }, body);

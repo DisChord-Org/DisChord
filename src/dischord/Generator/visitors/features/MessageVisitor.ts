@@ -1,9 +1,10 @@
 import { DisChordNode, DisChordNodeType, DisChordTokenType, MessageNode } from "../../../types";
 import { SubGenerator } from "../../../../chord/Generator/SubGenerator";
+import { BDOResolver } from "../../../../chord/Generator/BDOResolver";
 import { CompilerMetadataKind, TokenTypeUnion } from "../../../../chord/types";
-import { BDOVisitor } from "../../../../chord/Generator/visitors/expressions/BDOVisitor";
 import ButtonVisitor from "../components/ButtonVisitor";
 import EmbedVisitor from "../components/EmbedVisitor";
+import { MessageSchema } from "../../constants/schemas";
 
 /**
  * Generator class responsible for generating code related to message creation and interactions in DisChord.
@@ -22,13 +23,8 @@ export default class MessageVisitor extends SubGenerator<DisChordNodeType, DisCh
      * @returns The generated code for message body.
      */
     visit (node: MessageNode): string {
-        const channel: string | undefined = this.parent.visitIfExists(
-            this.parent.get(BDOVisitor).getODBProperty(node.object, 'canal')
-        );
-
-        const content: string | undefined = this.parent.visitIfExists(
-            this.parent.get(BDOVisitor).getODBProperty(node.object, 'contenido')
-        );
+        const resolver = new BDOResolver<DisChordNodeType, DisChordNode>(expression => this.parent.visit(expression));
+        const properties = resolver.resolve(node.object, MessageSchema);
 
         const Button = this.parent.get(ButtonVisitor).visitIfNodeExists(node.object);
         const Embed = this.parent.get(EmbedVisitor).visitIfNodeExists(node.object);
@@ -36,6 +32,6 @@ export default class MessageVisitor extends SubGenerator<DisChordNodeType, DisCh
         const ComponentsData = [ Button, Embed ].join('');
         const interactionContext: string = this.parent.context.symbolTable.getMetadata<boolean>(CompilerMetadataKind.IsInteraction)? 'interaccion' : 'null';
 
-        return `await createMessage(${channel}, { content: ${content} ${ComponentsData} }, ${interactionContext}, ctx)`;
+        return `await createMessage(${properties['canal']}, { content: ${properties['contenido']} ${ComponentsData} }, ${interactionContext}, ctx)`;
     }
 }

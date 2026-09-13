@@ -5,7 +5,7 @@ import { SubGenerator } from "../../../../chord/Generator/SubGenerator";
 import { BDOResolver } from "../../../../chord/Generator/BDOResolver";
 import { TokenType, TokenTypeUnion } from "../../../../chord/types";
 import { BDOVisitor } from "../../../../chord/Generator/visitors/expressions/BDOVisitor";
-import { EmbedSchema } from "../../constants/schemas";
+import { EmbedFieldSchema, EmbedFooterSchema, EmbedSchema } from "../../constants/schemas";
 
 /**
  * Generator class responsible for generating code related to message embeds in DisChord.
@@ -162,8 +162,8 @@ export default class EmbedVisitor extends SubGenerator<DisChordNodeType, DisChor
 
     /**
      * Resolves the 'campos' list.
-     * Iterates through a list of BDOs to generate an array of field objects. That every field is
-     * a BDO naming a 'titulo' is guaranteed by the Analyzer's `ValidateEmbedsRule`.
+     * Iterates through a list of BDOs, resolving each one against {@link EmbedFieldSchema} — the
+     * same schema the Analyzer's `ValidateEmbedsRule` already validated every entry against.
      * @private
      * @returns The generated addFields call with an array of field objects or an empty string if no fields are defined.
      */
@@ -172,30 +172,20 @@ export default class EmbedVisitor extends SubGenerator<DisChordNodeType, DisChor
 
         if (!fields || fields.type != 'Lista' || fields.body.length < 1) return '';
 
+        const resolver = new BDOResolver<DisChordNodeType, DisChordNode>(expression => this.parent.visit(expression));
+
         const FieldsResolved: string = fields.body.map((Field: DisChordASTNode): string => {
-            const fieldBDO = Field as DisChordODBNode;
+            const field = resolver.resolve(Field as DisChordODBNode, EmbedFieldSchema);
 
-            const name = this.parent.visitIfExists(
-                this.parent.get(BDOVisitor).getODBProperty(fieldBDO, 'titulo')
-            );
-
-            const value = this.parent.visitIfExists(
-                this.parent.get(BDOVisitor).getODBProperty(fieldBDO, 'descripcion')
-            ) || '';
-
-            const inline = this.parent.visitIfExists(
-                this.parent.get(BDOVisitor).getODBProperty(fieldBDO, 'lineado')
-            ) || 'false';
-
-            return `{ name: ${name}, value: ${value}, inline: ${inline} }`;
+            return `{ name: ${field['titulo']}, value: ${field['descripcion']}, inline: ${field['lineado']} }`;
         }).join(',\n');
 
         return `.addFields(${FieldsResolved})`;
     }
 
     /**
-     * Resolves the 'pie' block, requiring a 'texto' property. That 'texto' is present when 'pie'
-     * is defined is guaranteed by the Analyzer's `ValidateEmbedsRule`.
+     * Resolves the 'pie' block against {@link EmbedFooterSchema} — the same schema the Analyzer's
+     * `ValidateEmbedsRule` already validated it against (requiring a 'texto' property).
      * @private
      * @returns The generated setFooter call with the specified text and optional iconUrl, or an empty string if 'pie' is not defined.
      */
@@ -204,14 +194,9 @@ export default class EmbedVisitor extends SubGenerator<DisChordNodeType, DisChor
 
         if (!footer || footer.type != 'BDO') return '';
 
-        const text = this.parent.visitIfExists(
-            this.parent.get(BDOVisitor).getODBProperty(footer, 'texto')
-        );
+        const resolver = new BDOResolver<DisChordNodeType, DisChordNode>(expression => this.parent.visit(expression));
+        const resolved = resolver.resolve(footer, EmbedFooterSchema);
 
-        const iconUrl = this.parent.visitIfExists(
-            this.parent.get(BDOVisitor).getODBProperty(footer, 'icono')
-        );
-
-        return `.setFooter({ text: ${text}, iconUrl: ${iconUrl} })`;
+        return `.setFooter({ text: ${resolved['texto']}, iconUrl: ${resolved['icono']} })`;
     }
 }

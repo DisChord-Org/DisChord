@@ -61,7 +61,7 @@ export default class ButtonVisitor extends SubGenerator<DisChordNodeType, DisCho
 
         const resolver = new BDOResolver<DisChordNodeType, DisChordNode>(expression => this.parent.visit(expression));
         const button = resolver.resolve(node, ButtonSchema);
-        const ResolvedEmoji = this.resolveEmoji(node);
+        const ResolvedEmoji = button['emoji'] ? `.setEmoji(${button['emoji']})` : '';
 
         return `
             new Button()
@@ -70,20 +70,5 @@ export default class ButtonVisitor extends SubGenerator<DisChordNodeType, DisCho
                 .setStyle(${button['estilo']})
                 ${ResolvedEmoji}
         `;
-    }
-
-    /**
-     * Resolves the optional 'emoji' property.
-     * @private
-     * @returns The generated setEmoji call or an empty string if not defined.
-     */
-    private resolveEmoji (node: DisChordODBNode): string {
-        const emoji = this.parent.visitIfExists(
-            this.parent.get(BDOVisitor).getODBProperty(node, 'emoji')
-        );
-
-        if (!emoji) return '';
-
-        return `.setEmoji(${emoji})`;
     }
 }

@@ -93,7 +93,10 @@ export const CommandSchema: BDOSchema<DisChordNodeType, DisChordNode> = {
     ]
 };
 
-/** A button's own properties: `id`, `etiqueta`, `estilo` (and the optional `emoji`, unvalidated). */
+/**
+ * A button's own properties: `id`, `etiqueta`, `estilo` are required; the optional `emoji`
+ * defaults to `JSFallback.Empty` so `ButtonVisitor` can omit `.setEmoji(...)` entirely when absent.
+ */
 export const ButtonSchema: BDOSchema<DisChordNodeType, DisChordNode> = {
     fields: [
         { key: 'id', kind: FieldKind.Value, required: true, missingMessage: `Se debe especificar una id en el botón` },
@@ -105,21 +108,26 @@ export const ButtonSchema: BDOSchema<DisChordNodeType, DisChordNode> = {
             required: true,
             missingMessage: `Se debe especificar el estilo en el botón`,
             unknownMessage: value => `Estilo inválido: '${value}'`
-        }
+        },
+        { key: 'emoji', kind: FieldKind.Value, default: JSFallback.Empty }
     ]
 };
 
-/** An embed field entry (`campos [ { titulo "..." descripcion "..." } ]`). */
-const EmbedFieldSchema: BDOSchema<DisChordNodeType, DisChordNode> = {
+/** An embed field entry (`campos [ { titulo "..." descripcion "..." lineado verdadero } ]`). Only
+ * `titulo` is required; `descripcion`/`lineado` are plain optional pass-throughs. */
+export const EmbedFieldSchema: BDOSchema<DisChordNodeType, DisChordNode> = {
     fields: [
-        { key: 'titulo', kind: FieldKind.Value, required: true, missingMessage: `El campo requiere una propiedad 'titulo'` }
+        { key: 'titulo', kind: FieldKind.Value, required: true, missingMessage: `El campo requiere una propiedad 'titulo'` },
+        { key: 'descripcion', kind: FieldKind.Value, default: JSFallback.Empty },
+        { key: 'lineado', kind: FieldKind.Value, default: JSFallback.False }
     ]
 };
 
-/** An embed's footer (`pie { texto "..." }`). */
-const EmbedFooterSchema: BDOSchema<DisChordNodeType, DisChordNode> = {
+/** An embed's footer (`pie { texto "..." icono "..." }`). Only `texto` is required. */
+export const EmbedFooterSchema: BDOSchema<DisChordNodeType, DisChordNode> = {
     fields: [
-        { key: 'texto', kind: FieldKind.Value, required: true, missingMessage: `El pie de página requiere una propiedad 'texto'` }
+        { key: 'texto', kind: FieldKind.Value, required: true, missingMessage: `El pie de página requiere una propiedad 'texto'` },
+        { key: 'icono', kind: FieldKind.Value, default: JSFallback.Undefined }
     ]
 };
 
@@ -168,5 +176,31 @@ export const StartBotSchema: BDOSchema<DisChordNodeType, DisChordNode> = {
             mapping: intentsMap,
             unknownMessage: value => `Intención desconocida: ${value}`
         }
+    ]
+};
+
+/**
+ * A `recolector`'s own behavioral properties — each a reference to a `funcion` declared elsewhere,
+ * never inline code (see `CollectorVisitor`'s own doc comment). None are required or
+ * closed-vocabulary, so nothing here needs Analyzer validation; `CollectorVisitor` is this
+ * schema's only reader.
+ */
+export const CollectorSchema: BDOSchema<DisChordNodeType, DisChordNode> = {
+    fields: [
+        { key: 'filtro', kind: FieldKind.Value, default: JSFallback.Empty },
+        { key: 'tiempo', kind: FieldKind.Value, default: '60000' },
+        { key: 'alFinalizar', kind: FieldKind.Value, default: JSFallback.Empty }
+    ]
+};
+
+/**
+ * An `enviar mensaje { ... }`'s own plain properties (`boton`/`embed` are resolved separately, by
+ * `ButtonVisitor`/`EmbedVisitor`). Neither is required, so nothing here needs Analyzer validation;
+ * `MessageVisitor` is this schema's only reader.
+ */
+export const MessageSchema: BDOSchema<DisChordNodeType, DisChordNode> = {
+    fields: [
+        { key: 'canal', kind: FieldKind.Value, default: JSFallback.Undefined },
+        { key: 'contenido', kind: FieldKind.Value, default: JSFallback.Undefined }
     ]
 };
