@@ -1,7 +1,7 @@
 import { AnalysisRule } from "../AnalysisRule";
 import { walkAST } from "../walkAST";
 import { ASTNode, BaseNode, BinaryExpressionNode, IdentificatorNode, ListNode, LiteralNode, PrimitiveType, PrimitiveTypeName, TokenType, VariableNode } from "../../types";
-import { arrayOf, DataType, DataTypeKind, formatDataType, isAssignable, primitive, unionOf } from "../../DataType";
+import { arrayOf, DataType, DataTypeKind, formatDataType, isAssignable, primitive, TupleDataType, unionOf } from "../../DataType";
 import { ChordError, ErrorLevel } from "../../../errors/ChordError";
 
 /**
@@ -111,17 +111,28 @@ export class ResolveVariableTypesRule<T extends string, N extends BaseNode<T>> e
     }
 
     /**
-     * Resolves a variable's `dataType` by inferring it from the initializer (see
-     * {@link inferDataType}) and, if an explicit `tipo` annotation is also present, checking the
-     * inferred type is {@link isAssignable} to it.
+     * Resolves a variable's `dataType`. When the annotation is a tuple and the initializer is a
+     * list literal, validates it contextually, position by position (see
+     * {@link validateTupleLiteral}) — a tuple can never be reached through {@link inferDataType}
+     * (only an explicit `tipo [...]` produces one), so the general "infer, then check
+     * `isAssignable`" path below could never validate one correctly: inferring `[1, "a"]` on its
+     * own always yields a flat union array (`numero|texto[]`), not a tuple, and a tuple is never
+     * `isAssignable` from an array regardless of elements. Otherwise, infers the type from the
+     * initializer (see {@link inferDataType}) and, if an explicit `tipo` annotation is also
+     * present, checks the inferred type is {@link isAssignable} to it.
      * @param {VariableNode<T, N>} variableNode - The variable declaration to resolve.
      * @returns {DataType | undefined} The resolved type, or `undefined` if neither an annotation
      * nor an inferrable initializer is present.
      * @throws {ChordError} If the explicit `tipo` annotation isn't assignable from the inferred
-     * type.
+     * type (or, for a tuple, if the list literal's shape doesn't match it).
      * @private
      */
     private resolveDataType (variableNode: VariableNode<T, N>): DataType | undefined {
+        if (variableNode.dataType?.kind === DataTypeKind.Tuple && variableNode.value.type === TokenType.LISTA) {
+            this.validateTupleLiteral(variableNode.id, variableNode.dataType, variableNode.value as ListNode<T, N>);
+            return variableNode.dataType;
+        }
+
         const inferredType = this.inferDataType(variableNode.value);
 
         if (variableNode.dataType && inferredType && !isAssignable(variableNode.dataType, inferredType)) throw new ChordError({
@@ -209,7 +220,10 @@ export class ResolveVariableTypesRule<T extends string, N extends BaseNode<T>> e
      * (recursively — an element can itself be an identifier, a binary expression, ...), and their
      * primitive kinds are unioned together (`[1, "dos"]` -> `numero|texto[]`, not just `numero[]`
      * or a refusal to infer at all). Returns `undefined` for an empty list, one with any
-     * non-inferrable element, or one with a nested list (arrays of arrays aren't supported).
+     * non-inferrable element, or one with a nested list/tuple element (an array's inferred type is
+     * always a flat union of primitives — a tuple type is only ever produced by an explicit `tipo
+     * [...]` annotation, never inferred, matching how TypeScript itself never infers a tuple type
+     * from a plain array literal either).
      * @param {ListNode<T, N>} listNode - The list literal to inspect.
      * @returns {DataType | undefined} The inferred array type, or `undefined` if the list isn't
      * inferrable.
@@ -224,12 +238,46 @@ export class ResolveVariableTypesRule<T extends string, N extends BaseNode<T>> e
         const kinds = new Set<PrimitiveTypeName>();
 
         for (const elementType of elementTypes as DataType[]) {
-            if (elementType.kind === DataTypeKind.Array) return undefined;
+            if (elementType.kind === DataTypeKind.Array || elementType.kind === DataTypeKind.Tuple) return undefined;
 
             if (elementType.kind === DataTypeKind.Primitive) kinds.add(elementType.name);
             else elementType.members.forEach(member => kinds.add(member.name));
         }
 
         return arrayOf(unionOf([ ...kinds ]));
+    }
+
+    /**
+     * Validates a list literal against a declared tuple type, position by position: the list must
+     * have exactly as many elements as the tuple, and each element's inferred type must be
+     * {@link isAssignable} to that position's declared type. Unlike {@link inferArrayType} (which
+     * infers a single flat union for the whole list), this is *contextual*: it only runs when a
+     * `tipo [...]` annotation is already known, the same way TypeScript's checker only checks an
+     * array literal against a tuple shape when one is already expected from context, rather than
+     * ever inferring a tuple type from the literal on its own.
+     * @param {string} id - The variable's name, for the error message.
+     * @param {TupleDataType} tupleType - The declared tuple type.
+     * @param {ListNode<T, N>} listNode - The list literal assigned to the variable.
+     * @throws {ChordError} If the list's length doesn't match the tuple's, or an element's
+     * inferred type isn't assignable to its declared position.
+     * @private
+     */
+    private validateTupleLiteral (id: string, tupleType: TupleDataType, listNode: ListNode<T, N>): void {
+        if (listNode.body.length !== tupleType.elements.length) throw new ChordError({
+            phase: ErrorLevel.Analysis,
+            message: `La variable '${id}' se declaró como tupla de ${tupleType.elements.length} elemento(s) pero se le asignó una lista de ${listNode.body.length}`,
+            location: listNode.location
+        }).format();
+
+        listNode.body.forEach((element, index) => {
+            const elementType = this.inferDataType(element);
+            const expectedType = tupleType.elements[index];
+
+            if (elementType && !isAssignable(expectedType, elementType)) throw new ChordError({
+                phase: ErrorLevel.Analysis,
+                message: `La variable '${id}' se declaró con tipo '${formatDataType(tupleType)}', pero el elemento ${index} es de tipo '${formatDataType(elementType)}', se esperaba '${formatDataType(expectedType)}'`,
+                location: element.location
+            }).format();
+        });
     }
 }

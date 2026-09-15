@@ -1,0 +1,7 @@
+var par tipo [texto, numero] es [ "ether", 5 ]
+var mixto tipo [texto|numero, booleano] es [ 5, verdadero ]
+var lista tipo [texto, numero][] es [ [ "a", 1 ], [ "b", 2 ] ]
+
+consola.imprimir(par)
+consola.imprimir(mixto)
+consola.imprimir(lista)

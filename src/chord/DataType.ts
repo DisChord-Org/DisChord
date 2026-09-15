@@ -33,7 +33,8 @@ import { PrimitiveTypeName } from "./types";
 export const DataTypeKind = {
     Primitive: 'primitive',
     Union: 'union',
-    Array: 'array'
+    Array: 'array',
+    Tuple: 'tuple'
 } as const;
 
 /** Unified type extracting values from the `DataTypeKind` constant registry. */
@@ -63,13 +64,25 @@ export interface ArrayDataType {
 }
 
 /**
+ * A fixed-length, position-specific sequence of types, e.g. `[texto, numero]` — unlike
+ * `ArrayDataType`, order and length both carry meaning: element 0 must always be the first
+ * position's type, element 1 the second's, and a value with a different number of elements simply
+ * doesn't match, however its own elements are typed.
+ */
+export interface TupleDataType {
+    kind: typeof DataTypeKind.Tuple;
+    elements: DataType[];
+}
+
+/**
  * The structural model for everything a `var` declaration's `dataType` can be. Used by both
  * `VariableNode.dataType` (what was written/parsed) and `Symbol.dataType` (what was ultimately
  * resolved) — see each field's own doc comment for how their meanings differ. Always built via
- * {@link primitive}/{@link unionOf}/{@link arrayOf}, compared via {@link isAssignable}, and
- * rendered to text via {@link formatDataType} — never hand-assembled or string-compared directly.
+ * {@link primitive}/{@link unionOf}/{@link arrayOf}/{@link tupleOf}, compared via
+ * {@link isAssignable}, and rendered to text via {@link formatDataType} — never hand-assembled or
+ * string-compared directly.
  */
-export type DataType = PrimitiveDataType | UnionDataType | ArrayDataType;
+export type DataType = PrimitiveDataType | UnionDataType | ArrayDataType | TupleDataType;
 
 /** Builds a bare primitive `DataType`. */
 export function primitive (name: PrimitiveTypeName): PrimitiveDataType {
@@ -99,6 +112,11 @@ export function arrayOf (element: DataType): ArrayDataType {
     return { kind: DataTypeKind.Array, element };
 }
 
+/** Builds a fixed-length, position-specific tuple `DataType` of `elements`, in order. */
+export function tupleOf (elements: DataType[]): TupleDataType {
+    return { kind: DataTypeKind.Tuple, elements };
+}
+
 /**
  * Whether a value of type `source` can be used where `target` is expected — the same "is this
  * assignable" question TypeScript's checker answers structurally, recursively, over its own `Type`
@@ -108,8 +126,12 @@ export function arrayOf (element: DataType): ArrayDataType {
  *  - if `target` is a union, a (non-union) source is assignable as long as *some* member of
  *    `target` accepts it;
  *  - two primitives are assignable only when they name the same kind;
- *  - two arrays are assignable when their element types are (recursively).
- * Anything else (a primitive vs. an array, ...) isn't assignable.
+ *  - two arrays are assignable when their element types are (recursively);
+ *  - two tuples are assignable when they have the same length and every position is
+ *    (recursively).
+ * Anything else (a primitive vs. an array, a tuple vs. an array, ...) isn't assignable — a tuple's
+ * fixed shape is never interchangeable with an array's open-ended one, even when every element
+ * type happens to match.
  * @param {DataType} target - The declared/expected type.
  * @param {DataType} source - The type being checked against it.
  * @returns {boolean} Whether `source` is assignable to `target`.
@@ -120,6 +142,11 @@ export function isAssignable (target: DataType, source: DataType): boolean {
 
     if (target.kind === DataTypeKind.Primitive && source.kind === DataTypeKind.Primitive) return target.name === source.name;
     if (target.kind === DataTypeKind.Array && source.kind === DataTypeKind.Array) return isAssignable(target.element, source.element);
+
+    if (target.kind === DataTypeKind.Tuple && source.kind === DataTypeKind.Tuple) {
+        return target.elements.length === source.elements.length
+            && target.elements.every((element, index) => isAssignable(element, source.elements[index]));
+    }
 
     return false;
 }
@@ -138,5 +165,6 @@ export function formatDataType (dataType: DataType): string {
         case DataTypeKind.Primitive: return dataType.name;
         case DataTypeKind.Union: return dataType.members.map(member => member.name).sort().join('|');
         case DataTypeKind.Array: return `${formatDataType(dataType.element)}[]`;
+        case DataTypeKind.Tuple: return `[${dataType.elements.map(formatDataType).join(', ')}]`;
     }
 }

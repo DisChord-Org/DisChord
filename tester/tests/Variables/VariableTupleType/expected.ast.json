@@ -1,0 +1,303 @@
+[
+  {
+    "type": "importar",
+    "identificators": [],
+    "path": "./lib/consoleRuntime.js",
+    "isDestructured": false,
+    "location": {
+      "line": 0,
+      "column": 0
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "par",
+    "value": {
+      "type": "Lista",
+      "body": [
+        {
+          "type": "Literal",
+          "value": "ether",
+          "raw": "ether",
+          "location": {
+            "line": 1,
+            "column": 35
+          }
+        },
+        {
+          "type": "Literal",
+          "value": 5,
+          "raw": "5",
+          "location": {
+            "line": 1,
+            "column": 44
+          }
+        }
+      ],
+      "location": {
+        "line": 1,
+        "column": 46
+      }
+    },
+    "dataType": {
+      "kind": "tuple",
+      "elements": [
+        {
+          "kind": "primitive",
+          "name": "texto"
+        },
+        {
+          "kind": "primitive",
+          "name": "numero"
+        }
+      ]
+    },
+    "location": {
+      "line": 1,
+      "column": 46
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "mixto",
+    "value": {
+      "type": "Lista",
+      "body": [
+        {
+          "type": "Literal",
+          "value": 5,
+          "raw": "5",
+          "location": {
+            "line": 2,
+            "column": 46
+          }
+        },
+        {
+          "type": "Literal",
+          "value": true,
+          "raw": "verdadero",
+          "location": {
+            "line": 2,
+            "column": 49
+          }
+        }
+      ],
+      "location": {
+        "line": 2,
+        "column": 59
+      }
+    },
+    "dataType": {
+      "kind": "tuple",
+      "elements": [
+        {
+          "kind": "union",
+          "members": [
+            {
+              "kind": "primitive",
+              "name": "texto"
+            },
+            {
+              "kind": "primitive",
+              "name": "numero"
+            }
+          ]
+        },
+        {
+          "kind": "primitive",
+          "name": "booleano"
+        }
+      ]
+    },
+    "location": {
+      "line": 2,
+      "column": 59
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "lista",
+    "value": {
+      "type": "Lista",
+      "body": [
+        {
+          "type": "Lista",
+          "body": [
+            {
+              "type": "Literal",
+              "value": "a",
+              "raw": "a",
+              "location": {
+                "line": 3,
+                "column": 41
+              }
+            },
+            {
+              "type": "Literal",
+              "value": 1,
+              "raw": "1",
+              "location": {
+                "line": 3,
+                "column": 46
+              }
+            }
+          ],
+          "location": {
+            "line": 3,
+            "column": 48
+          }
+        },
+        {
+          "type": "Lista",
+          "body": [
+            {
+              "type": "Literal",
+              "value": "b",
+              "raw": "b",
+              "location": {
+                "line": 3,
+                "column": 53
+              }
+            },
+            {
+              "type": "Literal",
+              "value": 2,
+              "raw": "2",
+              "location": {
+                "line": 3,
+                "column": 58
+              }
+            }
+          ],
+          "location": {
+            "line": 3,
+            "column": 60
+          }
+        }
+      ],
+      "location": {
+        "line": 3,
+        "column": 62
+      }
+    },
+    "dataType": {
+      "kind": "array",
+      "element": {
+        "kind": "tuple",
+        "elements": [
+          {
+            "kind": "primitive",
+            "name": "texto"
+          },
+          {
+            "kind": "primitive",
+            "name": "numero"
+          }
+        ]
+      }
+    },
+    "location": {
+      "line": 3,
+      "column": 62
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 5,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 5,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "IDENTIFICADOR",
+        "value": "par",
+        "location": {
+          "line": 5,
+          "column": 18
+        }
+      }
+    ],
+    "location": {
+      "line": 5,
+      "column": 21
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 6,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 6,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "IDENTIFICADOR",
+        "value": "mixto",
+        "location": {
+          "line": 6,
+          "column": 18
+        }
+      }
+    ],
+    "location": {
+      "line": 6,
+      "column": 23
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 7,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 7,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "IDENTIFICADOR",
+        "value": "lista",
+        "location": {
+          "line": 7,
+          "column": 18
+        }
+      }
+    ],
+    "location": {
+      "line": 7,
+      "column": 23
+    }
+  }
+]
