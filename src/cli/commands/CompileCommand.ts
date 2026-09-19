@@ -38,6 +38,9 @@ export class CompileCommand {
     /** Resolved filesystem and output paths configuration */
     private config: CompilerConfig | null = null;
 
+    /** Absolute paths of every file written during the current compile, see `removeStaleOutputs` */
+    private emitted = new Set<string>();
+
     /**
      * Executes the main compilation process and optionally runs the generated code.
      * 
@@ -47,6 +50,7 @@ export class CompileCommand {
      */
     public async execute(rawPath: string, options: GlobalCLIOptions): Promise<void> {
         this.config = FileSystem.configure(rawPath);
+        this.emitted.clear();
         FileSystem.assertEsmProject(this.config.projectRoot);
 
         const files = FileSystem.getChordFiles(this.config.inputPath, this.config.isDirectory);
@@ -61,6 +65,8 @@ export class CompileCommand {
         }
 
         await this.writeExtraFiles(extraFiles);
+
+        this.removeStaleOutputs(options);
 
         if (options.run) await this.executeTarget();
     }
@@ -120,6 +126,7 @@ export class CompileCommand {
 
         const outputPath = path.join(targetDir, `${fileName}.js`);
         await Prettifier.savePrettified(outputPath, output);
+        this.emitted.add(outputPath);
 
         return context.extraFiles;
     }
@@ -141,7 +148,28 @@ export class CompileCommand {
             }
 
             await Prettifier.savePrettified(absolutePath, content);
+            this.emitted.add(absolutePath);
         }
+    }
+
+    /**
+     * Deletes files left in `dist/` by a previous compile whose `.chord` source has since been
+     * removed. Runs only after every file compiled successfully, so a
+     * failed compile never deletes anything, and only for a full project compile writing to the
+     * default `dist/`: a standalone script or a custom `--out-dir` doesn't know the complete set
+     * of files that belong there.
+     *
+     * @private
+     * @param {GlobalCLIOptions} options - CLI flags; `outDir` disables cleanup.
+     */
+    private removeStaleOutputs(options: GlobalCLIOptions): void {
+        if (!this.config || options.outDir) return;
+        if (!FileSystem.isProjectCompile(this.config.inputPath, this.config.isDirectory)) return;
+
+        const { projectRoot, distDir } = this.config;
+        const removed = FileSystem.removeStaleOutput(distDir, this.emitted);
+
+        removed.forEach(file => console.log(`Eliminado (sin fuente): ${path.relative(projectRoot, file)}`));
     }
 
     /**

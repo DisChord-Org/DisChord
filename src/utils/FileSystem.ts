@@ -80,13 +80,24 @@ export class FileSystem {
      */
     static getChordFiles(dir: string, isDirectory: boolean): string[] {
         if (!isDirectory) {
-            const parentDir = path.dirname(dir);
-            if (path.basename(parentDir) === 'src') return FileSystem.getChordFiles(parentDir, true);
+            if (FileSystem.isProjectCompile(dir, false)) return FileSystem.getChordFiles(path.dirname(dir), true);
 
             return [dir];
         }
 
         return FileSystem.walkChordFiles(dir);
+    }
+
+    /**
+     * Whether compiling `inputPath` covers the project's whole `src/` — a directory, or a single
+     * file directly inside `src/` (see `getChordFiles`) — as opposed to one standalone script.
+     * Only a full project compile knows every file that belongs in `dist/`, so it is the only
+     * kind that may delete stale output.
+     * @param inputPath - The entry path.
+     * @param isDirectory - Boolean flag of the input type.
+     */
+    static isProjectCompile(inputPath: string, isDirectory: boolean): boolean {
+        return isDirectory || path.basename(path.dirname(inputPath)) === 'src';
     }
 
     /**
@@ -109,6 +120,38 @@ export class FileSystem {
 
             return [];
         });
+    }
+
+    /**
+     * Deletes every `.js` under `distDir` that isn't in `keep` (files a previous compile left
+     * behind whose `.chord` source has since been removed), then removes the directories that
+     * leaves empty. Only `.js` is considered, since that's the only thing the compiler emits.
+     * @param distDir - Absolute path of the output directory.
+     * @param keep - Absolute paths of every file written by the current compile.
+     * @returns Absolute paths of the files that were removed.
+     */
+    static removeStaleOutput(distDir: string, keep: Set<string>): string[] {
+        if (!fs.existsSync(distDir)) return [];
+
+        const removed: string[] = [];
+
+        const walk = (dir: string): void => {
+            for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+                const entryPath = path.join(dir, entry.name);
+
+                if (entry.isDirectory()) walk(entryPath);
+                else if (entry.name.endsWith('.js') && !keep.has(entryPath)) {
+                    fs.rmSync(entryPath);
+                    removed.push(entryPath);
+                }
+            }
+
+            if (dir !== distDir && fs.readdirSync(dir).length === 0) fs.rmdirSync(dir);
+        };
+
+        walk(distDir);
+
+        return removed;
     }
 
     /**
