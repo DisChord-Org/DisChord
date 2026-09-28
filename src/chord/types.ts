@@ -54,8 +54,8 @@ export enum CompilerMetadataKind {
 /**
  * Registry of every primitive type name DisChord's compile-time type system currently recognizes,
  * in Spanish, for a `var` declaration's `dataType` — either written explicitly after `tipo`
- * (`VariableParser`) or inferred from a literal initializer's native JS type
- * (`ResolveVariableTypesRule`). Also the closed vocabulary the runtime `tipo x` unary operator
+ * (`TypeAnnotationParser`) or inferred from a literal initializer's native JS type
+ * (`LiteralInferrer`, via `TypeInferrer`). Also the closed vocabulary the runtime `tipo x` unary operator
  * (`UnaryVisitor`) translates a JS `typeof` result into. Named exactly like `TokenType` above (a
  * `const` registry plus a type extracting its values) instead of writing the bare Spanish words
  * inline wherever they're needed, for the same reason `TokenType.Var` is preferred over a raw
@@ -72,12 +72,11 @@ export const PrimitiveType = {
 } as const;
 
 /**
- * Unified type extracting values from the `PrimitiveType` constant registry — each consumer
- * (`UnaryVisitor.primitiveTypeNames`, `ResolveVariableTypesRule.primitiveTypeNames`,
- * `VariableParser.primitiveTypeNames`) keeps its own small lookup table typed against this union
- * (mirroring `BinaryExpressionVisitor.operatorsMap`) rather than sharing one runtime map/file, but
- * they all type-check against this single source, so adding or renaming a primitive here is a
- * compiler error everywhere a table is missing an entry — not a silent runtime mismatch.
+ * Unified type extracting values from the `PrimitiveType` constant registry. Every consumer that
+ * needs the full set of primitive names (`TypeAnnotationParser.primitiveTypeNames`) or a mapping
+ * keyed by them (`PrimitiveDataType.typeofMap`, in `DataType.ts`) is typed against this union, so
+ * adding or renaming a primitive here is a compiler error anywhere a table is missing an entry —
+ * not a silent runtime mismatch.
  */
 export type PrimitiveTypeName = typeof PrimitiveType[keyof typeof PrimitiveType];
 
@@ -358,8 +357,8 @@ export interface VariableNode<T extends string, N extends BaseNode<T>> extends B
     /**
      * The type explicitly written after `tipo` in this declaration (e.g. `texto`, `numero[]`) —
      * parsed and validated against the known primitive set (plus the optional union/array shape)
-     * by `VariableParser.parseTypeAnnotation`, but not yet cross-checked against `value` here
-     * (that happens later, in the Analyzer's `ResolveVariableTypesRule`, via `isAssignable`).
+     * by `TypeAnnotationParser.parse`, but not yet cross-checked against `value` here (that
+     * happens later, in the Analyzer's `ResolveVariableTypesRule`, via `DataType.isAssignableFrom`).
      * `undefined` when no `tipo` clause was written; the resulting `Symbol.dataType` may still end
      * up populated in that case via inference from `value`.
      */
