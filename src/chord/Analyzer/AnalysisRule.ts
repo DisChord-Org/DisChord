@@ -30,3 +30,14 @@ export abstract class AnalysisRule<T extends string, N extends BaseNode<T>> {
      */
     abstract check (nodes: ASTNode<T, N>[]): void;
 }
+
+/**
+ * Static blueprint for `AnalysisRule` implementations — mirrors `SubParserClass`/`SubGeneratorClass`
+ * so `Analyzer`'s static rule registry can be declared the same declarative way as `Parser.SubParsers`
+ * / `Generator.SubGenerators`, instead of each rule being constructed imperatively.
+ * @template {string} T - Extensible token type string vector.
+ * @template {BaseNode<T>} N - Extensible abstract syntax tree node layout.
+ */
+export interface AnalysisRuleClass<T extends string, N extends BaseNode<T>> {
+    new (context: CompilationContext<T>): AnalysisRule<T, N>;
+}

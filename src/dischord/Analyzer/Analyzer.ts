@@ -1,6 +1,6 @@
 import { Analyzer } from "../../chord/Analyzer/Analyzer";
+import { AnalysisRuleClass } from "../../chord/Analyzer/AnalysisRule";
 import { DisChordNode, DisChordNodeType } from "../types";
-import { CompilationContext } from "../../cli/commands/CompileCommand";
 import { BindDisChordDeclarationsRule } from "./rules/BindDisChordDeclarationsRule";
 import { SingleWholeFileDeclarationRule } from "./rules/SingleWholeFileDeclarationRule";
 import { ValidateStartBotRule } from "./rules/ValidateStartBotRule";
@@ -14,27 +14,40 @@ import { RequiresUserExtensionsRule } from "./rules/RequiresUserExtensionsRule";
 
 /**
  * DisChord's semantic analysis rules, run over a file's complete AST between parsing and
- * generation. See `Analyzer` for the general phase contract — this subclass calls `super(context)`
- * to keep chord's own rules, then pushes its own on top; the actual checks live in `./rules`.
+ * generation. See `Analyzer` for the general phase contract — this subclass overrides
+ * {@link registerRules} to keep chord's own rules (via `super.registerRules()`) and push its own
+ * on top, mirroring `DisChordParser.registerInstances`/`DisChordGenerator`'s own static-registry
+ * override; the actual checks live in `./rules`.
  */
 export class DisChordAnalyzer extends Analyzer<DisChordNodeType, DisChordNode> {
     /**
-     * @param context - The active compilation context (symbol table, project paths, etc.).
+     * DisChord's own analysis rules, in the order they must run after chord's.
+     * @private
+     * @static
      */
-    constructor (context: CompilationContext<DisChordNodeType>) {
-        super(context);
-
+    private static readonly DisChordRules: AnalysisRuleClass<DisChordNodeType, DisChordNode>[] = [
         // Pass 2 ("Variables"), dischord's own declarations: comando/evento/encender bot.
-        this.rules.push(new BindDisChordDeclarationsRule(context));
+        BindDisChordDeclarationsRule,
 
-        this.rules.push(new SingleWholeFileDeclarationRule(context));
-        this.rules.push(new ValidateStartBotRule(context));
-        this.rules.push(new ValidateEventRule(context));
-        this.rules.push(new ValidateCommandRule(context));
-        this.rules.push(new ValidateCollectorRule(context));
-        this.rules.push(new ValidateButtonsRule(context));
-        this.rules.push(new ValidateEmbedsRule(context));
-        this.rules.push(new RequiresMessageHelperRule(context));
-        this.rules.push(new RequiresUserExtensionsRule(context));
+        SingleWholeFileDeclarationRule,
+        ValidateStartBotRule,
+        ValidateEventRule,
+        ValidateCommandRule,
+        ValidateCollectorRule,
+        ValidateButtonsRule,
+        ValidateEmbedsRule,
+        RequiresMessageHelperRule,
+        RequiresUserExtensionsRule
+    ];
+
+    /**
+     * @override
+     */
+    protected override registerRules (): void {
+        super.registerRules();
+
+        DisChordAnalyzer.DisChordRules.forEach(RuleClass => {
+            this.rules.push(new RuleClass(this.context));
+        });
     }
 }
