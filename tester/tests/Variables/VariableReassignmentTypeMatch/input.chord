@@ -1,0 +1,4 @@
+var x tipo numero es 1
+x es 2
+
+consola.imprimir("x is " mas x)

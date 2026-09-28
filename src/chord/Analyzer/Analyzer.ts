@@ -4,6 +4,7 @@ import { AnalysisRule, AnalysisRuleClass } from "./AnalysisRule";
 import { BindImportsRule } from "./rules/BindImportsRule";
 import { BindDeclarationsRule } from "./rules/BindDeclarationsRule";
 import { ResolveVariableTypesRule } from "./rules/ResolveVariableTypesRule";
+import { ValidateAssignmentTypesRule } from "./rules/ValidateAssignmentTypesRule";
 import { ValidateCallTargetsRule } from "./rules/ValidateCallTargetsRule";
 import { RequiresConsoleRuntimeRule } from "./rules/RequiresConsoleRuntimeRule";
 
@@ -49,6 +50,10 @@ export class Analyzer<T extends string, N extends BaseNode<T>> {
         // Pass 3 ("Tipos"): reference/type validation against the now-complete symbol table.
         ResolveVariableTypesRule,
         ValidateCallTargetsRule,
+
+        // Reassignment validation — needs every variable's dataType already resolved by Pass 3
+        // above, so it runs after it rather than as part of it.
+        ValidateAssignmentTypesRule,
 
         // Lowering rules — independent of the 3-pass binding model above, they don't touch
         // SymbolTable at all.
