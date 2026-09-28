@@ -1,5 +1,5 @@
 import { BaseNode, PrimitiveType, PrimitiveTypeName, TokenType } from "../../../types";
-import { arrayOf, DataType, formatDataType, tupleOf, unionOf } from "../../../DataType";
+import { ArrayDataType, DataType, TupleDataType, UnionDataType } from "../../../DataType";
 import { Parser } from "../../Parser";
 import { ChordError, ErrorLevel } from "../../../../errors/ChordError";
 
@@ -64,8 +64,8 @@ export class TypeAnnotationParser<T extends string, N extends BaseNode<T>> {
         if (!this.parser.match(TokenType.TIPO)) return undefined;
 
         if (this.parser.peek().type === TokenType.L_SQUARE) {
-            const tupleType = tupleOf(this.parseTupleElements());
-            return this.matchArraySuffix() ? arrayOf(tupleType) : tupleType;
+            const tupleType = TupleDataType.of(this.parseTupleElements());
+            return this.matchArraySuffix() ? ArrayDataType.of(tupleType) : tupleType;
         }
 
         const { type: scalarType, hasParens, kindCount } = this.parseUnionType();
@@ -74,12 +74,12 @@ export class TypeAnnotationParser<T extends string, N extends BaseNode<T>> {
 
         if (kindCount > 1 && !hasParens) throw new ChordError({
             phase: ErrorLevel.Parser,
-            message: `Una unión de tipos usada como array debe ir entre paréntesis: (${formatDataType(scalarType)})[]`,
+            message: `Una unión de tipos usada como array debe ir entre paréntesis: (${scalarType.format()})[]`,
             location: this.parser.peek().location
         }).format();
 
         this.consumeArraySuffix();
-        return arrayOf(scalarType);
+        return ArrayDataType.of(scalarType);
     }
 
     /**
@@ -126,7 +126,7 @@ export class TypeAnnotationParser<T extends string, N extends BaseNode<T>> {
 
         if (hasParens) this.parser.consume(TokenType.R_PAREN, `Se esperaba ')' para cerrar la unión de tipos`);
 
-        return { type: unionOf(kinds), hasParens, kindCount: kinds.length };
+        return { type: UnionDataType.of(kinds), hasParens, kindCount: kinds.length };
     }
 
     /** Whether the upcoming tokens are an empty `[]` array-suffix, without consuming them. */

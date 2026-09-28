@@ -1,7 +1,7 @@
 import { AnalysisRule } from "../AnalysisRule";
 import { walkAST } from "../walkAST";
 import { ASTNode, BaseNode, BinaryExpressionNode, IdentificatorNode, ListNode, LiteralNode, PrimitiveType, PrimitiveTypeName, TokenType, VariableNode } from "../../types";
-import { arrayOf, DataType, DataTypeKind, formatDataType, isAssignable, primitive, TupleDataType, unionOf } from "../../DataType";
+import { ArrayDataType, DataType, PrimitiveDataType, TupleDataType, UnionDataType } from "../../DataType";
 import { ChordError, ErrorLevel } from "../../../errors/ChordError";
 
 /**
@@ -128,16 +128,16 @@ export class ResolveVariableTypesRule<T extends string, N extends BaseNode<T>> e
      * @private
      */
     private resolveDataType (variableNode: VariableNode<T, N>): DataType | undefined {
-        if (variableNode.dataType?.kind === DataTypeKind.Tuple && variableNode.value.type === TokenType.LISTA) {
+        if (variableNode.dataType instanceof TupleDataType && variableNode.value.type === TokenType.LISTA) {
             this.validateTupleLiteral(variableNode.id, variableNode.dataType, variableNode.value as ListNode<T, N>);
             return variableNode.dataType;
         }
 
         const inferredType = this.inferDataType(variableNode.value);
 
-        if (variableNode.dataType && inferredType && !isAssignable(variableNode.dataType, inferredType)) throw new ChordError({
+        if (variableNode.dataType && inferredType && !variableNode.dataType.isAssignableFrom(inferredType)) throw new ChordError({
             phase: ErrorLevel.Analysis,
-            message: `La variable '${variableNode.id}' se declaró con tipo '${formatDataType(variableNode.dataType)}' pero se le asignó un valor de tipo '${formatDataType(inferredType)}'`,
+            message: `La variable '${variableNode.id}' se declaró con tipo '${variableNode.dataType.format()}' pero se le asignó un valor de tipo '${inferredType.format()}'`,
             location: variableNode.location
         }).format();
 
@@ -161,7 +161,7 @@ export class ResolveVariableTypesRule<T extends string, N extends BaseNode<T>> e
     private inferDataType (value: ASTNode<T, N>): DataType | undefined {
         if (value.type === TokenType.LITERAL) {
             const kind = this.primitiveTypeNames[typeof (value as LiteralNode<T>).value];
-            return kind && primitive(kind);
+            return kind && PrimitiveDataType.of(kind);
         }
 
         if (value.type === TokenType.IDENTIFICADOR) {
@@ -187,29 +187,29 @@ export class ResolveVariableTypesRule<T extends string, N extends BaseNode<T>> e
      * @private
      */
     private inferBinaryType (node: BinaryExpressionNode<T, N>): DataType | undefined {
-        if (this.numericOperators.includes(node.operator)) return primitive(PrimitiveType.Numero);
-        if (this.comparisonOperators.includes(node.operator)) return primitive(PrimitiveType.Booleano);
+        if (this.numericOperators.includes(node.operator)) return PrimitiveDataType.of(PrimitiveType.Numero);
+        if (this.comparisonOperators.includes(node.operator)) return PrimitiveDataType.of(PrimitiveType.Booleano);
 
         if (node.operator === TokenType.Mas) {
             const left = this.inferDataType(node.left);
             const right = this.inferDataType(node.right);
             if (left === undefined || right === undefined) return undefined;
 
-            const textLike = primitive(PrimitiveType.Texto);
-            if (isAssignable(textLike, left) || isAssignable(textLike, right)) return textLike;
+            const textLike = PrimitiveDataType.of(PrimitiveType.Texto);
+            if (textLike.isAssignableFrom(left) || textLike.isAssignableFrom(right)) return textLike;
 
-            const numberLike = primitive(PrimitiveType.Numero);
-            if (isAssignable(numberLike, left) && isAssignable(numberLike, right)) return numberLike;
+            const numberLike = PrimitiveDataType.of(PrimitiveType.Numero);
+            if (numberLike.isAssignableFrom(left) && numberLike.isAssignableFrom(right)) return numberLike;
 
             return undefined;
         }
 
         if (node.operator === TokenType.Y || node.operator === TokenType.O) {
-            const boolLike = primitive(PrimitiveType.Booleano);
+            const boolLike = PrimitiveDataType.of(PrimitiveType.Booleano);
             const left = this.inferDataType(node.left);
             const right = this.inferDataType(node.right);
 
-            return left && right && isAssignable(boolLike, left) && isAssignable(boolLike, right) ? boolLike : undefined;
+            return left && right && boolLike.isAssignableFrom(left) && boolLike.isAssignableFrom(right) ? boolLike : undefined;
         }
 
         return undefined;
@@ -238,13 +238,13 @@ export class ResolveVariableTypesRule<T extends string, N extends BaseNode<T>> e
         const kinds = new Set<PrimitiveTypeName>();
 
         for (const elementType of elementTypes as DataType[]) {
-            if (elementType.kind === DataTypeKind.Array || elementType.kind === DataTypeKind.Tuple) return undefined;
+            if (elementType instanceof ArrayDataType || elementType instanceof TupleDataType) return undefined;
 
-            if (elementType.kind === DataTypeKind.Primitive) kinds.add(elementType.name);
-            else elementType.members.forEach(member => kinds.add(member.name));
+            if (elementType instanceof PrimitiveDataType) kinds.add(elementType.name);
+            else if (elementType instanceof UnionDataType) elementType.members.forEach(member => kinds.add(member.name));
         }
 
-        return arrayOf(unionOf([ ...kinds ]));
+        return ArrayDataType.of(UnionDataType.of([ ...kinds ]));
     }
 
     /**
@@ -273,9 +273,9 @@ export class ResolveVariableTypesRule<T extends string, N extends BaseNode<T>> e
             const elementType = this.inferDataType(element);
             const expectedType = tupleType.elements[index];
 
-            if (elementType && !isAssignable(expectedType, elementType)) throw new ChordError({
+            if (elementType && !expectedType.isAssignableFrom(elementType)) throw new ChordError({
                 phase: ErrorLevel.Analysis,
-                message: `La variable '${id}' se declaró con tipo '${formatDataType(tupleType)}', pero el elemento ${index} es de tipo '${formatDataType(elementType)}', se esperaba '${formatDataType(expectedType)}'`,
+                message: `La variable '${id}' se declaró con tipo '${tupleType.format()}', pero el elemento ${index} es de tipo '${elementType.format()}', se esperaba '${expectedType.format()}'`,
                 location: element.location
             }).format();
         });

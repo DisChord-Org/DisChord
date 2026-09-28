@@ -3,20 +3,19 @@ import { PrimitiveTypeName } from "./types";
 /**
  * @file DataType.ts
  * @description `DataType` — the structural model behind a `var` declaration's `dataType` — mirrors
- * how TypeScript's own checker represents types internally: a real tagged-union *tree* (a
- * primitive, a union of members, an array of an element type, ...), never a pre-serialized string.
- * The string you see in an error message (`'numero|texto[]'`) is a *display* produced by
- * {@link formatDataType} at the end, the same way TS's checker only turns a `Type` into text when
- * it needs to show one to a user — comparison and compatibility (`isAssignable`) always work on
- * the tree itself, structurally, never on that string.
+ * how TypeScript's own checker represents types internally: a real class hierarchy (a primitive, a
+ * union of members, an array of an element type, ...), never a pre-serialized string. The string
+ * you see in an error message (`'numero|texto[]'`) is a *display* produced by a node's own
+ * {@link DataType.format}, the same way TS's checker only turns a `Type` into text when it needs to
+ * show one to a user — comparison and compatibility ({@link DataType.isAssignableFrom}) always work
+ * on the tree itself, structurally, never on that string.
  *
- * The previous version of this file encoded everything as a single sorted-and-joined string
- * (`'numero|texto[]'`) and re-parsed it whenever a caller needed to inspect it — which worked for
- * "one level of union, one level of array" but had no way to grow: a tuple, for instance, needs
- * *order-preserving*, *position-specific* types, which doesn't fit a sorted/deduplicated string at
- * all, and would have needed its own incompatible encoding bolted on next to this one. A tree has
- * no such ceiling — a new shape is a new variant of the same `DataType` union, nothing else
- * changes.
+ * Each shape (primitive/union/array/tuple) is its own subclass of the abstract {@link DataType},
+ * owning its own model, construction, assignability and formatting together — the same reason
+ * `SubParser`/`SubGenerator`/`AnalysisRule` are one class per grammar rule/node kind/check instead
+ * of a single class with a `switch` over all of them. Adding a new shape means adding one new
+ * subclass that implements {@link DataType}'s abstract contract; forgetting a method is a compile
+ * error, not a silently-wrong `return false` at the end of an `if`-chain.
  *
  * Split out of `types.ts` for the same reason as before: that file is purely declarative
  * (interfaces, type aliases, `const` registries like `TokenType`/`PrimitiveType`), with no actual
@@ -26,8 +25,9 @@ import { PrimitiveTypeName } from "./types";
 
 /**
  * Discriminates the shape of a `DataType` node — named exactly like `TokenType`/`PrimitiveType`/
- * `FieldKind` (a `const` registry plus a type extracting its values) instead of writing
- * `'primitive'`/`'union'`/... inline wherever a `DataType`'s shape is checked.
+ * `FieldKind` (a `const` registry plus a type extracting its values), even though each subclass
+ * also knows its own `kind` as a fixed instance field — useful wherever code needs to branch on
+ * shape without an `instanceof` chain (e.g. serializing to `expected.ast.json`).
  * @type {const}
  */
 export const DataTypeKind = {
@@ -40,27 +40,137 @@ export const DataTypeKind = {
 /** Unified type extracting values from the `DataTypeKind` constant registry. */
 export type DataTypeKind = typeof DataTypeKind[keyof typeof DataTypeKind];
 
+/**
+ * The structural model for everything a `var` declaration's `dataType` can be. Used by both
+ * `VariableNode.dataType` (what was written/parsed) and `Symbol.dataType` (what was ultimately
+ * resolved) — see each field's own doc comment for how their meanings differ. Always built via a
+ * subclass's own static `of(...)` factory, never hand-assembled, and compared/rendered via its own
+ * instance methods, never by string comparison.
+ */
+export abstract class DataType {
+    /** Which concrete subclass this is — see {@link DataTypeKind}. */
+    abstract readonly kind: DataTypeKind;
+
+    /**
+     * Whether a value of type `source` can be used where `this` (the declared/expected type) is
+     * expected — the same "is this assignable" question TypeScript's checker answers structurally,
+     * recursively, over its own `Type` tree, rather than by comparing display strings.
+     *
+     * Handles the one rule that's the same regardless of `this`'s own shape — when `source` is a
+     * union, *every* member must be assignable to `this` (assigning a broader type requires the
+     * narrower target to accept everything the source could actually be) — and otherwise defers to
+     * {@link acceptsNonUnionSource}, each subclass's own half of the rule.
+     * @param {DataType} source - The type being checked against this one.
+     * @returns {boolean} Whether `source` is assignable to `this`.
+     */
+    public isAssignableFrom (source: DataType): boolean {
+        if (source instanceof UnionDataType) return source.members.every(member => this.isAssignableFrom(member));
+        return this.acceptsNonUnionSource(source);
+    }
+
+    /**
+     * The kind-specific half of {@link isAssignableFrom}, reached only once `source` is already
+     * known not to be a union.
+     * @protected
+     */
+    protected abstract acceptsNonUnionSource (source: DataType): boolean;
+
+    /**
+     * Renders this type to the text a user sees (in a `tipo` annotation's error message, e.g.) —
+     * so every message is built the same way instead of each caller re-deriving its own text.
+     * @returns {string} This type's display form.
+     */
+    public abstract format (): string;
+}
+
 /** A single primitive, e.g. `texto`. */
-export interface PrimitiveDataType {
-    kind: typeof DataTypeKind.Primitive;
-    name: PrimitiveTypeName;
+export class PrimitiveDataType extends DataType {
+    public readonly kind = DataTypeKind.Primitive;
+    public readonly name: PrimitiveTypeName;
+
+    private constructor (name: PrimitiveTypeName) {
+        super();
+        this.name = name;
+    }
+
+    /** Builds a bare primitive `DataType`. */
+    public static of (name: PrimitiveTypeName): PrimitiveDataType {
+        return new PrimitiveDataType(name);
+    }
+
+    protected acceptsNonUnionSource (source: DataType): boolean {
+        return source instanceof PrimitiveDataType && source.name === this.name;
+    }
+
+    public format (): string {
+        return this.name;
+    }
 }
 
 /**
  * A union of two or more distinct primitives, e.g. `texto|numero`. Never holds a single member —
- * {@link unionOf} collapses that case down to a bare `PrimitiveDataType` instead, mirroring how
- * TypeScript itself never represents a one-member union as a `UnionType`.
+ * {@link UnionDataType.of} collapses that case down to a bare {@link PrimitiveDataType} instead,
+ * mirroring how TypeScript itself never represents a one-member union as a `UnionType`.
  */
-export interface UnionDataType {
-    kind: typeof DataTypeKind.Union;
-    members: PrimitiveDataType[];
+export class UnionDataType extends DataType {
+    public readonly kind = DataTypeKind.Union;
+    public readonly members: PrimitiveDataType[];
+
+    private constructor (members: PrimitiveDataType[]) {
+        super();
+        this.members = members;
+    }
+
+    /**
+     * Builds the `DataType` for a set of one or more primitive kinds, deduplicated: a single
+     * distinct kind collapses to a bare {@link PrimitiveDataType} (matching TypeScript's own
+     * collapsing of a one-member union); two or more become a {@link UnionDataType}, in the order
+     * first encountered (order carries no meaning for a union — see {@link isAssignableFrom} — but
+     * member order is kept stable for readable, deterministic {@link format} output).
+     * @param {PrimitiveTypeName[]} kinds - The primitive kinds the type is a union of (always at
+     * least one).
+     * @returns {DataType} The resulting primitive or union type.
+     */
+    public static of (kinds: PrimitiveTypeName[]): DataType {
+        const unique = Array.from(new Set(kinds));
+
+        return unique.length === 1
+            ? PrimitiveDataType.of(unique[0])
+            : new UnionDataType(unique.map(PrimitiveDataType.of));
+    }
+
+    protected acceptsNonUnionSource (source: DataType): boolean {
+        return this.members.some(member => member.isAssignableFrom(source));
+    }
+
+    public format (): string {
+        return this.members.map(member => member.name).sort().join('|');
+    }
 }
 
 /** A homogeneous array of some other `DataType` (its `element`), e.g. `texto[]` or
  * `(texto|numero)[]`. */
-export interface ArrayDataType {
-    kind: typeof DataTypeKind.Array;
-    element: DataType;
+export class ArrayDataType extends DataType {
+    public readonly kind = DataTypeKind.Array;
+    public readonly element: DataType;
+
+    private constructor (element: DataType) {
+        super();
+        this.element = element;
+    }
+
+    /** Builds a homogeneous array `DataType` of `element`. */
+    public static of (element: DataType): ArrayDataType {
+        return new ArrayDataType(element);
+    }
+
+    protected acceptsNonUnionSource (source: DataType): boolean {
+        return source instanceof ArrayDataType && this.element.isAssignableFrom(source.element);
+    }
+
+    public format (): string {
+        return `${this.element.format()}[]`;
+    }
 }
 
 /**
@@ -69,102 +179,27 @@ export interface ArrayDataType {
  * position's type, element 1 the second's, and a value with a different number of elements simply
  * doesn't match, however its own elements are typed.
  */
-export interface TupleDataType {
-    kind: typeof DataTypeKind.Tuple;
-    elements: DataType[];
-}
+export class TupleDataType extends DataType {
+    public readonly kind = DataTypeKind.Tuple;
+    public readonly elements: DataType[];
 
-/**
- * The structural model for everything a `var` declaration's `dataType` can be. Used by both
- * `VariableNode.dataType` (what was written/parsed) and `Symbol.dataType` (what was ultimately
- * resolved) — see each field's own doc comment for how their meanings differ. Always built via
- * {@link primitive}/{@link unionOf}/{@link arrayOf}/{@link tupleOf}, compared via
- * {@link isAssignable}, and rendered to text via {@link formatDataType} — never hand-assembled or
- * string-compared directly.
- */
-export type DataType = PrimitiveDataType | UnionDataType | ArrayDataType | TupleDataType;
-
-/** Builds a bare primitive `DataType`. */
-export function primitive (name: PrimitiveTypeName): PrimitiveDataType {
-    return { kind: DataTypeKind.Primitive, name };
-}
-
-/**
- * Builds the `DataType` for a set of one or more primitive kinds, deduplicated: a single distinct
- * kind collapses to a bare {@link PrimitiveDataType} (matching TypeScript's own collapsing of a
- * one-member union); two or more become a {@link UnionDataType}, in the order first encountered
- * (order carries no meaning for a union — see {@link isAssignable} — but member order is kept
- * stable for readable, deterministic {@link formatDataType} output).
- * @param {PrimitiveTypeName[]} kinds - The primitive kinds the type is a union of (always at least
- * one).
- * @returns {DataType} The resulting primitive or union type.
- */
-export function unionOf (kinds: PrimitiveTypeName[]): DataType {
-    const unique = Array.from(new Set(kinds));
-
-    return unique.length === 1
-        ? primitive(unique[0])
-        : { kind: DataTypeKind.Union, members: unique.map(primitive) };
-}
-
-/** Builds a homogeneous array `DataType` of `element`. */
-export function arrayOf (element: DataType): ArrayDataType {
-    return { kind: DataTypeKind.Array, element };
-}
-
-/** Builds a fixed-length, position-specific tuple `DataType` of `elements`, in order. */
-export function tupleOf (elements: DataType[]): TupleDataType {
-    return { kind: DataTypeKind.Tuple, elements };
-}
-
-/**
- * Whether a value of type `source` can be used where `target` is expected — the same "is this
- * assignable" question TypeScript's checker answers structurally, recursively, over its own `Type`
- * tree, rather than by comparing display strings:
- *  - if `source` is a union, *every* member must be assignable to `target` (assigning a broader
- *    type requires the narrower target to accept everything the source could actually be);
- *  - if `target` is a union, a (non-union) source is assignable as long as *some* member of
- *    `target` accepts it;
- *  - two primitives are assignable only when they name the same kind;
- *  - two arrays are assignable when their element types are (recursively);
- *  - two tuples are assignable when they have the same length and every position is
- *    (recursively).
- * Anything else (a primitive vs. an array, a tuple vs. an array, ...) isn't assignable — a tuple's
- * fixed shape is never interchangeable with an array's open-ended one, even when every element
- * type happens to match.
- * @param {DataType} target - The declared/expected type.
- * @param {DataType} source - The type being checked against it.
- * @returns {boolean} Whether `source` is assignable to `target`.
- */
-export function isAssignable (target: DataType, source: DataType): boolean {
-    if (source.kind === DataTypeKind.Union) return source.members.every(member => isAssignable(target, member));
-    if (target.kind === DataTypeKind.Union) return target.members.some(member => isAssignable(member, source));
-
-    if (target.kind === DataTypeKind.Primitive && source.kind === DataTypeKind.Primitive) return target.name === source.name;
-    if (target.kind === DataTypeKind.Array && source.kind === DataTypeKind.Array) return isAssignable(target.element, source.element);
-
-    if (target.kind === DataTypeKind.Tuple && source.kind === DataTypeKind.Tuple) {
-        return target.elements.length === source.elements.length
-            && target.elements.every((element, index) => isAssignable(element, source.elements[index]));
+    private constructor (elements: DataType[]) {
+        super();
+        this.elements = elements;
     }
 
-    return false;
-}
+    /** Builds a fixed-length, position-specific tuple `DataType` of `elements`, in order. */
+    public static of (elements: DataType[]): TupleDataType {
+        return new TupleDataType(elements);
+    }
 
-/**
- * Renders a `DataType` to the text a user sees (in a `tipo` annotation's error message, e.g.) —
- * the single place that ever turns the tree into a string, so every message is built the same way
- * instead of each caller re-deriving its own text. A union's members are shown alphabetically
- * sorted (`'numero|texto'`), independent of the order they were built in, so the same set of kinds
- * always displays identically.
- * @param {DataType} dataType - The type to render.
- * @returns {string} Its display form.
- */
-export function formatDataType (dataType: DataType): string {
-    switch (dataType.kind) {
-        case DataTypeKind.Primitive: return dataType.name;
-        case DataTypeKind.Union: return dataType.members.map(member => member.name).sort().join('|');
-        case DataTypeKind.Array: return `${formatDataType(dataType.element)}[]`;
-        case DataTypeKind.Tuple: return `[${dataType.elements.map(formatDataType).join(', ')}]`;
+    protected acceptsNonUnionSource (source: DataType): boolean {
+        return source instanceof TupleDataType
+            && this.elements.length === source.elements.length
+            && this.elements.every((element, index) => element.isAssignableFrom(source.elements[index]));
+    }
+
+    public format (): string {
+        return `[${this.elements.map(element => element.format()).join(', ')}]`;
     }
 }
