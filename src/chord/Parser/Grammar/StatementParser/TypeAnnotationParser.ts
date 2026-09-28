@@ -34,17 +34,15 @@ import { ChordError, ErrorLevel } from "../../../../errors/ChordError";
  */
 export class TypeAnnotationParser<T extends string, N extends BaseNode<T>> {
     /**
-     * Every primitive type name accepted after `tipo` — the runtime counterpart of the
-     * {@link PrimitiveTypeName} union, needed here because a `tipo` clause's type name arrives
-     * from the Lexer as a plain, unvalidated `string` (see this class's own doc comment for why
-     * it isn't a reserved keyword instead) and so has to be checked against this list before it
-     * can be trusted as a `PrimitiveTypeName`.
+     * Every primitive type name accepted after `tipo`, derived from {@link PrimitiveType} itself
+     * (the single canonical registry) rather than its own hand-maintained copy — needed here
+     * because a `tipo` clause's type name arrives from the Lexer as a plain, unvalidated `string`
+     * (see this class's own doc comment for why it isn't a reserved keyword instead) and so has to
+     * be checked against this list before it can be trusted as a `PrimitiveTypeName`.
      * @private
      * @readonly
      */
-    private readonly primitiveTypeNames: readonly PrimitiveTypeName[] = [
-        PrimitiveType.Texto, PrimitiveType.Numero, PrimitiveType.Booleano, PrimitiveType.Objeto, PrimitiveType.Indefinido
-    ];
+    private readonly primitiveTypeNames: readonly PrimitiveTypeName[] = Object.values(PrimitiveType);
 
     /**
      * @param parser - Reference to the main Parser orchestrator (its token-stream primitives are

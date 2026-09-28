@@ -1,4 +1,4 @@
-import { PrimitiveTypeName } from "./types";
+import { PrimitiveType, PrimitiveTypeName } from "./types";
 
 /**
  * @file DataType.ts
@@ -96,6 +96,28 @@ export class PrimitiveDataType extends DataType {
     /** Builds a bare primitive `DataType`. */
     public static of (name: PrimitiveTypeName): PrimitiveDataType {
         return new PrimitiveDataType(name);
+    }
+
+    /**
+     * The single canonical correspondence between a native JS `typeof` result and the
+     * {@link PrimitiveTypeName} DisChord surfaces for it — the one place this mapping is written,
+     * consumed both at compile time (inferring a `var`'s `dataType` from a literal initializer, see
+     * `LiteralInferrer`) and at runtime (`UnaryVisitor` embeds this exact object into the generated
+     * JS to back the `tipo x` operator, so its key order/values must stay stable).
+     * @readonly
+     */
+    public static readonly typeofMap: Readonly<Record<string, PrimitiveTypeName>> = {
+        number: PrimitiveType.Numero,
+        string: PrimitiveType.Texto,
+        boolean: PrimitiveType.Booleano,
+        undefined: PrimitiveType.Indefinido,
+        object: PrimitiveType.Objeto
+    };
+
+    /** Infers the `PrimitiveDataType` for a native JS value via {@link typeofMap}. */
+    public static fromJSValue (value: unknown): PrimitiveDataType | undefined {
+        const name = PrimitiveDataType.typeofMap[typeof value];
+        return name ? PrimitiveDataType.of(name) : undefined;
     }
 
     protected acceptsNonUnionSource (source: DataType): boolean {

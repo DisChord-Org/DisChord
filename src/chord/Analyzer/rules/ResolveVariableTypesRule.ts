@@ -1,7 +1,8 @@
 import { AnalysisRule } from "../AnalysisRule";
 import { walkAST } from "../walkAST";
-import { ASTNode, BaseNode, BinaryExpressionNode, IdentificatorNode, ListNode, LiteralNode, PrimitiveType, PrimitiveTypeName, TokenType, VariableNode } from "../../types";
-import { ArrayDataType, DataType, PrimitiveDataType, TupleDataType, UnionDataType } from "../../DataType";
+import { ASTNode, BaseNode, ListNode, TokenType, VariableNode } from "../../types";
+import { DataType, TupleDataType } from "../../DataType";
+import { TypeInferrer } from "../TypeInferrer";
 import { ChordError, ErrorLevel } from "../../../errors/ChordError";
 
 /**
@@ -13,12 +14,12 @@ import { ChordError, ErrorLevel } from "../../../errors/ChordError";
  * `BindDeclarationsRule` itself is a separate pass from reference validation.
  *
  * A variable's `dataType` is either
- *  - inferred from its initializer ({@link inferDataType} — literals, identifiers referencing an
- *    already-resolved variable, arithmetic/comparison/logical binary expressions, and list
- *    literals, recursively combining element types into a union when they differ),
+ *  - inferred from its initializer (delegated to {@link TypeInferrer} — literals, identifiers
+ *    referencing an already-resolved variable, arithmetic/comparison/logical binary expressions,
+ *    and list literals, recursively combining element types into a union when they differ),
  *  - validated against an explicit `tipo` annotation, when both are present: the inferred type
- *    must be `isAssignable` to the declared one (`tipo (texto|numero)` accepts a `numero`-only
- *    value fine — the annotation only needs to cover what's actually possible), or
+ *    must be assignable to the declared one (`tipo (texto|numero)` accepts a `numero`-only value
+ *    fine — the annotation only needs to cover what's actually possible), or
  *  - left as-is (the explicit annotation, or `undefined`) when the initializer isn't inferrable at
  *    all — a function call, a property/index access, a component declaration (embed, comando,
  *    ...), or a function's return value (functions have no declared return type yet).
@@ -29,49 +30,11 @@ import { ChordError, ErrorLevel } from "../../../errors/ChordError";
  */
 export class ResolveVariableTypesRule<T extends string, N extends BaseNode<T>> extends AnalysisRule<T, N> {
     /**
-     * Translation table used to infer a variable's {@link PrimitiveTypeName} from a literal
-     * initializer's native JS value (`typeof (variableNode.value as LiteralNode<T>).value`). Kept
-     * as its own inline, rule-local table — the same self-contained-visitor/rule pattern
-     * `BinaryExpressionVisitor.operatorsMap` and `UnaryVisitor.primitiveTypeNames` follow — rather
-     * than importing the one `UnaryVisitor` keeps for the runtime `tipo x` operator, since this
-     * Analyzer rule has no business depending on a Generator-layer class. `PrimitiveTypeName` is
-     * what keeps both copies honest.
+     * Delegate for inferring a `DataType` from an expression — see `TypeInferrer`/`SubInferrer`.
      * @private
      * @readonly
      */
-    private readonly primitiveTypeNames: Record<string, PrimitiveTypeName> = {
-        number: PrimitiveType.Numero,
-        string: PrimitiveType.Texto,
-        boolean: PrimitiveType.Booleano,
-        undefined: PrimitiveType.Indefinido,
-        object: PrimitiveType.Objeto
-    };
-
-    /**
-     * Every binary operator that always produces a JS `number` result regardless of its operands'
-     * types — even `"a" - 1` is `NaN`, and `typeof NaN === 'number'` — so these can be inferred as
-     * `numero` unconditionally, without needing to know the operand types at all. `mas` (`+`) is
-     * deliberately excluded: unlike the others, it concatenates into a string when either operand
-     * is one, so it needs its own operand-aware handling (see {@link inferBinaryType}).
-     * @private
-     * @readonly
-     */
-    private readonly numericOperators: readonly string[] = [
-        TokenType.Menos, TokenType.Por, TokenType.Entre, TokenType.Exponente, TokenType.Resto
-    ];
-
-    /**
-     * Every binary operator that always produces a JS `boolean` result regardless of its
-     * operands' types — comparison always coerces to `true`/`false`. `y`/`o` (`&&`/`||`)
-     * deliberately aren't here: JS's short-circuit evaluation returns whichever operand decided
-     * the result, not necessarily a boolean, so those need their own operand-aware handling.
-     * @private
-     * @readonly
-     */
-    private readonly comparisonOperators: readonly string[] = [
-        TokenType.Igual, TokenType.IgualTipado, TokenType.Mayor, TokenType.Menor,
-        TokenType.MayorIgual, TokenType.MenorIgual, TokenType.NoIgual, TokenType.NoIgualTipado
-    ];
+    private readonly typeInferrer: TypeInferrer<T, N> = new TypeInferrer(this.context);
 
     /**
      * @override
@@ -113,13 +76,13 @@ export class ResolveVariableTypesRule<T extends string, N extends BaseNode<T>> e
     /**
      * Resolves a variable's `dataType`. When the annotation is a tuple and the initializer is a
      * list literal, validates it contextually, position by position (see
-     * {@link validateTupleLiteral}) — a tuple can never be reached through {@link inferDataType}
+     * {@link validateTupleLiteral}) — a tuple can never be reached through `TypeInferrer.infer`
      * (only an explicit `tipo [...]` produces one), so the general "infer, then check
-     * `isAssignable`" path below could never validate one correctly: inferring `[1, "a"]` on its
+     * assignability" path below could never validate one correctly: inferring `[1, "a"]` on its
      * own always yields a flat union array (`numero|texto[]`), not a tuple, and a tuple is never
-     * `isAssignable` from an array regardless of elements. Otherwise, infers the type from the
-     * initializer (see {@link inferDataType}) and, if an explicit `tipo` annotation is also
-     * present, checks the inferred type is {@link isAssignable} to it.
+     * assignable from an array regardless of elements. Otherwise, infers the type from the
+     * initializer and, if an explicit `tipo` annotation is also present, checks the inferred type
+     * is assignable to it.
      * @param {VariableNode<T, N>} variableNode - The variable declaration to resolve.
      * @returns {DataType | undefined} The resolved type, or `undefined` if neither an annotation
      * nor an inferrable initializer is present.
@@ -133,7 +96,7 @@ export class ResolveVariableTypesRule<T extends string, N extends BaseNode<T>> e
             return variableNode.dataType;
         }
 
-        const inferredType = this.inferDataType(variableNode.value);
+        const inferredType = this.typeInferrer.infer(variableNode.value);
 
         if (variableNode.dataType && inferredType && !variableNode.dataType.isAssignableFrom(inferredType)) throw new ChordError({
             phase: ErrorLevel.Analysis,
@@ -145,112 +108,9 @@ export class ResolveVariableTypesRule<T extends string, N extends BaseNode<T>> e
     }
 
     /**
-     * Infers a `DataType` from an expression, recursively:
-     *  - a literal infers its scalar primitive directly;
-     *  - an identifier infers whatever `dataType` the `SymbolTable` already resolved for it (only
-     *    meaningful for a variable declared earlier in the same pass, or in an enclosing scope);
-     *  - a binary expression infers via {@link inferBinaryType};
-     *  - a list literal infers a homogeneous-or-union array type via {@link inferArrayType}.
-     * Any other expression shape (a call, a property/index access, a component declaration, ...)
-     * can't be inferred yet.
-     * @param {ASTNode<T, N>} value - The expression to inspect.
-     * @returns {DataType | undefined} The inferred type, or `undefined` if this expression shape
-     * isn't inferrable.
-     * @private
-     */
-    private inferDataType (value: ASTNode<T, N>): DataType | undefined {
-        if (value.type === TokenType.LITERAL) {
-            const kind = this.primitiveTypeNames[typeof (value as LiteralNode<T>).value];
-            return kind && PrimitiveDataType.of(kind);
-        }
-
-        if (value.type === TokenType.IDENTIFICADOR) {
-            return this.context.symbolTable.lookup((value as IdentificatorNode<T>).value)?.dataType;
-        }
-
-        if (value.type === TokenType.EXPRESION_BINARIA) {
-            return this.inferBinaryType(value as BinaryExpressionNode<T, N>);
-        }
-
-        if (value.type === TokenType.LISTA) {
-            return this.inferArrayType(value as ListNode<T, N>);
-        }
-
-        return undefined;
-    }
-
-    /**
-     * Infers a binary expression's result type from its operator, and — only for `mas`/`y`/`o`,
-     * whose result depends on their operands' own types — by recursively inferring `node.left`/
-     * `node.right` via {@link inferDataType}. See {@link numericOperators}/{@link
-     * comparisonOperators}'s own doc comments for why the rest don't need that.
-     * @private
-     */
-    private inferBinaryType (node: BinaryExpressionNode<T, N>): DataType | undefined {
-        if (this.numericOperators.includes(node.operator)) return PrimitiveDataType.of(PrimitiveType.Numero);
-        if (this.comparisonOperators.includes(node.operator)) return PrimitiveDataType.of(PrimitiveType.Booleano);
-
-        if (node.operator === TokenType.Mas) {
-            const left = this.inferDataType(node.left);
-            const right = this.inferDataType(node.right);
-            if (left === undefined || right === undefined) return undefined;
-
-            const textLike = PrimitiveDataType.of(PrimitiveType.Texto);
-            if (textLike.isAssignableFrom(left) || textLike.isAssignableFrom(right)) return textLike;
-
-            const numberLike = PrimitiveDataType.of(PrimitiveType.Numero);
-            if (numberLike.isAssignableFrom(left) && numberLike.isAssignableFrom(right)) return numberLike;
-
-            return undefined;
-        }
-
-        if (node.operator === TokenType.Y || node.operator === TokenType.O) {
-            const boolLike = PrimitiveDataType.of(PrimitiveType.Booleano);
-            const left = this.inferDataType(node.left);
-            const right = this.inferDataType(node.right);
-
-            return left && right && boolLike.isAssignableFrom(left) && boolLike.isAssignableFrom(right) ? boolLike : undefined;
-        }
-
-        return undefined;
-    }
-
-    /**
-     * Infers a list literal's array type: every element is inferred via {@link inferDataType}
-     * (recursively — an element can itself be an identifier, a binary expression, ...), and their
-     * primitive kinds are unioned together (`[1, "dos"]` -> `numero|texto[]`, not just `numero[]`
-     * or a refusal to infer at all). Returns `undefined` for an empty list, one with any
-     * non-inferrable element, or one with a nested list/tuple element (an array's inferred type is
-     * always a flat union of primitives — a tuple type is only ever produced by an explicit `tipo
-     * [...]` annotation, never inferred, matching how TypeScript itself never infers a tuple type
-     * from a plain array literal either).
-     * @param {ListNode<T, N>} listNode - The list literal to inspect.
-     * @returns {DataType | undefined} The inferred array type, or `undefined` if the list isn't
-     * inferrable.
-     * @private
-     */
-    private inferArrayType (listNode: ListNode<T, N>): DataType | undefined {
-        if (listNode.body.length === 0) return undefined;
-
-        const elementTypes = listNode.body.map(element => this.inferDataType(element));
-        if (elementTypes.some(elementType => elementType === undefined)) return undefined;
-
-        const kinds = new Set<PrimitiveTypeName>();
-
-        for (const elementType of elementTypes as DataType[]) {
-            if (elementType instanceof ArrayDataType || elementType instanceof TupleDataType) return undefined;
-
-            if (elementType instanceof PrimitiveDataType) kinds.add(elementType.name);
-            else if (elementType instanceof UnionDataType) elementType.members.forEach(member => kinds.add(member.name));
-        }
-
-        return ArrayDataType.of(UnionDataType.of([ ...kinds ]));
-    }
-
-    /**
      * Validates a list literal against a declared tuple type, position by position: the list must
      * have exactly as many elements as the tuple, and each element's inferred type must be
-     * {@link isAssignable} to that position's declared type. Unlike {@link inferArrayType} (which
+     * assignable to that position's declared type. Unlike `TypeInferrer.infer` on a list (which
      * infers a single flat union for the whole list), this is *contextual*: it only runs when a
      * `tipo [...]` annotation is already known, the same way TypeScript's checker only checks an
      * array literal against a tuple shape when one is already expected from context, rather than
@@ -270,7 +130,7 @@ export class ResolveVariableTypesRule<T extends string, N extends BaseNode<T>> e
         }).format();
 
         listNode.body.forEach((element, index) => {
-            const elementType = this.inferDataType(element);
+            const elementType = this.typeInferrer.infer(element);
             const expectedType = tupleType.elements[index];
 
             if (elementType && !expectedType.isAssignableFrom(elementType)) throw new ChordError({
