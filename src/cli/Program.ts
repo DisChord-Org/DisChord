@@ -90,7 +90,7 @@ export class Program {
         
         this.program
             .command('run')
-            .argument('<file>', 'Ruta al archivo JavaScript (.mjs) compilado')
+            .argument('<file>', 'Ruta al archivo JavaScript (.js) compilado')
             .description('Ejecuta código previamente compilado')
             .action(async (file: string) => {
                 await new RunCommand().execute(file);
