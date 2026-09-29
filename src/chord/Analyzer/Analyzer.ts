@@ -2,6 +2,7 @@ import { ASTNode, BaseNode, TokenType } from "../types";
 import { CompilationContext } from "../../cli/commands/CompileCommand";
 import { AnalysisRule, AnalysisRuleClass } from "./AnalysisRule";
 import { BindImportsRule } from "./rules/BindImportsRule";
+import { ValidateImportTargetsRule } from "./rules/ValidateImportTargetsRule";
 import { BindDeclarationsRule } from "./rules/BindDeclarationsRule";
 import { ResolveVariableTypesRule } from "./rules/ResolveVariableTypesRule";
 import { ValidateAssignmentTypesRule } from "./rules/ValidateAssignmentTypesRule";
@@ -41,6 +42,10 @@ export class Analyzer<T extends string, N extends BaseNode<T>> {
     private static readonly Rules: AnalysisRuleClass<TokenType, BaseNode<TokenType>>[] = [
         // Pass 1 ("Imports"): bind every imported name before anything else needs to see it.
         BindImportsRule,
+
+        // Import targets must exist. Runs before any lowering rule inserts a synthetic import
+        // (those point at generated `dist/` files with no source counterpart).
+        ValidateImportTargetsRule,
 
         // Pass 2 ("Variables"): bind every declaration (classes, functions, variables,
         // properties) across the whole file, so forward references resolve regardless of

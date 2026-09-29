@@ -1,0 +1,3 @@
+importar ent
+
+consola.imprimir(ent)

@@ -151,7 +151,7 @@ export abstract class Test {
         DisChordParser.registerGrammar(context);
 
         const code = this.code;
-        context.codeProvider.currentCode = { name: fileName, content: code };
+        context.codeProvider.currentCode = { name: path.join(this.fixturePath, 'input.chord'), content: code };
 
         const lexer = new Lexer<DisChordTokenType>(context);
         const tokens = lexer.tokenize();
