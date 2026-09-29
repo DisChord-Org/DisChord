@@ -1,5 +1,5 @@
 import { Parser } from "../../Parser";
-import { ASTNode, BaseNode, BinaryExpressionNode, TokenType, TokenTypeUnion } from "../../../types";
+import { ASTNode, BaseNode, BinaryExpressionNode, ComparisonOperators, TokenType, TokenTypeUnion } from "../../../types";
 import { SubParser } from "../../SubParser";
 import { AditiveParser } from "./AditiveParser";
 
@@ -10,10 +10,7 @@ export class ComparisionParser<T extends string, N extends BaseNode<T>> extends 
     /**
      * Collection of reserved keywords this specific sub-parser registers
      */
-    static keywords: TokenTypeUnion<string>[] = [
-        TokenType.Mayor, TokenType.Menor, TokenType.MayorIgual, TokenType.MenorIgual,
-        TokenType.Igual, TokenType.IgualTipado, TokenType.NoIgual, TokenType.NoIgualTipado
-    ];
+    static keywords: TokenTypeUnion<string>[] = [ ...ComparisonOperators ];
 
     /**
      * @param parent - Reference to the main Parser orchestrator.

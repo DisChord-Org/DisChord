@@ -1,5 +1,5 @@
 import { SubParser } from "../../SubParser";
-import { ASTNode, BaseNode, ExpressionNode, IdentificatorNode, JSNode, ListNode, NewNode, ODBMode, SuperNode, ThisNode, TokenType, TokenTypeUnion } from "../../../types";
+import { ASTNode, BaseNode, ExpressionNode, IdentificatorNode, JSNode, ListNode, LiteralTokens, NewNode, ODBMode, SuperNode, ThisNode, TokenType, TokenTypeUnion } from "../../../types";
 import { ExpressionParser } from "../Expressions/ExpressionParser";
 import { AssignmentParser } from "../Expressions/AssignmentParser";
 import { DecoratorProcessor } from "../../../DecoratorProcessor";
@@ -118,7 +118,7 @@ export class PrimaryParser<T extends string, N extends BaseNode<T>> extends SubP
             });
         }
 
-        if (([ TokenType.NUMERO, TokenType.BIGINT, TokenType.TEXTO, TokenType.BOOLEANO, TokenType.Indefinido ] as TokenType[]).includes(token.type as TokenType)) {
+        if ((LiteralTokens as readonly TokenType[]).includes(token.type as TokenType)) {
             return this.parent.get(LiteralParser).parse();
         }
 

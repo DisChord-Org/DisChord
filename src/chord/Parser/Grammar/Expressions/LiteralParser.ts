@@ -1,5 +1,5 @@
 import { SubParser } from "../../SubParser";
-import { ASTNode, BaseNode, LiteralNode, TokenType, TokenTypeUnion } from "../../../types";
+import { ASTNode, BaseNode, LiteralNode, LiteralTokens, TokenType, TokenTypeUnion } from "../../../types";
 import { Parser } from "../../Parser";
 
 export class LiteralParser<T extends string, N extends BaseNode<T>> extends SubParser<T, N> {
@@ -17,7 +17,7 @@ export class LiteralParser<T extends string, N extends BaseNode<T>> extends SubP
 
     public parse(): ASTNode<T, N> {
 
-        const token = this.consume([ TokenType.NUMERO, TokenType.BIGINT, TokenType.BOOLEANO, TokenType.TEXTO, TokenType.Indefinido ], `Se esperaba un literal (número, texto, booleano o indefinido)`);
+        const token = this.consume([ ...LiteralTokens ], `Se esperaba un literal (número, texto, booleano o indefinido)`);
 
         let value: boolean | number | string | undefined = token.value;
 
