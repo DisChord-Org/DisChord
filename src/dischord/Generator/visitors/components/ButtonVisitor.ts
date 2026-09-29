@@ -2,7 +2,7 @@ import { DisChordError, ErrorLevel } from "../../../../errors/ChordError";
 import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordODBNode, DisChordTokenType } from "../../../types";
 import { SubGenerator } from "../../../../chord/Generator/SubGenerator";
 import { BDOResolver } from "../../../../chord/Generator/BDOResolver";
-import { TokenTypeUnion } from "../../../../chord/types";
+import { TokenType, TokenTypeUnion } from "../../../../chord/types";
 import { BDOVisitor } from "../../../../chord/Generator/visitors/expressions/BDOVisitor";
 import ActionRowVisitor from "./ActionRowVisitor";
 import { ButtonSchema } from "../../constants/schemas";
@@ -53,7 +53,7 @@ export default class ButtonVisitor extends SubGenerator<DisChordNodeType, DisCho
      * @returns A string representing the instantiation and configuration of a new Button.
      */
     visit (node: DisChordASTNode): string {
-        if (node.type != 'BDO') throw new DisChordError({
+        if (node.type !== TokenType.BDO) throw new DisChordError({
             phase: ErrorLevel.Compiler,
             message: `Se esperaba un BDO, se recibió '${node.type}'`,
             location: node.location
