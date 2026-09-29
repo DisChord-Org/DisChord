@@ -2,6 +2,15 @@ import { SubParser } from "../../../SubParser";
 import { BaseNode, ImportNode, TokenType, TokenTypeUnion } from "../../../../types";
 import { Parser } from "../../../Parser";
 
+/*
+importar { foo, bar } desde "./module.chord"
+importar foo desde "./module.chord"
+importar "./module.chord" // solo efectos secundarios
+
+importar { ent } desde "lib:ent" // importar desde la carpeta lib
+importar ent // atajo de: importar ent desde "lib:ent"
+*/
+
 export class ImportParser<T extends string, N extends BaseNode<T>> extends SubParser<T, N> {
     /** To identify when this parser should be used */
     static triggerToken: TokenType | undefined = TokenType.Importar;
@@ -20,7 +29,7 @@ export class ImportParser<T extends string, N extends BaseNode<T>> extends SubPa
 
     public parse(): ImportNode<T> {
         this.consume(TokenType.Importar);
-        
+
         const identificators: string[] = [];
         const isDestructured = this.match(TokenType.L_BRACE);
 
@@ -34,8 +43,14 @@ export class ImportParser<T extends string, N extends BaseNode<T>> extends SubPa
             identificators.push(this.consume(TokenType.IDENTIFICADOR, "Se esperaba un nombre tras 'importar'").value);
         }
 
-        this.consume(TokenType.Desde, "Falta la palabra clave 'desde'");
-        const path = this.consume(TokenType.TEXTO, "Se requiere la ruta del módulo").value;
+        let path: string;
+
+        if (!isDestructured && this.peek().type !== TokenType.Desde) {
+            path = `lib:${identificators[0]}`;
+        } else {
+            this.consume(TokenType.Desde, "Falta la palabra clave 'desde'");
+            path = this.consume(TokenType.TEXTO, "Se requiere la ruta del módulo").value;
+        }
 
         return this.createNode<ImportNode<T>>({
             type: TokenType.Importar,
