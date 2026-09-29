@@ -148,7 +148,7 @@ export const TokenType = {
     // Reserver keywords as primitive literal types
     Verdadero: 'verdadero',
     Falso: 'falso',
-    Indefinido: 'indefinido',
+    Indefinido: PrimitiveType.Indefinido,
 
     // Decorators
     Decorador: 'decorador',
