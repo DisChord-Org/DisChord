@@ -1,6 +1,6 @@
-import { AccessNode, BaseNode, IdentificatorNode, TokenType, TokenTypeUnion } from "../../../types";
+import { AccessNode, BaseNode, TokenType, TokenTypeUnion } from "../../../types";
 import { SubGenerator } from "../../SubGenerator";
-import { corelib } from "../../core.lib";
+import { CoreLibUtils } from "../../corelib";
 
 /**
  * Atomic SubGenerator mapping properties, fields, and core native dictionary methods.
@@ -24,30 +24,11 @@ export class AccessVisitor<T extends string, N extends BaseNode<T>> extends SubG
      * @public
      */
     public visit(node: AccessNode<T, N>): string {
-        const targetObject = node.object as IdentificatorNode<T>;
-        
-        const objName = targetObject.type === TokenType.IDENTIFICADOR
-            ? targetObject.value 
-            : null;
-            
-        const propName = node.property;
+        const staticMember = CoreLibUtils.resolveStatic(node);
+        if (staticMember) return staticMember.member.transpile;
 
-        if (objName && corelib.classes[objName] && corelib.classes[objName].methods[propName]) {
-            return corelib.classes[objName].methods[propName];
-        }
+        const property = CoreLibUtils.resolveInstance(node)?.member.transpile ?? node.property;
 
-        for (const className in corelib.classes) {
-            const classEntry = corelib.classes[className];
-
-            // if the class is static, skip it
-            if (classEntry.static) continue;
-
-            const methods = classEntry.methods;
-            if (methods && methods[propName]) {
-                return `${this.parent.visit(node.object)}.${methods[propName]}`;
-            }
-        }
-
-        return `${this.parent.visit(node.object)}.${propName}`;
+        return `${this.parent.visit(node.object)}.${property}`;
     }
 }

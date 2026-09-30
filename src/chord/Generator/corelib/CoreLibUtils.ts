@@ -71,11 +71,19 @@ export class CoreLibUtils {
         const qualifiedName = `${ClassesEnum[className]}.${propName}`;
 
         if (CoreLibUtils.hasOwn(classEntry.methods, propName)) {
-            return { qualifiedName, member: classEntry.methods[propName], isProperty: false };
+            return {
+                qualifiedName,
+                member: classEntry.methods[propName],
+                isProperty: false
+            };
         }
 
         if (classEntry.properties && CoreLibUtils.hasOwn(classEntry.properties, propName)) {
-            return { qualifiedName, member: classEntry.properties[propName], isProperty: true };
+            return {
+                qualifiedName,
+                member: classEntry.properties[propName],
+                isProperty: true
+            };
         }
 
         return undefined;
