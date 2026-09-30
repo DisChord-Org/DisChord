@@ -1,6 +1,7 @@
 import { AnalysisRule } from "../AnalysisRule";
 import { walkAST } from "../walkAST";
-import { ASTNode, BaseNode, ImportNode, SymbolKind, TokenType } from "../../types";
+import { isImportNode } from "../../ast.guards";
+import { ASTNode, BaseNode, SymbolKind } from "../../types";
 
 /**
  * Pass 1 of the Analyzer's binding model ("Imports"): walks the complete AST and registers every
@@ -14,11 +15,9 @@ export class BindImportsRule<T extends string, N extends BaseNode<T>> extends An
      */
     check (nodes: ASTNode<T, N>[]): void {
         nodes.forEach(node => walkAST<T, N>(node, current => {
-            if (current.type !== TokenType.Importar) return;
+            if (!isImportNode(current)) return;
 
-            const importNode = current as unknown as ImportNode<T>;
-
-            importNode.identificators.forEach(name => {
+            current.identificators.forEach(name => {
                 this.context.symbolTable.register(name, {
                     name,
                     kind: SymbolKind.Declaration

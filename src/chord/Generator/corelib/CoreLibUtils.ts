@@ -1,5 +1,6 @@
 import { ClassesEnum, corelib } from "./corelib.data";
-import { AccessNode, BaseNode, IdentificatorNode, TokenType } from "../../types";
+import { isIdentificatorNode } from "../../ast.guards";
+import { AccessNode, BaseNode } from "../../types";
 import { CoreLibClass, ResolvedMember } from "./corelib.types";
 
 /**
@@ -45,9 +46,7 @@ export class CoreLibUtils {
      * @returns {string | null} The name of the accessed object, or `null` if it is not an identifier.
      */
     private static getObjectName<T extends string, N extends BaseNode<T>> (access: AccessNode<T, N>): string | null {
-        if (access.object.type !== TokenType.IDENTIFICADOR) return null;
-
-        return (access.object as unknown as IdentificatorNode<T>).value;
+        return isIdentificatorNode(access.object) ? access.object.value : null;
     }
 
     /**

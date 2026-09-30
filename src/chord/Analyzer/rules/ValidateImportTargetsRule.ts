@@ -2,7 +2,8 @@ import fs from "node:fs";
 import path from "node:path";
 import { AnalysisRule } from "../AnalysisRule";
 import { walkAST } from "../walkAST";
-import { ASTNode, BaseNode, ImportNode, TokenType } from "../../types";
+import { isImportNode } from "../../ast.guards";
+import { ASTNode, BaseNode } from "../../types";
 import { ChordError, ErrorLevel } from "../../../errors/ChordError";
 
 /**
@@ -23,17 +24,16 @@ export class ValidateImportTargetsRule<T extends string, N extends BaseNode<T>> 
      */
     check (nodes: ASTNode<T, N>[]): void {
         nodes.forEach(node => walkAST<T, N>(node, current => {
-            if (current.type !== TokenType.Importar) return;
+            if (!isImportNode(current)) return;
 
-            const importNode = current as unknown as ImportNode<T>;
-            const candidates = this.resolveCandidates(importNode.path);
+            const candidates = this.resolveCandidates(current.path);
 
             if (candidates.some(candidate => fs.existsSync(candidate))) return;
 
             throw new ChordError({
                 phase: ErrorLevel.Analysis,
-                message: `No se encontró el módulo '${importNode.path}' (se buscó en: ${candidates.map(candidate => path.relative(this.context.projectRoot, candidate)).join(', ')}).`,
-                location: importNode.location
+                message: `No se encontró el módulo '${current.path}' (se buscó en: ${candidates.map(candidate => path.relative(this.context.projectRoot, candidate)).join(', ')}).`,
+                location: current.location
             }).format();
         }));
     }
