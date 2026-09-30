@@ -1,11 +1,19 @@
 import { CoreLib } from "./corelib.types";
 
+/**
+ * Names of the classes provided by the core library. Used as the keys of `corelib.classes`.
+ */
 export enum ClassesEnum {
     consola,
     Texto,
     Lista
 }
 
+/**
+ * Core library definition: maps every class, and each of its methods and properties, from its
+ * name in the source language to the JavaScript it is transpiled to.
+ * @type {CoreLib}
+ */
 export const corelib = {
     classes: {
         [ClassesEnum.consola]: {

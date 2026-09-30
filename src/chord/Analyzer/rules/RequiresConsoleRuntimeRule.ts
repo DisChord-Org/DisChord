@@ -1,8 +1,8 @@
 import path from "node:path";
 import { AnalysisRule } from "../AnalysisRule";
 import { walkAST } from "../walkAST";
-import { ASTNode, BaseNode, ImportNode, TokenType } from "../../types";
-import { corelib, consoleRuntimeModuleContent, consoleRuntimeModulePath } from "../../Generator/core.lib";
+import { ASTNode, AccessNode, BaseNode, ImportNode, TokenType } from "../../types";
+import { consoleRuntimeModuleContent, consoleRuntimeModulePath, CoreLibUtils } from "../../Generator/corelib/index";
 import { buildSharedModuleImportSpecifier } from "../sharedModulePath";
 
 /**
@@ -26,12 +26,9 @@ export class RequiresConsoleRuntimeRule<T extends string, N extends BaseNode<T>>
         nodes.forEach(node => walkAST<T, N>(node, current => {
             if (needsConsoleRuntime || current.type !== TokenType.ACCESO) return;
 
-            const access = current as unknown as { object: ASTNode<T, N>; property: string };
-            const objName = access.object.type === TokenType.IDENTIFICADOR
-                ? (access.object as unknown as { value: string }).value
-                : null;
+            const access = current as unknown as AccessNode<T, N>;
 
-            if (objName && corelib.classes[objName]?.methods?.[access.property] === 'console.log') {
+            if (CoreLibUtils.resolveStatic(access)?.qualifiedName === 'consola.imprimir') {
                 needsConsoleRuntime = true;
             }
         }));
