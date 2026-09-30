@@ -168,5 +168,151 @@ export const corelib = {
                 }
             }
         }
+        [ClassesEnum.Mate]: {
+            methods: {
+                absoluto: {
+                    transpile: 'Math.abs',
+                    static: true
+                },
+                redArriba: {
+                    transpile: 'Math.ceil',
+                    static: true
+                },
+                redAbajo: {
+                    transpile: 'Math.floor',
+                    static: true
+                },
+                redondear: {
+                    transpile: 'Math.round',
+                    static: true
+                },
+                truncar: {
+                    transpile: 'Math.trunc',
+                    static: true
+                },
+                potencia: {
+                    transpile: 'Math.pow',
+                    static: true
+                },
+                raizCuadrada: {
+                    transpile: 'Math.sqrt',
+                    static: true
+                },
+                raizCubica: {
+                    transpile: 'Math.cbrt',
+                    static: true
+                },
+                hipotenusa: {
+                    transpile: 'Math.hypot',
+                    static: true
+                },
+                expon: {
+                    transpile: 'Math.exp',
+                    static: true
+                },
+                log: {
+                    transpile: 'Math.log',
+                    static: true
+                },
+                log10: {
+                    transpile: 'Math.log10',
+                    static: true
+                },
+                log2: {
+                    transpile: 'Math.log2',
+                    static: true
+                },
+                seno: {
+                    transpile: 'Math.sin',
+                    static: true
+                },
+                coseno: {
+                    transpile: 'Math.cos',
+                    static: true
+                },
+                tangente: {
+                    transpile: 'Math.tan',
+                    static: true
+                },
+                arcoSeno: {
+                    transpile: 'Math.asin',
+                    static: true
+                },
+                arcoCoseno: {
+                    transpile: 'Math.acos',
+                    static: true
+                },
+                arcoTangente: {
+                    transpile: 'Math.atan',
+                    static: true
+                },
+                arcoTangente2: {
+                    transpile: 'Math.atan2',
+                    static: true
+                },
+                senoHiperbolico: {
+                    transpile: 'Math.sinh',
+                    static: true
+                },
+                cosenoHiperbolico: {
+                    transpile: 'Math.cosh',
+                    static: true
+                },
+                tangenteHiperbolica: {
+                    transpile: 'Math.tanh',
+                    static: true
+                },
+                max: {
+                    transpile: 'Math.max',
+                    static: true
+                },
+                min: {
+                    transpile: 'Math.min',
+                    static: true
+                },
+                aleatorio: {
+                    transpile: 'Math.random',
+                    static: true
+                },
+                signo: {
+                    transpile: 'Math.sign',
+                    static: true
+                }
+            },
+            properties: {
+                PI: {
+                    transpile: 'Math.PI',
+                    static: true
+                },
+                E: {
+                    transpile: 'Math.E',
+                    static: true
+                },
+                LOGNEP2: {
+                    transpile: 'Math.LN2',
+                    static: true
+                },
+                LOGNEP10: {
+                    transpile: 'Math.LN10',
+                    static: true
+                },
+                LOG2E: {
+                    transpile: 'Math.LOG2E',
+                    static: true
+                },
+                LOG10E: {
+                    transpile: 'Math.LOG10E',
+                    static: true
+                },
+                RAIZCUADRADA1_2: {
+                    transpile: 'Math.SQRT1_2',
+                    static: true
+                },
+                RAIZCUADRADA2: {
+                    transpile: 'Math.SQRT2',
+                    static: true
+                }
+            }
+        }
     },
 } as const satisfies CoreLib;
