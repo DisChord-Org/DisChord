@@ -6,7 +6,9 @@ import { CoreLib } from "./corelib.types";
 export enum ClassesEnum {
     consola,
     Texto,
-    Lista
+    Lista,
+    Mates,
+    Fecha
 }
 
 /**
@@ -167,18 +169,18 @@ export const corelib = {
                     transpile: 'length'
                 }
             }
-        }
-        [ClassesEnum.Mate]: {
+        },
+        [ClassesEnum.Mates]: {
             methods: {
                 absoluto: {
                     transpile: 'Math.abs',
                     static: true
                 },
-                redArriba: {
+                redondearArriba: {
                     transpile: 'Math.ceil',
                     static: true
                 },
-                redAbajo: {
+                redondearAbajo: {
                     transpile: 'Math.floor',
                     static: true
                 },
@@ -206,7 +208,7 @@ export const corelib = {
                     transpile: 'Math.hypot',
                     static: true
                 },
-                expon: {
+                exponente: {
                     transpile: 'Math.exp',
                     static: true
                 },
@@ -234,19 +236,19 @@ export const corelib = {
                     transpile: 'Math.tan',
                     static: true
                 },
-                arcoSeno: {
+                arcoseno: {
                     transpile: 'Math.asin',
                     static: true
                 },
-                arcoCoseno: {
+                arcocoseno: {
                     transpile: 'Math.acos',
                     static: true
                 },
-                arcoTangente: {
+                arcotangente: {
                     transpile: 'Math.atan',
                     static: true
                 },
-                arcoTangente2: {
+                arcotangente2: {
                     transpile: 'Math.atan2',
                     static: true
                 },
@@ -262,11 +264,11 @@ export const corelib = {
                     transpile: 'Math.tanh',
                     static: true
                 },
-                max: {
+                maximo: {
                     transpile: 'Math.max',
                     static: true
                 },
-                min: {
+                minimo: {
                     transpile: 'Math.min',
                     static: true
                 },
@@ -313,6 +315,9 @@ export const corelib = {
                     static: true
                 }
             }
+        },
+        [ClassesEnum.Fecha]: {
+            methods: {}
         }
     },
 } as const satisfies CoreLib;
