@@ -7,6 +7,12 @@ export interface CoreLibMember {
     readonly transpile: string;
     /** Whether it is called on the class itself (like `consola.imprimir`) instead of an instance. Omitted means `false`. */
     readonly static?: boolean;
+    /**
+     * Whether it is provided by a runtime module instead of being rewritten at compile time. Such a
+     * member only documents the name and what it maps to: lookups skip it, so it never rewrites an
+     * access. Omitted means `false`.
+     */
+    readonly runtime?: boolean;
 }
 
 /**

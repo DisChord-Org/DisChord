@@ -55,7 +55,7 @@ export class CoreLibUtils<C extends string = string> {
     }
 
     /**
-     * Looks a member up in a class, methods first and then properties.
+     * Looks a member up in a class, methods first and then properties. Members provided by a runtime module are skipped.
      * @param {C} className - Core library class.
      * @param {string} propName - Member name as written in source code.
      * @returns {ResolvedMember | undefined} The member, or `undefined` if the class has no such member.
@@ -64,7 +64,7 @@ export class CoreLibUtils<C extends string = string> {
         const classEntry: CoreLibClass = this.corelib.classes[className];
         const qualifiedName = `${className}.${propName}`;
 
-        if (this.hasOwn(classEntry.methods, propName)) {
+        if (this.hasOwn(classEntry.methods, propName) && !classEntry.methods[propName].runtime) {
             return {
                 qualifiedName,
                 member: classEntry.methods[propName],
@@ -72,7 +72,7 @@ export class CoreLibUtils<C extends string = string> {
             };
         }
 
-        if (classEntry.properties && this.hasOwn(classEntry.properties, propName)) {
+        if (classEntry.properties && this.hasOwn(classEntry.properties, propName) && !classEntry.properties[propName].runtime) {
             return {
                 qualifiedName,
                 member: classEntry.properties[propName],
