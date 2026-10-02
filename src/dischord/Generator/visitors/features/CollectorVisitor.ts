@@ -23,7 +23,7 @@ interface CollectorConfig {
  *
  * Unlike the old inline body, a referenced callback is compiled as a standalone function and
  * can't close over the command's `run(contexto)` preamble — so it loses `contexto`, `cliente`,
- * `usuario`, etc. for free. `cliente` specifically also backs `imprimir` (`corelib.imprimir ===
+ * `usuario`, etc. for free. `cliente` specifically also backs `imprimir` (`corelib.functions.imprimir ===
  * 'cliente.logger.info'`), a plain compile-time text substitution that assumes a variable
  * literally named `cliente` is in scope wherever it's used — same requirement `eventsMap` already
  * satisfies for event handlers by injecting a fixed `cliente` parameter. Every callback here is

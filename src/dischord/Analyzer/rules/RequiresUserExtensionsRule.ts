@@ -4,7 +4,7 @@ import { walkAST } from "../../../chord/Analyzer/walkAST";
 import { buildSharedModuleImportSpecifier } from "../../../chord/Analyzer/sharedModulePath";
 import { ASTNode, ImportNode, LiteralNode, ODBNode, TokenType } from "../../../chord/types";
 import { DisChordASTNode, DisChordNode, DisChordNodeType } from "../../types";
-import { userExtensionsModuleContent, userExtensionsModulePath, userPropertyNames } from "../../core.lib";
+import { userExtensionsModuleContent, userExtensionsModulePath, userPropertyNames } from "../../corelib";
 
 /**
  * Detects, over the *complete* AST, whether the file needs the Spanish user-data getters

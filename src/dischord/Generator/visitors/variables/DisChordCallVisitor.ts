@@ -1,7 +1,7 @@
 import { CallVisitor } from "../../../../chord/Generator/visitors/variables/CallVisitor";
 import { DisChordNodeType, DisChordNode } from "../../../types";
 import { CallNode, TokenType, TokenTypeUnion } from "../../../../chord/types";
-import { corelib } from "../../../core.lib";
+import { disChordCoreLibUtils } from "../../../corelib";
 
 export class DisChordCallVisitor extends CallVisitor<DisChordNodeType, DisChordNode> {
     /**
@@ -20,10 +20,9 @@ export class DisChordCallVisitor extends CallVisitor<DisChordNodeType, DisChordN
      */
     public override visit(node: CallNode<DisChordNodeType, DisChordNode>): string {
         if (node.object.type === TokenType.IDENTIFICADOR) {
-            const name = node.object.value;
+            const translation = disChordCoreLibUtils.resolveFunction(node.object.value);
 
-            if (typeof corelib[name] === 'string') {
-                const translation = corelib[name] as string;
+            if (translation) {
                 const args = node.params.map(arg => this.parent.visit(arg)).join(', ');
                 return `${translation}(${args})`;
             }

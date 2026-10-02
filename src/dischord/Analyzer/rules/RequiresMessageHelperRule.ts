@@ -4,7 +4,7 @@ import { walkAST } from "../../../chord/Analyzer/walkAST";
 import { buildSharedModuleImportSpecifier } from "../../../chord/Analyzer/sharedModulePath";
 import { ImportNode, TokenType } from "../../../chord/types";
 import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType } from "../../types";
-import { createMessageModuleContent, createMessageModulePath } from "../../core.lib";
+import { createMessageModuleContent, createMessageModulePath } from "../../corelib";
 
 /**
  * Detects, over the *complete* AST (any nesting depth — inside a `comando`/`evento`'s body, etc.),

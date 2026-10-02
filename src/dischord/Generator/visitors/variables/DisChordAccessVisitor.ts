@@ -1,7 +1,7 @@
 import { AccessVisitor } from "../../../../chord/Generator/visitors/variables/AccessVisitor";
 import { DisChordNodeType, DisChordNode } from "../../../types";
 import { AccessNode, TokenType, TokenTypeUnion } from "../../../../chord/types";
-import { corelib } from "../../../core.lib";
+import { disChordCoreLibUtils } from "../../../corelib";
 
 export class DisChordAccessVisitor extends AccessVisitor<DisChordNodeType, DisChordNode> {
      /**
@@ -19,21 +19,8 @@ export class DisChordAccessVisitor extends AccessVisitor<DisChordNodeType, DisCh
      * @returns The generated code for the property access, which may be translated based on the core library mappings or fall back to the default generation if no mapping is found.
      */
     public override visit(node: AccessNode<DisChordNodeType, DisChordNode>): string {
-        const objName = node.object.type === TokenType.IDENTIFICADOR ? node.object.value : null;
-        const propName = node.property;
-
-        if (objName && corelib[objName]) {
-            const mapping = corelib[objName];
-
-            if (typeof mapping === 'object' && mapping[propName]) {
-                const translation = mapping[propName];
-
-                if (translation.startsWith(objName + '.')) {
-                    return translation;
-                }
-                return `${objName}.${translation}`;
-            }
-        }
+        const member = disChordCoreLibUtils.resolveStatic(node);
+        if (member) return member.member.transpile;
 
         return super.visit(node);
     }
