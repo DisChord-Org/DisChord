@@ -1,6 +1,6 @@
 import { AccessNode, BaseNode, TokenType, TokenTypeUnion } from "../../../types";
 import { SubGenerator } from "../../SubGenerator";
-import { CoreLibUtils } from "../../corelib";
+import { coreLibUtils } from "../../../corelib";
 
 /**
  * Atomic SubGenerator mapping properties, fields, and core native dictionary methods.
@@ -24,10 +24,10 @@ export class AccessVisitor<T extends string, N extends BaseNode<T>> extends SubG
      * @public
      */
     public visit(node: AccessNode<T, N>): string {
-        const staticMember = CoreLibUtils.resolveStatic(node);
+        const staticMember = coreLibUtils.resolveStatic(node);
         if (staticMember) return staticMember.member.transpile;
 
-        const property = CoreLibUtils.resolveInstance(node)?.member.transpile ?? node.property;
+        const property = coreLibUtils.resolveInstance(node)?.member.transpile ?? node.property;
 
         return `${this.parent.visit(node.object)}.${property}`;
     }

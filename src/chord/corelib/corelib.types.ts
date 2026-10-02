@@ -1,5 +1,3 @@
-import { ClassesEnum } from "./corelib.data";
-
 /**
  * A single member (method or property) of a core library class, keyed by its name in the
  * source language inside `CoreLibClass`.
@@ -21,10 +19,13 @@ export interface CoreLibClass {
 }
 
 /**
- * Shape of the whole core library, with one entry per `ClassesEnum` value.
+ * Shape of the whole core library: one entry per class name `C` (a layer's `ClassesEnum`), plus
+ * the free functions that have no class to hang off.
  */
-export interface CoreLib {
-    readonly classes: Readonly<Record<ClassesEnum, CoreLibClass>>;
+export interface CoreLib<C extends string = string> {
+    readonly classes: Readonly<Record<C, CoreLibClass>>;
+    /** Free functions rewritten to a different callee, keyed by their name in the source language (`imprimir` → `cliente.logger.info`). */
+    readonly functions: Readonly<Record<string, string>>;
 }
 
 /**

@@ -4,17 +4,19 @@ import { CoreLib } from "./corelib.types";
  * Names of the classes provided by the core library. Used as the keys of `corelib.classes`.
  */
 export enum ClassesEnum {
-    consola,
-    Texto,
-    Lista,
-    Mates,
-    Fecha
+    consola = 'consola',
+    Texto = 'Texto',
+    Lista = 'Lista',
+    Mates = 'Mates',
+    Fecha = 'Fecha'
 }
 
 /**
  * Core library definition: maps every class, and each of its methods and properties, from its
- * name in the source language to the JavaScript it is transpiled to.
- * @type {CoreLib}
+ * name in the source language to the JavaScript it is transpiled to. `functions` holds free
+ * functions rewritten to another callee; it is empty here and left for layers built on top of
+ * chord to fill.
+ * @type {CoreLib<ClassesEnum>}
  */
 export const corelib = {
     classes: {
@@ -320,4 +322,5 @@ export const corelib = {
             methods: {}
         }
     },
-} as const satisfies CoreLib;
+    functions: {}
+} as const satisfies CoreLib<ClassesEnum>;

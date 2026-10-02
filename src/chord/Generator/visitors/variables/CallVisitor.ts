@@ -1,5 +1,6 @@
 import { CallNode, BaseNode, TokenType, TokenTypeUnion, IdentificatorNode, AccessNode } from "../../../types";
 import { SubGenerator } from "../../SubGenerator";
+import { coreLibUtils } from "../../../corelib";
 
 /**
  * Atomic SubGenerator that handles function and method execution structures.
@@ -42,7 +43,7 @@ export class CallVisitor<T extends string, N extends BaseNode<T>> extends SubGen
         } else if (node.object.type === TokenType.IDENTIFICADOR) {
             const identificatorNode = node.object as IdentificatorNode<T>;
             const name = identificatorNode.value;
-            translation = name;
+            translation = coreLibUtils.resolveFunction(name) ?? name;
 
             const symbol = this.parent.context.symbolTable.lookup(name);
             if (symbol?.metadata.isAsync) {
