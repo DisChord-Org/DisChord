@@ -8,6 +8,13 @@ export enum ClassesEnum {
     Texto = 'Texto',
     Lista = 'Lista',
     Mates = 'Mates',
+    Numero = 'Numero',
+    JSON = 'JSON',
+    Objeto = 'Objeto',
+    Mapa = 'Mapa',
+    Conjunto = 'Conjunto',
+    Promesa = 'Promesa',
+    Expresion = 'Expresion',
     Fecha = 'Fecha'
 }
 
@@ -92,6 +99,36 @@ export const corelib = {
                 },
                 concatenar: {
                     transpile: 'concat'
+                },
+                recortarInicio: {
+                    transpile: 'trimStart'
+                },
+                recortarFinal: {
+                    transpile: 'trimEnd'
+                },
+                normalizar: {
+                    transpile: 'normalize'
+                },
+                coincidir: {
+                    transpile: 'match'
+                },
+                coincidirTodo: {
+                    transpile: 'matchAll'
+                },
+                buscar: {
+                    transpile: 'search'
+                },
+                codigoEn: {
+                    transpile: 'charCodeAt'
+                },
+                subcadena: {
+                    transpile: 'substring'
+                },
+                comparar: {
+                    transpile: 'localeCompare'
+                },
+                en: {
+                    transpile: 'at'
                 }
             },
             properties: {
@@ -164,6 +201,45 @@ export const corelib = {
                 },
                 concatenar: {
                     transpile: 'concat'
+                },
+                buscarIndice: {
+                    transpile: 'findIndex'
+                },
+                encontrarUltimo: {
+                    transpile: 'findLast'
+                },
+                aplanarMapear: {
+                    transpile: 'flatMap'
+                },
+                en: {
+                    transpile: 'at'
+                },
+                insertar: {
+                    transpile: 'splice'
+                },
+                eliminar: {
+                    transpile: 'splice'
+                },
+                claves: {
+                    transpile: 'keys'
+                },
+                valores: {
+                    transpile: 'values'
+                },
+                entradas: {
+                    transpile: 'entries'
+                },
+                reducirDerecha: {
+                    transpile: 'reduceRight'
+                },
+                copiarDentro: {
+                    transpile: 'copyWithin'
+                },
+                ordenarCopia: {
+                    transpile: 'toSorted'
+                },
+                invertirCopia: {
+                    transpile: 'toReversed'
                 }
             },
             properties: {
@@ -281,6 +357,34 @@ export const corelib = {
                 signo: {
                     transpile: 'Math.sign',
                     static: true
+                },
+                arcosenoHiperbolico: {
+                    transpile: 'Math.asinh',
+                    static: true
+                },
+                arcocosenoHiperbolico: {
+                    transpile: 'Math.acosh',
+                    static: true
+                },
+                arcotangenteHiperbolica: {
+                    transpile: 'Math.atanh',
+                    static: true
+                },
+                redondearFlotante: {
+                    transpile: 'Math.fround',
+                    static: true
+                },
+                exponenteMenosUno: {
+                    transpile: 'Math.expm1',
+                    static: true
+                },
+                logMasUno: {
+                    transpile: 'Math.log1p',
+                    static: true
+                },
+                ceroInicial: {
+                    transpile: 'Math.clz32',
+                    static: true
                 }
             },
             properties: {
@@ -315,6 +419,181 @@ export const corelib = {
                 RAIZCUADRADA2: {
                     transpile: 'Math.SQRT2',
                     static: true
+                }
+            }
+        },
+        [ClassesEnum.Numero]: {
+            methods: {
+                esEntero: {
+                    transpile: 'Number.isInteger',
+                    static: true
+                },
+                esNumero: {
+                    transpile: 'Number.isFinite',
+                    static: true
+                },
+                esEnteroSeguro: {
+                    transpile: 'Number.isSafeInteger',
+                    static: true
+                },
+                esNaN: {
+                    transpile: 'Number.isNaN',
+                    static: true
+                },
+                aEntero: {
+                    transpile: 'parseInt',
+                    static: true
+                },
+                aDecimal: {
+                    transpile: 'parseFloat',
+                    static: true
+                },
+                aFijo: {
+                    transpile: 'toFixed'
+                },
+                aPrecision: {
+                    transpile: 'toPrecision'
+                },
+                aTexto: {
+                    transpile: 'toString'
+                },
+                aLocal: {
+                    transpile: 'toLocaleString'
+                }
+            },
+            properties: {
+                MAXIMO_SEGURO: {
+                    transpile: 'Number.MAX_SAFE_INTEGER',
+                    static: true
+                },
+                MINIMO_SEGURO: {
+                    transpile: 'Number.MIN_SAFE_INTEGER',
+                    static: true
+                },
+                MAXIMO: {
+                    transpile: 'Number.MAX_VALUE',
+                    static: true
+                },
+                MINIMO: {
+                    transpile: 'Number.MIN_VALUE',
+                    static: true
+                },
+                EPSILON: {
+                    transpile: 'Number.EPSILON',
+                    static: true
+                }
+            }
+        },
+        [ClassesEnum.JSON]: {
+            methods: {
+                leer: {
+                    transpile: 'JSON.parse',
+                    static: true
+                },
+                escribir: {
+                    transpile: 'JSON.stringify',
+                    static: true
+                }
+            }
+        },
+        [ClassesEnum.Objeto]: {
+            methods: {
+                claves: {
+                    transpile: 'Object.keys',
+                    static: true
+                },
+                valores: {
+                    transpile: 'Object.values',
+                    static: true
+                },
+                entradas: {
+                    transpile: 'Object.entries',
+                    static: true
+                },
+                unir: {
+                    transpile: 'Object.assign',
+                    static: true
+                },
+                congelar: {
+                    transpile: 'Object.freeze',
+                    static: true
+                },
+                desdeEntradas: {
+                    transpile: 'Object.fromEntries',
+                    static: true
+                },
+                tienePropia: {
+                    transpile: 'Object.hasOwn',
+                    static: true
+                }
+            }
+        },
+        [ClassesEnum.Mapa]: {
+            methods: {
+                obtener: {
+                    transpile: 'get'
+                },
+                poner: {
+                    transpile: 'set'
+                },
+                existe: {
+                    transpile: 'has'
+                },
+                borrar: {
+                    transpile: 'delete'
+                },
+                vaciar: {
+                    transpile: 'clear'
+                }
+            },
+            properties: {
+                tamano: {
+                    transpile: 'size'
+                }
+            }
+        },
+        [ClassesEnum.Conjunto]: {
+            methods: {
+                sumar: {
+                    transpile: 'add'
+                }
+            }
+        },
+        [ClassesEnum.Promesa]: {
+            methods: {
+                todas: {
+                    transpile: 'Promise.all',
+                    static: true
+                },
+                todasResueltas: {
+                    transpile: 'Promise.allSettled',
+                    static: true
+                },
+                primera: {
+                    transpile: 'Promise.race',
+                    static: true
+                },
+                cualquiera: {
+                    transpile: 'Promise.any',
+                    static: true
+                },
+                resolver: {
+                    transpile: 'Promise.resolve',
+                    static: true
+                },
+                rechazar: {
+                    transpile: 'Promise.reject',
+                    static: true
+                }
+            }
+        },
+        [ClassesEnum.Expresion]: {
+            methods: {
+                probar: {
+                    transpile: 'test'
+                },
+                ejecutar: {
+                    transpile: 'exec'
                 }
             }
         },
