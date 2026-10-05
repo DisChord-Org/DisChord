@@ -1,7 +1,7 @@
 import { AnalysisRule } from "../AnalysisRule";
 import { walkAST } from "../walkAST";
 import { ASTNode, BaseNode, ListNode, TokenType, VariableNode } from "../../types";
-import { DataType, TupleDataType } from "../../DataType";
+import { DataType, TupleDataType, VoidDataType } from "../../DataType";
 import { TypeInferrer } from "../TypeInferrer";
 import { ChordError, ErrorLevel } from "../../../errors/ChordError";
 
@@ -16,12 +16,13 @@ import { ChordError, ErrorLevel } from "../../../errors/ChordError";
  * A variable's `dataType` is either
  *  - inferred from its initializer (delegated to {@link TypeInferrer} — literals, identifiers
  *    referencing an already-resolved variable, arithmetic/comparison/logical binary expressions,
- *    and list literals, recursively combining element types into a union when they differ),
+ *    list literals (recursively combining element types into a union when they differ), and
+ *    calls/reads of a core library member, typed by its `returns`),
  *  - validated against an explicit `tipo` annotation, when both are present: the inferred type
  *    must be assignable to the declared one (`tipo (texto|numero)` accepts a `numero`-only value
  *    fine — the annotation only needs to cover what's actually possible), or
  *  - left as-is (the explicit annotation, or `undefined`) when the initializer isn't inferrable at
- *    all — a function call, a property/index access, a component declaration (embed, comando,
+ *    all — a call to a user function, an index access, a component declaration (embed, comando,
  *    ...), or a function's return value (functions have no declared return type yet).
  *
  * Mirrors `BindDeclarationsRule`'s own traversal: classes and functions get their own lexical
@@ -97,6 +98,12 @@ export class ResolveVariableTypesRule<T extends string, N extends BaseNode<T>> e
         }
 
         const inferredType = this.typeInferrer.infer(variableNode.value);
+
+        if (inferredType instanceof VoidDataType) throw new ChordError({
+            phase: ErrorLevel.Analysis,
+            message: `La variable '${variableNode.id}' se inicializó con una llamada que no devuelve ningún valor`,
+            location: variableNode.location
+        }).format();
 
         if (variableNode.dataType && inferredType && !variableNode.dataType.isAssignableFrom(inferredType)) throw new ChordError({
             phase: ErrorLevel.Analysis,

@@ -1,5 +1,6 @@
 import { corelib } from "./corelib.data";
 import { isIdentificatorNode } from "../ast.guards";
+import { DataType } from "../DataType";
 import { AccessNode, BaseNode } from "../types";
 import { CoreLib, CoreLibClass, ResolvedMember } from "./corelib.types";
 
@@ -47,6 +48,39 @@ export class CoreLibUtils<C extends string = string> {
     }
 
     /**
+     * Every class's non-static member called `access.property`, in declaration order. Unlike
+     * {@link resolveInstance} it doesn't stop at the first one, so a caller that needs to know
+     * whether the name is ambiguous across classes can tell.
+     * @param {AccessNode<T, N>} access - The access node.
+     * @returns {ResolvedMember[]} The matches, empty if no class has it as an instance member.
+     */
+    resolveInstanceMembers<T extends string, N extends BaseNode<T>> (access: AccessNode<T, N>): ResolvedMember[] {
+        return Object.keys(this.corelib.classes)
+            .map(key => this.findInClass(key as C, access.property))
+            .filter((found): found is ResolvedMember => found !== undefined && !found.member.static);
+    }
+
+    /**
+     * The type an access evaluates to: a static member's own `returns`, or an instance member's when
+     * every class with a member of that name agrees on it (a value's class isn't known yet, so a
+     * name like `tiene`, which several classes define, only resolves if they all return the same
+     * type instance). A method yields its type only as a call, and a property only as a plain access.
+     * @param {AccessNode<T, N>} access - The access node.
+     * @param {boolean} isCall - Whether the access is the callee of a call.
+     * @returns {DataType | undefined} The type, or `undefined` if the core library has no such
+     * member, its name is ambiguous, or it is used the wrong way (a method read without calling it).
+     */
+    resolveReturnType<T extends string, N extends BaseNode<T>> (access: AccessNode<T, N>, isCall: boolean): DataType | undefined {
+        const staticMember = this.resolveStatic(access);
+        if (staticMember) return this.returnTypeOf(staticMember, isCall);
+
+        const [first, ...rest] = this.resolveInstanceMembers(access);
+        if (!first || rest.some(other => other.isProperty !== first.isProperty || other.member.returns !== first.member.returns)) return undefined;
+
+        return this.returnTypeOf(first, isCall);
+    }
+
+    /**
      * @param {string} name - Function name as written in source code.
      * @returns {string | undefined} The callee it is transpiled to, or `undefined` if the core library doesn't map it.
      */
@@ -81,6 +115,10 @@ export class CoreLibUtils<C extends string = string> {
         }
 
         return undefined;
+    }
+
+    private returnTypeOf(resolved: ResolvedMember, isCall: boolean): DataType | undefined {
+        return resolved.isProperty === isCall ? undefined : resolved.member.returns;
     }
 
     /**

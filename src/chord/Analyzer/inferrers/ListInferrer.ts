@@ -1,5 +1,5 @@
 import { ASTNode, BaseNode, ListNode, PrimitiveTypeName, TokenType, TokenTypeUnion } from "../../types";
-import { ArrayDataType, DataType, PrimitiveDataType, TupleDataType, UnionDataType } from "../../DataType";
+import { AnyDataType, ArrayDataType, DataType, PrimitiveDataType, TupleDataType, UnionDataType, VoidDataType } from "../../DataType";
 import { SubInferrer } from "../SubInferrer";
 
 /**
@@ -25,7 +25,7 @@ export class ListInferrer<T extends string, N extends BaseNode<T>> extends SubIn
         const kinds = new Set<PrimitiveTypeName>();
 
         for (const elementType of elementTypes as DataType[]) {
-            if (elementType instanceof ArrayDataType || elementType instanceof TupleDataType) return undefined;
+            if (elementType instanceof ArrayDataType || elementType instanceof TupleDataType || elementType instanceof AnyDataType || elementType instanceof VoidDataType) return undefined;
 
             if (elementType instanceof PrimitiveDataType) kinds.add(elementType.name);
             else if (elementType instanceof UnionDataType) elementType.members.forEach(member => kinds.add(member.name));

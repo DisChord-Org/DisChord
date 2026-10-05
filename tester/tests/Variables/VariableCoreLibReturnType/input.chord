@@ -1,0 +1,11 @@
+var raiz tipo numero es Mates.raizCuadrada(16)
+var pi tipo numero es Mates.PI
+var partes tipo texto[] es "a,b".partir(",")
+var largo tipo numero es "hola".longitud
+var cualquiera tipo texto es JSON.leer("1")
+
+consola.imprimir(raiz)
+consola.imprimir(pi)
+consola.imprimir(partes)
+consola.imprimir(largo)
+consola.imprimir(cualquiera)

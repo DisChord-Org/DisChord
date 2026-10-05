@@ -1,5 +1,5 @@
 import { ASTNode, BaseNode, BinaryExpressionNode, ComparisonOperators, NumericOperators, PrimitiveType, TokenType, TokenTypeUnion } from "../../types";
-import { DataType, PrimitiveDataType } from "../../DataType";
+import { AnyDataType, DataType, PrimitiveDataType } from "../../DataType";
 import { SubInferrer } from "../SubInferrer";
 
 /**
@@ -20,7 +20,7 @@ export class BinaryExpressionInferrer<T extends string, N extends BaseNode<T>> e
         if (binaryNode.operator === TokenType.Mas) {
             const left = this.parent.infer(binaryNode.left);
             const right = this.parent.infer(binaryNode.right);
-            if (left === undefined || right === undefined) return undefined;
+            if (left === undefined || right === undefined || left instanceof AnyDataType || right instanceof AnyDataType) return undefined;
 
             const textLike = PrimitiveDataType.Texto;
             if (textLike.isAssignableFrom(left) || textLike.isAssignableFrom(right)) return textLike;

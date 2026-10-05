@@ -1,0 +1,11 @@
+import './lib/consoleRuntime.js';
+let raiz = Math.sqrt(16);
+let pi = Math.PI;
+let partes = 'a,b'.split(',');
+let largo = 'hola'.length;
+let cualquiera = JSON.parse('1');
+console.log(raiz);
+console.log(pi);
+console.log(partes);
+console.log(largo);
+console.log(cualquiera);
