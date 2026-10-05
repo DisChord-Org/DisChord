@@ -14,25 +14,25 @@ export class BinaryExpressionInferrer<T extends string, N extends BaseNode<T>> e
     public infer (node: ASTNode<T, N>): DataType | undefined {
         const binaryNode = node as BinaryExpressionNode<T, N>;
 
-        if ((NumericOperators as readonly string[]).includes(binaryNode.operator)) return PrimitiveDataType.of(PrimitiveType.Numero);
-        if ((ComparisonOperators as readonly string[]).includes(binaryNode.operator)) return PrimitiveDataType.of(PrimitiveType.Booleano);
+        if ((NumericOperators as readonly string[]).includes(binaryNode.operator)) return PrimitiveDataType.Numero;
+        if ((ComparisonOperators as readonly string[]).includes(binaryNode.operator)) return PrimitiveDataType.Booleano;
 
         if (binaryNode.operator === TokenType.Mas) {
             const left = this.parent.infer(binaryNode.left);
             const right = this.parent.infer(binaryNode.right);
             if (left === undefined || right === undefined) return undefined;
 
-            const textLike = PrimitiveDataType.of(PrimitiveType.Texto);
+            const textLike = PrimitiveDataType.Texto;
             if (textLike.isAssignableFrom(left) || textLike.isAssignableFrom(right)) return textLike;
 
-            const numberLike = PrimitiveDataType.of(PrimitiveType.Numero);
+            const numberLike = PrimitiveDataType.Numero;
             if (numberLike.isAssignableFrom(left) && numberLike.isAssignableFrom(right)) return numberLike;
 
             return undefined;
         }
 
         if (binaryNode.operator === TokenType.Y || binaryNode.operator === TokenType.O) {
-            const boolLike = PrimitiveDataType.of(PrimitiveType.Booleano);
+            const boolLike = PrimitiveDataType.Booleano;
             const left = this.parent.infer(binaryNode.left);
             const right = this.parent.infer(binaryNode.right);
 

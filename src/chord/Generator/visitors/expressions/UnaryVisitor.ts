@@ -1,4 +1,4 @@
-import { UnaryNode, BaseNode, TokenType, TokenTypeUnion } from "../../../types";
+import { UnaryNode, BaseNode, PrimitiveType, TokenType, TokenTypeUnion } from "../../../types";
 import { PrimitiveDataType } from "../../../DataType";
 import { SubGenerator } from "../../SubGenerator";
 
@@ -27,7 +27,9 @@ export class UnaryVisitor<T extends string, N extends BaseNode<T>> extends SubGe
     public visit(node: UnaryNode<T, N>): string {
         if (node.operator === TokenType.TIPO) {
             const mapping = JSON.stringify(PrimitiveDataType.typeofMap);
-            return `${mapping}[typeof (${this.parent.visit(node.object)})]`;
+            const list = JSON.stringify(PrimitiveDataType.listTypeName);
+            const indefinido = JSON.stringify(PrimitiveType.Indefinido);
+            return `((v) => v === null ? ${indefinido} : Array.isArray(v) ? ${list} : ${mapping}[typeof v])(${this.parent.visit(node.object)})`;
         }
 
         return '';

@@ -1,3 +1,5 @@
+import { AnyDataType, ArrayDataType, PrimitiveDataType, UnionDataType, VoidDataType } from "../DataType";
+import { PrimitiveType } from "../types";
 import { CoreLib } from "./corelib.types";
 
 /**
@@ -10,7 +12,7 @@ export enum ClassesEnum {
     Mates = 'Mates',
     Numero = 'Numero',
     JSON = 'JSON',
-    Objeto = 'Objeto',
+    BDO = 'BDO',
     Mapa = 'Mapa',
     Conjunto = 'Conjunto',
     Promesa = 'Promesa',
@@ -31,18 +33,22 @@ export const corelib = {
             methods: {
                 imprimir: {
                     transpile: 'console.log',
+                    returns: VoidDataType.Void,
                     static: true
                 },
                 error: {
                     transpile: 'console.error',
+                    returns: VoidDataType.Void,
                     static: true
                 },
                 advertencia: {
                     transpile: 'console.warn',
+                    returns: VoidDataType.Void,
                     static: true
                 },
                 limpiar: {
                     transpile: 'console.clear',
+                    returns: VoidDataType.Void,
                     static: true
                 }
             }
@@ -50,201 +56,264 @@ export const corelib = {
         [ClassesEnum.Texto]: {
             methods: {
                 limpiar: {
-                    transpile: 'trim'
+                    transpile: 'trim',
+                    returns: PrimitiveDataType.Texto
                 },
                 partir: {
-                    transpile: 'split'
+                    transpile: 'split',
+                    returns: ArrayDataType.of(PrimitiveDataType.Texto)
                 },
                 reemplazar: {
-                    transpile: 'replace'
+                    transpile: 'replace',
+                    returns: PrimitiveDataType.Texto
                 },
                 reemplazarTodo: {
-                    transpile: 'replaceAll'
+                    transpile: 'replaceAll',
+                    returns: PrimitiveDataType.Texto
                 },
                 terminaCon: {
-                    transpile: 'endsWith'
+                    transpile: 'endsWith',
+                    returns: PrimitiveDataType.Booleano
                 },
                 empiezaCon: {
-                    transpile: 'startsWith'
+                    transpile: 'startsWith',
+                    returns: PrimitiveDataType.Booleano
                 },
                 repetir: {
-                    transpile: 'repeat'
+                    transpile: 'repeat',
+                    returns: PrimitiveDataType.Texto
                 },
                 cortar: {
-                    transpile: 'slice'
+                    transpile: 'slice',
+                    returns: PrimitiveDataType.Texto
                 },
                 minusculas: {
-                    transpile: 'toLowerCase'
+                    transpile: 'toLowerCase',
+                    returns: PrimitiveDataType.Texto
                 },
                 mayusculas: {
-                    transpile: 'toUpperCase'
+                    transpile: 'toUpperCase',
+                    returns: PrimitiveDataType.Texto
                 },
                 tiene: {
-                    transpile: 'includes'
+                    transpile: 'includes',
+                    returns: PrimitiveDataType.Booleano
                 },
                 indiceDe: {
-                    transpile: 'indexOf'
+                    transpile: 'indexOf',
+                    returns: PrimitiveDataType.Numero
                 },
                 ultimoIndiceDe: {
-                    transpile: 'lastIndexOf'
+                    transpile: 'lastIndexOf',
+                    returns: PrimitiveDataType.Numero
                 },
                 caracterEn: {
-                    transpile: 'charAt'
+                    transpile: 'charAt',
+                    returns: PrimitiveDataType.Texto
                 },
                 rellenarInicio: {
-                    transpile: 'padStart'
+                    transpile: 'padStart',
+                    returns: PrimitiveDataType.Texto
                 },
                 rellenarFinal: {
-                    transpile: 'padEnd'
+                    transpile: 'padEnd',
+                    returns: PrimitiveDataType.Texto
                 },
                 concatenar: {
-                    transpile: 'concat'
+                    transpile: 'concat',
+                    returns: PrimitiveDataType.Texto
                 },
                 recortarInicio: {
-                    transpile: 'trimStart'
+                    transpile: 'trimStart',
+                    returns: PrimitiveDataType.Texto
                 },
                 recortarFinal: {
-                    transpile: 'trimEnd'
+                    transpile: 'trimEnd',
+                    returns: PrimitiveDataType.Texto
                 },
                 normalizar: {
-                    transpile: 'normalize'
+                    transpile: 'normalize',
+                    returns: PrimitiveDataType.Texto
                 },
                 coincidir: {
-                    transpile: 'match'
+                    transpile: 'match',
+                    returns: AnyDataType.Any
                 },
                 coincidirTodo: {
-                    transpile: 'matchAll'
+                    transpile: 'matchAll',
+                    returns: AnyDataType.Any
                 },
                 buscar: {
-                    transpile: 'search'
+                    transpile: 'search',
+                    returns: PrimitiveDataType.Numero
                 },
                 codigoEn: {
-                    transpile: 'charCodeAt'
+                    transpile: 'charCodeAt',
+                    returns: PrimitiveDataType.Numero
                 },
                 subcadena: {
-                    transpile: 'substring'
+                    transpile: 'substring',
+                    returns: PrimitiveDataType.Texto
                 },
                 comparar: {
-                    transpile: 'localeCompare'
+                    transpile: 'localeCompare',
+                    returns: PrimitiveDataType.Numero
                 },
                 en: {
-                    transpile: 'at'
+                    transpile: 'at',
+                    returns: UnionDataType.of([PrimitiveType.Texto, PrimitiveType.Indefinido])
                 }
             },
             properties: {
                 longitud: {
-                    transpile: 'length'
+                    transpile: 'length',
+                    returns: PrimitiveDataType.Numero
                 }
             }
         },
         [ClassesEnum.Lista]: {
             methods: {
                 agregar: {
-                    transpile: 'push'
+                    transpile: 'push',
+                    returns: PrimitiveDataType.Numero
                 },
                 quitarUltimo: {
-                    transpile: 'pop'
+                    transpile: 'pop',
+                    returns: AnyDataType.Any
                 },
                 quitarPrimero: {
-                    transpile: 'shift'
+                    transpile: 'shift',
+                    returns: AnyDataType.Any
                 },
                 agregarInicio: {
-                    transpile: 'unshift'
+                    transpile: 'unshift',
+                    returns: PrimitiveDataType.Numero
                 },
                 unir: {
-                    transpile: 'join'
+                    transpile: 'join',
+                    returns: PrimitiveDataType.Texto
                 },
                 mapear: {
-                    transpile: 'map'
+                    transpile: 'map',
+                    returns: ArrayDataType.AnyList
                 },
                 llenar: {
-                    transpile: 'fill'
+                    transpile: 'fill',
+                    returns: ArrayDataType.AnyList
                 },
                 todos: {
-                    transpile: 'every'
+                    transpile: 'every',
+                    returns: PrimitiveDataType.Booleano
                 },
                 algunos: {
-                    transpile: 'some'
+                    transpile: 'some',
+                    returns: PrimitiveDataType.Booleano
                 },
                 filtrar: {
-                    transpile: 'filter'
+                    transpile: 'filter',
+                    returns: ArrayDataType.AnyList
                 },
                 encontrar: {
-                    transpile: 'find'
+                    transpile: 'find',
+                    returns: AnyDataType.Any
                 },
                 tiene: {
-                    transpile: 'includes'
+                    transpile: 'includes',
+                    returns: PrimitiveDataType.Booleano
                 },
                 cortar: {
-                    transpile: 'slice'
+                    transpile: 'slice',
+                    returns: ArrayDataType.AnyList
                 },
                 invertir: {
-                    transpile: 'reverse'
+                    transpile: 'reverse',
+                    returns: ArrayDataType.AnyList
                 },
                 ordenar: {
-                    transpile: 'sort'
+                    transpile: 'sort',
+                    returns: ArrayDataType.AnyList
                 },
                 reducir: {
-                    transpile: 'reduce'
+                    transpile: 'reduce',
+                    returns: AnyDataType.Any
                 },
                 aplanar: {
-                    transpile: 'flat'
+                    transpile: 'flat',
+                    returns: ArrayDataType.AnyList
                 },
                 paraCada: {
-                    transpile: 'forEach'
+                    transpile: 'forEach',
+                    returns: VoidDataType.Void
                 },
                 indiceDe: {
-                    transpile: 'indexOf'
+                    transpile: 'indexOf',
+                    returns: PrimitiveDataType.Numero
                 },
                 ultimoIndiceDe: {
-                    transpile: 'lastIndexOf'
+                    transpile: 'lastIndexOf',
+                    returns: PrimitiveDataType.Numero
                 },
                 concatenar: {
-                    transpile: 'concat'
+                    transpile: 'concat',
+                    returns: ArrayDataType.AnyList
                 },
                 buscarIndice: {
-                    transpile: 'findIndex'
+                    transpile: 'findIndex',
+                    returns: PrimitiveDataType.Numero
                 },
                 encontrarUltimo: {
-                    transpile: 'findLast'
+                    transpile: 'findLast',
+                    returns: AnyDataType.Any
                 },
                 aplanarMapear: {
-                    transpile: 'flatMap'
+                    transpile: 'flatMap',
+                    returns: ArrayDataType.AnyList
                 },
                 en: {
-                    transpile: 'at'
+                    transpile: 'at',
+                    returns: AnyDataType.Any
                 },
                 insertar: {
-                    transpile: 'splice'
+                    transpile: 'splice',
+                    returns: ArrayDataType.AnyList
                 },
                 eliminar: {
-                    transpile: 'splice'
+                    transpile: 'splice',
+                    returns: ArrayDataType.AnyList
                 },
                 claves: {
-                    transpile: 'keys'
+                    transpile: 'keys',
+                    returns: AnyDataType.Any
                 },
                 valores: {
-                    transpile: 'values'
+                    transpile: 'values',
+                    returns: AnyDataType.Any
                 },
                 entradas: {
-                    transpile: 'entries'
+                    transpile: 'entries',
+                    returns: AnyDataType.Any
                 },
                 reducirDerecha: {
-                    transpile: 'reduceRight'
+                    transpile: 'reduceRight',
+                    returns: AnyDataType.Any
                 },
                 copiarDentro: {
-                    transpile: 'copyWithin'
+                    transpile: 'copyWithin',
+                    returns: ArrayDataType.AnyList
                 },
                 ordenarCopia: {
-                    transpile: 'toSorted'
+                    transpile: 'toSorted',
+                    returns: ArrayDataType.AnyList
                 },
                 invertirCopia: {
-                    transpile: 'toReversed'
+                    transpile: 'toReversed',
+                    returns: ArrayDataType.AnyList
                 }
             },
             properties: {
                 longitud: {
-                    transpile: 'length'
+                    transpile: 'length',
+                    returns: PrimitiveDataType.Numero
                 }
             }
         },
@@ -252,172 +321,214 @@ export const corelib = {
             methods: {
                 absoluto: {
                     transpile: 'Math.abs',
+                    returns: PrimitiveDataType.Numero,
                     static: true
                 },
                 redondearArriba: {
                     transpile: 'Math.ceil',
+                    returns: PrimitiveDataType.Numero,
                     static: true
                 },
                 redondearAbajo: {
                     transpile: 'Math.floor',
+                    returns: PrimitiveDataType.Numero,
                     static: true
                 },
                 redondear: {
                     transpile: 'Math.round',
+                    returns: PrimitiveDataType.Numero,
                     static: true
                 },
                 truncar: {
                     transpile: 'Math.trunc',
+                    returns: PrimitiveDataType.Numero,
                     static: true
                 },
                 potencia: {
                     transpile: 'Math.pow',
+                    returns: PrimitiveDataType.Numero,
                     static: true
                 },
                 raizCuadrada: {
                     transpile: 'Math.sqrt',
+                    returns: PrimitiveDataType.Numero,
                     static: true
                 },
                 raizCubica: {
                     transpile: 'Math.cbrt',
+                    returns: PrimitiveDataType.Numero,
                     static: true
                 },
                 hipotenusa: {
                     transpile: 'Math.hypot',
+                    returns: PrimitiveDataType.Numero,
                     static: true
                 },
                 exponente: {
                     transpile: 'Math.exp',
+                    returns: PrimitiveDataType.Numero,
                     static: true
                 },
                 log: {
                     transpile: 'Math.log',
+                    returns: PrimitiveDataType.Numero,
                     static: true
                 },
                 log10: {
                     transpile: 'Math.log10',
+                    returns: PrimitiveDataType.Numero,
                     static: true
                 },
                 log2: {
                     transpile: 'Math.log2',
+                    returns: PrimitiveDataType.Numero,
                     static: true
                 },
                 seno: {
                     transpile: 'Math.sin',
+                    returns: PrimitiveDataType.Numero,
                     static: true
                 },
                 coseno: {
                     transpile: 'Math.cos',
+                    returns: PrimitiveDataType.Numero,
                     static: true
                 },
                 tangente: {
                     transpile: 'Math.tan',
+                    returns: PrimitiveDataType.Numero,
                     static: true
                 },
                 arcoseno: {
                     transpile: 'Math.asin',
+                    returns: PrimitiveDataType.Numero,
                     static: true
                 },
                 arcocoseno: {
                     transpile: 'Math.acos',
+                    returns: PrimitiveDataType.Numero,
                     static: true
                 },
                 arcotangente: {
                     transpile: 'Math.atan',
+                    returns: PrimitiveDataType.Numero,
                     static: true
                 },
                 arcotangente2: {
                     transpile: 'Math.atan2',
+                    returns: PrimitiveDataType.Numero,
                     static: true
                 },
                 senoHiperbolico: {
                     transpile: 'Math.sinh',
+                    returns: PrimitiveDataType.Numero,
                     static: true
                 },
                 cosenoHiperbolico: {
                     transpile: 'Math.cosh',
+                    returns: PrimitiveDataType.Numero,
                     static: true
                 },
                 tangenteHiperbolica: {
                     transpile: 'Math.tanh',
+                    returns: PrimitiveDataType.Numero,
                     static: true
                 },
                 maximo: {
                     transpile: 'Math.max',
+                    returns: PrimitiveDataType.Numero,
                     static: true
                 },
                 minimo: {
                     transpile: 'Math.min',
+                    returns: PrimitiveDataType.Numero,
                     static: true
                 },
                 aleatorio: {
                     transpile: 'Math.random',
+                    returns: PrimitiveDataType.Numero,
                     static: true
                 },
                 signo: {
                     transpile: 'Math.sign',
+                    returns: PrimitiveDataType.Numero,
                     static: true
                 },
                 arcosenoHiperbolico: {
                     transpile: 'Math.asinh',
+                    returns: PrimitiveDataType.Numero,
                     static: true
                 },
                 arcocosenoHiperbolico: {
                     transpile: 'Math.acosh',
+                    returns: PrimitiveDataType.Numero,
                     static: true
                 },
                 arcotangenteHiperbolica: {
                     transpile: 'Math.atanh',
+                    returns: PrimitiveDataType.Numero,
                     static: true
                 },
                 redondearFlotante: {
                     transpile: 'Math.fround',
+                    returns: PrimitiveDataType.Numero,
                     static: true
                 },
                 exponenteMenosUno: {
                     transpile: 'Math.expm1',
+                    returns: PrimitiveDataType.Numero,
                     static: true
                 },
                 logMasUno: {
                     transpile: 'Math.log1p',
+                    returns: PrimitiveDataType.Numero,
                     static: true
                 },
                 ceroInicial: {
                     transpile: 'Math.clz32',
+                    returns: PrimitiveDataType.Numero,
                     static: true
                 }
             },
             properties: {
                 PI: {
                     transpile: 'Math.PI',
+                    returns: PrimitiveDataType.Numero,
                     static: true
                 },
                 E: {
                     transpile: 'Math.E',
+                    returns: PrimitiveDataType.Numero,
                     static: true
                 },
                 LOGNEP2: {
                     transpile: 'Math.LN2',
+                    returns: PrimitiveDataType.Numero,
                     static: true
                 },
                 LOGNEP10: {
                     transpile: 'Math.LN10',
+                    returns: PrimitiveDataType.Numero,
                     static: true
                 },
                 LOG2E: {
                     transpile: 'Math.LOG2E',
+                    returns: PrimitiveDataType.Numero,
                     static: true
                 },
                 LOG10E: {
                     transpile: 'Math.LOG10E',
+                    returns: PrimitiveDataType.Numero,
                     static: true
                 },
                 RAIZCUADRADA1_2: {
                     transpile: 'Math.SQRT1_2',
+                    returns: PrimitiveDataType.Numero,
                     static: true
                 },
                 RAIZCUADRADA2: {
                     transpile: 'Math.SQRT2',
+                    returns: PrimitiveDataType.Numero,
                     static: true
                 }
             }
@@ -426,60 +537,75 @@ export const corelib = {
             methods: {
                 esEntero: {
                     transpile: 'Number.isInteger',
+                    returns: PrimitiveDataType.Booleano,
                     static: true
                 },
                 esNumero: {
                     transpile: 'Number.isFinite',
+                    returns: PrimitiveDataType.Booleano,
                     static: true
                 },
                 esEnteroSeguro: {
                     transpile: 'Number.isSafeInteger',
+                    returns: PrimitiveDataType.Booleano,
                     static: true
                 },
                 esNaN: {
                     transpile: 'Number.isNaN',
+                    returns: PrimitiveDataType.Booleano,
                     static: true
                 },
                 aEntero: {
                     transpile: 'parseInt',
+                    returns: PrimitiveDataType.Numero,
                     static: true
                 },
                 aDecimal: {
                     transpile: 'parseFloat',
+                    returns: PrimitiveDataType.Numero,
                     static: true
                 },
                 aFijo: {
-                    transpile: 'toFixed'
+                    transpile: 'toFixed',
+                    returns: PrimitiveDataType.Texto
                 },
                 aPrecision: {
-                    transpile: 'toPrecision'
+                    transpile: 'toPrecision',
+                    returns: PrimitiveDataType.Texto
                 },
                 aTexto: {
-                    transpile: 'toString'
+                    transpile: 'toString',
+                    returns: PrimitiveDataType.Texto
                 },
                 aLocal: {
-                    transpile: 'toLocaleString'
+                    transpile: 'toLocaleString',
+                    returns: PrimitiveDataType.Texto
                 }
             },
             properties: {
                 MAXIMO_SEGURO: {
                     transpile: 'Number.MAX_SAFE_INTEGER',
+                    returns: PrimitiveDataType.Numero,
                     static: true
                 },
                 MINIMO_SEGURO: {
                     transpile: 'Number.MIN_SAFE_INTEGER',
+                    returns: PrimitiveDataType.Numero,
                     static: true
                 },
                 MAXIMO: {
                     transpile: 'Number.MAX_VALUE',
+                    returns: PrimitiveDataType.Numero,
                     static: true
                 },
                 MINIMO: {
                     transpile: 'Number.MIN_VALUE',
+                    returns: PrimitiveDataType.Numero,
                     static: true
                 },
                 EPSILON: {
                     transpile: 'Number.EPSILON',
+                    returns: PrimitiveDataType.Numero,
                     static: true
                 }
             }
@@ -488,42 +614,51 @@ export const corelib = {
             methods: {
                 leer: {
                     transpile: 'JSON.parse',
+                    returns: AnyDataType.Any,
                     static: true
                 },
                 escribir: {
                     transpile: 'JSON.stringify',
+                    returns: PrimitiveDataType.Texto,
                     static: true
                 }
             }
         },
-        [ClassesEnum.Objeto]: {
+        [ClassesEnum.BDO]: {
             methods: {
                 claves: {
                     transpile: 'Object.keys',
+                    returns: ArrayDataType.of(PrimitiveDataType.Texto),
                     static: true
                 },
                 valores: {
                     transpile: 'Object.values',
+                    returns: ArrayDataType.AnyList,
                     static: true
                 },
                 entradas: {
                     transpile: 'Object.entries',
+                    returns: ArrayDataType.AnyList,
                     static: true
                 },
                 unir: {
                     transpile: 'Object.assign',
+                    returns: PrimitiveDataType.BDO,
                     static: true
                 },
                 congelar: {
                     transpile: 'Object.freeze',
+                    returns: AnyDataType.Any,
                     static: true
                 },
                 desdeEntradas: {
                     transpile: 'Object.fromEntries',
+                    returns: PrimitiveDataType.BDO,
                     static: true
                 },
                 tienePropia: {
                     transpile: 'Object.hasOwn',
+                    returns: PrimitiveDataType.Booleano,
                     static: true
                 }
             }
@@ -531,31 +666,38 @@ export const corelib = {
         [ClassesEnum.Mapa]: {
             methods: {
                 obtener: {
-                    transpile: 'get'
+                    transpile: 'get',
+                    returns: AnyDataType.Any
                 },
                 poner: {
-                    transpile: 'set'
+                    transpile: 'set',
+                    returns: AnyDataType.Any
                 },
                 existe: {
-                    transpile: 'has'
+                    transpile: 'has',
+                    returns: PrimitiveDataType.Booleano
                 },
                 borrar: {
-                    transpile: 'delete'
+                    transpile: 'delete',
+                    returns: PrimitiveDataType.Booleano
                 },
                 vaciar: {
-                    transpile: 'clear'
+                    transpile: 'clear',
+                    returns: VoidDataType.Void
                 }
             },
             properties: {
                 tamano: {
-                    transpile: 'size'
+                    transpile: 'size',
+                    returns: PrimitiveDataType.Numero
                 }
             }
         },
         [ClassesEnum.Conjunto]: {
             methods: {
                 sumar: {
-                    transpile: 'add'
+                    transpile: 'add',
+                    returns: AnyDataType.Any
                 }
             }
         },
@@ -563,26 +705,32 @@ export const corelib = {
             methods: {
                 todas: {
                     transpile: 'Promise.all',
+                    returns: AnyDataType.Any,
                     static: true
                 },
                 todasResueltas: {
                     transpile: 'Promise.allSettled',
+                    returns: AnyDataType.Any,
                     static: true
                 },
                 primera: {
                     transpile: 'Promise.race',
+                    returns: AnyDataType.Any,
                     static: true
                 },
                 cualquiera: {
                     transpile: 'Promise.any',
+                    returns: AnyDataType.Any,
                     static: true
                 },
                 resolver: {
                     transpile: 'Promise.resolve',
+                    returns: AnyDataType.Any,
                     static: true
                 },
                 rechazar: {
                     transpile: 'Promise.reject',
+                    returns: AnyDataType.Any,
                     static: true
                 }
             }
@@ -590,10 +738,12 @@ export const corelib = {
         [ClassesEnum.Expresion]: {
             methods: {
                 probar: {
-                    transpile: 'test'
+                    transpile: 'test',
+                    returns: PrimitiveDataType.Booleano
                 },
                 ejecutar: {
-                    transpile: 'exec'
+                    transpile: 'exec',
+                    returns: AnyDataType.Any
                 }
             }
         },

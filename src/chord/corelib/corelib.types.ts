@@ -1,3 +1,5 @@
+import { DataType } from "../DataType";
+
 /**
  * A single member (method or property) of a core library class, keyed by its name in the
  * source language inside `CoreLibClass`.
@@ -7,12 +9,10 @@ export interface CoreLibMember {
     readonly transpile: string;
     /** Whether it is called on the class itself (like `consola.imprimir`) instead of an instance. Omitted means `false`. */
     readonly static?: boolean;
-    /**
-     * Whether it is provided by a runtime module instead of being rewritten at compile time. Such a
-     * member only documents the name and what it maps to: lookups skip it, so it never rewrites an
-     * access. Omitted means `false`.
-     */
+    /** Whether it is provided by a runtime module. */
     readonly runtime?: boolean;
+    /** Type of the value a call to this member produces, or of the member itself for a property. */
+    readonly returns: DataType;
 }
 
 /**

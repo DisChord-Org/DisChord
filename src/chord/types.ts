@@ -67,7 +67,7 @@ export const PrimitiveType = {
     Texto: 'texto',
     Numero: 'numero',
     Booleano: 'booleano',
-    Objeto: 'objeto',
+    BDO: 'bdo',
     Indefinido: 'indefinido'
 } as const;
 

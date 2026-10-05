@@ -32,6 +32,8 @@ import { PrimitiveType, PrimitiveTypeName } from "./types";
  */
 export const DataTypeKind = {
     Primitive: 'primitive',
+    Any: 'any',
+    Void: 'void',
     Union: 'union',
     Array: 'array',
     Tuple: 'tuple'
@@ -64,6 +66,7 @@ export abstract class DataType {
      * @returns {boolean} Whether `source` is assignable to `this`.
      */
     public isAssignableFrom (source: DataType): boolean {
+        if (this instanceof AnyDataType || source instanceof AnyDataType) return true;
         if (source instanceof UnionDataType) return source.members.every(member => this.isAssignableFrom(member));
         return this.acceptsNonUnionSource(source);
     }
@@ -98,6 +101,17 @@ export class PrimitiveDataType extends DataType {
         return new PrimitiveDataType(name);
     }
 
+    /** Shared `texto` instance, so callers don't rebuild it with {@link of} each time. */
+    public static readonly Texto = PrimitiveDataType.of(PrimitiveType.Texto);
+    /** Shared `numero` instance. */
+    public static readonly Numero = PrimitiveDataType.of(PrimitiveType.Numero);
+    /** Shared `booleano` instance. */
+    public static readonly Booleano = PrimitiveDataType.of(PrimitiveType.Booleano);
+    /** Shared `indefinido` instance. */
+    public static readonly Indefinido = PrimitiveDataType.of(PrimitiveType.Indefinido);
+    /** Shared `bdo` instance. */
+    public static readonly BDO = PrimitiveDataType.of(PrimitiveType.BDO);
+
     /**
      * The single canonical correspondence between a native JS `typeof` result and the
      * {@link PrimitiveTypeName} DisChord surfaces for it — the one place this mapping is written,
@@ -111,11 +125,26 @@ export class PrimitiveDataType extends DataType {
         string: PrimitiveType.Texto,
         boolean: PrimitiveType.Booleano,
         undefined: PrimitiveType.Indefinido,
-        object: PrimitiveType.Objeto
+        object: PrimitiveType.BDO
     };
 
-    /** Infers the `PrimitiveDataType` for a native JS value via {@link typeofMap}. */
+    /**
+     * What the runtime `tipo x` operator yields for a list. Not a {@link PrimitiveTypeName}: lists
+     * are typed structurally (see {@link ArrayDataType}), so `lista` is not valid in a `tipo`
+     * annotation, only as a `tipo x` result. Native JS reports a list as `object`, so
+     * `UnaryVisitor` checks for it before consulting {@link typeofMap}.
+     */
+    public static readonly listTypeName = 'lista';
+
+    /**
+     * Infers the `PrimitiveDataType` for a native JS value via {@link typeofMap}. `null` is
+     * `indefinido` (the language has no `null`), and a list has no primitive type, so it yields
+     * `undefined` instead of the `bdo` that `typeof` would report.
+     */
     public static fromJSValue (value: unknown): PrimitiveDataType | undefined {
+        if (value === null) return PrimitiveDataType.Indefinido;
+        if (Array.isArray(value)) return undefined;
+
         const name = PrimitiveDataType.typeofMap[typeof value];
         return name ? PrimitiveDataType.of(name) : undefined;
     }
@@ -126,6 +155,56 @@ export class PrimitiveDataType extends DataType {
 
     public format (): string {
         return this.name;
+    }
+}
+
+/**
+ * A value whose type isn't known at compile time (what `mapear` or `JSON.leer` produce, say).
+ * Compatible with every other type in both directions, so it never causes a mismatch error but
+ * also never helps catch one. Not a {@link PrimitiveTypeName}: it can't be written in a `tipo`
+ * annotation, it only comes from the core library.
+ */
+export class AnyDataType extends DataType {
+    public readonly kind = DataTypeKind.Any;
+
+    private constructor () {
+        super();
+    }
+
+    /** The shared `cualquiera` instance. */
+    public static readonly Any = new AnyDataType();
+
+    protected acceptsNonUnionSource (): boolean {
+        return true;
+    }
+
+    public format (): string {
+        return 'cualquiera';
+    }
+}
+
+/**
+ * What a call that produces no value returns (`consola.imprimir`, `paraCada`). Distinct from
+ * `indefinido`, which is a value you can hold: using a `vacio` result (`var x es consola.imprimir()`)
+ * is a type error, since only `cualquiera` and another `vacio` accept it. Not a
+ * {@link PrimitiveTypeName}, so it can't be written in a `tipo` annotation either.
+ */
+export class VoidDataType extends DataType {
+    public readonly kind = DataTypeKind.Void;
+
+    private constructor () {
+        super();
+    }
+
+    /** The shared `vacio` instance. */
+    public static readonly Void = new VoidDataType();
+
+    protected acceptsNonUnionSource (source: DataType): boolean {
+        return source instanceof VoidDataType;
+    }
+
+    public format (): string {
+        return 'vacio';
     }
 }
 
@@ -180,6 +259,9 @@ export class ArrayDataType extends DataType {
         super();
         this.element = element;
     }
+
+    /** Shared `cualquiera[]` instance: a list whose element type isn't known. */
+    public static readonly AnyList = new ArrayDataType(AnyDataType.Any);
 
     /** Builds a homogeneous array `DataType` of `element`. */
     public static of (element: DataType): ArrayDataType {
