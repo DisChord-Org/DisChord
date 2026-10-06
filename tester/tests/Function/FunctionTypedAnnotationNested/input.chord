@@ -1,0 +1,5 @@
+funcion f() {
+    funcion g(x tipo (Caja[])|indefinido) {
+        devolver x
+    }
+}

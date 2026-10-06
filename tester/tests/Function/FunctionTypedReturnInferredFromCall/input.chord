@@ -1,0 +1,9 @@
+funcion hayEn(c tipo Mapa, x tipo texto) -> booleano {
+    devolver c.tiene(x)
+}
+
+var m es nuevo Mapa()
+var b es hayEn(m, "a")
+var c tipo booleano es hayEn(m, "a")
+consola.imprimir(b)
+consola.imprimir(c)

@@ -1,0 +1,291 @@
+[
+  {
+    "type": "importar",
+    "identificators": [],
+    "path": "./lib/consoleRuntime.js",
+    "isDestructured": false,
+    "location": {
+      "line": 0,
+      "column": 0
+    }
+  },
+  {
+    "type": "clase",
+    "id": "Caja",
+    "body": [
+      {
+        "type": "funcion",
+        "id": "Caja",
+        "metadata": {
+          "isConstructor": true,
+          "isMethod": true,
+          "isStatic": false,
+          "isAsync": false
+        },
+        "params": [
+          "a"
+        ],
+        "paramTypes": [
+          {
+            "kind": "primitive",
+            "name": "texto"
+          }
+        ],
+        "body": [
+          {
+            "type": "Asignacion",
+            "left": {
+              "type": "Acceso",
+              "object": {
+                "type": "esta",
+                "value": "",
+                "location": {
+                  "line": 3,
+                  "column": 9
+                }
+              },
+              "property": "a",
+              "location": {
+                "line": 3,
+                "column": 14
+              }
+            },
+            "assignment": {
+              "type": "IDENTIFICADOR",
+              "value": "a",
+              "location": {
+                "line": 3,
+                "column": 19
+              }
+            },
+            "location": {
+              "line": 3,
+              "column": 19
+            }
+          }
+        ],
+        "location": {
+          "line": 4,
+          "column": 5
+        }
+      },
+      {
+        "type": "funcion",
+        "id": "pesar",
+        "metadata": {
+          "isConstructor": false,
+          "isMethod": true,
+          "isStatic": false,
+          "isAsync": false
+        },
+        "params": [
+          "kilos"
+        ],
+        "paramTypes": [
+          {
+            "kind": "primitive",
+            "name": "numero"
+          }
+        ],
+        "returnType": {
+          "kind": "primitive",
+          "name": "numero"
+        },
+        "body": [
+          {
+            "type": "devolver",
+            "object": {
+              "type": "IDENTIFICADOR",
+              "value": "kilos",
+              "location": {
+                "line": 7,
+                "column": 18
+              }
+            },
+            "location": {
+              "line": 7,
+              "column": 18
+            }
+          }
+        ],
+        "location": {
+          "line": 8,
+          "column": 5
+        }
+      },
+      {
+        "type": "funcion",
+        "id": "doble",
+        "metadata": {
+          "isConstructor": false,
+          "isMethod": true,
+          "isStatic": false,
+          "isAsync": false
+        },
+        "params": [
+          "kilos"
+        ],
+        "paramTypes": [
+          {
+            "kind": "primitive",
+            "name": "numero"
+          }
+        ],
+        "returnType": {
+          "kind": "primitive",
+          "name": "numero"
+        },
+        "body": [
+          {
+            "type": "devolver",
+            "object": {
+              "type": "Llamada",
+              "object": {
+                "type": "Acceso",
+                "object": {
+                  "type": "esta",
+                  "value": "",
+                  "location": {
+                    "line": 11,
+                    "column": 18
+                  }
+                },
+                "property": "pesar",
+                "location": {
+                  "line": 11,
+                  "column": 23
+                }
+              },
+              "params": [
+                {
+                  "type": "IDENTIFICADOR",
+                  "value": "kilos",
+                  "location": {
+                    "line": 11,
+                    "column": 29
+                  }
+                }
+              ],
+              "location": {
+                "line": 11,
+                "column": 34
+              }
+            },
+            "location": {
+              "line": 11,
+              "column": 34
+            }
+          }
+        ],
+        "location": {
+          "line": 12,
+          "column": 5
+        }
+      }
+    ],
+    "location": {
+      "line": 13,
+      "column": 1
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "c",
+    "value": {
+      "type": "nuevo",
+      "object": {
+        "type": "Llamada",
+        "object": {
+          "type": "IDENTIFICADOR",
+          "value": "Caja",
+          "location": {
+            "line": 15,
+            "column": 16
+          }
+        },
+        "params": [
+          {
+            "type": "Literal",
+            "value": "x",
+            "raw": "x",
+            "location": {
+              "line": 15,
+              "column": 21
+            }
+          }
+        ],
+        "location": {
+          "line": 15,
+          "column": 24
+        }
+      },
+      "location": {
+        "line": 15,
+        "column": 24
+      }
+    },
+    "location": {
+      "line": 15,
+      "column": 24
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 16,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 16,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "Llamada",
+        "object": {
+          "type": "Acceso",
+          "object": {
+            "type": "IDENTIFICADOR",
+            "value": "c",
+            "location": {
+              "line": 16,
+              "column": 18
+            }
+          },
+          "property": "pesar",
+          "location": {
+            "line": 16,
+            "column": 20
+          }
+        },
+        "params": [
+          {
+            "type": "Literal",
+            "value": 2,
+            "raw": "2",
+            "location": {
+              "line": 16,
+              "column": 26
+            }
+          }
+        ],
+        "location": {
+          "line": 16,
+          "column": 27
+        }
+      }
+    ],
+    "location": {
+      "line": 16,
+      "column": 28
+    }
+  }
+]

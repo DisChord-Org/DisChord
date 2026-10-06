@@ -1,0 +1,12 @@
+funcion saludar(nombre tipo texto, titulo tipo texto|indefinido) {
+    consola.imprimir(nombre)
+}
+
+saludar("a")
+saludar("a", "b")
+
+funcion mezcla(a tipo numero, b) {
+    consola.imprimir(a)
+}
+
+mezcla(1)

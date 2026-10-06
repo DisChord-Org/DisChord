@@ -1,0 +1,93 @@
+[
+  {
+    "type": "clase",
+    "id": "Caja",
+    "body": [
+      {
+        "type": "funcion",
+        "id": "pesar",
+        "metadata": {
+          "isConstructor": false,
+          "isMethod": true,
+          "isStatic": false,
+          "isAsync": false
+        },
+        "params": [
+          "a"
+        ],
+        "paramTypes": [
+          {
+            "kind": "primitive",
+            "name": "numero"
+          }
+        ],
+        "returnType": {
+          "kind": "primitive",
+          "name": "numero"
+        },
+        "body": [
+          {
+            "type": "funcion",
+            "id": "interna",
+            "metadata": {
+              "isConstructor": false,
+              "isMethod": false,
+              "isStatic": false,
+              "isAsync": false
+            },
+            "params": [],
+            "returnType": {
+              "kind": "primitive",
+              "name": "texto"
+            },
+            "body": [
+              {
+                "type": "devolver",
+                "object": {
+                  "type": "Literal",
+                  "value": "x",
+                  "raw": "x",
+                  "location": {
+                    "line": 4,
+                    "column": 22
+                  }
+                },
+                "location": {
+                  "line": 4,
+                  "column": 22
+                }
+              }
+            ],
+            "location": {
+              "line": 5,
+              "column": 9
+            }
+          },
+          {
+            "type": "devolver",
+            "object": {
+              "type": "IDENTIFICADOR",
+              "value": "a",
+              "location": {
+                "line": 6,
+                "column": 18
+              }
+            },
+            "location": {
+              "line": 6,
+              "column": 18
+            }
+          }
+        ],
+        "location": {
+          "line": 7,
+          "column": 5
+        }
+      }
+    ],
+    "location": {
+      "line": 8,
+      "column": 1
+    }
+  }
+]

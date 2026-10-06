@@ -1,0 +1,5 @@
+clase Caja {
+    funcion m(x tipo mango) {
+        devolver x
+    }
+}

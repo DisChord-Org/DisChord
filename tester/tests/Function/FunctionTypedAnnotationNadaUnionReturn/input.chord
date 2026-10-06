@@ -1,0 +1,5 @@
+funcion f() -> texto|nada {
+    devolver "a"
+}
+
+consola.imprimir(f())

@@ -8,6 +8,8 @@ import { ValidateTypeAnnotationsRule } from "./rules/ValidateTypeAnnotationsRule
 import { ResolveVariableTypesRule } from "./rules/ResolveVariableTypesRule";
 import { ValidateAssignmentTypesRule } from "./rules/ValidateAssignmentTypesRule";
 import { ValidateCallTargetsRule } from "./rules/ValidateCallTargetsRule";
+import { ValidateReturnTypesRule } from "./rules/ValidateReturnTypesRule";
+import { ValidateCallArgumentsRule } from "./rules/ValidateCallArgumentsRule";
 import { ResolveAwaitedCallsRule } from "./rules/ResolveAwaitedCallsRule";
 import { RequiresConsoleRuntimeRule } from "./rules/RequiresConsoleRuntimeRule";
 import { RequiresRuntimeHelpersRule } from "./rules/RequiresRuntimeHelpersRule";
@@ -64,6 +66,12 @@ export class Analyzer<T extends string, N extends BaseNode<T>> {
         // Reassignment validation — needs every variable's dataType already resolved by Pass 3
         // above, so it runs after it rather than as part of it.
         ValidateAssignmentTypesRule,
+
+        // Checks each `devolver` against the declared return type; needs the types resolved by Pass 3.
+        ValidateReturnTypesRule,
+
+        // Checks the arguments of each call against the declared parameter types.
+        ValidateCallArgumentsRule,
 
         // Decides which calls are awaited; needs the types resolved by Pass 3.
         ResolveAwaitedCallsRule,

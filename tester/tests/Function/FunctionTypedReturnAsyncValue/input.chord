@@ -1,0 +1,8 @@
+@asincrono
+funcion cargar() -> numero {
+    devolver 5
+}
+
+var r es cargar()
+var n tipo numero es r
+consola.imprimir(n)

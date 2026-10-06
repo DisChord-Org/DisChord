@@ -1,0 +1,310 @@
+[
+  {
+    "type": "funcion",
+    "id": "hayEn",
+    "metadata": {
+      "isConstructor": false,
+      "isMethod": false,
+      "isStatic": false,
+      "isAsync": false
+    },
+    "params": [
+      "c",
+      "x"
+    ],
+    "paramTypes": [
+      {
+        "kind": "class",
+        "name": "Mapa"
+      },
+      {
+        "kind": "primitive",
+        "name": "texto"
+      }
+    ],
+    "returnType": {
+      "kind": "primitive",
+      "name": "booleano"
+    },
+    "body": [
+      {
+        "type": "devolver",
+        "object": {
+          "type": "Llamada",
+          "object": {
+            "type": "Acceso",
+            "object": {
+              "type": "IDENTIFICADOR",
+              "value": "c",
+              "location": {
+                "line": 2,
+                "column": 14
+              }
+            },
+            "property": "tiene",
+            "location": {
+              "line": 2,
+              "column": 16
+            }
+          },
+          "params": [
+            {
+              "type": "IDENTIFICADOR",
+              "value": "x",
+              "location": {
+                "line": 2,
+                "column": 22
+              }
+            }
+          ],
+          "location": {
+            "line": 2,
+            "column": 23
+          }
+        },
+        "location": {
+          "line": 2,
+          "column": 23
+        }
+      }
+    ],
+    "location": {
+      "line": 3,
+      "column": 1
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "m",
+    "value": {
+      "type": "nuevo",
+      "object": {
+        "type": "Llamada",
+        "object": {
+          "type": "IDENTIFICADOR",
+          "value": "Mapa",
+          "location": {
+            "line": 4,
+            "column": 16
+          }
+        },
+        "params": [],
+        "location": {
+          "line": 4,
+          "column": 21
+        }
+      },
+      "location": {
+        "line": 4,
+        "column": 21
+      }
+    },
+    "location": {
+      "line": 4,
+      "column": 21
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "IDENTIFICADOR",
+      "value": "hayEn",
+      "location": {
+        "line": 5,
+        "column": 1
+      }
+    },
+    "params": [
+      {
+        "type": "IDENTIFICADOR",
+        "value": "m",
+        "location": {
+          "line": 5,
+          "column": 7
+        }
+      },
+      {
+        "type": "Literal",
+        "value": "a",
+        "raw": "a",
+        "location": {
+          "line": 5,
+          "column": 10
+        }
+      }
+    ],
+    "location": {
+      "line": 5,
+      "column": 13
+    }
+  },
+  {
+    "type": "funcion",
+    "id": "puente",
+    "metadata": {
+      "isConstructor": false,
+      "isMethod": false,
+      "isStatic": false,
+      "isAsync": false
+    },
+    "params": [
+      "p",
+      "q"
+    ],
+    "paramTypes": [
+      null,
+      {
+        "kind": "primitive",
+        "name": "numero"
+      }
+    ],
+    "body": [
+      {
+        "type": "Llamada",
+        "object": {
+          "type": "IDENTIFICADOR",
+          "value": "hayEn",
+          "location": {
+            "line": 8,
+            "column": 5
+          }
+        },
+        "params": [
+          {
+            "type": "IDENTIFICADOR",
+            "value": "p",
+            "location": {
+              "line": 8,
+              "column": 11
+            }
+          },
+          {
+            "type": "Literal",
+            "value": "a",
+            "raw": "a",
+            "location": {
+              "line": 8,
+              "column": 14
+            }
+          }
+        ],
+        "location": {
+          "line": 8,
+          "column": 17
+        }
+      },
+      {
+        "type": "Llamada",
+        "object": {
+          "type": "IDENTIFICADOR",
+          "value": "hayEn",
+          "location": {
+            "line": 9,
+            "column": 5
+          }
+        },
+        "params": [
+          {
+            "type": "IDENTIFICADOR",
+            "value": "m",
+            "location": {
+              "line": 9,
+              "column": 11
+            }
+          },
+          {
+            "type": "IDENTIFICADOR",
+            "value": "p",
+            "location": {
+              "line": 9,
+              "column": 14
+            }
+          }
+        ],
+        "location": {
+          "line": 9,
+          "column": 15
+        }
+      }
+    ],
+    "location": {
+      "line": 10,
+      "column": 1
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "cualquiera",
+    "value": {
+      "type": "Llamada",
+      "object": {
+        "type": "Acceso",
+        "object": {
+          "type": "IDENTIFICADOR",
+          "value": "JSON",
+          "location": {
+            "line": 12,
+            "column": 19
+          }
+        },
+        "property": "leer",
+        "location": {
+          "line": 12,
+          "column": 24
+        }
+      },
+      "params": [
+        {
+          "type": "Literal",
+          "value": "1",
+          "raw": "1",
+          "location": {
+            "line": 12,
+            "column": 29
+          }
+        }
+      ],
+      "location": {
+        "line": 12,
+        "column": 32
+      }
+    },
+    "location": {
+      "line": 12,
+      "column": 32
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "IDENTIFICADOR",
+      "value": "hayEn",
+      "location": {
+        "line": 13,
+        "column": 1
+      }
+    },
+    "params": [
+      {
+        "type": "IDENTIFICADOR",
+        "value": "m",
+        "location": {
+          "line": 13,
+          "column": 7
+        }
+      },
+      {
+        "type": "IDENTIFICADOR",
+        "value": "cualquiera",
+        "location": {
+          "line": 13,
+          "column": 10
+        }
+      }
+    ],
+    "location": {
+      "line": 13,
+      "column": 20
+    }
+  }
+]

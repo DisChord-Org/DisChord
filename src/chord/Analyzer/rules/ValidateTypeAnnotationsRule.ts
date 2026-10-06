@@ -1,6 +1,6 @@
 import { AnalysisRule } from "../AnalysisRule";
 import { walkAST } from "../walkAST";
-import { ASTNode, BaseNode, PrimitiveType, TokenType, VariableNode } from "../../types";
+import { ASTNode, BaseNode, FunctionNode, PrimitiveType, TokenType, VariableNode } from "../../types";
 import { ArrayDataType, DataType, TupleDataType, UnionDataType, UserClassDataType, VoidDataType } from "../../DataType";
 import { ChordError, ErrorLevel } from "../../../errors/ChordError";
 
@@ -8,8 +8,9 @@ import { ChordError, ErrorLevel } from "../../../errors/ChordError";
  * Checks the names a `tipo` annotation uses, which `TypeAnnotationParser` can't: a class of the
  * user may be declared further down the file, so the parser leaves any unrecognized name as a
  * provisional `UserClassDataType`, and this rule, running once every class is bound, rejects the
- * ones that name no class. It also rejects `nada`, which only makes sense as a return type, in a
- * `var`'s annotation.
+ * ones that name no class. It also rejects `nada`, which only makes sense as a return type, anywhere
+ * a value's type is written. Today that is a `var`'s annotation, a parameter's and a return type (of functions, methods and constructors). `nada` is
+ * valid only as a return type, alone or in a union, never as a parameter or inside a list or tuple.
  *
  * Runs before `ResolveVariableTypesRule`, so an annotation is known to be well-formed by the time
  * it is compared with its initializer.
@@ -20,6 +21,14 @@ export class ValidateTypeAnnotationsRule<T extends string, N extends BaseNode<T>
      */
     check (nodes: ASTNode<T, N>[]): void {
         nodes.forEach(node => walkAST<T, N>(node, current => {
+            if (current.type === TokenType.Funcion) {
+                const fn = current as FunctionNode<T, N>;
+
+                fn.paramTypes?.forEach(type => type && this.validate(type, fn.location, false));
+                if (fn.returnType) this.validate(fn.returnType, fn.location, true);
+                return;
+            }
+
             if (current.type !== TokenType.VARIABLE) return;
 
             const variable = current as VariableNode<T, N>;

@@ -1,0 +1,3 @@
+funcion f() -> numero {
+    consola.imprimir(1)
+}

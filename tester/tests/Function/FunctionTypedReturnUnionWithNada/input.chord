@@ -1,0 +1,11 @@
+funcion buscar() -> texto|nada {
+    devolver "a"
+}
+
+funcion vacia() -> texto|nada {
+    devolver
+}
+
+funcion sinDevolver() -> texto|nada {
+    consola.imprimir(1)
+}

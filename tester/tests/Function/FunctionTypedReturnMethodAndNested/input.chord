@@ -1,0 +1,8 @@
+clase Caja {
+    funcion pesar(a tipo numero) -> numero {
+        funcion interna() -> texto {
+            devolver "x"
+        }
+        devolver a
+    }
+}

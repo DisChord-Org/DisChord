@@ -1,0 +1,6 @@
+funcion sumar(a, b) {
+    devolver a mas b
+}
+
+consola.imprimir(sumar(1, 2, 3))
+consola.imprimir(sumar(1))

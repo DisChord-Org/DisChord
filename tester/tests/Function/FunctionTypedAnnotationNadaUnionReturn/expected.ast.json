@@ -1,0 +1,98 @@
+[
+  {
+    "type": "importar",
+    "identificators": [],
+    "path": "./lib/consoleRuntime.js",
+    "isDestructured": false,
+    "location": {
+      "line": 0,
+      "column": 0
+    }
+  },
+  {
+    "type": "funcion",
+    "id": "f",
+    "metadata": {
+      "isConstructor": false,
+      "isMethod": false,
+      "isStatic": false,
+      "isAsync": false
+    },
+    "params": [],
+    "returnType": {
+      "kind": "union",
+      "members": [
+        {
+          "kind": "primitive",
+          "name": "texto"
+        },
+        {
+          "kind": "void"
+        }
+      ]
+    },
+    "body": [
+      {
+        "type": "devolver",
+        "object": {
+          "type": "Literal",
+          "value": "a",
+          "raw": "a",
+          "location": {
+            "line": 2,
+            "column": 14
+          }
+        },
+        "location": {
+          "line": 2,
+          "column": 14
+        }
+      }
+    ],
+    "location": {
+      "line": 3,
+      "column": 1
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 5,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 5,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "Llamada",
+        "object": {
+          "type": "IDENTIFICADOR",
+          "value": "f",
+          "location": {
+            "line": 5,
+            "column": 18
+          }
+        },
+        "params": [],
+        "location": {
+          "line": 5,
+          "column": 20
+        }
+      }
+    ],
+    "location": {
+      "line": 5,
+      "column": 21
+    }
+  }
+]

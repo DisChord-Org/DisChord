@@ -1,0 +1,13 @@
+funcion hayEn(c tipo Mapa, x tipo texto) -> booleano {
+    devolver c.tiene(x)
+}
+var m es nuevo Mapa()
+hayEn(m, "a")
+
+funcion puente(p, q tipo numero) {
+    hayEn(p, "a")
+    hayEn(m, p)
+}
+
+var cualquiera es JSON.leer("1")
+hayEn(m, cualquiera)

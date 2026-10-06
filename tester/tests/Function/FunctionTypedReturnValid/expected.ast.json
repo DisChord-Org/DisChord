@@ -1,0 +1,158 @@
+[
+  {
+    "type": "funcion",
+    "id": "hayEn",
+    "metadata": {
+      "isConstructor": false,
+      "isMethod": false,
+      "isStatic": false,
+      "isAsync": false
+    },
+    "params": [
+      "c",
+      "x"
+    ],
+    "paramTypes": [
+      {
+        "kind": "class",
+        "name": "Mapa"
+      },
+      {
+        "kind": "primitive",
+        "name": "texto"
+      }
+    ],
+    "returnType": {
+      "kind": "primitive",
+      "name": "booleano"
+    },
+    "body": [
+      {
+        "type": "devolver",
+        "object": {
+          "type": "Llamada",
+          "object": {
+            "type": "Acceso",
+            "object": {
+              "type": "IDENTIFICADOR",
+              "value": "c",
+              "location": {
+                "line": 2,
+                "column": 14
+              }
+            },
+            "property": "tiene",
+            "location": {
+              "line": 2,
+              "column": 16
+            }
+          },
+          "params": [
+            {
+              "type": "IDENTIFICADOR",
+              "value": "x",
+              "location": {
+                "line": 2,
+                "column": 22
+              }
+            }
+          ],
+          "location": {
+            "line": 2,
+            "column": 23
+          }
+        },
+        "location": {
+          "line": 2,
+          "column": 23
+        }
+      }
+    ],
+    "location": {
+      "line": 3,
+      "column": 1
+    }
+  },
+  {
+    "type": "funcion",
+    "id": "cualquierCosa",
+    "metadata": {
+      "isConstructor": false,
+      "isMethod": false,
+      "isStatic": false,
+      "isAsync": false
+    },
+    "params": [],
+    "returnType": {
+      "kind": "any"
+    },
+    "body": [
+      {
+        "type": "devolver",
+        "object": {
+          "type": "Literal",
+          "value": 1,
+          "raw": "1",
+          "location": {
+            "line": 6,
+            "column": 14
+          }
+        },
+        "location": {
+          "line": 6,
+          "column": 14
+        }
+      }
+    ],
+    "location": {
+      "line": 7,
+      "column": 1
+    }
+  },
+  {
+    "type": "funcion",
+    "id": "desconocido",
+    "metadata": {
+      "isConstructor": false,
+      "isMethod": false,
+      "isStatic": false,
+      "isAsync": false
+    },
+    "params": [
+      "p"
+    ],
+    "returnType": {
+      "kind": "primitive",
+      "name": "numero"
+    },
+    "body": [
+      {
+        "type": "devolver",
+        "object": {
+          "type": "Acceso",
+          "object": {
+            "type": "IDENTIFICADOR",
+            "value": "p",
+            "location": {
+              "line": 10,
+              "column": 14
+            }
+          },
+          "property": "valor",
+          "location": {
+            "line": 10,
+            "column": 16
+          }
+        },
+        "location": {
+          "line": 10,
+          "column": 16
+        }
+      }
+    ],
+    "location": {
+      "line": 11,
+      "column": 1
+    }
+  }
+]

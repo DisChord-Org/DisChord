@@ -1,0 +1,5 @@
+clase Caja {
+    Caja(x tipo mango) {
+        esta.x es x
+    }
+}

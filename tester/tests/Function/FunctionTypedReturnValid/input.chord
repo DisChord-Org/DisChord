@@ -1,0 +1,11 @@
+funcion hayEn(c tipo Mapa, x tipo texto) -> booleano {
+    devolver c.tiene(x)
+}
+
+funcion cualquierCosa() -> cualquiera {
+    devolver 1
+}
+
+funcion desconocido(p) -> numero {
+    devolver p.valor
+}

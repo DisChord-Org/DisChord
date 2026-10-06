@@ -1,0 +1,126 @@
+[
+  {
+    "type": "importar",
+    "identificators": [],
+    "path": "./lib/consoleRuntime.js",
+    "isDestructured": false,
+    "location": {
+      "line": 0,
+      "column": 0
+    }
+  },
+  {
+    "type": "funcion",
+    "id": "cargar",
+    "metadata": {
+      "isConstructor": false,
+      "isMethod": false,
+      "isStatic": false,
+      "isAsync": true
+    },
+    "params": [],
+    "returnType": {
+      "kind": "primitive",
+      "name": "numero"
+    },
+    "body": [
+      {
+        "type": "devolver",
+        "object": {
+          "type": "Literal",
+          "value": 5,
+          "raw": "5",
+          "location": {
+            "line": 3,
+            "column": 14
+          }
+        },
+        "location": {
+          "line": 3,
+          "column": 14
+        }
+      }
+    ],
+    "location": {
+      "line": 4,
+      "column": 1
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "r",
+    "value": {
+      "type": "Llamada",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "cargar",
+        "location": {
+          "line": 6,
+          "column": 10
+        }
+      },
+      "params": [],
+      "location": {
+        "line": 6,
+        "column": 17
+      }
+    },
+    "location": {
+      "line": 6,
+      "column": 17
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "n",
+    "value": {
+      "type": "IDENTIFICADOR",
+      "value": "r",
+      "location": {
+        "line": 7,
+        "column": 22
+      }
+    },
+    "dataType": {
+      "kind": "primitive",
+      "name": "numero"
+    },
+    "location": {
+      "line": 7,
+      "column": 22
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 8,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 8,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "IDENTIFICADOR",
+        "value": "n",
+        "location": {
+          "line": 8,
+          "column": 18
+        }
+      }
+    ],
+    "location": {
+      "line": 8,
+      "column": 19
+    }
+  }
+]

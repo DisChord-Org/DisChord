@@ -1,0 +1,5 @@
+funcion f() -> nada {
+    consola.imprimir(1)
+}
+
+var x es f()

@@ -1,0 +1,8 @@
+clase Caja {
+    funcion pesar(kilos tipo numero) -> numero {
+        devolver kilos
+    }
+}
+
+var c es nuevo Caja()
+c.pesar("mucho")

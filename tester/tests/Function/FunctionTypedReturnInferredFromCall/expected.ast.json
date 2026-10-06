@@ -1,0 +1,271 @@
+[
+  {
+    "type": "importar",
+    "identificators": [],
+    "path": "./lib/consoleRuntime.js",
+    "isDestructured": false,
+    "location": {
+      "line": 0,
+      "column": 0
+    }
+  },
+  {
+    "type": "funcion",
+    "id": "hayEn",
+    "metadata": {
+      "isConstructor": false,
+      "isMethod": false,
+      "isStatic": false,
+      "isAsync": false
+    },
+    "params": [
+      "c",
+      "x"
+    ],
+    "paramTypes": [
+      {
+        "kind": "class",
+        "name": "Mapa"
+      },
+      {
+        "kind": "primitive",
+        "name": "texto"
+      }
+    ],
+    "returnType": {
+      "kind": "primitive",
+      "name": "booleano"
+    },
+    "body": [
+      {
+        "type": "devolver",
+        "object": {
+          "type": "Llamada",
+          "object": {
+            "type": "Acceso",
+            "object": {
+              "type": "IDENTIFICADOR",
+              "value": "c",
+              "location": {
+                "line": 2,
+                "column": 14
+              }
+            },
+            "property": "tiene",
+            "location": {
+              "line": 2,
+              "column": 16
+            }
+          },
+          "params": [
+            {
+              "type": "IDENTIFICADOR",
+              "value": "x",
+              "location": {
+                "line": 2,
+                "column": 22
+              }
+            }
+          ],
+          "location": {
+            "line": 2,
+            "column": 23
+          }
+        },
+        "location": {
+          "line": 2,
+          "column": 23
+        }
+      }
+    ],
+    "location": {
+      "line": 3,
+      "column": 1
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "m",
+    "value": {
+      "type": "nuevo",
+      "object": {
+        "type": "Llamada",
+        "object": {
+          "type": "IDENTIFICADOR",
+          "value": "Mapa",
+          "location": {
+            "line": 5,
+            "column": 16
+          }
+        },
+        "params": [],
+        "location": {
+          "line": 5,
+          "column": 21
+        }
+      },
+      "location": {
+        "line": 5,
+        "column": 21
+      }
+    },
+    "location": {
+      "line": 5,
+      "column": 21
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "b",
+    "value": {
+      "type": "Llamada",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "hayEn",
+        "location": {
+          "line": 6,
+          "column": 10
+        }
+      },
+      "params": [
+        {
+          "type": "IDENTIFICADOR",
+          "value": "m",
+          "location": {
+            "line": 6,
+            "column": 16
+          }
+        },
+        {
+          "type": "Literal",
+          "value": "a",
+          "raw": "a",
+          "location": {
+            "line": 6,
+            "column": 19
+          }
+        }
+      ],
+      "location": {
+        "line": 6,
+        "column": 22
+      }
+    },
+    "location": {
+      "line": 6,
+      "column": 22
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "c",
+    "value": {
+      "type": "Llamada",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "hayEn",
+        "location": {
+          "line": 7,
+          "column": 24
+        }
+      },
+      "params": [
+        {
+          "type": "IDENTIFICADOR",
+          "value": "m",
+          "location": {
+            "line": 7,
+            "column": 30
+          }
+        },
+        {
+          "type": "Literal",
+          "value": "a",
+          "raw": "a",
+          "location": {
+            "line": 7,
+            "column": 33
+          }
+        }
+      ],
+      "location": {
+        "line": 7,
+        "column": 36
+      }
+    },
+    "dataType": {
+      "kind": "primitive",
+      "name": "booleano"
+    },
+    "location": {
+      "line": 7,
+      "column": 36
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 8,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 8,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "IDENTIFICADOR",
+        "value": "b",
+        "location": {
+          "line": 8,
+          "column": 18
+        }
+      }
+    ],
+    "location": {
+      "line": 8,
+      "column": 19
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 9,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 9,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "IDENTIFICADOR",
+        "value": "c",
+        "location": {
+          "line": 9,
+          "column": 18
+        }
+      }
+    ],
+    "location": {
+      "line": 9,
+      "column": 19
+    }
+  }
+]

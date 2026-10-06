@@ -1,0 +1,3 @@
+funcion f() -> nada {
+    devolver 1
+}

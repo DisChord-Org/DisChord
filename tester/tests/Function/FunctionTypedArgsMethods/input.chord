@@ -1,0 +1,16 @@
+clase Caja {
+    Caja(a tipo texto) {
+        esta.a es a
+    }
+
+    funcion pesar(kilos tipo numero) -> numero {
+        devolver kilos
+    }
+
+    funcion doble(kilos tipo numero) -> numero {
+        devolver esta.pesar(kilos)
+    }
+}
+
+var c es nuevo Caja("x")
+consola.imprimir(c.pesar(2))

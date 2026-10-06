@@ -1,0 +1,8 @@
+funcion f(x tipo Caja) {
+    devolver x
+}
+
+clase Caja {
+}
+
+consola.imprimir(f(nuevo Caja()))

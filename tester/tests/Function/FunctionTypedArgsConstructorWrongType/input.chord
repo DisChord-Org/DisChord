@@ -1,0 +1,7 @@
+clase Caja {
+    Caja(a tipo texto) {
+        esta.a es a
+    }
+}
+
+var c es nuevo Caja(1)
