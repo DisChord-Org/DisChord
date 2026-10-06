@@ -1,0 +1,6 @@
+funcion f(c tipo Lista|Conjunto) {
+    devolver c.agregar(1)
+}
+
+consola.imprimir(f([]))
+consola.imprimir(f(nuevo Conjunto()))

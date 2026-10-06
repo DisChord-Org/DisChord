@@ -1,4 +1,5 @@
-import { CallNode, BaseNode, TokenType, TokenTypeUnion } from "../../../types";
+import { AccessNode, CallNode, BaseNode, TokenType, TokenTypeUnion } from "../../../types";
+import { CallDispatch } from "../../../SymbolsTable";
 import { isAccessNode, isIdentificatorNode } from "../../../ast.guards";
 import { SubGenerator } from "../../SubGenerator";
 import { asyncRuntimeHelperNames, coreLibUtils } from "../../../corelib";
@@ -34,8 +35,12 @@ export class CallVisitor<T extends string, N extends BaseNode<T>> extends SubGen
         let isAsyncCall = false;
 
         if (isAccessNode(node.object)) {
-            translation = this.parent.visit(node.object);
             isAsyncCall = this.parent.context.symbolTable.isAwaited(node);
+
+            const dispatch = this.parent.context.symbolTable.dispatchOf(node);
+            if (dispatch) return this.visitDispatched(node, node.object, dispatch, args, isAsyncCall);
+
+            translation = this.parent.visit(node.object);
         } else if (isIdentificatorNode(node.object)) {
             const name = node.object.value;
             translation = coreLibUtils.resolveFunction(node.object) ?? name;
@@ -50,5 +55,20 @@ export class CallVisitor<T extends string, N extends BaseNode<T>> extends SubGen
 
         const awaitPrefix = isAsyncCall ? 'await ' : '';
         return `${awaitPrefix}${translation}(${args})`;
+    }
+
+    /**
+     * Emits a call the Analyzer decided to dispatch (see `ResolveDispatchedCallsRule`): either the
+     * member the classes of the receiver's union agree on, or a runtime helper taking the receiver as
+     * its first argument.
+     * @private
+     */
+    private visitDispatched(node: CallNode<T, N>, access: AccessNode<T, N>, dispatch: CallDispatch, args: string, isAsyncCall: boolean): string {
+        const awaitPrefix = isAsyncCall ? 'await ' : '';
+        const receiver = this.parent.visit(access.object);
+
+        if ('member' in dispatch) return `${awaitPrefix}${receiver}.${dispatch.member}(${args})`;
+
+        return `${awaitPrefix}${dispatch.helper}(${[ receiver, ...(args ? [ args ] : []) ].join(', ')})`;
     }
 }

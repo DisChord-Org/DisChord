@@ -1,0 +1,5 @@
+funcion f(c tipo texto|numero) {
+    devolver c.limpiar()
+}
+
+consola.imprimir(f("a"))

@@ -3,6 +3,13 @@ import { DataType } from "./DataType";
 import { ChordError, ErrorLevel } from "../errors/ChordError";
 
 /**
+ * How a method call on a receiver of union type is emitted, when it isn't by the member's name:
+ * as a call to `member` on the receiver, or as a call to the runtime helper `helper` with the
+ * receiver as its first argument.
+ */
+export type CallDispatch = { readonly member: string } | { readonly helper: string };
+
+/**
  * One lexical scope: the symbols declared in it plus its contextual compilation metadata.
  */
 interface Scope {
@@ -52,6 +59,12 @@ export class SymbolTable {
      * Calls the analyzer decided must be awaited (see {@link markAwaited}).
      */
     private readonly awaitedCalls: WeakSet<object> = new WeakSet();
+
+    /**
+     * Calls on a receiver of union type that the analyzer decided to emit differently (see
+     * {@link markDispatched}).
+     */
+    private readonly dispatchedCalls: WeakMap<object, CallDispatch> = new WeakMap();
 
     private static createScope(): Scope {
         return { symbols: new Map(), metadata: new Map() };
@@ -165,6 +178,25 @@ export class SymbolTable {
      */
     public isAwaited(call: object): boolean {
         return this.awaitedCalls.has(call);
+    }
+
+    /**
+     * Records how the analyzer decided to emit a method call on a receiver of union type, so the
+     * generator only has to read the decision.
+     *
+     * @param {object} call - The call node.
+     * @param {CallDispatch} dispatch - What it is emitted as.
+     */
+    public markDispatched(call: object, dispatch: CallDispatch): void {
+        this.dispatchedCalls.set(call, dispatch);
+    }
+
+    /**
+     * @param {object} call - The call node.
+     * @returns {CallDispatch | undefined} How the analyzer decided to emit this call, if it did.
+     */
+    public dispatchOf(call: object): CallDispatch | undefined {
+        return this.dispatchedCalls.get(call);
     }
 
     /**

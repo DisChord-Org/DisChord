@@ -1,8 +1,15 @@
 import { corelib } from "./corelib.data";
 import { isIdentificatorNode } from "../ast.guards";
-import { AnyDataType, ClassDataType, DataType, UnionDataType } from "../DataType";
+import { AnyDataType, ClassDataType, DataType, UnionDataType, UserClassDataType } from "../DataType";
 import { AccessNode, ASTNode, BaseNode, CallNode, TokenType } from "../types";
 import { CoreLib, CoreLibClass, ResolvedMember } from "./corelib.types";
+import { runtimeHelperNames } from "./runtimeHelpers";
+
+/**
+ * What a method call on a receiver of union type is emitted as: a call to `member`, or to the runtime
+ * helper `helper` with the receiver as its first argument.
+ */
+export type UnionDispatch = { readonly member: string } | { readonly helper: string };
 
 /**
  * Read-only lookups over a `CoreLib`, so callers pass the raw names they have from the AST and
@@ -212,6 +219,51 @@ export class CoreLibUtils<C extends string = string> {
      */
     private isUnknownReceiver(type: DataType): boolean {
         return type instanceof AnyDataType || type instanceof UnionDataType;
+    }
+
+    /**
+     * Decides how a method called on a receiver of union type is emitted, by resolving the class of
+     * every member of the union. If they all map the name to the same JavaScript member, that member
+     * is called directly (`Mapa|Conjunto` and `tiene` give `has`). If they differ, the name is
+     * ambiguous at compile time and the choice is made at run time by the runtime helper named
+     * `chord<Name>` (`chordTiene`), which exists only for the names that need one. A member of the
+     * union that is a class of the file counts as one that maps the name to itself, so the helper
+     * delegates to its own method.
+     *
+     * Anything else yields `undefined`, leaving the call as if the receiver were of unknown type: a
+     * member that isn't a class (`indefinido`) or lacks the method, a property, a name with no helper,
+     * or a union with no core library class at all. Only calls are decided: reading `c.tiene` without
+     * calling it is never rewritten.
+     * @param {AccessNode<T, N>} access - The callee of the call.
+     * @param {UnionDataType} union - The inferred type of its receiver.
+     * @param {(className: string) => boolean} declaresMethod - Whether a class of the file declares the method.
+     * @returns {UnionDispatch | undefined} What the call is emitted as, or `undefined` to leave it alone.
+     */
+    resolveUnionDispatch<T extends string, N extends BaseNode<T>> (access: AccessNode<T, N>, union: UnionDataType, declaresMethod: (className: string) => boolean): UnionDispatch | undefined {
+        const transpiles = new Set<string>();
+        let hasUserClass = false;
+
+        for (const member of union.members) {
+            if (member instanceof UserClassDataType) {
+                if (!declaresMethod(member.name)) return undefined;
+                hasUserClass = true;
+                continue;
+            }
+
+            const className = this.classOf(member);
+            const found = className && this.findInClass(className, access.property);
+            if (!found || found.member.static || found.isProperty) return undefined;
+
+            transpiles.add(found.member.transpile);
+        }
+
+        if (transpiles.size === 0) return undefined;
+
+        if (hasUserClass) transpiles.add(access.property);
+        if (transpiles.size === 1) return hasUserClass ? undefined : { member: [ ...transpiles ][0] };
+
+        const helper = `chord${access.property.charAt(0).toUpperCase()}${access.property.slice(1)}`;
+        return runtimeHelperNames.has(helper) ? { helper } : undefined;
     }
 
     private resolveInstanceOf<T extends string, N extends BaseNode<T>> (access: AccessNode<T, N>, receiverType: DataType): ResolvedMember | undefined {

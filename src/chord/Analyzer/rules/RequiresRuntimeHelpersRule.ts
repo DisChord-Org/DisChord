@@ -9,7 +9,8 @@ import { buildSharedModuleImportSpecifier } from "../sharedModulePath";
 /**
  * Detects, over the *complete* AST, which runtime helpers the file uses (a core library member or
  * function whose `transpile` is one `runtimeHelperNames` exports, e.g. `Mates.limitar` or
- * `esperar`). If any, inserts a synthetic `ImportNode` for the shared helpers module at the front
+ * `esperar`), or that a call on a receiver of union type was decided to be dispatched through (`chordTiene`).
+ * If any, inserts a synthetic `ImportNode` for the shared helpers module at the front
  * of `nodes`, importing only the ones used, and registers the module's content in
  * `context.extraFiles` — the same lowering `RequiresConsoleRuntimeRule` does for the console
  * override. A file that uses none gets no import.
@@ -22,9 +23,12 @@ export class RequiresRuntimeHelpersRule<T extends string, N extends BaseNode<T>>
         const used = new Set<string>();
 
         nodes.forEach(node => walkAST<T, N>(node, current => {
-            const transpiled = isAccessNode(current)
-                ? coreLibUtils.resolveStatic(current)?.member.transpile
-                : isCallNode(current) ? coreLibUtils.resolveFunction(current.object) : undefined;
+            const dispatch = isCallNode(current) ? this.context.symbolTable.dispatchOf(current) : undefined;
+            const transpiled = dispatch
+                ? ('helper' in dispatch ? dispatch.helper : undefined)
+                : isAccessNode(current)
+                    ? coreLibUtils.resolveStatic(current)?.member.transpile
+                    : isCallNode(current) ? coreLibUtils.resolveFunction(current.object) : undefined;
 
             if (transpiled !== undefined && runtimeHelperNames.has(transpiled)) used.add(transpiled);
         }));

@@ -11,6 +11,7 @@ import { ValidateCallTargetsRule } from "./rules/ValidateCallTargetsRule";
 import { ValidateReturnTypesRule } from "./rules/ValidateReturnTypesRule";
 import { ValidateCallArgumentsRule } from "./rules/ValidateCallArgumentsRule";
 import { ResolveAwaitedCallsRule } from "./rules/ResolveAwaitedCallsRule";
+import { ResolveDispatchedCallsRule } from "./rules/ResolveDispatchedCallsRule";
 import { RequiresConsoleRuntimeRule } from "./rules/RequiresConsoleRuntimeRule";
 import { RequiresRuntimeHelpersRule } from "./rules/RequiresRuntimeHelpersRule";
 
@@ -75,6 +76,9 @@ export class Analyzer<T extends string, N extends BaseNode<T>> {
 
         // Decides which calls are awaited; needs the types resolved by Pass 3.
         ResolveAwaitedCallsRule,
+
+        // Decides how calls on a receiver of union type are emitted; needs the same resolved types.
+        ResolveDispatchedCallsRule,
 
         // Lowering rules — independent of the 3-pass binding model above, they don't touch
         // SymbolTable at all.

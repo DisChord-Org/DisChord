@@ -1,0 +1,8 @@
+funcion f(c tipo texto|Mapa, d tipo texto|Mapa) {
+    d.limpiar()
+    devolver c.tiene(1) y c.tiene(2)
+}
+
+esperar(1)
+consola.imprimir(Mates.limitar(5, 0, 3))
+consola.imprimir(f("a", nuevo Mapa()))

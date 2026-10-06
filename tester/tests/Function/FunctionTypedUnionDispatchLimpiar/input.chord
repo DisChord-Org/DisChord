@@ -1,0 +1,5 @@
+funcion f(c tipo texto|Mapa) {
+    devolver c.limpiar()
+}
+
+consola.imprimir(f("  abc  "))

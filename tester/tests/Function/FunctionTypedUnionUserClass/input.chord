@@ -1,0 +1,11 @@
+clase Caja {
+    funcion tiene(x) {
+        devolver verdadero
+    }
+}
+
+funcion f(c tipo Caja|Mapa) {
+    devolver c.tiene(1)
+}
+
+consola.imprimir(f(nuevo Caja()))

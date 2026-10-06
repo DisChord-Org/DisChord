@@ -1,0 +1,5 @@
+funcion f(c tipo texto|Lista) {
+    devolver c.tiene(1)
+}
+
+consola.imprimir(f([1]))

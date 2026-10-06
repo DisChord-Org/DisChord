@@ -1,0 +1,359 @@
+[
+  {
+    "type": "importar",
+    "identificators": [
+      "chordEsperar",
+      "chordLimitar",
+      "chordLimpiar",
+      "chordTiene"
+    ],
+    "isDestructured": true,
+    "path": "./lib/runtimeHelpers.js",
+    "location": {
+      "line": 0,
+      "column": 0
+    }
+  },
+  {
+    "type": "importar",
+    "identificators": [],
+    "path": "./lib/consoleRuntime.js",
+    "isDestructured": false,
+    "location": {
+      "line": 0,
+      "column": 0
+    }
+  },
+  {
+    "type": "funcion",
+    "id": "f",
+    "metadata": {
+      "isConstructor": false,
+      "isMethod": false,
+      "isStatic": false,
+      "isAsync": false
+    },
+    "params": [
+      "c",
+      "d"
+    ],
+    "paramTypes": [
+      {
+        "kind": "union",
+        "members": [
+          {
+            "kind": "primitive",
+            "name": "texto"
+          },
+          {
+            "kind": "class",
+            "name": "Mapa"
+          }
+        ]
+      },
+      {
+        "kind": "union",
+        "members": [
+          {
+            "kind": "primitive",
+            "name": "texto"
+          },
+          {
+            "kind": "class",
+            "name": "Mapa"
+          }
+        ]
+      }
+    ],
+    "body": [
+      {
+        "type": "Llamada",
+        "object": {
+          "type": "Acceso",
+          "object": {
+            "type": "IDENTIFICADOR",
+            "value": "d",
+            "location": {
+              "line": 2,
+              "column": 5
+            }
+          },
+          "property": "limpiar",
+          "location": {
+            "line": 2,
+            "column": 7
+          }
+        },
+        "params": [],
+        "location": {
+          "line": 2,
+          "column": 15
+        }
+      },
+      {
+        "type": "devolver",
+        "object": {
+          "type": "ExpresionBinaria",
+          "left": {
+            "type": "Llamada",
+            "object": {
+              "type": "Acceso",
+              "object": {
+                "type": "IDENTIFICADOR",
+                "value": "c",
+                "location": {
+                  "line": 3,
+                  "column": 14
+                }
+              },
+              "property": "tiene",
+              "location": {
+                "line": 3,
+                "column": 16
+              }
+            },
+            "params": [
+              {
+                "type": "Literal",
+                "value": 1,
+                "raw": "1",
+                "location": {
+                  "line": 3,
+                  "column": 22
+                }
+              }
+            ],
+            "location": {
+              "line": 3,
+              "column": 23
+            }
+          },
+          "operator": "y",
+          "right": {
+            "type": "Llamada",
+            "object": {
+              "type": "Acceso",
+              "object": {
+                "type": "IDENTIFICADOR",
+                "value": "c",
+                "location": {
+                  "line": 3,
+                  "column": 27
+                }
+              },
+              "property": "tiene",
+              "location": {
+                "line": 3,
+                "column": 29
+              }
+            },
+            "params": [
+              {
+                "type": "Literal",
+                "value": 2,
+                "raw": "2",
+                "location": {
+                  "line": 3,
+                  "column": 35
+                }
+              }
+            ],
+            "location": {
+              "line": 3,
+              "column": 36
+            }
+          },
+          "location": {
+            "line": 3,
+            "column": 36
+          }
+        },
+        "location": {
+          "line": 3,
+          "column": 36
+        }
+      }
+    ],
+    "location": {
+      "line": 4,
+      "column": 1
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "IDENTIFICADOR",
+      "value": "esperar",
+      "location": {
+        "line": 6,
+        "column": 1
+      }
+    },
+    "params": [
+      {
+        "type": "Literal",
+        "value": 1,
+        "raw": "1",
+        "location": {
+          "line": 6,
+          "column": 9
+        }
+      }
+    ],
+    "location": {
+      "line": 6,
+      "column": 10
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 7,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 7,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "Llamada",
+        "object": {
+          "type": "Acceso",
+          "object": {
+            "type": "IDENTIFICADOR",
+            "value": "Mates",
+            "location": {
+              "line": 7,
+              "column": 18
+            }
+          },
+          "property": "limitar",
+          "location": {
+            "line": 7,
+            "column": 24
+          }
+        },
+        "params": [
+          {
+            "type": "Literal",
+            "value": 5,
+            "raw": "5",
+            "location": {
+              "line": 7,
+              "column": 32
+            }
+          },
+          {
+            "type": "Literal",
+            "value": 0,
+            "raw": "0",
+            "location": {
+              "line": 7,
+              "column": 35
+            }
+          },
+          {
+            "type": "Literal",
+            "value": 3,
+            "raw": "3",
+            "location": {
+              "line": 7,
+              "column": 38
+            }
+          }
+        ],
+        "location": {
+          "line": 7,
+          "column": 39
+        }
+      }
+    ],
+    "location": {
+      "line": 7,
+      "column": 40
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 8,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 8,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "Llamada",
+        "object": {
+          "type": "IDENTIFICADOR",
+          "value": "f",
+          "location": {
+            "line": 8,
+            "column": 18
+          }
+        },
+        "params": [
+          {
+            "type": "Literal",
+            "value": "a",
+            "raw": "a",
+            "location": {
+              "line": 8,
+              "column": 20
+            }
+          },
+          {
+            "type": "nuevo",
+            "object": {
+              "type": "Llamada",
+              "object": {
+                "type": "IDENTIFICADOR",
+                "value": "Mapa",
+                "location": {
+                  "line": 8,
+                  "column": 31
+                }
+              },
+              "params": [],
+              "location": {
+                "line": 8,
+                "column": 36
+              }
+            },
+            "location": {
+              "line": 8,
+              "column": 36
+            }
+          }
+        ],
+        "location": {
+          "line": 8,
+          "column": 37
+        }
+      }
+    ],
+    "location": {
+      "line": 8,
+      "column": 38
+    }
+  }
+]

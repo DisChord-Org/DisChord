@@ -1,0 +1,5 @@
+funcion mostrar(c tipo texto|Lista|Mapa) {
+    consola.imprimir(c)
+}
+
+mostrar("a")

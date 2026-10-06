@@ -1,0 +1,5 @@
+funcion f(c tipo Mapa|Conjunto) {
+    devolver c.tiene(1)
+}
+
+consola.imprimir(f(nuevo Conjunto()))

@@ -1,0 +1,6 @@
+funcion f(c tipo texto|Mapa) {
+    devolver c.tiene("a")
+}
+
+consola.imprimir(f("abc"))
+consola.imprimir(f(nuevo Mapa()))
