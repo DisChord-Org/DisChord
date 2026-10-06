@@ -11,11 +11,20 @@ interface EventType {
 }
 
 /**
+ * Builds a lookup table with no prototype, so a name written in the source (`constructor`,
+ * `toString`...) is never found among the keys it inherits from `Object.prototype`.
+ * @param entries - The table's own entries.
+ */
+function dictionary<V> (entries: Record<string, V>): Record<string, V> {
+    return Object.assign(Object.create(null), entries);
+}
+
+/**
  * Map translating DisChord Spanish event identifiers to their corresponding internal Discord event structures.
  *
  * @type {Readonly<Record<string, EventType>>}
  */
-export const eventsMap: Record<string, EventType> = {
+export const eventsMap: Record<string, EventType> = dictionary({
     'encendido': {
         'name': 'ready',
         'params': [ 'usuario', 'cliente' ]
@@ -88,14 +97,14 @@ export const eventsMap: Record<string, EventType> = {
         'name': 'interactionCreate',
         'params': [ 'interaccion', 'cliente' ]
     }
-} as const;
+} as const);
 
 /**
  * Map translating DisChord Gateway Intent aliases into standard Discord Gateway Intent flags.
  *
  * @type {Readonly<Record<string, string>>}
  */
-export const intentsMap: Record<string, string> = {
+export const intentsMap: Record<string, string> = dictionary({
     'ConfiguracionDelAutomoderador': 'AutoModeratorConfiguration',
     'EjecucionDelAutomoderador': 'AutoModerationExecution',
     'EncuestasPorPrivado': 'DirectMessagePolls',
@@ -117,14 +126,14 @@ export const intentsMap: Record<string, string> = {
     'WebhooksDelServidor': 'GuildWebhooks',
     'Servidores': 'Guilds',
     'ContenidoDelMensaje': 'MessageContent'
-} as const;
+} as const);
 
 /**
  * Map translating DisChord color aliases to standardized Discord Embed color identifiers.
  *
  * @type {Readonly<Record<string, string>>}
  */
-export const EmbedColors: Record<string, string> = {
+export const EmbedColors: Record<string, string> = dictionary({
     'Aqua': 'Aqua',
     'Azul': 'Blue',
     'Desenfocado': 'Blurple',
@@ -158,14 +167,14 @@ export const EmbedColors: Record<string, string> = {
     'Rojo': 'Red',
     'Blanco': 'White',
     'Amarillo': 'Yellow'
-} as const;
+} as const);
 
 /**
  * Map translating DisChord option type keywords to their corresponding `DiscordOptionType` enum values.
  *
  * @type {Readonly<Record<string, DiscordOptionType>>}
  */
-export const DisChordTypeMap: Record<string, DiscordOptionType> = {
+export const DisChordTypeMap: Record<string, DiscordOptionType> = dictionary({
     "texto": DiscordOptionType.String,
     "entero": DiscordOptionType.Integer,
     "booleano": DiscordOptionType.Boolean,
@@ -175,35 +184,35 @@ export const DisChordTypeMap: Record<string, DiscordOptionType> = {
     "mencionable": DiscordOptionType.Mentionable,
     "numero": DiscordOptionType.Number,
     "archivo": DiscordOptionType.Attachment
-} as const;
+} as const);
 
 /**
  * Map translating DisChord application installation keywords to `ApplicationIntegrationType` enum values.
  *
  * @type {Readonly<Record<string, ApplicationIntegrationType>>}
  */
-export const IntegrationTypes: Record<string, ApplicationIntegrationType> = {
+export const IntegrationTypes: Record<string, ApplicationIntegrationType> = dictionary({
     "Servidor": ApplicationIntegrationType.GuildInstall,
     "Usuario": ApplicationIntegrationType.UserInstall
-} as const;
+} as const);
 
 /**
  * Map translating DisChord interaction context keywords to `InteractionContextType` enum values.
  *
  * @type {Readonly<Record<string, InteractionContextType>>}
  */
-export const ContextTypes: Record<string, InteractionContextType> = {
+export const ContextTypes: Record<string, InteractionContextType> = dictionary({
     "Servidor": InteractionContextType.Guild,
     "DM": InteractionContextType.BotDM,
     "CanalPrivado": InteractionContextType.PrivateChannel
-} as const;
+} as const);
 
 /**
  * Map translating DisChord command type exclusion flags to `IgnoreCommandType` enum values.
  *
  * @type {Readonly<Record<string, IgnoreCommandType>>}
  */
-export const IgnoreCommandTypes: Record<string, IgnoreCommandType> = {
+export const IgnoreCommandTypes: Record<string, IgnoreCommandType> = dictionary({
     "Mensajes": IgnoreCommandType.Message,
     "Slashs": IgnoreCommandType.Slash
-} as const;
+} as const);

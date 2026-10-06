@@ -1,0 +1,5 @@
+encender bot {
+    prefijo "!"
+    token "t"
+    intenciones [ "constructor" ]
+}

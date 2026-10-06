@@ -1,0 +1,56 @@
+[
+  {
+    "type": "importar",
+    "identificators": [],
+    "path": "./lib/consoleRuntime.js",
+    "isDestructured": false,
+    "location": {
+      "line": 0,
+      "column": 0
+    }
+  },
+  {
+    "type": "Evento",
+    "name": "encendido",
+    "body": [
+      {
+        "type": "Llamada",
+        "object": {
+          "type": "Acceso",
+          "object": {
+            "type": "IDENTIFICADOR",
+            "value": "consola",
+            "location": {
+              "line": 2,
+              "column": 5
+            }
+          },
+          "property": "imprimir",
+          "location": {
+            "line": 2,
+            "column": 13
+          }
+        },
+        "params": [
+          {
+            "type": "Literal",
+            "value": 1,
+            "raw": "1",
+            "location": {
+              "line": 2,
+              "column": 22
+            }
+          }
+        ],
+        "location": {
+          "line": 2,
+          "column": 23
+        }
+      }
+    ],
+    "location": {
+      "line": 3,
+      "column": 1
+    }
+  }
+]
