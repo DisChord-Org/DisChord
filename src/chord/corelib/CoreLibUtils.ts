@@ -1,7 +1,7 @@
 import { corelib } from "./corelib.data";
 import { isIdentificatorNode } from "../ast.guards";
-import { AnyDataType, DataType } from "../DataType";
-import { AccessNode, ASTNode, BaseNode } from "../types";
+import { AnyDataType, ClassDataType, DataType } from "../DataType";
+import { AccessNode, ASTNode, BaseNode, CallNode, TokenType } from "../types";
 import { CoreLib, CoreLibClass, ResolvedMember } from "./corelib.types";
 
 /**
@@ -129,11 +129,45 @@ export class CoreLibUtils<C extends string = string> {
     }
 
     /**
+     * @param {ASTNode<T, N>} target - What follows `nuevo`: a class name, called (`Mapa()`) or not.
+     * @returns {string | undefined} The JavaScript constructor it is emitted as (`Mapa` → `Map`), or `undefined` if it isn't an instantiable core library class.
+     */
+    resolveConstructor<T extends string, N extends BaseNode<T>> (target: ASTNode<T, N>): string | undefined {
+        const name = this.instantiatedName(target);
+        return name !== undefined && this.hasOwn(this.corelib.classes, name) ? this.corelib.classes[name as C].constructs : undefined;
+    }
+
+    /**
+     * @param {ASTNode<T, N>} target - What follows `nuevo`: a class name, called (`Mapa()`) or not.
+     * @returns {ClassDataType | undefined} The type of the instance it creates, or `undefined` if it isn't a core library class typed by its class.
+     */
+    resolveConstructedType<T extends string, N extends BaseNode<T>> (target: ASTNode<T, N>): ClassDataType | undefined {
+        const name = this.instantiatedName(target);
+        return name === undefined ? undefined : this.resolveClassType(name);
+    }
+
+    /**
+     * @param {string} name - Class name as written in source code.
+     * @returns {ClassDataType | undefined} The type of an instance of that class, or `undefined` if it isn't a core library class whose instances are typed by their class (`Texto` has a primitive instead).
+     */
+    resolveClassType(name: string): ClassDataType | undefined {
+        if (!this.hasOwn(this.corelib.classes, name)) return undefined;
+
+        const receiver = this.corelib.classes[name as C].receiver;
+        return receiver instanceof ClassDataType ? receiver : undefined;
+    }
+
+    /**
      * @param {DataType} type - The type of a value.
      * @returns {C | undefined} The class whose `receiver` accepts it, or `undefined` if it belongs to none.
      */
     classOf(type: DataType): C | undefined {
         return (Object.keys(this.corelib.classes) as C[]).find(key => this.corelib.classes[key].receiver?.isAssignableFrom(type));
+    }
+
+    private instantiatedName<T extends string, N extends BaseNode<T>> (target: ASTNode<T, N>): string | undefined {
+        const callee = target.type === TokenType.LLAMADA ? (target as CallNode<T, N>).object : target;
+        return isIdentificatorNode(callee) ? callee.value : undefined;
     }
 
     private returnTypeOf(resolved: ResolvedMember, isCall: boolean): DataType | undefined {

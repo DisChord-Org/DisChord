@@ -34,6 +34,7 @@ export const DataTypeKind = {
     Primitive: 'primitive',
     Any: 'any',
     Void: 'void',
+    Class: 'class',
     Union: 'union',
     Array: 'array',
     Tuple: 'tuple'
@@ -205,6 +206,35 @@ export class VoidDataType extends DataType {
 
     public format (): string {
         return 'vacio';
+    }
+}
+
+/**
+ * An instance of a core library class that has no primitive of its own (`Mapa`, `Conjunto`,
+ * `Promesa`, ...), identified by the class's name. Two are compatible only when they name the same
+ * class: a `Mapa` is not a `Conjunto`. It carries no type parameters, so what the class holds is
+ * not tracked. It can't be part of a union or tuple, only written alone in a `tipo` annotation.
+ */
+export class ClassDataType extends DataType {
+    public readonly kind = DataTypeKind.Class;
+    public readonly name: string;
+
+    private constructor (name: string) {
+        super();
+        this.name = name;
+    }
+
+    /** Builds the `DataType` of an instance of the core library class called `name`. */
+    public static of (name: string): ClassDataType {
+        return new ClassDataType(name);
+    }
+
+    protected acceptsNonUnionSource (source: DataType): boolean {
+        return source instanceof ClassDataType && source.name === this.name;
+    }
+
+    public format (): string {
+        return this.name;
     }
 }
 

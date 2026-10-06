@@ -8,6 +8,7 @@ import { BinaryExpressionInferrer } from "./inferrers/BinaryExpressionInferrer";
 import { ListInferrer } from "./inferrers/ListInferrer";
 import { CallInferrer } from "./inferrers/CallInferrer";
 import { AccessInferrer } from "./inferrers/AccessInferrer";
+import { NewInferrer } from "./inferrers/NewInferrer";
 
 /**
  * Dispatches a `DataType` inference request to the `SubInferrer` registered for the node's shape —
@@ -37,7 +38,7 @@ export class TypeInferrer<T extends string, N extends BaseNode<T>> {
      * @static
      */
     private static readonly SubInferrers: SubInferrerClass<TokenType, BaseNode<TokenType>>[] = [
-        LiteralInferrer, IdentifierInferrer, BinaryExpressionInferrer, ListInferrer, CallInferrer, AccessInferrer
+        LiteralInferrer, IdentifierInferrer, BinaryExpressionInferrer, ListInferrer, CallInferrer, AccessInferrer, NewInferrer
     ];
 
     /**

@@ -1,0 +1,330 @@
+[
+  {
+    "type": "importar",
+    "identificators": [],
+    "path": "./lib/consoleRuntime.js",
+    "isDestructured": false,
+    "location": {
+      "line": 0,
+      "column": 0
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "m",
+    "value": {
+      "type": "nuevo",
+      "object": {
+        "type": "Llamada",
+        "object": {
+          "type": "IDENTIFICADOR",
+          "value": "Mapa",
+          "location": {
+            "line": 1,
+            "column": 26
+          }
+        },
+        "params": [],
+        "location": {
+          "line": 1,
+          "column": 31
+        }
+      },
+      "location": {
+        "line": 1,
+        "column": 31
+      }
+    },
+    "dataType": {
+      "kind": "class",
+      "name": "Mapa"
+    },
+    "location": {
+      "line": 1,
+      "column": 31
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "m",
+        "location": {
+          "line": 2,
+          "column": 1
+        }
+      },
+      "property": "poner",
+      "location": {
+        "line": 2,
+        "column": 3
+      }
+    },
+    "params": [
+      {
+        "type": "Literal",
+        "value": "a",
+        "raw": "a",
+        "location": {
+          "line": 2,
+          "column": 9
+        }
+      },
+      {
+        "type": "Literal",
+        "value": 1,
+        "raw": "1",
+        "location": {
+          "line": 2,
+          "column": 14
+        }
+      }
+    ],
+    "location": {
+      "line": 2,
+      "column": 15
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "hay",
+    "value": {
+      "type": "Llamada",
+      "object": {
+        "type": "Acceso",
+        "object": {
+          "type": "IDENTIFICADOR",
+          "value": "m",
+          "location": {
+            "line": 3,
+            "column": 26
+          }
+        },
+        "property": "existe",
+        "location": {
+          "line": 3,
+          "column": 28
+        }
+      },
+      "params": [
+        {
+          "type": "Literal",
+          "value": "a",
+          "raw": "a",
+          "location": {
+            "line": 3,
+            "column": 35
+          }
+        }
+      ],
+      "location": {
+        "line": 3,
+        "column": 38
+      }
+    },
+    "dataType": {
+      "kind": "primitive",
+      "name": "booleano"
+    },
+    "location": {
+      "line": 3,
+      "column": 38
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "tam",
+    "value": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "m",
+        "location": {
+          "line": 4,
+          "column": 24
+        }
+      },
+      "property": "tamano",
+      "location": {
+        "line": 4,
+        "column": 26
+      }
+    },
+    "dataType": {
+      "kind": "primitive",
+      "name": "numero"
+    },
+    "location": {
+      "line": 4,
+      "column": 26
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "c",
+    "value": {
+      "type": "nuevo",
+      "object": {
+        "type": "Llamada",
+        "object": {
+          "type": "IDENTIFICADOR",
+          "value": "Conjunto",
+          "location": {
+            "line": 5,
+            "column": 16
+          }
+        },
+        "params": [],
+        "location": {
+          "line": 5,
+          "column": 25
+        }
+      },
+      "location": {
+        "line": 5,
+        "column": 25
+      }
+    },
+    "location": {
+      "line": 5,
+      "column": 25
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "c",
+        "location": {
+          "line": 6,
+          "column": 1
+        }
+      },
+      "property": "sumar",
+      "location": {
+        "line": 6,
+        "column": 3
+      }
+    },
+    "params": [
+      {
+        "type": "Literal",
+        "value": 1,
+        "raw": "1",
+        "location": {
+          "line": 6,
+          "column": 9
+        }
+      }
+    ],
+    "location": {
+      "line": 6,
+      "column": 10
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "f",
+    "value": {
+      "type": "nuevo",
+      "object": {
+        "type": "Llamada",
+        "object": {
+          "type": "IDENTIFICADOR",
+          "value": "Fecha",
+          "location": {
+            "line": 7,
+            "column": 27
+          }
+        },
+        "params": [],
+        "location": {
+          "line": 7,
+          "column": 33
+        }
+      },
+      "location": {
+        "line": 7,
+        "column": 33
+      }
+    },
+    "dataType": {
+      "kind": "class",
+      "name": "Fecha"
+    },
+    "location": {
+      "line": 7,
+      "column": 33
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 9,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 9,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "IDENTIFICADOR",
+        "value": "hay",
+        "location": {
+          "line": 9,
+          "column": 18
+        }
+      }
+    ],
+    "location": {
+      "line": 9,
+      "column": 21
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 10,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 10,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "IDENTIFICADOR",
+        "value": "tam",
+        "location": {
+          "line": 10,
+          "column": 18
+        }
+      }
+    ],
+    "location": {
+      "line": 10,
+      "column": 21
+    }
+  }
+]

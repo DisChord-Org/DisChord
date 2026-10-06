@@ -1,4 +1,4 @@
-import { AnyDataType, ArrayDataType, PrimitiveDataType, UnionDataType, VoidDataType } from "../DataType";
+import { AnyDataType, ArrayDataType, ClassDataType, PrimitiveDataType, UnionDataType, VoidDataType } from "../DataType";
 import { PrimitiveType } from "../types";
 import { CoreLib } from "./corelib.types";
 
@@ -668,6 +668,8 @@ export const corelib = {
             }
         },
         [ClassesEnum.Mapa]: {
+            receiver: ClassDataType.of(ClassesEnum.Mapa),
+            constructs: 'Map',
             methods: {
                 obtener: {
                     transpile: 'get',
@@ -698,6 +700,8 @@ export const corelib = {
             }
         },
         [ClassesEnum.Conjunto]: {
+            receiver: ClassDataType.of(ClassesEnum.Conjunto),
+            constructs: 'Set',
             methods: {
                 sumar: {
                     transpile: 'add',
@@ -706,6 +710,8 @@ export const corelib = {
             }
         },
         [ClassesEnum.Promesa]: {
+            receiver: ClassDataType.of(ClassesEnum.Promesa),
+            constructs: 'Promise',
             methods: {
                 todas: {
                     transpile: 'Promise.all',
@@ -740,6 +746,8 @@ export const corelib = {
             }
         },
         [ClassesEnum.Expresion]: {
+            receiver: ClassDataType.of(ClassesEnum.Expresion),
+            constructs: 'RegExp',
             methods: {
                 probar: {
                     transpile: 'test',
@@ -752,6 +760,8 @@ export const corelib = {
             }
         },
         [ClassesEnum.Fecha]: {
+            receiver: ClassDataType.of(ClassesEnum.Fecha),
+            constructs: 'Date',
             methods: {}
         }
     },

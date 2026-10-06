@@ -1,0 +1,10 @@
+import './lib/consoleRuntime.js';
+let m = new Map();
+m.set('a', 1);
+let hay = m.has('a');
+let tam = m.size;
+let c = new Set();
+c.add(1);
+let f = new Date();
+console.log(hay);
+console.log(tam);

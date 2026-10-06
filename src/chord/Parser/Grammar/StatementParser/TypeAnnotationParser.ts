@@ -1,11 +1,12 @@
 import { BaseNode, PrimitiveType, PrimitiveTypeName, TokenType } from "../../../types";
-import { ArrayDataType, DataType, TupleDataType, UnionDataType } from "../../../DataType";
+import { ArrayDataType, ClassDataType, DataType, TupleDataType, UnionDataType } from "../../../DataType";
+import { coreLibUtils } from "../../../corelib";
 import { Parser } from "../../Parser";
 import { ChordError, ErrorLevel } from "../../../../errors/ChordError";
 
 /**
  * Parses a `tipo <anotación>` clause: a primitive (`texto`), a union (`texto|numero`), an array
- * (`texto[]`, `(texto|numero)[]`), or a tuple (`[texto, numero]`, itself array-able as
+ * (`texto[]`, `(texto|numero)[]`), a core library class (`Mapa`), or a tuple (`[texto, numero]`, itself array-able as
  * `[texto, numero][]`).
  *
  * Split out of `VariableParser` on its own: parsing a `var` declaration and parsing everything a
@@ -118,6 +119,13 @@ export class TypeAnnotationParser<T extends string, N extends BaseNode<T>> {
      */
     private parseUnionType (): { type: DataType; hasParens: boolean; kindCount: number } {
         const hasParens = this.parser.match(TokenType.L_PAREN);
+
+        const classType = this.parseClassType();
+        if (classType) {
+            if (hasParens) this.parser.consume(TokenType.R_PAREN, `Se esperaba ')' para cerrar la unión de tipos`);
+            return { type: classType, hasParens, kindCount: 1 };
+        }
+
         const kinds: PrimitiveTypeName[] = [ this.parsePrimitiveKind() ];
 
         while (this.parser.match(TokenType.PIPE)) kinds.push(this.parsePrimitiveKind());
@@ -125,6 +133,30 @@ export class TypeAnnotationParser<T extends string, N extends BaseNode<T>> {
         if (hasParens) this.parser.consume(TokenType.R_PAREN, `Se esperaba ')' para cerrar la unión de tipos`);
 
         return { type: UnionDataType.of(kinds), hasParens, kindCount: kinds.length };
+    }
+
+    /**
+     * Consumes the name of a core library class (`Mapa`, `Fecha`, ...) if that's what comes next. Its
+     * name is matched as written, unlike a primitive's, which ignores case.
+     * @returns {ClassDataType | undefined} The class's type, or `undefined` (consuming nothing) if
+     * the next token isn't a core library class name.
+     * @throws {ChordError} If the class is followed by `|`, since a union only holds primitives.
+     * @private
+     */
+    private parseClassType (): ClassDataType | undefined {
+        const token = this.parser.peek();
+        const classType = token.type === TokenType.IDENTIFICADOR ? coreLibUtils.resolveClassType(token.value) : undefined;
+        if (!classType) return undefined;
+
+        this.parser.consume(TokenType.IDENTIFICADOR);
+
+        if (this.parser.peek().type === TokenType.PIPE) throw new ChordError({
+            phase: ErrorLevel.Parser,
+            message: `La clase '${classType.name}' no puede formar parte de una unión de tipos`,
+            location: this.parser.peek().location
+        }).format();
+
+        return classType;
     }
 
     /** Whether the upcoming tokens are an empty `[]` array-suffix, without consuming them. */

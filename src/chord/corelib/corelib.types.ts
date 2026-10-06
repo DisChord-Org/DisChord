@@ -21,6 +21,8 @@ export interface CoreLibMember {
  */
 export interface CoreLibClass {
     readonly receiver?: DataType;
+    /** JavaScript constructor is emitted as (`Mapa` → `Map`). Omitted means the class can't be instantiated. */
+    readonly constructs?: string;
     readonly methods: Readonly<Record<string, CoreLibMember>>;
     readonly properties?: Readonly<Record<string, CoreLibMember>>;
 }
