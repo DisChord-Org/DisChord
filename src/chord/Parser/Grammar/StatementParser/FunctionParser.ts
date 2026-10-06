@@ -44,6 +44,11 @@ export class FunctionParser<T extends string, N extends BaseNode<T>> extends Sub
 
         this.reset();
 
+        // Taken before the body is parsed: the decorator box is global, so a function nested in the
+        // body would otherwise consume the decorators written for this one.
+        const isAsync: boolean = DecoratorProcessor.matchAndDelete('asincrono', true);
+        const isStatic: boolean = DecoratorProcessor.matchAndDelete('fijar', true);
+
         if (flags.constructor) {
             id = this.consume(TokenType.IDENTIFICADOR, "Se esperaba el nombre del constructor.").value;
         } else {
@@ -64,9 +69,6 @@ export class FunctionParser<T extends string, N extends BaseNode<T>> extends Sub
         this.consume(TokenType.R_PAREN);
 
         const body = (this.parent.get(BlockParser) as BlockParser<T, N>).parse().body;
-
-        const isAsync: boolean = DecoratorProcessor.matchAndDelete('asincrono', true);
-        const isStatic: boolean = DecoratorProcessor.matchAndDelete('fijar', true);
 
         return this.createNode<FunctionNode<T, N>>({
             type: TokenType.Funcion,

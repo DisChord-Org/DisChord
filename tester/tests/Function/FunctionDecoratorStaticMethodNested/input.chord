@@ -1,0 +1,7 @@
+clase Caja {
+    @fijar
+    funcion crear() {
+        funcion interna() { consola.imprimir(1) }
+        interna()
+    }
+}

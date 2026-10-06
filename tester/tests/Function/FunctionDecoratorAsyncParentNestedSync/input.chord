@@ -1,0 +1,5 @@
+@asincrono
+funcion padre() {
+    funcion hijo() { consola.imprimir(1) }
+    hijo()
+}
