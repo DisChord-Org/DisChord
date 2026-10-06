@@ -1,0 +1,8 @@
+nuevo evento encendido {
+    var a es usuario.constructor
+    var b es usuario.toString
+    var c es usuario.hasOwnProperty
+    imprimir(a)
+    imprimir(b)
+    imprimir(c)
+}

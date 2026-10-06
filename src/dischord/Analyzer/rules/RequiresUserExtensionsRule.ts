@@ -38,7 +38,7 @@ export class RequiresUserExtensionsRule extends AnalysisRule<DisChordNodeType, D
             if (isAccessNode(current)) {
                 const objName = isIdentificatorNode(current.object) ? current.object.value : null;
 
-                if (objName === 'usuario' && current.property in userPropertyNames) needsUserExtensions = true;
+                if (objName === 'usuario' && Object.prototype.hasOwnProperty.call(userPropertyNames, current.property)) needsUserExtensions = true;
                 return;
             }
 
