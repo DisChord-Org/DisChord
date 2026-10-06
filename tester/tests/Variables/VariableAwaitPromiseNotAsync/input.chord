@@ -1,0 +1,6 @@
+funcion f() {
+    devolver Mates.redondear(1.5)
+}
+
+var r es f()
+consola.imprimir(r)

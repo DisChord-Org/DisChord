@@ -1,0 +1,2 @@
+var r es Promesa.todas([Promesa.resolver(1), Promesa.resolver(2)])
+consola.imprimir(r)

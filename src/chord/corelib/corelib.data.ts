@@ -746,32 +746,38 @@ export const corelib = {
                 todas: {
                     transpile: 'Promise.all',
                     returns: AnyDataType.Any,
-                    static: true
+                    static: true,
+                    async: true
                 },
                 todasResueltas: {
                     transpile: 'Promise.allSettled',
                     returns: AnyDataType.Any,
-                    static: true
+                    static: true,
+                    async: true
                 },
                 primera: {
                     transpile: 'Promise.race',
                     returns: AnyDataType.Any,
-                    static: true
+                    static: true,
+                    async: true
                 },
                 cualquiera: {
                     transpile: 'Promise.any',
                     returns: AnyDataType.Any,
-                    static: true
+                    static: true,
+                    async: true
                 },
                 resolver: {
                     transpile: 'Promise.resolve',
                     returns: AnyDataType.Any,
-                    static: true
+                    static: true,
+                    async: true
                 },
                 rechazar: {
                     transpile: 'Promise.reject',
                     returns: AnyDataType.Any,
-                    static: true
+                    static: true,
+                    async: true
                 }
             }
         },

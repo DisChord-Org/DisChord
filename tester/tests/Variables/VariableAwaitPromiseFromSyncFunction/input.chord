@@ -1,0 +1,3 @@
+funcion f() {
+    devolver Promesa.todas([Promesa.resolver(1)])
+}

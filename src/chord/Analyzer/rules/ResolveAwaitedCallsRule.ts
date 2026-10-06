@@ -18,7 +18,8 @@ import { ChordError, ErrorLevel } from "../../../errors/ChordError";
  *
  * A method called through an object is resolved by the type of its receiver: an instance of a
  * class of this file, `esta` (the enclosing class) or `super` are looked up in that class and its
- * parents; a receiver of any other known type (core library classes, primitives, lists) never
+ * parents; a core library class awaits the static members it marks `async` (`Promesa.todas`), and a
+ * receiver of any other known type (primitives, lists, instances of core library classes) never
  * awaits. A receiver of unknown type awaits only if every class of the file declaring a method of
  * that name marks it async, and at least one does.
  *
@@ -135,7 +136,9 @@ export class ResolveAwaitedCallsRule<T extends string, N extends BaseNode<T>> ex
 
         if (isIdentificatorNode(receiver)) {
             if (symbolTable.isUserClass(receiver.value)) return !!symbolTable.findMember(receiver.value, access.property)?.metadata.isAsync;
-            if (Object.prototype.hasOwnProperty.call(corelib.classes, receiver.value) && !symbolTable.lookup(receiver.value)) return false;
+            if (Object.prototype.hasOwnProperty.call(corelib.classes, receiver.value) && !symbolTable.lookup(receiver.value)) {
+                return !!coreLibUtils.resolveStatic(access)?.member.async;
+            }
         }
 
         const type = this.typeInferrer.infer(receiver);

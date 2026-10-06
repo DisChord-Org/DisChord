@@ -1,0 +1,94 @@
+[
+  {
+    "type": "funcion",
+    "id": "f",
+    "metadata": {
+      "isConstructor": false,
+      "isMethod": false,
+      "isStatic": false,
+      "isAsync": true
+    },
+    "params": [],
+    "body": [
+      {
+        "type": "devolver",
+        "object": {
+          "type": "Llamada",
+          "object": {
+            "type": "Acceso",
+            "object": {
+              "type": "IDENTIFICADOR",
+              "value": "Promesa",
+              "location": {
+                "line": 3,
+                "column": 14
+              }
+            },
+            "property": "todas",
+            "location": {
+              "line": 3,
+              "column": 22
+            }
+          },
+          "params": [
+            {
+              "type": "Lista",
+              "body": [
+                {
+                  "type": "Llamada",
+                  "object": {
+                    "type": "Acceso",
+                    "object": {
+                      "type": "IDENTIFICADOR",
+                      "value": "Promesa",
+                      "location": {
+                        "line": 3,
+                        "column": 29
+                      }
+                    },
+                    "property": "resolver",
+                    "location": {
+                      "line": 3,
+                      "column": 37
+                    }
+                  },
+                  "params": [
+                    {
+                      "type": "Literal",
+                      "value": 1,
+                      "raw": "1",
+                      "location": {
+                        "line": 3,
+                        "column": 46
+                      }
+                    }
+                  ],
+                  "location": {
+                    "line": 3,
+                    "column": 47
+                  }
+                }
+              ],
+              "location": {
+                "line": 3,
+                "column": 48
+              }
+            }
+          ],
+          "location": {
+            "line": 3,
+            "column": 49
+          }
+        },
+        "location": {
+          "line": 3,
+          "column": 49
+        }
+      }
+    ],
+    "location": {
+      "line": 4,
+      "column": 1
+    }
+  }
+]

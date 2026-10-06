@@ -1,0 +1,127 @@
+[
+  {
+    "type": "importar",
+    "identificators": [],
+    "path": "./lib/consoleRuntime.js",
+    "isDestructured": false,
+    "location": {
+      "line": 0,
+      "column": 0
+    }
+  },
+  {
+    "type": "funcion",
+    "id": "f",
+    "metadata": {
+      "isConstructor": false,
+      "isMethod": false,
+      "isStatic": false,
+      "isAsync": false
+    },
+    "params": [],
+    "body": [
+      {
+        "type": "devolver",
+        "object": {
+          "type": "Llamada",
+          "object": {
+            "type": "Acceso",
+            "object": {
+              "type": "IDENTIFICADOR",
+              "value": "Mates",
+              "location": {
+                "line": 2,
+                "column": 14
+              }
+            },
+            "property": "redondear",
+            "location": {
+              "line": 2,
+              "column": 20
+            }
+          },
+          "params": [
+            {
+              "type": "Literal",
+              "value": 1.5,
+              "raw": "1.5",
+              "location": {
+                "line": 2,
+                "column": 30
+              }
+            }
+          ],
+          "location": {
+            "line": 2,
+            "column": 33
+          }
+        },
+        "location": {
+          "line": 2,
+          "column": 33
+        }
+      }
+    ],
+    "location": {
+      "line": 3,
+      "column": 1
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "r",
+    "value": {
+      "type": "Llamada",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "f",
+        "location": {
+          "line": 5,
+          "column": 10
+        }
+      },
+      "params": [],
+      "location": {
+        "line": 5,
+        "column": 12
+      }
+    },
+    "location": {
+      "line": 5,
+      "column": 12
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 6,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 6,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "IDENTIFICADOR",
+        "value": "r",
+        "location": {
+          "line": 6,
+          "column": 18
+        }
+      }
+    ],
+    "location": {
+      "line": 6,
+      "column": 19
+    }
+  }
+]

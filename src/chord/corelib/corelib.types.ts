@@ -11,6 +11,8 @@ export interface CoreLibMember {
     readonly static?: boolean;
     /** Whether it is provided by a runtime module. */
     readonly runtime?: boolean;
+    /** Whether it returns a promise the compiler awaits on its own, like a function marked `@asincrono`. Omitted means `false`. */
+    readonly async?: boolean;
     /** Type of the value a call to this member produces, or of the member itself for a property. */
     readonly returns: DataType;
 }
