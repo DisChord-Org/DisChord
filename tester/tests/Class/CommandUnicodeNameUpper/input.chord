@@ -1,0 +1,7 @@
+nuevo comando ÁrbolNavidad {
+    descripcion "Test";
+
+    enviar mensaje {
+        contenido "hola"
+    }
+}

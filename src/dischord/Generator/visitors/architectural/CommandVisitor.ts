@@ -79,13 +79,13 @@ export default class CommandVisitor extends SubGenerator<DisChordNodeType, DisCh
      * @returns {string} Processed source code defining class flags (name, description, nsfw, etc.).
      */
     private generateCommandFlags(node: CommandNode): string {
-        const CommandName = this.getCommandName(node).replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase() /*slugified*/
+        const CommandName = this.getCommandName(node).replace(/(\p{Ll})(\p{Lu})/gu, '$1-$2').toLowerCase(); /* slugified */
 
         const resolver = new BDOResolver<DisChordNodeType, DisChordNode>(expression => this.parent.visit(expression));
         const flags = resolver.resolve(node.body, CommandSchema);
 
         return `
-            name = "${CommandName}";
+            name = "${CommandName /* slugified */}";
             description = ${flags['descripcion']};
             nsfw = ${flags['nsfw']};
             integrationTypes = ${flags['integraciones']};

@@ -4,6 +4,24 @@ import { CompilationContext } from '../cli/commands/CompileCommand';
 import { SymbolTranslationMap } from './Symbols';
 
 export class Lexer<T extends string> {
+    /**
+     * First character of a word: any Unicode letter (`año`, `canción`, `ñu`).
+     */
+    private static readonly WORD_START = /\p{L}/u;
+
+    /**
+     * Rest of a word: letters, combining marks (so `ñ` written as `n` + U+0303 lexes as one
+     * word), ASCII digits and `_`. Digits of other scripts and symbols are left out on purpose.
+     */
+    private static readonly WORD_PART = /[\p{L}\p{M}0-9_]/u;
+
+    /**
+     * Reserved words are plain ASCII. A word with any other character is never looked up among
+     * them, since case folding could otherwise map one onto an ASCII keyword (`K`, the Kelvin
+     * sign, lowercases to `k`).
+     */
+    private static readonly ASCII_ONLY = /^[\u0000-\u007F]*$/;
+
     private line = 1;
     private column = 1;
     private current = 0;
@@ -133,7 +151,7 @@ export class Lexer<T extends string> {
             if (char === '@') {
                 let value = this.advance();
 
-                while (this.current < this.input.length && /[a-zA-Z0-9_]/.test(this.peek())) {
+                while (this.current < this.input.length && Lexer.WORD_PART.test(this.peek())) {
                     value += this.advance();
                 }
 
@@ -141,11 +159,14 @@ export class Lexer<T extends string> {
                 continue;
             }
 
-            if (/[a-zA-Z]/.test(char)) { // Keywords, identificadores, booleanos, undefined
+            if (Lexer.WORD_START.test(char)) { // Keywords, identificadores, booleanos, undefined
                 let value = "";
-                while (/[a-zA-Z0-9_]/.test(this.peek()) && this.current < this.input.length) {
+                while (Lexer.WORD_PART.test(this.peek()) && this.current < this.input.length) {
                     value += this.advance();
                 }
+
+                // Composed and decomposed spellings of a letter (`ñ`) must be the same identifier.
+                value = value.normalize('NFC');
 
                 // A word right after `.` is always a member name, even if it is a reserved word
                 // (`lista.en(0)`, `fecha.entre`), so it never goes through the keyword lookup.
@@ -159,7 +180,7 @@ export class Lexer<T extends string> {
                     tokens.push(this.createToken(TokenType.TEXTO, ' ', startLine, startCol));
                 } else if (value === TokenType.Intro) {
                     tokens.push(this.createToken(TokenType.TEXTO, '\n', startLine, startCol));
-                } else if (this.context.keywordsManager.isKeyword(value)) {
+                } else if (Lexer.ASCII_ONLY.test(value) && this.context.keywordsManager.isKeyword(value)) {
                     tokens.push(this.createToken(this.context.keywordsManager.resolve(value.toLowerCase()) as TokenType, value, startLine, startCol));
                 } else {
                     tokens.push(this.createToken(TokenType.IDENTIFICADOR, value, startLine, startCol));

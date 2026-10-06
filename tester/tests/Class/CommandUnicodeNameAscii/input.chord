@@ -1,0 +1,7 @@
+nuevo comando miComando {
+    descripcion "Test";
+
+    enviar mensaje {
+        contenido "hola"
+    }
+}
