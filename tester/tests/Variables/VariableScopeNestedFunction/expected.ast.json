@@ -1,0 +1,126 @@
+[
+  {
+    "type": "funcion",
+    "id": "externa",
+    "metadata": {
+      "isConstructor": false,
+      "isMethod": false,
+      "isStatic": false,
+      "isAsync": false
+    },
+    "params": [],
+    "body": [
+      {
+        "type": "Variable",
+        "id": "a",
+        "value": {
+          "type": "Literal",
+          "value": 1,
+          "raw": "1",
+          "location": {
+            "line": 2,
+            "column": 26
+          }
+        },
+        "dataType": {
+          "kind": "primitive",
+          "name": "numero"
+        },
+        "location": {
+          "line": 2,
+          "column": 26
+        }
+      },
+      {
+        "type": "funcion",
+        "id": "interna",
+        "metadata": {
+          "isConstructor": false,
+          "isMethod": false,
+          "isStatic": false,
+          "isAsync": false
+        },
+        "params": [],
+        "body": [
+          {
+            "type": "Variable",
+            "id": "a",
+            "value": {
+              "type": "Literal",
+              "value": "x",
+              "raw": "x",
+              "location": {
+                "line": 4,
+                "column": 29
+              }
+            },
+            "dataType": {
+              "kind": "primitive",
+              "name": "texto"
+            },
+            "location": {
+              "line": 4,
+              "column": 29
+            }
+          },
+          {
+            "type": "Asignacion",
+            "left": {
+              "type": "IDENTIFICADOR",
+              "value": "a",
+              "location": {
+                "line": 5,
+                "column": 9
+              }
+            },
+            "assignment": {
+              "type": "Literal",
+              "value": "y",
+              "raw": "y",
+              "location": {
+                "line": 5,
+                "column": 14
+              }
+            },
+            "location": {
+              "line": 5,
+              "column": 14
+            }
+          }
+        ],
+        "location": {
+          "line": 6,
+          "column": 5
+        }
+      },
+      {
+        "type": "Asignacion",
+        "left": {
+          "type": "IDENTIFICADOR",
+          "value": "a",
+          "location": {
+            "line": 7,
+            "column": 5
+          }
+        },
+        "assignment": {
+          "type": "Literal",
+          "value": 2,
+          "raw": "2",
+          "location": {
+            "line": 7,
+            "column": 10
+          }
+        },
+        "location": {
+          "line": 7,
+          "column": 10
+        }
+      }
+    ],
+    "location": {
+      "line": 8,
+      "column": 1
+    }
+  }
+]

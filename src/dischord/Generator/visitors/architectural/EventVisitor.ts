@@ -23,9 +23,14 @@ export default class EventVisitor extends SubGenerator<DisChordNodeType, DisChor
     visit (node: EventNode): string {
         const eventName = eventsMap[node.name].name;
 
+        // reopening the scope the analyzer bound to this event
+        this.parent.context.symbolTable.enterScope(node);
+
         const body = node.body
             .map((n: DisChordASTNode): string => "    " + this.parent.visit(n) + ";")
             .join('\n');
+
+        this.parent.context.symbolTable.exitScope();
 
         const ctxParams = eventsMap[node.name].params.filter(param => param === 'cliente' || param === 'mensaje');
         const ctxDeclaration = `const ctx = { ${ctxParams.join(', ')} };`;

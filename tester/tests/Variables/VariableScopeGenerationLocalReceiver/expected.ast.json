@@ -1,0 +1,119 @@
+[
+  {
+    "type": "funcion",
+    "id": "f",
+    "metadata": {
+      "isConstructor": false,
+      "isMethod": false,
+      "isStatic": false,
+      "isAsync": false
+    },
+    "params": [],
+    "body": [
+      {
+        "type": "Variable",
+        "id": "b",
+        "value": {
+          "type": "Literal",
+          "value": true,
+          "raw": "verdadero",
+          "location": {
+            "line": 2,
+            "column": 14
+          }
+        },
+        "location": {
+          "line": 2,
+          "column": 14
+        }
+      },
+      {
+        "type": "Variable",
+        "id": "largo",
+        "value": {
+          "type": "Acceso",
+          "object": {
+            "type": "IDENTIFICADOR",
+            "value": "b",
+            "location": {
+              "line": 3,
+              "column": 18
+            }
+          },
+          "property": "longitud",
+          "location": {
+            "line": 3,
+            "column": 20
+          }
+        },
+        "location": {
+          "line": 3,
+          "column": 20
+        }
+      },
+      {
+        "type": "Variable",
+        "id": "l",
+        "value": {
+          "type": "Lista",
+          "body": [
+            {
+              "type": "Literal",
+              "value": 1,
+              "raw": "1",
+              "location": {
+                "line": 4,
+                "column": 15
+              }
+            },
+            {
+              "type": "Literal",
+              "value": 2,
+              "raw": "2",
+              "location": {
+                "line": 4,
+                "column": 18
+              }
+            }
+          ],
+          "location": {
+            "line": 4,
+            "column": 19
+          }
+        },
+        "location": {
+          "line": 4,
+          "column": 19
+        }
+      },
+      {
+        "type": "Variable",
+        "id": "n",
+        "value": {
+          "type": "Acceso",
+          "object": {
+            "type": "IDENTIFICADOR",
+            "value": "l",
+            "location": {
+              "line": 5,
+              "column": 14
+            }
+          },
+          "property": "longitud",
+          "location": {
+            "line": 5,
+            "column": 16
+          }
+        },
+        "location": {
+          "line": 5,
+          "column": 16
+        }
+      }
+    ],
+    "location": {
+      "line": 6,
+      "column": 1
+    }
+  }
+]

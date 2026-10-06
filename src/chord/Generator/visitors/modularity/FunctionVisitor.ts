@@ -25,9 +25,14 @@ export class FunctionVisitor<T extends string, N extends BaseNode<T>> extends Su
     public visit(node: FunctionNode<T, N>): string {
         const params = node.params.join(', ');
         
+        // reopening the scope the analyzer bound to this node lets lookups see the function's locals.
+        this.parent.context.symbolTable.enterScope(node);
+
         const body = node.body
             .map((n: ASTNode<T, N>) => '    ' + this.parent.visitStatement(n) + ";")
             .join('\n');
+
+        this.parent.context.symbolTable.exitScope();
 
         const asyncPrefix = node.metadata.isAsync ? 'async ' : '';
 

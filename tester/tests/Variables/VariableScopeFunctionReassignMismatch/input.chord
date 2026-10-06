@@ -1,0 +1,5 @@
+var total tipo numero es 1
+funcion cambiar() {
+    var local tipo numero es 2
+    local es "x"
+}

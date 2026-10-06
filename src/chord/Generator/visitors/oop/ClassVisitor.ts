@@ -25,9 +25,14 @@ export class ClassVisitor<T extends string, N extends BaseNode<T>> extends SubGe
     public visit(node: ClassNode<T, N>): string {
         const inheritance = node.superClass ? ` extends ${node.superClass}` : '';
 
+        // Reopening the scope the analyzer bound to this node lets lookups see the class's members.
+        this.parent.context.symbolTable.enterScope(node);
+
         const body = node.body
             .map((n: ASTNode<T, N>) => "  " + this.parent.visit(n) + ";")
             .join('\n\n');
+
+        this.parent.context.symbolTable.exitScope();
         
         return `class ${node.id}${inheritance} {\n  ${body}\n}`;
     }

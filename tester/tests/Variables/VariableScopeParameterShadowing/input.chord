@@ -1,0 +1,5 @@
+var x tipo numero es 1
+funcion usar(x) {
+    x es "texto"
+}
+x es 2

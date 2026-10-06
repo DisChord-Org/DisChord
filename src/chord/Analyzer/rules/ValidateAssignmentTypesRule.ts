@@ -35,18 +35,17 @@ export class ValidateAssignmentTypesRule<T extends string, N extends BaseNode<T>
     }
 
     /**
-     * Mirrors `ResolveVariableTypesRule`'s scope tracking (push on class/function entry) so a
+     * Mirrors `ResolveVariableTypesRule`'s scope tracking (enter the scope of each node owning one) so a
      * reassignment inside a nested scope resolves its target against the same `SymbolTable` entry
      * earlier passes created for it.
      * @private
      */
     private enter (node: ASTNode<T, N>): void {
-        switch (node.type) {
-            case TokenType.Clase:
-            case TokenType.Funcion:
-                this.context.symbolTable.pushScope();
-                break;
+        if (this.context.symbolTable.ownsScope(node)) {
+            this.context.symbolTable.enterScope(node);
+        }
 
+        switch (node.type) {
             case TokenType.ASIGNACION:
                 this.validateAssignment(node as AssignmentNode<T, N>);
                 break;
@@ -54,12 +53,12 @@ export class ValidateAssignmentTypesRule<T extends string, N extends BaseNode<T>
     }
 
     /**
-     * Mirrors `ResolveVariableTypesRule`'s scope tracking (pop on class/function exit).
+     * Mirrors `ResolveVariableTypesRule`'s scope tracking (exit it again).
      * @private
      */
     private exit (node: ASTNode<T, N>): void {
-        if (node.type === TokenType.Clase || node.type === TokenType.Funcion) {
-            this.context.symbolTable.popScope();
+        if (this.context.symbolTable.ownsScope(node)) {
+            this.context.symbolTable.exitScope();
         }
     }
 

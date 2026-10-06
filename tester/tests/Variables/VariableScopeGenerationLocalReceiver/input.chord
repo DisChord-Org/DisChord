@@ -1,0 +1,6 @@
+funcion f () {
+    var b es verdadero
+    var largo es b.longitud
+    var l es [1, 2]
+    var n es l.longitud
+}

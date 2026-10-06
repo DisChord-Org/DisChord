@@ -22,8 +22,8 @@ export default class CommandVisitor extends SubGenerator<DisChordNodeType, DisCh
      * @returns The generated code for the command definition.
      */
     visit (node: CommandNode): string {
-        // first we just add a new scope in the symboltable
-        this.parent.context.symbolTable.pushScope();
+        // reopening the scope the analyzer bound to this command
+        this.parent.context.symbolTable.enterScope(node);
         // adding interaction context
         this.parent.context.symbolTable.setMetadata(CompilerMetadataKind.IsInteraction, false); // is this necccessary yet? I need to check it
 
@@ -63,8 +63,7 @@ export default class CommandVisitor extends SubGenerator<DisChordNodeType, DisCh
             }
         `;
 
-        // deleting scope from symboltable
-        this.parent.context.symbolTable.popScope();
+        this.parent.context.symbolTable.exitScope();
 
         return commandBody;
     }

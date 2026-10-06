@@ -45,17 +45,16 @@ export class ResolveVariableTypesRule<T extends string, N extends BaseNode<T>> e
     }
 
     /**
-     * Mirrors {@link BindDeclarationsRule}'s scope tracking (push on class/function entry) and, for
+     * Mirrors {@link BindDeclarationsRule}'s scope tracking (enter the scope of each node owning one) and, for
      * a `VariableNode`, resolves and stores its `dataType` via {@link resolveDataType}.
      * @private
      */
     private enter (node: ASTNode<T, N>): void {
-        switch (node.type) {
-            case TokenType.Clase:
-            case TokenType.Funcion:
-                this.context.symbolTable.pushScope();
-                break;
+        if (this.context.symbolTable.ownsScope(node)) {
+            this.context.symbolTable.enterScope(node);
+        }
 
+        switch (node.type) {
             case TokenType.VARIABLE:
                 const variableNode = node as VariableNode<T, N>;
                 const dataType = this.resolveDataType(variableNode);
@@ -65,12 +64,12 @@ export class ResolveVariableTypesRule<T extends string, N extends BaseNode<T>> e
     }
 
     /**
-     * Mirrors {@link BindDeclarationsRule}'s scope tracking (pop on class/function exit).
+     * Mirrors {@link BindDeclarationsRule}'s scope tracking (exit it again).
      * @private
      */
     private exit (node: ASTNode<T, N>): void {
-        if (node.type === TokenType.Clase || node.type === TokenType.Funcion) {
-            this.context.symbolTable.popScope();
+        if (this.context.symbolTable.ownsScope(node)) {
+            this.context.symbolTable.exitScope();
         }
     }
 

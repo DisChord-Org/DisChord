@@ -1,6 +1,14 @@
-import { Location, Symbol, SymbolKind, CompilerMetadataKind } from "./types";
+import { Location, Symbol, SymbolKind, CompilerMetadataKind, TokenType } from "./types";
 import { DataType } from "./DataType";
 import { ChordError, ErrorLevel } from "../errors/ChordError";
+
+/**
+ * One lexical scope: the symbols declared in it plus its contextual compilation metadata.
+ */
+interface Scope {
+    symbols: Map<string, Symbol>;
+    metadata: Map<CompilerMetadataKind, unknown>;
+}
 
 /**
  * Manages the hierarchical symbol table for the DisChord language.
@@ -11,36 +19,71 @@ import { ChordError, ErrorLevel } from "../errors/ChordError";
  */
 export class SymbolTable {
     /**
-     * A stack of symbol maps representing nested scopes. 
-     * The first element is the global scope, and the last is the current local scope.
+     * A stack of scopes. The first element is the global scope, and the last is the current
+     * local scope.
      */
-    private scopes: Map<string, Symbol>[] = [ new Map() ];
+    private scopes: Scope[] = [ SymbolTable.createScope() ];
 
     /**
-     * A stack of metadata maps matching the scope hierarchy, 
-     * storing contextual compilation flags and metadata per scope.
-     * 
-     * @private
+     * Scopes bound to the AST node that owns them (a class, a function, a command...), so every
+     * pass and the generator reopening the same node land on the same symbols.
      */
-    private metadata: Map<CompilerMetadataKind, unknown>[] = [ new Map() ];
+    private readonly nodeScopes: WeakMap<object, Scope> = new WeakMap();
 
     /**
-     * Creates and enters a new lexical scope (e.g., when entering a block, function, or class).
+     * Node types that own a scope for their body. Chord's own are classes and functions; a
+     * dialect adds its own through {@link registerScopeOwner}.
      */
-    public pushScope(): void {
-        this.scopes.push(new Map());
-        this.metadata.push(new Map());
+    private readonly scopeOwnerTypes: Set<string> = new Set([ TokenType.Clase, TokenType.Funcion ]);
+
+    private static createScope(): Scope {
+        return { symbols: new Map(), metadata: new Map() };
     }
 
     /**
-     * Exits the current local scope and returns to the parent scope.
+     * Declares that nodes of `type` own a scope for their body.
+     *
+     * @param {string} type - The node type string.
+     */
+    public registerScopeOwner(type: string): void {
+        this.scopeOwnerTypes.add(type);
+    }
+
+    /**
+     * Whether `node` owns a scope for its body, i.e. whether the passes walking the tree must
+     * {@link enterScope} it.
+     *
+     * @param {{ type: string }} node - The AST node to check.
+     * @returns {boolean}
+     */
+    public ownsScope(node: { type: string }): boolean {
+        return this.scopeOwnerTypes.has(node.type);
+    }
+
+    /**
+     * Enters the scope owned by `node`, creating it the first time the node is seen. The scope
+     * outlives {@link exitScope}, so later passes reopening the node find what earlier ones
+     * registered in it.
+     *
+     * @param {object} node - The AST node owning the scope.
+     */
+    public enterScope(node: object): void {
+        let scope = this.nodeScopes.get(node);
+
+        if (!scope) {
+            scope = SymbolTable.createScope();
+            this.nodeScopes.set(node, scope);
+        }
+
+        this.scopes.push(scope);
+    }
+
+    /**
+     * Exits the current local scope and returns to the parent scope, without destroying it.
      * Prevents popping the global scope.
      */
-    public popScope(): void {
-        if (this.scopes.length > 1) {
-            this.scopes.pop();
-            this.metadata.pop();
-        }
+    public exitScope(): void {
+        if (this.scopes.length > 1) this.scopes.pop();
     }
 
     /**
@@ -55,7 +98,7 @@ export class SymbolTable {
      * @throws {ChordError} If the identifier is already declared in the current scope.
      */
     public register(name: string, info: Partial<Symbol>, location: Location): void {
-        const currentScope = this.scopes[this.scopes.length - 1];
+        const currentScope = this.scopes[this.scopes.length - 1].symbols;
         
         if (currentScope.has(name)) {
             throw new ChordError({
@@ -92,7 +135,7 @@ export class SymbolTable {
      */
     public setDataType(name: string, dataType: DataType | undefined): void {
         for (let i = this.scopes.length - 1; i >= 0; i--) {
-            const symbol = this.scopes[i].get(name);
+            const symbol = this.scopes[i].symbols.get(name);
 
             if (symbol) {
                 symbol.dataType = dataType;
@@ -110,8 +153,8 @@ export class SymbolTable {
      */
     public lookup(name: string): Symbol | undefined {
         for (let i = this.scopes.length - 1; i >= 0; i--) {
-            if (this.scopes[i].has(name)) {
-                return this.scopes[i].get(name);
+            if (this.scopes[i].symbols.has(name)) {
+                return this.scopes[i].symbols.get(name);
             }
         }
         return undefined;
@@ -125,7 +168,7 @@ export class SymbolTable {
      * @param {unknown} value - The value payload associated with the metadata key.
      */
     public setMetadata(key: CompilerMetadataKind, value: unknown): void {
-        this.metadata[this.metadata.length - 1].set(key, value);
+        this.scopes[this.scopes.length - 1].metadata.set(key, value);
     }
 
     /**
@@ -136,8 +179,8 @@ export class SymbolTable {
      * @returns {T | undefined} The metadata value cast to generic type T if found, otherwise undefined.
      */
     public getMetadata<T>(key: CompilerMetadataKind): T | undefined {
-        for(let i = this.metadata.length - 1; i >= 0; i--) {
-            if (this.metadata[i].has(key)) return this.metadata[i].get(key) as T;
+        for(let i = this.scopes.length - 1; i >= 0; i--) {
+            if (this.scopes[i].metadata.has(key)) return this.scopes[i].metadata.get(key) as T;
         }
 
         return undefined;

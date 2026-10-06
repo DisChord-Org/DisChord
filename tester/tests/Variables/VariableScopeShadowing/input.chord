@@ -1,0 +1,7 @@
+var x tipo numero es 1
+funcion sombra() {
+    var x tipo texto es "a"
+    x es "b"
+}
+x es 2
+consola.imprimir(x)

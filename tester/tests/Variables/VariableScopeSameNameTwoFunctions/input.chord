@@ -1,0 +1,9 @@
+funcion uno() {
+    var dato tipo numero es 1
+    dato es 2
+}
+
+funcion dos() {
+    var dato tipo texto es "a"
+    dato es "b"
+}

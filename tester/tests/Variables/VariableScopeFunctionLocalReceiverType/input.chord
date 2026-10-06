@@ -1,0 +1,4 @@
+funcion recortar() {
+    var s es "hola"
+    var t tipo numero es s.cortar(0, 2)
+}

@@ -1,0 +1,8 @@
+funcion externa() {
+    var a tipo numero es 1
+    funcion interna() {
+        var a tipo texto es "x"
+        a es "y"
+    }
+    a es 2
+}

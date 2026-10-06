@@ -1,6 +1,6 @@
 import { Analyzer } from "../../chord/Analyzer/Analyzer";
 import { AnalysisRuleClass } from "../../chord/Analyzer/AnalysisRule";
-import { DisChordNode, DisChordNodeType } from "../types";
+import { DisChordNode, DisChordNodeType, DisChordTokenType } from "../types";
 import { BindDisChordDeclarationsRule } from "./rules/BindDisChordDeclarationsRule";
 import { SingleWholeFileDeclarationRule } from "./rules/SingleWholeFileDeclarationRule";
 import { ValidateStartBotRule } from "./rules/ValidateStartBotRule";
@@ -44,6 +44,10 @@ export class DisChordAnalyzer extends Analyzer<DisChordNodeType, DisChordNode> {
      * @override
      */
     protected override registerRules (): void {
+        // command and event bodies get their own scope, declared before chord's rules bind anything.
+        this.context.symbolTable.registerScopeOwner(DisChordTokenType.CREAR_COMANDO);
+        this.context.symbolTable.registerScopeOwner(DisChordTokenType.EVENTO);
+
         super.registerRules();
 
         DisChordAnalyzer.DisChordRules.forEach(RuleClass => {

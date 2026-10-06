@@ -1,0 +1,9 @@
+var x tipo numero es 1
+
+nuevo comando Uno {
+    descripcion "uno";
+    var x tipo texto es "a"
+    x es "b"
+}
+
+x es 2

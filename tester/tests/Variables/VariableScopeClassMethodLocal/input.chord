@@ -1,0 +1,6 @@
+clase Caja {
+    funcion guardar() {
+        var total tipo numero es 1
+        total es "x"
+    }
+}

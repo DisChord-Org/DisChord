@@ -1,0 +1,152 @@
+[
+  {
+    "type": "importar",
+    "identificators": [],
+    "path": "./lib/consoleRuntime.js",
+    "isDestructured": false,
+    "location": {
+      "line": 0,
+      "column": 0
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "x",
+    "value": {
+      "type": "Literal",
+      "value": 1,
+      "raw": "1",
+      "location": {
+        "line": 1,
+        "column": 22
+      }
+    },
+    "dataType": {
+      "kind": "primitive",
+      "name": "numero"
+    },
+    "location": {
+      "line": 1,
+      "column": 22
+    }
+  },
+  {
+    "type": "funcion",
+    "id": "sombra",
+    "metadata": {
+      "isConstructor": false,
+      "isMethod": false,
+      "isStatic": false,
+      "isAsync": false
+    },
+    "params": [],
+    "body": [
+      {
+        "type": "Variable",
+        "id": "x",
+        "value": {
+          "type": "Literal",
+          "value": "a",
+          "raw": "a",
+          "location": {
+            "line": 3,
+            "column": 25
+          }
+        },
+        "dataType": {
+          "kind": "primitive",
+          "name": "texto"
+        },
+        "location": {
+          "line": 3,
+          "column": 25
+        }
+      },
+      {
+        "type": "Asignacion",
+        "left": {
+          "type": "IDENTIFICADOR",
+          "value": "x",
+          "location": {
+            "line": 4,
+            "column": 5
+          }
+        },
+        "assignment": {
+          "type": "Literal",
+          "value": "b",
+          "raw": "b",
+          "location": {
+            "line": 4,
+            "column": 10
+          }
+        },
+        "location": {
+          "line": 4,
+          "column": 10
+        }
+      }
+    ],
+    "location": {
+      "line": 5,
+      "column": 1
+    }
+  },
+  {
+    "type": "Asignacion",
+    "left": {
+      "type": "IDENTIFICADOR",
+      "value": "x",
+      "location": {
+        "line": 6,
+        "column": 1
+      }
+    },
+    "assignment": {
+      "type": "Literal",
+      "value": 2,
+      "raw": "2",
+      "location": {
+        "line": 6,
+        "column": 6
+      }
+    },
+    "location": {
+      "line": 6,
+      "column": 6
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 7,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 7,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "IDENTIFICADOR",
+        "value": "x",
+        "location": {
+          "line": 7,
+          "column": 18
+        }
+      }
+    ],
+    "location": {
+      "line": 7,
+      "column": 19
+    }
+  }
+]
