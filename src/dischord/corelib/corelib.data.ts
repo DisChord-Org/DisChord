@@ -1,5 +1,5 @@
 import { corelib as chordCorelib } from "../../chord/corelib/corelib.data";
-import { AnyDataType, PrimitiveDataType, UnionDataType } from "../../chord/DataType";
+import { PrimitiveDataType, UnionDataType, VoidDataType } from "../../chord/DataType";
 import { PrimitiveType } from "../../chord/types";
 import { DisChordCoreLib } from "./corelib.types";
 
@@ -18,6 +18,9 @@ export enum DisChordClassesEnum {
  * name in the source language to the Seyfert code it is transpiled to. Every member is static
  * because `cliente` and `canal` are fixed identifiers in scope, not values of unknown type, and
  * its `transpile` is the whole replacement expression.
+ *
+ * Seyfert types absent values as `string | null` (or optional fields); the language has no `null`,
+ * so those are approximated as `texto|indefinido` (or the matching primitive with `indefinido`).
  * @type {DisChordCoreLib}
  */
 export const corelib: DisChordCoreLib = {
@@ -27,7 +30,7 @@ export const corelib: DisChordCoreLib = {
             methods: {
                 emitir: {
                     transpile: 'cliente.events.runEvent',
-                    returns: AnyDataType.Any,
+                    returns: VoidDataType.Void,
                     static: true
                 }
             },
@@ -69,7 +72,7 @@ export const corelib: DisChordCoreLib = {
                 },
                 ratelimit: {
                     transpile: 'canal.rateLimitPerUser',
-                    returns: PrimitiveDataType.Numero,
+                    returns: UnionDataType.of([PrimitiveType.Numero, PrimitiveType.Indefinido]),
                     static: true
                 },
                 posicion: {
@@ -84,7 +87,7 @@ export const corelib: DisChordCoreLib = {
                 },
                 nombre: {
                     transpile: 'canal.name',
-                    returns: PrimitiveDataType.Texto,
+                    returns: UnionDataType.of([PrimitiveType.Texto, PrimitiveType.Indefinido]),
                     static: true
                 },
                 ultimoMensaje: {
@@ -134,17 +137,17 @@ export const corelib: DisChordCoreLib = {
                 },
                 insignias: {
                     transpile: 'publicFlags',
-                    returns: PrimitiveDataType.Numero,
+                    returns: UnionDataType.of([PrimitiveType.Numero, PrimitiveType.Indefinido]),
                     runtime: true
                 },
                 esBot: {
                     transpile: 'bot',
-                    returns: PrimitiveDataType.Booleano,
+                    returns: UnionDataType.of([PrimitiveType.Booleano, PrimitiveType.Indefinido]),
                     runtime: true
                 },
                 esSistema: {
                     transpile: 'system',
-                    returns: PrimitiveDataType.Booleano,
+                    returns: UnionDataType.of([PrimitiveType.Booleano, PrimitiveType.Indefinido]),
                     runtime: true
                 },
                 avatarUrl: {
