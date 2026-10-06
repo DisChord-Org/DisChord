@@ -1,0 +1,10 @@
+clase Caja {
+    @asincrono
+    funcion cargar() {
+        devolver 1
+    }
+}
+
+funcion f(c tipo Caja|texto) {
+    devolver c.cargar()
+}

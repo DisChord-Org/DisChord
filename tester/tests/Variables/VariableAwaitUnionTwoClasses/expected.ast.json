@@ -1,0 +1,153 @@
+[
+  {
+    "type": "clase",
+    "id": "Caja",
+    "body": [
+      {
+        "type": "funcion",
+        "id": "cargar",
+        "metadata": {
+          "isConstructor": false,
+          "isMethod": true,
+          "isStatic": false,
+          "isAsync": true
+        },
+        "params": [],
+        "body": [
+          {
+            "type": "devolver",
+            "object": {
+              "type": "Literal",
+              "value": 1,
+              "raw": "1",
+              "location": {
+                "line": 4,
+                "column": 18
+              }
+            },
+            "location": {
+              "line": 4,
+              "column": 18
+            }
+          }
+        ],
+        "location": {
+          "line": 5,
+          "column": 5
+        }
+      }
+    ],
+    "location": {
+      "line": 6,
+      "column": 1
+    }
+  },
+  {
+    "type": "clase",
+    "id": "Otra",
+    "body": [
+      {
+        "type": "funcion",
+        "id": "cargar",
+        "metadata": {
+          "isConstructor": false,
+          "isMethod": true,
+          "isStatic": false,
+          "isAsync": false
+        },
+        "params": [],
+        "body": [
+          {
+            "type": "devolver",
+            "object": {
+              "type": "Literal",
+              "value": 2,
+              "raw": "2",
+              "location": {
+                "line": 10,
+                "column": 18
+              }
+            },
+            "location": {
+              "line": 10,
+              "column": 18
+            }
+          }
+        ],
+        "location": {
+          "line": 11,
+          "column": 5
+        }
+      }
+    ],
+    "location": {
+      "line": 12,
+      "column": 1
+    }
+  },
+  {
+    "type": "funcion",
+    "id": "f",
+    "metadata": {
+      "isConstructor": false,
+      "isMethod": false,
+      "isStatic": false,
+      "isAsync": false
+    },
+    "params": [
+      "c"
+    ],
+    "paramTypes": [
+      {
+        "kind": "union",
+        "members": [
+          {
+            "kind": "userClass",
+            "name": "Caja"
+          },
+          {
+            "kind": "userClass",
+            "name": "Otra"
+          }
+        ]
+      }
+    ],
+    "body": [
+      {
+        "type": "devolver",
+        "object": {
+          "type": "Llamada",
+          "object": {
+            "type": "Acceso",
+            "object": {
+              "type": "IDENTIFICADOR",
+              "value": "c",
+              "location": {
+                "line": 15,
+                "column": 14
+              }
+            },
+            "property": "cargar",
+            "location": {
+              "line": 15,
+              "column": 16
+            }
+          },
+          "params": [],
+          "location": {
+            "line": 15,
+            "column": 23
+          }
+        },
+        "location": {
+          "line": 15,
+          "column": 23
+        }
+      }
+    ],
+    "location": {
+      "line": 16,
+      "column": 1
+    }
+  }
+]

@@ -3,7 +3,7 @@ import { walkAST } from "../walkAST";
 import { TypeInferrer } from "../TypeInferrer";
 import { ASTNode, AccessNode, BaseNode, CallNode, ClassNode, FunctionNode, TokenType } from "../../types";
 import { isAccessNode, isIdentificatorNode } from "../../ast.guards";
-import { UserClassDataType } from "../../DataType";
+import { AnyDataType, UnionDataType, UserClassDataType } from "../../DataType";
 import { asyncRuntimeHelperNames, corelib, coreLibUtils } from "../../corelib";
 import { CompilerMetadataKind } from "../../types";
 import { ChordError, ErrorLevel } from "../../../errors/ChordError";
@@ -20,7 +20,8 @@ import { ChordError, ErrorLevel } from "../../../errors/ChordError";
  * class of this file, `esta` (the enclosing class) or `super` are looked up in that class and its
  * parents; a core library class awaits the static members it marks `async` (`Promesa.todas`), and a
  * receiver of any other known type (primitives, lists, instances of core library classes) never
- * awaits. A receiver of unknown type awaits only if every class of the file declaring a method of
+ * awaits. A receiver of a union type awaits if some class of the union declares the method and every
+ * one that does marks it async. A receiver of unknown type (or `cualquiera`) awaits only if every class of the file declaring a method of
  * that name marks it async, and at least one does.
  *
  * Runs after every variable's type is resolved, walking the tree with the same scopes as the
@@ -118,6 +119,20 @@ export class ResolveAwaitedCallsRule<T extends string, N extends BaseNode<T>> ex
     }
 
     /**
+     * Whether a method called on a receiver of a union type is async: the members that aren't
+     * classes of this file (primitives, core library classes, lists) are ignored, and it is awaited if
+     * at least one class of the union declares the method and every one that does marks it async.
+     */
+    private isAsyncOnUnion (union: UnionDataType, method: string): boolean {
+        const declared = union.members
+            .filter((member): member is UserClassDataType => member instanceof UserClassDataType)
+            .map(member => this.context.symbolTable.findMember(member.name, method))
+            .filter(symbol => symbol !== undefined);
+
+        return declared.length > 0 && declared.every(symbol => symbol.metadata.isAsync);
+    }
+
+    /**
      * Whether `access` names an async method, from what its receiver is.
      */
     private isAsyncMethod (access: AccessNode<T, N>): boolean {
@@ -143,7 +158,8 @@ export class ResolveAwaitedCallsRule<T extends string, N extends BaseNode<T>> ex
 
         const type = this.typeInferrer.infer(receiver);
         if (type instanceof UserClassDataType) return !!symbolTable.findMember(type.name, access.property)?.metadata.isAsync;
-        if (type) return false;
+        if (type instanceof UnionDataType) return this.isAsyncOnUnion(type, access.property);
+        if (type && !(type instanceof AnyDataType)) return false;
 
         const candidates = symbolTable.membersNamed(access.property);
         return candidates.length > 0 && candidates.every(symbol => symbol.metadata.isAsync);

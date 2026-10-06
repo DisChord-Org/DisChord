@@ -1,0 +1,110 @@
+[
+  {
+    "type": "clase",
+    "id": "Caja",
+    "body": [
+      {
+        "type": "funcion",
+        "id": "cargar",
+        "metadata": {
+          "isConstructor": false,
+          "isMethod": true,
+          "isStatic": false,
+          "isAsync": true
+        },
+        "params": [],
+        "body": [
+          {
+            "type": "devolver",
+            "object": {
+              "type": "Literal",
+              "value": 1,
+              "raw": "1",
+              "location": {
+                "line": 4,
+                "column": 18
+              }
+            },
+            "location": {
+              "line": 4,
+              "column": 18
+            }
+          }
+        ],
+        "location": {
+          "line": 5,
+          "column": 5
+        }
+      }
+    ],
+    "location": {
+      "line": 6,
+      "column": 1
+    }
+  },
+  {
+    "type": "funcion",
+    "id": "f",
+    "metadata": {
+      "isConstructor": false,
+      "isMethod": false,
+      "isStatic": false,
+      "isAsync": false
+    },
+    "params": [
+      "c"
+    ],
+    "paramTypes": [
+      {
+        "kind": "union",
+        "members": [
+          {
+            "kind": "primitive",
+            "name": "texto"
+          },
+          {
+            "kind": "primitive",
+            "name": "numero"
+          }
+        ]
+      }
+    ],
+    "body": [
+      {
+        "type": "devolver",
+        "object": {
+          "type": "Llamada",
+          "object": {
+            "type": "Acceso",
+            "object": {
+              "type": "IDENTIFICADOR",
+              "value": "c",
+              "location": {
+                "line": 9,
+                "column": 14
+              }
+            },
+            "property": "cargar",
+            "location": {
+              "line": 9,
+              "column": 16
+            }
+          },
+          "params": [],
+          "location": {
+            "line": 9,
+            "column": 23
+          }
+        },
+        "location": {
+          "line": 9,
+          "column": 23
+        }
+      }
+    ],
+    "location": {
+      "line": 10,
+      "column": 1
+    }
+  }
+]
