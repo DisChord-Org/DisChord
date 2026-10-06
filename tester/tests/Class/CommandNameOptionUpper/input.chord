@@ -1,0 +1,15 @@
+nuevo comando prueba {
+    descripcion "Test";
+
+    opciones {
+        miOpcion {
+            opcion "texto"
+            descripcion "Una opcion"
+            requerido verdadero
+        }
+    }
+
+    enviar mensaje {
+        contenido miOpcion
+    }
+}

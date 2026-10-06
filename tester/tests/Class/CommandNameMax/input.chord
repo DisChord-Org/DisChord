@@ -1,0 +1,7 @@
+nuevo comando abcdefghijklmnopqrstuvwxyzabcdef {
+    descripcion "Test";
+
+    enviar mensaje {
+        contenido "hola"
+    }
+}

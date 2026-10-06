@@ -4,6 +4,7 @@ import { BDOResolver } from '../../../../chord/Generator/BDOResolver';
 import { CompilerMetadataKind, TokenTypeUnion } from '../../../../chord/types';
 import CommandOptionVisitor from '../components/CommandOptionVisitor';
 import { CommandSchema } from '../../constants/schemas';
+import { slugifyCommandName } from '../../constants/commandNames';
 
 /**
  * Generator class responsible for generating code related to command definitions.
@@ -79,7 +80,7 @@ export default class CommandVisitor extends SubGenerator<DisChordNodeType, DisCh
      * @returns {string} Processed source code defining class flags (name, description, nsfw, etc.).
      */
     private generateCommandFlags(node: CommandNode): string {
-        const CommandName = this.getCommandName(node).replace(/(\p{Ll})(\p{Lu})/gu, '$1-$2').toLowerCase(); /* slugified */
+        const CommandName = slugifyCommandName(this.getCommandName(node));
 
         const resolver = new BDOResolver<DisChordNodeType, DisChordNode>(expression => this.parent.visit(expression));
         const flags = resolver.resolve(node.body, CommandSchema);
