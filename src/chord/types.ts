@@ -48,7 +48,8 @@ export enum SymbolKind {
  */
 export enum CompilerMetadataKind {
     IsInteraction = 'isInteraction',
-    RequiresAsync = 'requiresAsync'
+    RequiresAsync = 'requiresAsync',
+    CurrentClass = 'currentClass'
 };
 
 /**

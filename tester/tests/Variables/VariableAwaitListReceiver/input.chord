@@ -1,0 +1,7 @@
+clase Servicio {
+    @asincrono
+    funcion cargar() { devolver 5 }
+}
+
+var l es [1, 2]
+l.cargar()

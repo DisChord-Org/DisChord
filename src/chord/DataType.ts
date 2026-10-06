@@ -239,6 +239,35 @@ export class ClassDataType extends DataType {
 }
 
 /**
+ * An instance of a class declared in the source file (`nuevo Caja()`, or `esta` inside one). It
+ * carries only the class name — what the instance holds is not tracked — and any user class
+ * instance is assignable to any other, since the class hierarchy is not modelled here. It can't be
+ * part of a union or tuple, and is never written in a `tipo` annotation.
+ */
+export class UserClassDataType extends DataType {
+    public readonly kind = DataTypeKind.Class;
+    public readonly name: string;
+
+    private constructor (name: string) {
+        super();
+        this.name = name;
+    }
+
+    /** Builds the `DataType` of an instance of the user class called `name`. */
+    public static of (name: string): UserClassDataType {
+        return new UserClassDataType(name);
+    }
+
+    protected acceptsNonUnionSource (source: DataType): boolean {
+        return source instanceof UserClassDataType;
+    }
+
+    public format (): string {
+        return this.name;
+    }
+}
+
+/**
  * A union of two or more distinct primitives, e.g. `texto|numero`. Never holds a single member —
  * {@link UnionDataType.of} collapses that case down to a bare {@link PrimitiveDataType} instead,
  * mirroring how TypeScript itself never represents a one-member union as a `UnionType`.

@@ -1,0 +1,12 @@
+@asincrono
+funcion cargar() { devolver 1 }
+
+clase Caja {
+    funcion cargar() { devolver 2 }
+}
+
+var c es nuevo Caja()
+
+funcion g() {
+    c.cargar()
+}

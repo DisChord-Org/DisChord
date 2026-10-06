@@ -20,7 +20,7 @@ export class CallVisitor<T extends string, N extends BaseNode<T>> extends SubGen
     public static triggerToken: TokenTypeUnion<TokenType> | undefined = TokenType.LLAMADA;
 
     /**
-     * Resolves routine execution nodes by evaluating arguments and looking up async signatures.
+     * Resolves routine execution nodes by evaluating arguments and reading the Analyzer's decision on whether to await the call.
      * `node.object`'s shape (identifier, property access, or `super`) is guaranteed by the
      * Analyzer's `ValidateCallTargetsRule`, which runs before generation ever starts — this visitor
      * only has to translate, not validate.
@@ -35,18 +35,13 @@ export class CallVisitor<T extends string, N extends BaseNode<T>> extends SubGen
 
         if (isAccessNode(node.object)) {
             translation = this.parent.visit(node.object);
-
-            const symbol = this.parent.context.symbolTable.lookup(node.object.property);
-            if (symbol?.metadata.isAsync) {
-                isAsyncCall = true;
-            }
+            isAsyncCall = this.parent.context.symbolTable.isAwaited(node);
         } else if (isIdentificatorNode(node.object)) {
             const name = node.object.value;
             translation = coreLibUtils.resolveFunction(node.object) ?? name;
             isAsyncCall = asyncRuntimeHelperNames.has(translation);
 
-            const symbol = this.parent.context.symbolTable.lookup(name);
-            if (symbol?.metadata.isAsync) {
+            if (this.parent.context.symbolTable.isAwaited(node)) {
                 isAsyncCall = true;
             }
         } else {

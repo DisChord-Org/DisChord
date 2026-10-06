@@ -1,0 +1,6 @@
+esperar(10)
+
+@asincrono
+funcion f() {
+    esperar(10)
+}

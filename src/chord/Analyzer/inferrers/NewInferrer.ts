@@ -1,16 +1,24 @@
-import { ASTNode, BaseNode, NewNode, TokenType, TokenTypeUnion } from "../../types";
-import { DataType } from "../../DataType";
+import { ASTNode, BaseNode, CallNode, NewNode, TokenType, TokenTypeUnion } from "../../types";
+import { isIdentificatorNode } from "../../ast.guards";
+import { DataType, UserClassDataType } from "../../DataType";
 import { coreLibUtils } from "../../corelib";
 import { SubInferrer } from "../SubInferrer";
 
 /**
- * Infers `nuevo Mapa()` as an instance of that core library class. Instantiating anything else (a
- * user class, which has no type of its own yet) infers `undefined`.
+ * Infers `nuevo Caja()` as an instance of that class. A class declared in the file prevails over
+ * a core library class of the same name. Instantiating anything else infers `undefined`.
  */
 export class NewInferrer<T extends string, N extends BaseNode<T>> extends SubInferrer<T, N> {
     public static triggerToken: TokenTypeUnion<TokenType> | undefined = TokenType.Nuevo;
 
     public infer (node: ASTNode<T, N>): DataType | undefined {
-        return coreLibUtils.resolveConstructedType((node as NewNode<T, N>).object);
+        const target = (node as NewNode<T, N>).object;
+        const callee = target.type === TokenType.LLAMADA ? (target as CallNode<T, N>).object : target;
+
+        if (isIdentificatorNode(callee) && this.parent.context.symbolTable.isUserClass(callee.value)) {
+            return UserClassDataType.of(callee.value);
+        }
+
+        return coreLibUtils.resolveConstructedType(target);
     }
 }

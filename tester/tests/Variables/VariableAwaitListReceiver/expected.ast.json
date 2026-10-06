@@ -1,0 +1,104 @@
+[
+  {
+    "type": "clase",
+    "id": "Servicio",
+    "body": [
+      {
+        "type": "funcion",
+        "id": "cargar",
+        "metadata": {
+          "isConstructor": false,
+          "isMethod": true,
+          "isStatic": false,
+          "isAsync": true
+        },
+        "params": [],
+        "body": [
+          {
+            "type": "devolver",
+            "object": {
+              "type": "Literal",
+              "value": 5,
+              "raw": "5",
+              "location": {
+                "line": 3,
+                "column": 33
+              }
+            },
+            "location": {
+              "line": 3,
+              "column": 33
+            }
+          }
+        ],
+        "location": {
+          "line": 3,
+          "column": 35
+        }
+      }
+    ],
+    "location": {
+      "line": 4,
+      "column": 1
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "l",
+    "value": {
+      "type": "Lista",
+      "body": [
+        {
+          "type": "Literal",
+          "value": 1,
+          "raw": "1",
+          "location": {
+            "line": 6,
+            "column": 11
+          }
+        },
+        {
+          "type": "Literal",
+          "value": 2,
+          "raw": "2",
+          "location": {
+            "line": 6,
+            "column": 14
+          }
+        }
+      ],
+      "location": {
+        "line": 6,
+        "column": 15
+      }
+    },
+    "location": {
+      "line": 6,
+      "column": 15
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "l",
+        "location": {
+          "line": 7,
+          "column": 1
+        }
+      },
+      "property": "cargar",
+      "location": {
+        "line": 7,
+        "column": 3
+      }
+    },
+    "params": [],
+    "location": {
+      "line": 7,
+      "column": 10
+    }
+  }
+]

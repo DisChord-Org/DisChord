@@ -1,0 +1,80 @@
+[
+  {
+    "type": "funcion",
+    "id": "tarea",
+    "metadata": {
+      "isConstructor": false,
+      "isMethod": false,
+      "isStatic": false,
+      "isAsync": true
+    },
+    "params": [],
+    "body": [
+      {
+        "type": "devolver",
+        "object": {
+          "type": "Literal",
+          "value": 1,
+          "raw": "1",
+          "location": {
+            "line": 2,
+            "column": 28
+          }
+        },
+        "location": {
+          "line": 2,
+          "column": 28
+        }
+      }
+    ],
+    "location": {
+      "line": 2,
+      "column": 30
+    }
+  },
+  {
+    "type": "CrearComando",
+    "value": "Uno",
+    "body": {
+      "type": "BDO",
+      "mode": 1,
+      "blocks": {
+        "descripcion": {
+          "type": "Literal",
+          "value": "uno",
+          "raw": "uno",
+          "location": {
+            "line": 5,
+            "column": 17
+          }
+        }
+      },
+      "body": [
+        {
+          "type": "Llamada",
+          "object": {
+            "type": "IDENTIFICADOR",
+            "value": "tarea",
+            "location": {
+              "line": 6,
+              "column": 5
+            }
+          },
+          "params": [],
+          "location": {
+            "line": 6,
+            "column": 11
+          }
+        }
+      ],
+      "location": {
+        "line": 7,
+        "column": 1
+      }
+    },
+    "location": {
+      "line": 7,
+      "column": 1
+    }
+  }
+]

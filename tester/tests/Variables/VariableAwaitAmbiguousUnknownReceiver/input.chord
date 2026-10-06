@@ -1,0 +1,12 @@
+clase A {
+    @asincrono
+    funcion cargar() { devolver 1 }
+}
+
+clase B {
+    funcion cargar() { devolver 2 }
+}
+
+funcion g(x) {
+    x.cargar()
+}

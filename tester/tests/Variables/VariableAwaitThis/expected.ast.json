@@ -1,0 +1,86 @@
+[
+  {
+    "type": "clase",
+    "id": "A",
+    "body": [
+      {
+        "type": "funcion",
+        "id": "a",
+        "metadata": {
+          "isConstructor": false,
+          "isMethod": true,
+          "isStatic": false,
+          "isAsync": true
+        },
+        "params": [],
+        "body": [
+          {
+            "type": "devolver",
+            "object": {
+              "type": "Literal",
+              "value": 1,
+              "raw": "1",
+              "location": {
+                "line": 3,
+                "column": 28
+              }
+            },
+            "location": {
+              "line": 3,
+              "column": 28
+            }
+          }
+        ],
+        "location": {
+          "line": 3,
+          "column": 30
+        }
+      },
+      {
+        "type": "funcion",
+        "id": "b",
+        "metadata": {
+          "isConstructor": false,
+          "isMethod": true,
+          "isStatic": false,
+          "isAsync": true
+        },
+        "params": [],
+        "body": [
+          {
+            "type": "Llamada",
+            "object": {
+              "type": "Acceso",
+              "object": {
+                "type": "esta",
+                "value": "",
+                "location": {
+                  "line": 7,
+                  "column": 9
+                }
+              },
+              "property": "a",
+              "location": {
+                "line": 7,
+                "column": 14
+              }
+            },
+            "params": [],
+            "location": {
+              "line": 7,
+              "column": 16
+            }
+          }
+        ],
+        "location": {
+          "line": 8,
+          "column": 5
+        }
+      }
+    ],
+    "location": {
+      "line": 9,
+      "column": 1
+    }
+  }
+]

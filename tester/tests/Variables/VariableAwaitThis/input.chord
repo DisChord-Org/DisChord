@@ -1,0 +1,9 @@
+clase A {
+    @asincrono
+    funcion a() { devolver 1 }
+
+    @asincrono
+    funcion b() {
+        esta.a()
+    }
+}

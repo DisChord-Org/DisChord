@@ -45,8 +45,8 @@ export class DisChordAnalyzer extends Analyzer<DisChordNodeType, DisChordNode> {
      */
     protected override registerRules (): void {
         // command and event bodies get their own scope, declared before chord's rules bind anything.
-        this.context.symbolTable.registerScopeOwner(DisChordTokenType.CREAR_COMANDO);
-        this.context.symbolTable.registerScopeOwner(DisChordTokenType.EVENTO);
+        this.context.symbolTable.registerScopeOwner(DisChordTokenType.CREAR_COMANDO, true);
+        this.context.symbolTable.registerScopeOwner(DisChordTokenType.EVENTO, true);
 
         super.registerRules();
 

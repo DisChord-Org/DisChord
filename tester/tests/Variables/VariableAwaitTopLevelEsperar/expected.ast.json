@@ -1,0 +1,83 @@
+[
+  {
+    "type": "importar",
+    "identificators": [
+      "chordEsperar"
+    ],
+    "isDestructured": true,
+    "path": "./lib/runtimeHelpers.js",
+    "location": {
+      "line": 0,
+      "column": 0
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "IDENTIFICADOR",
+      "value": "esperar",
+      "location": {
+        "line": 1,
+        "column": 1
+      }
+    },
+    "params": [
+      {
+        "type": "Literal",
+        "value": 10,
+        "raw": "10",
+        "location": {
+          "line": 1,
+          "column": 9
+        }
+      }
+    ],
+    "location": {
+      "line": 1,
+      "column": 11
+    }
+  },
+  {
+    "type": "funcion",
+    "id": "f",
+    "metadata": {
+      "isConstructor": false,
+      "isMethod": false,
+      "isStatic": false,
+      "isAsync": true
+    },
+    "params": [],
+    "body": [
+      {
+        "type": "Llamada",
+        "object": {
+          "type": "IDENTIFICADOR",
+          "value": "esperar",
+          "location": {
+            "line": 5,
+            "column": 5
+          }
+        },
+        "params": [
+          {
+            "type": "Literal",
+            "value": 10,
+            "raw": "10",
+            "location": {
+              "line": 5,
+              "column": 13
+            }
+          }
+        ],
+        "location": {
+          "line": 5,
+          "column": 15
+        }
+      }
+    ],
+    "location": {
+      "line": 6,
+      "column": 1
+    }
+  }
+]

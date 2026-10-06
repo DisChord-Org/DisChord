@@ -7,6 +7,7 @@ import { BindDeclarationsRule } from "./rules/BindDeclarationsRule";
 import { ResolveVariableTypesRule } from "./rules/ResolveVariableTypesRule";
 import { ValidateAssignmentTypesRule } from "./rules/ValidateAssignmentTypesRule";
 import { ValidateCallTargetsRule } from "./rules/ValidateCallTargetsRule";
+import { ResolveAwaitedCallsRule } from "./rules/ResolveAwaitedCallsRule";
 import { RequiresConsoleRuntimeRule } from "./rules/RequiresConsoleRuntimeRule";
 import { RequiresRuntimeHelpersRule } from "./rules/RequiresRuntimeHelpersRule";
 
@@ -60,6 +61,9 @@ export class Analyzer<T extends string, N extends BaseNode<T>> {
         // Reassignment validation — needs every variable's dataType already resolved by Pass 3
         // above, so it runs after it rather than as part of it.
         ValidateAssignmentTypesRule,
+
+        // Decides which calls are awaited; needs the types resolved by Pass 3.
+        ResolveAwaitedCallsRule,
 
         // Lowering rules — independent of the 3-pass binding model above, they don't touch
         // SymbolTable at all.

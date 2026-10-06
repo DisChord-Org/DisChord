@@ -1,0 +1,6 @@
+@asincrono
+funcion tarea() { devolver 1 }
+
+funcion f() {
+    tarea()
+}

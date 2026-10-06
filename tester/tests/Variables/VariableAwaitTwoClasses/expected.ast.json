@@ -1,0 +1,198 @@
+[
+  {
+    "type": "clase",
+    "id": "A",
+    "body": [
+      {
+        "type": "funcion",
+        "id": "cargar",
+        "metadata": {
+          "isConstructor": false,
+          "isMethod": true,
+          "isStatic": false,
+          "isAsync": true
+        },
+        "params": [],
+        "body": [
+          {
+            "type": "devolver",
+            "object": {
+              "type": "Literal",
+              "value": 1,
+              "raw": "1",
+              "location": {
+                "line": 3,
+                "column": 33
+              }
+            },
+            "location": {
+              "line": 3,
+              "column": 33
+            }
+          }
+        ],
+        "location": {
+          "line": 3,
+          "column": 35
+        }
+      }
+    ],
+    "location": {
+      "line": 4,
+      "column": 1
+    }
+  },
+  {
+    "type": "clase",
+    "id": "B",
+    "body": [
+      {
+        "type": "funcion",
+        "id": "cargar",
+        "metadata": {
+          "isConstructor": false,
+          "isMethod": true,
+          "isStatic": false,
+          "isAsync": false
+        },
+        "params": [],
+        "body": [
+          {
+            "type": "devolver",
+            "object": {
+              "type": "Literal",
+              "value": 2,
+              "raw": "2",
+              "location": {
+                "line": 7,
+                "column": 33
+              }
+            },
+            "location": {
+              "line": 7,
+              "column": 33
+            }
+          }
+        ],
+        "location": {
+          "line": 7,
+          "column": 35
+        }
+      }
+    ],
+    "location": {
+      "line": 8,
+      "column": 1
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "a",
+    "value": {
+      "type": "nuevo",
+      "object": {
+        "type": "Llamada",
+        "object": {
+          "type": "IDENTIFICADOR",
+          "value": "A",
+          "location": {
+            "line": 10,
+            "column": 16
+          }
+        },
+        "params": [],
+        "location": {
+          "line": 10,
+          "column": 18
+        }
+      },
+      "location": {
+        "line": 10,
+        "column": 18
+      }
+    },
+    "location": {
+      "line": 10,
+      "column": 18
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "b",
+    "value": {
+      "type": "nuevo",
+      "object": {
+        "type": "Llamada",
+        "object": {
+          "type": "IDENTIFICADOR",
+          "value": "B",
+          "location": {
+            "line": 11,
+            "column": 16
+          }
+        },
+        "params": [],
+        "location": {
+          "line": 11,
+          "column": 18
+        }
+      },
+      "location": {
+        "line": 11,
+        "column": 18
+      }
+    },
+    "location": {
+      "line": 11,
+      "column": 18
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "a",
+        "location": {
+          "line": 12,
+          "column": 1
+        }
+      },
+      "property": "cargar",
+      "location": {
+        "line": 12,
+        "column": 3
+      }
+    },
+    "params": [],
+    "location": {
+      "line": 12,
+      "column": 10
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "b",
+        "location": {
+          "line": 13,
+          "column": 1
+        }
+      },
+      "property": "cargar",
+      "location": {
+        "line": 13,
+        "column": 3
+      }
+    },
+    "params": [],
+    "location": {
+      "line": 13,
+      "column": 10
+    }
+  }
+]

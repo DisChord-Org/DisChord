@@ -1,0 +1,10 @@
+clase A {
+    @asincrono
+    funcion deA() { devolver 1 }
+}
+
+clase B extiende A {
+}
+
+var b es nuevo B()
+b.deA()

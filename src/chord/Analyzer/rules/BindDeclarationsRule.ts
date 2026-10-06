@@ -1,7 +1,7 @@
 import { AnalysisRule } from "../AnalysisRule";
 import { walkAST } from "../walkAST";
 import { isClassNode, isFunctionNode, isPropertyNode, isVariableNode } from "../../ast.guards";
-import { ASTNode, BaseNode, SymbolKind } from "../../types";
+import { ASTNode, BaseNode, CompilerMetadataKind, SymbolKind } from "../../types";
 
 /**
  * Pass 2 of the Analyzer's binding model ("Variables"): walks the complete AST and registers
@@ -36,6 +36,8 @@ export class BindDeclarationsRule<T extends string, N extends BaseNode<T>> exten
             }, node.location);
 
             this.context.symbolTable.enterScope(node);
+            this.context.symbolTable.registerClass(node.id, node.superClass);
+            this.context.symbolTable.setMetadata(CompilerMetadataKind.CurrentClass, node.id);
 
         } else if (isFunctionNode(node)) {
             this.context.symbolTable.register(node.id, {

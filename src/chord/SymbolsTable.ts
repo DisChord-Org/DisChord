@@ -36,6 +36,23 @@ export class SymbolTable {
      */
     private readonly scopeOwnerTypes: Set<string> = new Set([ TokenType.Clase, TokenType.Funcion ]);
 
+    /**
+     * The subset of scope owners whose body runs inside an async context, so it may `await`
+     * (a function is async only if marked, so it's not listed here).
+     */
+    private readonly asyncBodyTypes: Set<string> = new Set();
+
+    /**
+     * Every class declared in the file by name, with its parent class and the scope holding its
+     * members, so a method can be found from a class name and through inheritance.
+     */
+    private readonly classes: Map<string, { superClass?: string; scope: Scope }> = new Map();
+
+    /**
+     * Calls the analyzer decided must be awaited (see {@link markAwaited}).
+     */
+    private readonly awaitedCalls: WeakSet<object> = new WeakSet();
+
     private static createScope(): Scope {
         return { symbols: new Map(), metadata: new Map() };
     }
@@ -44,9 +61,102 @@ export class SymbolTable {
      * Declares that nodes of `type` own a scope for their body.
      *
      * @param {string} type - The node type string.
+     * @param {boolean} [asyncBody=false] - Whether the body runs in an async context.
      */
-    public registerScopeOwner(type: string): void {
+    public registerScopeOwner(type: string, asyncBody: boolean = false): void {
         this.scopeOwnerTypes.add(type);
+        if (asyncBody) this.asyncBodyTypes.add(type);
+    }
+
+    /**
+     * Whether the body of `node` always runs in an async context (see {@link registerScopeOwner}).
+     *
+     * @param {{ type: string }} node - The AST node to check.
+     * @returns {boolean}
+     */
+    public hasAsyncBody(node: { type: string }): boolean {
+        return this.asyncBodyTypes.has(node.type);
+    }
+
+    /**
+     * Records the class being declared, whose scope must be the current one, so its members can be
+     * found by class name later.
+     *
+     * @param {string} name - The class name.
+     * @param {string} [superClass] - The name of the class it extends, if any.
+     */
+    public registerClass(name: string, superClass?: string): void {
+        this.classes.set(name, { superClass, scope: this.scopes[this.scopes.length - 1] });
+    }
+
+    /**
+     * @param {string} name - A class name.
+     * @returns {boolean} Whether a class with that name is declared in the file.
+     */
+    public isUserClass(name: string): boolean {
+        return this.classes.has(name);
+    }
+
+    /**
+     * @param {string} name - A user class name.
+     * @returns {string | undefined} The class it extends, if any.
+     */
+    public superClassOf(name: string): string | undefined {
+        return this.classes.get(name)?.superClass;
+    }
+
+    /**
+     * Finds a member in a user class, searching its parent classes in turn. A parent that isn't a
+     * class of this file ends the search, since what it holds is unknown.
+     *
+     * @param {string} className - A user class name.
+     * @param {string} member - The member name.
+     * @returns {Symbol | undefined} The member, or `undefined` if it isn't found in the chain.
+     */
+    public findMember(className: string, member: string): Symbol | undefined {
+        const seen = new Set<string>();
+        let current: string | undefined = className;
+
+        while (current !== undefined && !seen.has(current)) {
+            seen.add(current);
+            const entry = this.classes.get(current);
+            if (!entry) return undefined;
+
+            const symbol = entry.scope.symbols.get(member);
+            if (symbol) return symbol;
+
+            current = entry.superClass;
+        }
+
+        return undefined;
+    }
+
+    /**
+     * @param {string} member - A member name.
+     * @returns {Symbol[]} The member as declared by each class of the file that declares it itself.
+     */
+    public membersNamed(member: string): Symbol[] {
+        return [...this.classes.values()]
+            .map(entry => entry.scope.symbols.get(member))
+            .filter((symbol): symbol is Symbol => symbol !== undefined);
+    }
+
+    /**
+     * Records that the analyzer decided this call must be awaited, so the generator only has to
+     * read the decision.
+     *
+     * @param {object} call - The call node.
+     */
+    public markAwaited(call: object): void {
+        this.awaitedCalls.add(call);
+    }
+
+    /**
+     * @param {object} call - The call node.
+     * @returns {boolean} Whether the analyzer decided this call must be awaited.
+     */
+    public isAwaited(call: object): boolean {
+        return this.awaitedCalls.has(call);
     }
 
     /**

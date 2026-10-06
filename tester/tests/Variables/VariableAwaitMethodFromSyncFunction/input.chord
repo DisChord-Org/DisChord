@@ -1,0 +1,10 @@
+clase Servicio {
+    @asincrono
+    funcion cargar() { devolver 5 }
+}
+
+var s es nuevo Servicio()
+
+funcion f() {
+    s.cargar()
+}

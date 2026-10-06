@@ -1,0 +1,13 @@
+clase A {
+    @asincrono
+    funcion cargar() { devolver 1 }
+}
+
+clase B {
+    funcion cargar() { devolver 2 }
+}
+
+var a es nuevo A()
+var b es nuevo B()
+a.cargar()
+b.cargar()
