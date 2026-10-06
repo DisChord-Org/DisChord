@@ -20,6 +20,7 @@ export interface CoreLibMember {
  * accesses such as `longitud` → `.length`, so the generator knows whether to emit a call.
  */
 export interface CoreLibClass {
+    readonly receiver?: DataType;
     readonly methods: Readonly<Record<string, CoreLibMember>>;
     readonly properties?: Readonly<Record<string, CoreLibMember>>;
 }

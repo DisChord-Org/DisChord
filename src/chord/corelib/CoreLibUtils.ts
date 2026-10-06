@@ -1,6 +1,6 @@
 import { corelib } from "./corelib.data";
 import { isIdentificatorNode } from "../ast.guards";
-import { DataType } from "../DataType";
+import { AnyDataType, DataType } from "../DataType";
 import { AccessNode, BaseNode } from "../types";
 import { CoreLib, CoreLibClass, ResolvedMember } from "./corelib.types";
 
@@ -61,18 +61,29 @@ export class CoreLibUtils<C extends string = string> {
     }
 
     /**
-     * The type an access evaluates to: a static member's own `returns`, or an instance member's when
-     * every class with a member of that name agrees on it (a value's class isn't known yet, so a
-     * name like `tiene`, which several classes define, only resolves if they all return the same
-     * type instance). A method yields its type only as a call, and a property only as a plain access.
+     * The type an access evaluates to: a static member's own `returns`, or an instance member's.
+     * When the receiver's type is known the member is looked up only in the class that type belongs
+     * to (`texto.cortar` is `Texto.cortar`, never `Lista.cortar`), and it has no type if that class
+     * has no such member or the type belongs to no class (a `bdo`'s own fields, a `booleano`):
+     * guessing there would type a user's field after a core library one that happens to share its
+     * name. With no receiver type (or `cualquiera`), falls back to looking the name up in every
+     * class and only resolves if they all agree on its type instance. A method yields its type only
+     * as a call, and a property only as a plain access.
      * @param {AccessNode<T, N>} access - The access node.
      * @param {boolean} isCall - Whether the access is the callee of a call.
+     * @param {DataType} [receiverType] - The inferred type of `access.object`, if known.
      * @returns {DataType | undefined} The type, or `undefined` if the core library has no such
      * member, its name is ambiguous, or it is used the wrong way (a method read without calling it).
      */
-    resolveReturnType<T extends string, N extends BaseNode<T>> (access: AccessNode<T, N>, isCall: boolean): DataType | undefined {
+    resolveReturnType<T extends string, N extends BaseNode<T>> (access: AccessNode<T, N>, isCall: boolean, receiverType?: DataType): DataType | undefined {
         const staticMember = this.resolveStatic(access);
         if (staticMember) return this.returnTypeOf(staticMember, isCall);
+
+        if (receiverType && !(receiverType instanceof AnyDataType)) {
+            const className = this.classOf(receiverType);
+            const found = className && this.findInClass(className, access.property);
+            return found && !found.member.static ? this.returnTypeOf(found, isCall) : undefined;
+        }
 
         const [first, ...rest] = this.resolveInstanceMembers(access);
         if (!first || rest.some(other => other.isProperty !== first.isProperty || other.member.returns !== first.member.returns)) return undefined;
@@ -115,6 +126,14 @@ export class CoreLibUtils<C extends string = string> {
         }
 
         return undefined;
+    }
+
+    /**
+     * @param {DataType} type - The type of a value.
+     * @returns {C | undefined} The class whose `receiver` accepts it, or `undefined` if it belongs to none.
+     */
+    classOf(type: DataType): C | undefined {
+        return (Object.keys(this.corelib.classes) as C[]).find(key => this.corelib.classes[key].receiver?.isAssignableFrom(type));
     }
 
     private returnTypeOf(resolved: ResolvedMember, isCall: boolean): DataType | undefined {

@@ -1,0 +1,4 @@
+var b es verdadero
+var largo tipo texto es b.longitud
+
+consola.imprimir(largo)

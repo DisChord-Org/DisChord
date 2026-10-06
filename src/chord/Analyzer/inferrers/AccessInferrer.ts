@@ -12,6 +12,7 @@ export class AccessInferrer<T extends string, N extends BaseNode<T>> extends Sub
     public static triggerToken: TokenTypeUnion<TokenType> | undefined = TokenType.ACCESO;
 
     public infer (node: ASTNode<T, N>): DataType | undefined {
-        return coreLibUtils.resolveReturnType(node as AccessNode<T, N>, false);
+        const access = node as AccessNode<T, N>;
+        return coreLibUtils.resolveReturnType(access, false, this.parent.infer(access.object));
     }
 }

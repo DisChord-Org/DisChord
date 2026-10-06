@@ -54,6 +54,7 @@ export const corelib = {
             }
         },
         [ClassesEnum.Texto]: {
+            receiver: PrimitiveDataType.Texto,
             methods: {
                 limpiar: {
                     transpile: 'trim',
@@ -172,6 +173,7 @@ export const corelib = {
             }
         },
         [ClassesEnum.Lista]: {
+            receiver: ArrayDataType.AnyList,
             methods: {
                 agregar: {
                     transpile: 'push',
@@ -534,6 +536,7 @@ export const corelib = {
             }
         },
         [ClassesEnum.Numero]: {
+            receiver: PrimitiveDataType.Numero,
             methods: {
                 esEntero: {
                     transpile: 'Number.isInteger',
@@ -625,6 +628,7 @@ export const corelib = {
             }
         },
         [ClassesEnum.BDO]: {
+            receiver: PrimitiveDataType.BDO,
             methods: {
                 claves: {
                     transpile: 'Object.keys',

@@ -1,0 +1,7 @@
+var s tipo texto es "hola"
+var t tipo texto es s.cortar(0, 2)
+var l tipo texto[] es "a,b".partir(",")
+var sub tipo texto[] es l.cortar(0, 1)
+
+consola.imprimir(t)
+consola.imprimir(sub)

@@ -15,6 +15,7 @@ export class CallInferrer<T extends string, N extends BaseNode<T>> extends SubIn
         const callee = (node as CallNode<T, N>).object;
         if (callee.type !== TokenType.ACCESO) return undefined;
 
-        return coreLibUtils.resolveReturnType(callee as AccessNode<T, N>, true);
+        const access = callee as AccessNode<T, N>;
+        return coreLibUtils.resolveReturnType(access, true, this.parent.infer(access.object));
     }
 }

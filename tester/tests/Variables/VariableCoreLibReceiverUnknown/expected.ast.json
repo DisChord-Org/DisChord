@@ -1,0 +1,90 @@
+[
+  {
+    "type": "importar",
+    "identificators": [],
+    "path": "./lib/consoleRuntime.js",
+    "isDestructured": false,
+    "location": {
+      "line": 0,
+      "column": 0
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "b",
+    "value": {
+      "type": "Literal",
+      "value": true,
+      "raw": "verdadero",
+      "location": {
+        "line": 1,
+        "column": 10
+      }
+    },
+    "location": {
+      "line": 1,
+      "column": 10
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "largo",
+    "value": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "b",
+        "location": {
+          "line": 2,
+          "column": 25
+        }
+      },
+      "property": "longitud",
+      "location": {
+        "line": 2,
+        "column": 27
+      }
+    },
+    "dataType": {
+      "kind": "primitive",
+      "name": "texto"
+    },
+    "location": {
+      "line": 2,
+      "column": 27
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 4,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 4,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "IDENTIFICADOR",
+        "value": "largo",
+        "location": {
+          "line": 4,
+          "column": 18
+        }
+      }
+    ],
+    "location": {
+      "line": 4,
+      "column": 23
+    }
+  }
+]
