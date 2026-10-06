@@ -21,5 +21,5 @@ export class VariableUnionArrayMismatchTest extends Test {
     /**
      * @type {string}
      */
-    public readonly expectedError: string = "se declaró con tipo 'numero|texto[]' pero se le asignó un valor de tipo 'booleano|numero[]'";
+    public readonly expectedError: string = "se declaró con tipo '(numero|texto)[]' pero se le asignó un valor de tipo '(booleano|numero)[]'";
 }

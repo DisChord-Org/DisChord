@@ -1,0 +1,20 @@
+var a tipo (texto[])|numero es 5
+var b tipo (texto[])|numero es ["a"]
+var c tipo numero|(texto[]) es 1
+var d tipo (texto[]|numero) es 5
+var e tipo ((texto|numero)[])|indefinido es indefinido
+var f tipo (Mapa[])|Lista es [1]
+var g tipo (Caja[])|indefinido es indefinido
+var h tipo (texto|numero)[] es ["a", 1]
+
+clase Caja {
+}
+
+consola.imprimir(a)
+consola.imprimir(b)
+consola.imprimir(c)
+consola.imprimir(d)
+consola.imprimir(e)
+consola.imprimir(f)
+consola.imprimir(g)
+consola.imprimir(h)

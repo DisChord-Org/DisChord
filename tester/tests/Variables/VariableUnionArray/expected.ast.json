@@ -1,0 +1,179 @@
+[
+  {
+    "type": "importar",
+    "identificators": [],
+    "path": "./lib/consoleRuntime.js",
+    "isDestructured": false,
+    "location": {
+      "line": 0,
+      "column": 0
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "x",
+    "value": {
+      "type": "Lista",
+      "body": [
+        {
+          "type": "Literal",
+          "value": "a",
+          "raw": "a",
+          "location": {
+            "line": 1,
+            "column": 32
+          }
+        },
+        {
+          "type": "Lista",
+          "body": [
+            {
+              "type": "Literal",
+              "value": 1,
+              "raw": "1",
+              "location": {
+                "line": 1,
+                "column": 38
+              }
+            },
+            {
+              "type": "Literal",
+              "value": 2,
+              "raw": "2",
+              "location": {
+                "line": 1,
+                "column": 41
+              }
+            }
+          ],
+          "location": {
+            "line": 1,
+            "column": 42
+          }
+        }
+      ],
+      "location": {
+        "line": 1,
+        "column": 43
+      }
+    },
+    "dataType": {
+      "kind": "array",
+      "element": {
+        "kind": "union",
+        "members": [
+          {
+            "kind": "primitive",
+            "name": "texto"
+          },
+          {
+            "kind": "array",
+            "element": {
+              "kind": "any"
+            }
+          }
+        ]
+      }
+    },
+    "location": {
+      "line": 1,
+      "column": 43
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "z",
+    "value": {
+      "type": "Literal",
+      "value": "a",
+      "raw": "a",
+      "location": {
+        "line": 2,
+        "column": 28
+      }
+    },
+    "dataType": {
+      "kind": "union",
+      "members": [
+        {
+          "kind": "class",
+          "name": "Mapa"
+        },
+        {
+          "kind": "primitive",
+          "name": "texto"
+        }
+      ]
+    },
+    "location": {
+      "line": 2,
+      "column": 28
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 3,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 3,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "IDENTIFICADOR",
+        "value": "x",
+        "location": {
+          "line": 3,
+          "column": 18
+        }
+      }
+    ],
+    "location": {
+      "line": 3,
+      "column": 19
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 4,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 4,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "IDENTIFICADOR",
+        "value": "z",
+        "location": {
+          "line": 4,
+          "column": 18
+        }
+      }
+    ],
+    "location": {
+      "line": 4,
+      "column": 19
+    }
+  }
+]

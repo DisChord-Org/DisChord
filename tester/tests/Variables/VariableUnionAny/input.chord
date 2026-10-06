@@ -1,0 +1,2 @@
+var x tipo cualquiera|texto es 5
+consola.imprimir(x)

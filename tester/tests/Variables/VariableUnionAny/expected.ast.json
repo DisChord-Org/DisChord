@@ -1,0 +1,65 @@
+[
+  {
+    "type": "importar",
+    "identificators": [],
+    "path": "./lib/consoleRuntime.js",
+    "isDestructured": false,
+    "location": {
+      "line": 0,
+      "column": 0
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "x",
+    "value": {
+      "type": "Literal",
+      "value": 5,
+      "raw": "5",
+      "location": {
+        "line": 1,
+        "column": 32
+      }
+    },
+    "dataType": {
+      "kind": "any"
+    },
+    "location": {
+      "line": 1,
+      "column": 32
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 2,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 2,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "IDENTIFICADOR",
+        "value": "x",
+        "location": {
+          "line": 2,
+          "column": 18
+        }
+      }
+    ],
+    "location": {
+      "line": 2,
+      "column": 19
+    }
+  }
+]

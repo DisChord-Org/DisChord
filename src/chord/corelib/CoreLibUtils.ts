@@ -185,6 +185,16 @@ export class CoreLibUtils<C extends string = string> {
     }
 
     /**
+     * @param {string} name - Class name as written in a `tipo` annotation.
+     * @returns {DataType | undefined} What a value of that class is typed as (`Lista` is `cualquiera[]`), or `undefined` if it isn't a core library class with a receiver.
+     */
+    resolveClassReceiver(name: string): DataType | undefined {
+        return this.hasOwn(this.corelib.classes, name) ? this.corelib.classes[name as C].receiver : undefined;
+    }
+
+    /**
+     * A union belongs to a class only if that class's receiver accepts every member
+     * (`texto[]|numero[]` is a `Lista`); a mixed one (`texto|Mapa`) belongs to none, so member lookups on it resolve by name.
      * @param {DataType} type - The type of a value.
      * @returns {C | undefined} The class whose `receiver` accepts it, or `undefined` if it belongs to none.
      */

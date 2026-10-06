@@ -1,0 +1,251 @@
+[
+  {
+    "type": "importar",
+    "identificators": [],
+    "path": "./lib/consoleRuntime.js",
+    "isDestructured": false,
+    "location": {
+      "line": 0,
+      "column": 0
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "a",
+    "value": {
+      "type": "nuevo",
+      "object": {
+        "type": "Llamada",
+        "object": {
+          "type": "IDENTIFICADOR",
+          "value": "Mapa",
+          "location": {
+            "line": 1,
+            "column": 38
+          }
+        },
+        "params": [],
+        "location": {
+          "line": 1,
+          "column": 43
+        }
+      },
+      "location": {
+        "line": 1,
+        "column": 43
+      }
+    },
+    "dataType": {
+      "kind": "union",
+      "members": [
+        {
+          "kind": "primitive",
+          "name": "texto"
+        },
+        {
+          "kind": "class",
+          "name": "Mapa"
+        },
+        {
+          "kind": "array",
+          "element": {
+            "kind": "any"
+          }
+        }
+      ]
+    },
+    "location": {
+      "line": 1,
+      "column": 43
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "b",
+    "value": {
+      "type": "Literal",
+      "value": "a",
+      "raw": "a",
+      "location": {
+        "line": 2,
+        "column": 32
+      }
+    },
+    "dataType": {
+      "kind": "union",
+      "members": [
+        {
+          "kind": "primitive",
+          "name": "texto"
+        },
+        {
+          "kind": "class",
+          "name": "Mapa"
+        },
+        {
+          "kind": "array",
+          "element": {
+            "kind": "any"
+          }
+        }
+      ]
+    },
+    "location": {
+      "line": 2,
+      "column": 32
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "c",
+    "value": {
+      "type": "Lista",
+      "body": [
+        {
+          "type": "Literal",
+          "value": 1,
+          "raw": "1",
+          "location": {
+            "line": 3,
+            "column": 33
+          }
+        },
+        {
+          "type": "Literal",
+          "value": 2,
+          "raw": "2",
+          "location": {
+            "line": 3,
+            "column": 36
+          }
+        }
+      ],
+      "location": {
+        "line": 3,
+        "column": 37
+      }
+    },
+    "dataType": {
+      "kind": "union",
+      "members": [
+        {
+          "kind": "primitive",
+          "name": "texto"
+        },
+        {
+          "kind": "class",
+          "name": "Mapa"
+        },
+        {
+          "kind": "array",
+          "element": {
+            "kind": "any"
+          }
+        }
+      ]
+    },
+    "location": {
+      "line": 3,
+      "column": 37
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 4,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 4,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "IDENTIFICADOR",
+        "value": "a",
+        "location": {
+          "line": 4,
+          "column": 18
+        }
+      }
+    ],
+    "location": {
+      "line": 4,
+      "column": 19
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 5,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 5,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "IDENTIFICADOR",
+        "value": "b",
+        "location": {
+          "line": 5,
+          "column": 18
+        }
+      }
+    ],
+    "location": {
+      "line": 5,
+      "column": 19
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 6,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 6,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "IDENTIFICADOR",
+        "value": "c",
+        "location": {
+          "line": 6,
+          "column": 18
+        }
+      }
+    ],
+    "location": {
+      "line": 6,
+      "column": 19
+    }
+  }
+]

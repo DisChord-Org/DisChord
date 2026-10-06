@@ -1,0 +1,237 @@
+[
+  {
+    "type": "importar",
+    "identificators": [],
+    "path": "./lib/consoleRuntime.js",
+    "isDestructured": false,
+    "location": {
+      "line": 0,
+      "column": 0
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "a",
+    "value": {
+      "type": "Literal",
+      "value": 5,
+      "raw": "5",
+      "location": {
+        "line": 1,
+        "column": 32
+      }
+    },
+    "dataType": {
+      "kind": "union",
+      "members": [
+        {
+          "kind": "primitive",
+          "name": "numero"
+        },
+        {
+          "kind": "array",
+          "element": {
+            "kind": "primitive",
+            "name": "texto"
+          }
+        }
+      ]
+    },
+    "location": {
+      "line": 1,
+      "column": 32
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "b",
+    "value": {
+      "type": "Lista",
+      "body": [
+        {
+          "type": "Literal",
+          "value": "a",
+          "raw": "a",
+          "location": {
+            "line": 2,
+            "column": 33
+          }
+        }
+      ],
+      "location": {
+        "line": 2,
+        "column": 36
+      }
+    },
+    "dataType": {
+      "kind": "union",
+      "members": [
+        {
+          "kind": "primitive",
+          "name": "numero"
+        },
+        {
+          "kind": "array",
+          "element": {
+            "kind": "primitive",
+            "name": "texto"
+          }
+        }
+      ]
+    },
+    "location": {
+      "line": 2,
+      "column": 36
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "c",
+    "value": {
+      "type": "Lista",
+      "body": [
+        {
+          "type": "Literal",
+          "value": 1,
+          "raw": "1",
+          "location": {
+            "line": 3,
+            "column": 33
+          }
+        },
+        {
+          "type": "Literal",
+          "value": "a",
+          "raw": "a",
+          "location": {
+            "line": 3,
+            "column": 36
+          }
+        }
+      ],
+      "location": {
+        "line": 3,
+        "column": 39
+      }
+    },
+    "dataType": {
+      "kind": "array",
+      "element": {
+        "kind": "union",
+        "members": [
+          {
+            "kind": "primitive",
+            "name": "numero"
+          },
+          {
+            "kind": "primitive",
+            "name": "texto"
+          }
+        ]
+      }
+    },
+    "location": {
+      "line": 3,
+      "column": 39
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 4,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 4,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "IDENTIFICADOR",
+        "value": "a",
+        "location": {
+          "line": 4,
+          "column": 18
+        }
+      }
+    ],
+    "location": {
+      "line": 4,
+      "column": 19
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 5,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 5,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "IDENTIFICADOR",
+        "value": "b",
+        "location": {
+          "line": 5,
+          "column": 18
+        }
+      }
+    ],
+    "location": {
+      "line": 5,
+      "column": 19
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 6,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 6,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "IDENTIFICADOR",
+        "value": "c",
+        "location": {
+          "line": 6,
+          "column": 18
+        }
+      }
+    ],
+    "location": {
+      "line": 6,
+      "column": 19
+    }
+  }
+]

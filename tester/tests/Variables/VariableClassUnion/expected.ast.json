@@ -1,0 +1,75 @@
+[
+  {
+    "type": "importar",
+    "identificators": [],
+    "path": "./lib/consoleRuntime.js",
+    "isDestructured": false,
+    "location": {
+      "line": 0,
+      "column": 0
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "x",
+    "value": {
+      "type": "Literal",
+      "value": "a",
+      "raw": "a",
+      "location": {
+        "line": 1,
+        "column": 26
+      }
+    },
+    "dataType": {
+      "kind": "union",
+      "members": [
+        {
+          "kind": "class",
+          "name": "Mapa"
+        },
+        {
+          "kind": "primitive",
+          "name": "texto"
+        }
+      ]
+    },
+    "location": {
+      "line": 1,
+      "column": 26
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 2,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 2,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "IDENTIFICADOR",
+        "value": "x",
+        "location": {
+          "line": 2,
+          "column": 18
+        }
+      }
+    ],
+    "location": {
+      "line": 2,
+      "column": 19
+    }
+  }
+]

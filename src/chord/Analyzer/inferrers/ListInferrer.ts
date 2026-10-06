@@ -1,5 +1,5 @@
 import { ASTNode, BaseNode, ListNode, PrimitiveTypeName, TokenType, TokenTypeUnion } from "../../types";
-import { AnyDataType, ArrayDataType, DataType, PrimitiveDataType, TupleDataType, UnionDataType, VoidDataType } from "../../DataType";
+import { ArrayDataType, DataType, PrimitiveDataType, UnionDataType } from "../../DataType";
 import { SubInferrer } from "../SubInferrer";
 
 /**
@@ -10,7 +10,8 @@ import { SubInferrer } from "../SubInferrer";
  * non-inferrable element, or one with a nested list/tuple element (an array's inferred type is
  * always a flat union of primitives — a tuple type is only ever produced by an explicit
  * `tipo [...]` annotation, never inferred, matching how TypeScript itself never infers a tuple
- * type from a plain array literal either).
+ * type from a plain array literal either). The same goes for an element of any other type (an
+ * instance of a class, `cualquiera`, `nada`, a union with such members): only primitives are unioned.
  */
 export class ListInferrer<T extends string, N extends BaseNode<T>> extends SubInferrer<T, N> {
     public static triggerToken: TokenTypeUnion<TokenType> | undefined = TokenType.LISTA;
@@ -23,12 +24,18 @@ export class ListInferrer<T extends string, N extends BaseNode<T>> extends SubIn
         if (elementTypes.some(elementType => elementType === undefined)) return undefined;
 
         const kinds = new Set<PrimitiveTypeName>();
+        const addKind = (type: DataType): boolean => {
+            if (!(type instanceof PrimitiveDataType)) return false;
+            kinds.add(type.name);
+            return true;
+        };
 
         for (const elementType of elementTypes as DataType[]) {
-            if (elementType instanceof ArrayDataType || elementType instanceof TupleDataType || elementType instanceof AnyDataType || elementType instanceof VoidDataType) return undefined;
+            const isPrimitiveOrUnionOfPrimitives = elementType instanceof UnionDataType
+                ? elementType.members.every(addKind)
+                : addKind(elementType);
 
-            if (elementType instanceof PrimitiveDataType) kinds.add(elementType.name);
-            else if (elementType instanceof UnionDataType) elementType.members.forEach(member => kinds.add(member.name));
+            if (!isPrimitiveOrUnionOfPrimitives) return undefined;
         }
 
         return ArrayDataType.of(UnionDataType.of([ ...kinds ]));

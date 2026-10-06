@@ -1,0 +1,8 @@
+var x tipo Caja|indefinido es nuevo Caja()
+var z tipo Caja|indefinido es indefinido
+
+clase Caja {
+}
+
+consola.imprimir(x)
+consola.imprimir(z)

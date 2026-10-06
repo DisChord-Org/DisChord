@@ -1,0 +1,6 @@
+var a tipo numero|(texto[]) es 5
+var b tipo numero|(texto[]) es ["a"]
+var c tipo (numero|texto)[] es [1, "a"]
+consola.imprimir(a)
+consola.imprimir(b)
+consola.imprimir(c)

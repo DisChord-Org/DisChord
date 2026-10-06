@@ -1,0 +1,6 @@
+var a tipo texto|Mapa|Lista es nuevo Mapa()
+var b tipo texto|Mapa|Lista es "a"
+var c tipo texto|Mapa|Lista es [1, 2]
+consola.imprimir(a)
+consola.imprimir(b)
+consola.imprimir(c)

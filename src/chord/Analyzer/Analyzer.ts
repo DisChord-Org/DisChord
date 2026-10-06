@@ -4,6 +4,7 @@ import { AnalysisRule, AnalysisRuleClass } from "./AnalysisRule";
 import { BindImportsRule } from "./rules/BindImportsRule";
 import { ValidateImportTargetsRule } from "./rules/ValidateImportTargetsRule";
 import { BindDeclarationsRule } from "./rules/BindDeclarationsRule";
+import { ValidateTypeAnnotationsRule } from "./rules/ValidateTypeAnnotationsRule";
 import { ResolveVariableTypesRule } from "./rules/ResolveVariableTypesRule";
 import { ValidateAssignmentTypesRule } from "./rules/ValidateAssignmentTypesRule";
 import { ValidateCallTargetsRule } from "./rules/ValidateCallTargetsRule";
@@ -54,7 +55,9 @@ export class Analyzer<T extends string, N extends BaseNode<T>> {
         // source order.
         BindDeclarationsRule,
 
-        // Pass 3 ("Tipos"): reference/type validation against the now-complete symbol table.
+        // Pass 3 ("Tipos"): reference/type validation against the now-complete symbol table. The
+        // names an annotation uses are checked first, so the rest can trust them.
+        ValidateTypeAnnotationsRule,
         ResolveVariableTypesRule,
         ValidateCallTargetsRule,
 

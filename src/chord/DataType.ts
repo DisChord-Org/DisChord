@@ -35,6 +35,7 @@ export const DataTypeKind = {
     Any: 'any',
     Void: 'void',
     Class: 'class',
+    UserClass: 'userClass',
     Union: 'union',
     Array: 'array',
     Tuple: 'tuple'
@@ -186,8 +187,8 @@ export class AnyDataType extends DataType {
 
 /**
  * What a call that produces no value returns (`consola.imprimir`, `paraCada`). Distinct from
- * `indefinido`, which is a value you can hold: using a `vacio` result (`var x es consola.imprimir()`)
- * is a type error, since only `cualquiera` and another `vacio` accept it. Not a
+ * `indefinido`, which is a value you can hold: using a `nada` result (`var x es consola.imprimir()`)
+ * is a type error, since only `cualquiera` and another `nada` accept it. Not a
  * {@link PrimitiveTypeName}, so it can't be written in a `tipo` annotation either.
  */
 export class VoidDataType extends DataType {
@@ -197,7 +198,7 @@ export class VoidDataType extends DataType {
         super();
     }
 
-    /** The shared `vacio` instance. */
+    /** The shared `nada` instance. */
     public static readonly Void = new VoidDataType();
 
     protected acceptsNonUnionSource (source: DataType): boolean {
@@ -205,7 +206,7 @@ export class VoidDataType extends DataType {
     }
 
     public format (): string {
-        return 'vacio';
+        return 'nada';
     }
 }
 
@@ -213,7 +214,7 @@ export class VoidDataType extends DataType {
  * An instance of a core library class that has no primitive of its own (`Mapa`, `Conjunto`,
  * `Promesa`, ...), identified by the class's name. Two are compatible only when they name the same
  * class: a `Mapa` is not a `Conjunto`. It carries no type parameters, so what the class holds is
- * not tracked. It can't be part of a union or tuple, only written alone in a `tipo` annotation.
+ * not tracked. It can be part of a union or tuple.
  */
 export class ClassDataType extends DataType {
     public readonly kind = DataTypeKind.Class;
@@ -241,11 +242,12 @@ export class ClassDataType extends DataType {
 /**
  * An instance of a class declared in the source file (`nuevo Caja()`, or `esta` inside one). It
  * carries only the class name — what the instance holds is not tracked — and any user class
- * instance is assignable to any other, since the class hierarchy is not modelled here. It can't be
- * part of a union or tuple, and is never written in a `tipo` annotation.
+ * instance is assignable to any other, since the class hierarchy is not modelled here. A `tipo`
+ * annotation writes it by name; the parser can't tell whether the class exists (it may be declared further
+ * down), so `ValidateTypeAnnotationsRule` checks that.
  */
 export class UserClassDataType extends DataType {
-    public readonly kind = DataTypeKind.Class;
+    public readonly kind = DataTypeKind.UserClass;
     public readonly name: string;
 
     private constructor (name: string) {
@@ -268,43 +270,69 @@ export class UserClassDataType extends DataType {
 }
 
 /**
- * A union of two or more distinct primitives, e.g. `texto|numero`. Never holds a single member —
- * {@link UnionDataType.of} collapses that case down to a bare {@link PrimitiveDataType} instead,
- * mirroring how TypeScript itself never represents a one-member union as a `UnionType`.
+ * A union of two or more distinct types, e.g. `texto|numero` or `texto|Mapa|Caja`. Never holds a
+ * single member, another union, or `cualquiera` — {@link UnionDataType.ofTypes} flattens, deduplicates
+ * and collapses those cases, mirroring how TypeScript itself never represents a one-member union as a
+ * `UnionType`. `nada` may be a member: it only makes sense as a return type, which `tipo` annotations
+ * of a `var` or parameter reject separately (see `ValidateTypeAnnotationsRule`).
  */
 export class UnionDataType extends DataType {
     public readonly kind = DataTypeKind.Union;
-    public readonly members: PrimitiveDataType[];
+    public readonly members: DataType[];
 
-    private constructor (members: PrimitiveDataType[]) {
+    private constructor (members: DataType[]) {
         super();
         this.members = members;
     }
 
     /**
-     * Builds the `DataType` for a set of one or more primitive kinds, deduplicated: a single
-     * distinct kind collapses to a bare {@link PrimitiveDataType} (matching TypeScript's own
-     * collapsing of a one-member union); two or more become a {@link UnionDataType}, in the order
-     * first encountered (order carries no meaning for a union — see {@link isAssignableFrom} — but
-     * member order is kept stable for readable, deterministic {@link format} output).
+     * Builds the `DataType` for a set of one or more primitive kinds. See {@link ofTypes}.
      * @param {PrimitiveTypeName[]} kinds - The primitive kinds the type is a union of (always at
      * least one).
      * @returns {DataType} The resulting primitive or union type.
      */
     public static of (kinds: PrimitiveTypeName[]): DataType {
-        const unique = Array.from(new Set(kinds));
+        return UnionDataType.ofTypes(kinds.map(PrimitiveDataType.of));
+    }
 
-        return unique.length === 1
-            ? PrimitiveDataType.of(unique[0])
-            : new UnionDataType(unique.map(PrimitiveDataType.of));
+    /**
+     * Builds the `DataType` for a set of one or more types: nested unions are flattened, members
+     * are deduplicated (by structure, keeping the order first encountered — order carries no meaning
+     * for a union, see {@link isAssignableFrom}, but is kept stable for readable, deterministic
+     * {@link format} output), a single distinct member collapses to that member, and any `cualquiera`
+     * absorbs the rest (`cualquiera|texto` is `cualquiera`, since it is compatible with everything anyway).
+     * @param {DataType[]} types - The types the result is a union of (always at least one).
+     * @returns {DataType} The resulting type.
+     */
+    public static ofTypes (types: DataType[]): DataType {
+        const flat = types.flatMap(type => type instanceof UnionDataType ? type.members : [ type ]);
+        if (flat.some(type => type instanceof AnyDataType)) return AnyDataType.Any;
+
+        const unique = new Map<string, DataType>();
+        flat.forEach(type => {
+            const key = `${type.kind}:${type.format()}`;
+            if (!unique.has(key)) unique.set(key, type);
+        });
+
+        const members = [ ...unique.values() ];
+        return members.length === 1 ? members[0] : new UnionDataType(members);
     }
 
     protected acceptsNonUnionSource (source: DataType): boolean {
         return this.members.some(member => member.isAssignableFrom(source));
     }
 
+    /**
+     * Members are sorted by their own text, and an array member is parenthesized (`numero|(texto[])`):
+     * what is shown can be written back in a `tipo` annotation as is, where `numero|texto[]` would be
+     * rejected as ambiguous.
+     */
     public format (): string {
-        return this.members.map(member => member.name).sort().join('|');
+        return this.members
+            .map(member => ({ text: member.format(), isArray: member instanceof ArrayDataType }))
+            .sort((a, b) => (a.text < b.text ? -1 : a.text > b.text ? 1 : 0))
+            .map(({ text, isArray }) => isArray ? `(${text})` : text)
+            .join('|');
     }
 }
 
@@ -331,8 +359,13 @@ export class ArrayDataType extends DataType {
         return source instanceof ArrayDataType && this.element.isAssignableFrom(source.element);
     }
 
+    /**
+     * A union element is parenthesized (`(numero|texto)[]`), as the grammar requires: the text can be
+     * written back in a `tipo` annotation as is.
+     */
     public format (): string {
-        return `${this.element.format()}[]`;
+        const element = this.element.format();
+        return `${this.element instanceof UnionDataType ? `(${element})` : element}[]`;
     }
 }
 
