@@ -1,0 +1,2 @@
+var n es 3
+var x tipo numero es n.aFijo(2)

@@ -1,0 +1,170 @@
+[
+  {
+    "type": "importar",
+    "identificators": [],
+    "path": "./lib/consoleRuntime.js",
+    "isDestructured": false,
+    "location": {
+      "line": 0,
+      "column": 0
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "a",
+    "value": {
+      "type": "Llamada",
+      "object": {
+        "type": "Acceso",
+        "object": {
+          "type": "IDENTIFICADOR",
+          "value": "JSON",
+          "location": {
+            "line": 1,
+            "column": 21
+          }
+        },
+        "property": "escribir",
+        "location": {
+          "line": 1,
+          "column": 26
+        }
+      },
+      "params": [
+        {
+          "type": "Literal",
+          "value": 1,
+          "raw": "1",
+          "location": {
+            "line": 1,
+            "column": 35
+          }
+        }
+      ],
+      "location": {
+        "line": 1,
+        "column": 36
+      }
+    },
+    "dataType": {
+      "kind": "primitive",
+      "name": "texto"
+    },
+    "location": {
+      "line": 1,
+      "column": 36
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "b",
+    "value": {
+      "type": "Llamada",
+      "object": {
+        "type": "Acceso",
+        "object": {
+          "type": "IDENTIFICADOR",
+          "value": "JSON",
+          "location": {
+            "line": 2,
+            "column": 21
+          }
+        },
+        "property": "escribir",
+        "location": {
+          "line": 2,
+          "column": 26
+        }
+      },
+      "params": [
+        {
+          "type": "Literal",
+          "value": "x",
+          "raw": "x",
+          "location": {
+            "line": 2,
+            "column": 35
+          }
+        }
+      ],
+      "location": {
+        "line": 2,
+        "column": 38
+      }
+    },
+    "dataType": {
+      "kind": "primitive",
+      "name": "texto"
+    },
+    "location": {
+      "line": 2,
+      "column": 38
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 4,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 4,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "IDENTIFICADOR",
+        "value": "a",
+        "location": {
+          "line": 4,
+          "column": 18
+        }
+      }
+    ],
+    "location": {
+      "line": 4,
+      "column": 19
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 5,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 5,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "IDENTIFICADOR",
+        "value": "b",
+        "location": {
+          "line": 5,
+          "column": 18
+        }
+      }
+    ],
+    "location": {
+      "line": 5,
+      "column": 19
+    }
+  }
+]

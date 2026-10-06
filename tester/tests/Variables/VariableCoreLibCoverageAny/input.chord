@@ -1,0 +1,17 @@
+var a tipo texto es JSON.leer("1")
+var b tipo numero es JSON.leer("1")
+var c tipo texto[] es JSON.leer("1")
+var l tipo numero[] es [1, 2]
+var d tipo texto es l.quitarUltimo()
+var e tipo booleano es l.encontrar(1)
+var f tipo Mapa es JSON.leer("1")
+var s es "x"
+var g tipo numero es s.coincidir("a")
+
+consola.imprimir(a)
+consola.imprimir(b)
+consola.imprimir(c)
+consola.imprimir(d)
+consola.imprimir(e)
+consola.imprimir(f)
+consola.imprimir(g)

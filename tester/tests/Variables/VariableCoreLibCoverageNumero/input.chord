@@ -1,0 +1,21 @@
+var n tipo numero es 3
+var a tipo booleano es Numero.esEntero(3)
+var b tipo booleano es Numero.esNaN(3)
+var c tipo numero es Numero.aEntero("3")
+var d tipo numero es Numero.aDecimal("3.5")
+var e tipo texto es n.aFijo(2)
+var f tipo texto es n.aPrecision(2)
+var g tipo texto es n.aTexto()
+var h tipo numero es Numero.MAXIMO_SEGURO
+var i tipo numero es Numero.EPSILON
+
+consola.imprimir(n)
+consola.imprimir(a)
+consola.imprimir(b)
+consola.imprimir(c)
+consola.imprimir(d)
+consola.imprimir(e)
+consola.imprimir(f)
+consola.imprimir(g)
+consola.imprimir(h)
+consola.imprimir(i)

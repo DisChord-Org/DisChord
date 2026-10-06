@@ -1,0 +1,9 @@
+import './lib/consoleRuntime.js';
+let obj = { a: 1 };
+let a = Object.keys(obj);
+let b = Object.hasOwn(obj, 'a');
+let c = Object.assign(obj, obj);
+console.log(obj);
+console.log(a);
+console.log(b);
+console.log(c);

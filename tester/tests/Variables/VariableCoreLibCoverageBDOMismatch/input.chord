@@ -1,0 +1,4 @@
+var obj es {
+    a 1
+}
+var x tipo texto es BDO.claves(obj)

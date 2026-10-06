@@ -1,0 +1,5 @@
+var a tipo texto es JSON.escribir(1)
+var b tipo texto es JSON.escribir("x")
+
+consola.imprimir(a)
+consola.imprimir(b)

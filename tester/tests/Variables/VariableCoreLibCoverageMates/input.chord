@@ -1,0 +1,23 @@
+var a tipo numero es Mates.absoluto(1)
+var b tipo numero es Mates.redondearArriba(1.2)
+var c tipo numero es Mates.potencia(2, 3)
+var d tipo numero es Mates.raizCuadrada(4)
+var e tipo numero es Mates.maximo(1, 2)
+var f tipo numero es Mates.minimo(1, 2)
+var g tipo numero es Mates.aleatorio()
+var h tipo numero es Mates.seno(1)
+var i tipo numero es Mates.PI
+var j tipo numero es Mates.E
+var k tipo numero es Mates.RAIZCUADRADA2
+
+consola.imprimir(a)
+consola.imprimir(b)
+consola.imprimir(c)
+consola.imprimir(d)
+consola.imprimir(e)
+consola.imprimir(f)
+consola.imprimir(g)
+consola.imprimir(h)
+consola.imprimir(i)
+consola.imprimir(j)
+consola.imprimir(k)

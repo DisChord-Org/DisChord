@@ -1,0 +1,17 @@
+import './lib/consoleRuntime.js';
+let a = JSON.parse('1');
+let b = JSON.parse('1');
+let c = JSON.parse('1');
+let l = [1, 2];
+let d = l.pop();
+let e = l.find(1);
+let f = JSON.parse('1');
+let s = 'x';
+let g = s.match('a');
+console.log(a);
+console.log(b);
+console.log(c);
+console.log(d);
+console.log(e);
+console.log(f);
+console.log(g);

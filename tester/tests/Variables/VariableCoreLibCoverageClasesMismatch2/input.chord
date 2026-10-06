@@ -1,0 +1,2 @@
+var m tipo Mapa es nuevo Mapa()
+var x tipo texto es m.tamano

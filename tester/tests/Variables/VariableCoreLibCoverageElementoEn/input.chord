@@ -1,0 +1,5 @@
+var a tipo texto|indefinido es "hola".en(0)
+var b tipo texto es [1, 2].en(0)
+
+consola.imprimir(a)
+consola.imprimir(b)

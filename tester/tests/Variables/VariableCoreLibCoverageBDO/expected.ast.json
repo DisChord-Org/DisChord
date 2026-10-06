@@ -1,0 +1,327 @@
+[
+  {
+    "type": "importar",
+    "identificators": [],
+    "path": "./lib/consoleRuntime.js",
+    "isDestructured": false,
+    "location": {
+      "line": 0,
+      "column": 0
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "obj",
+    "value": {
+      "type": "BDO",
+      "mode": 0,
+      "blocks": {
+        "a": {
+          "type": "Literal",
+          "value": 1,
+          "raw": "1",
+          "location": {
+            "line": 2,
+            "column": 7
+          }
+        }
+      },
+      "body": [],
+      "location": {
+        "line": 3,
+        "column": 1
+      }
+    },
+    "location": {
+      "line": 3,
+      "column": 1
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "a",
+    "value": {
+      "type": "Llamada",
+      "object": {
+        "type": "Acceso",
+        "object": {
+          "type": "IDENTIFICADOR",
+          "value": "BDO",
+          "location": {
+            "line": 4,
+            "column": 23
+          }
+        },
+        "property": "claves",
+        "location": {
+          "line": 4,
+          "column": 27
+        }
+      },
+      "params": [
+        {
+          "type": "IDENTIFICADOR",
+          "value": "obj",
+          "location": {
+            "line": 4,
+            "column": 34
+          }
+        }
+      ],
+      "location": {
+        "line": 4,
+        "column": 37
+      }
+    },
+    "dataType": {
+      "kind": "array",
+      "element": {
+        "kind": "primitive",
+        "name": "texto"
+      }
+    },
+    "location": {
+      "line": 4,
+      "column": 37
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "b",
+    "value": {
+      "type": "Llamada",
+      "object": {
+        "type": "Acceso",
+        "object": {
+          "type": "IDENTIFICADOR",
+          "value": "BDO",
+          "location": {
+            "line": 5,
+            "column": 24
+          }
+        },
+        "property": "tienePropia",
+        "location": {
+          "line": 5,
+          "column": 28
+        }
+      },
+      "params": [
+        {
+          "type": "IDENTIFICADOR",
+          "value": "obj",
+          "location": {
+            "line": 5,
+            "column": 40
+          }
+        },
+        {
+          "type": "Literal",
+          "value": "a",
+          "raw": "a",
+          "location": {
+            "line": 5,
+            "column": 45
+          }
+        }
+      ],
+      "location": {
+        "line": 5,
+        "column": 48
+      }
+    },
+    "dataType": {
+      "kind": "primitive",
+      "name": "booleano"
+    },
+    "location": {
+      "line": 5,
+      "column": 48
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "c",
+    "value": {
+      "type": "Llamada",
+      "object": {
+        "type": "Acceso",
+        "object": {
+          "type": "IDENTIFICADOR",
+          "value": "BDO",
+          "location": {
+            "line": 6,
+            "column": 19
+          }
+        },
+        "property": "unir",
+        "location": {
+          "line": 6,
+          "column": 23
+        }
+      },
+      "params": [
+        {
+          "type": "IDENTIFICADOR",
+          "value": "obj",
+          "location": {
+            "line": 6,
+            "column": 28
+          }
+        },
+        {
+          "type": "IDENTIFICADOR",
+          "value": "obj",
+          "location": {
+            "line": 6,
+            "column": 33
+          }
+        }
+      ],
+      "location": {
+        "line": 6,
+        "column": 36
+      }
+    },
+    "dataType": {
+      "kind": "primitive",
+      "name": "bdo"
+    },
+    "location": {
+      "line": 6,
+      "column": 36
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 8,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 8,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "IDENTIFICADOR",
+        "value": "obj",
+        "location": {
+          "line": 8,
+          "column": 18
+        }
+      }
+    ],
+    "location": {
+      "line": 8,
+      "column": 21
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 9,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 9,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "IDENTIFICADOR",
+        "value": "a",
+        "location": {
+          "line": 9,
+          "column": 18
+        }
+      }
+    ],
+    "location": {
+      "line": 9,
+      "column": 19
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 10,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 10,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "IDENTIFICADOR",
+        "value": "b",
+        "location": {
+          "line": 10,
+          "column": 18
+        }
+      }
+    ],
+    "location": {
+      "line": 10,
+      "column": 19
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 11,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 11,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "IDENTIFICADOR",
+        "value": "c",
+        "location": {
+          "line": 11,
+          "column": 18
+        }
+      }
+    ],
+    "location": {
+      "line": 11,
+      "column": 19
+    }
+  }
+]

@@ -1,0 +1,2 @@
+var m tipo Mapa es nuevo Mapa()
+var x tipo numero es m.tiene("a")
