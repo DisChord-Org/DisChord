@@ -3,6 +3,9 @@ import { BaseNode, FunctionNode, TokenType, TokenTypeUnion } from "../../../type
 import { BlockParser } from "../BlockParser";
 import { Parser } from "../../Parser";
 import { DecoratorProcessor } from "../../../DecoratorProcessor";
+import { DataType } from "../../../DataType";
+import { TypeAnnotationParser } from "./TypeAnnotationParser";
+import { ChordError, ErrorLevel } from "../../../../errors/ChordError";
 
 export class FunctionParser<T extends string, N extends BaseNode<T>> extends SubParser<T, N> {
     /** To identify when this parser should be used */
@@ -61,12 +64,27 @@ export class FunctionParser<T extends string, N extends BaseNode<T>> extends Sub
         }
 
         this.consume(TokenType.L_PAREN, `Después del nombre de la función se debe abrir una expresión con '(' para especificar los parámetros.`);
+        const typeParser = new TypeAnnotationParser(this.parent);
         const params: string[] = [];
+        const paramTypes: (DataType | undefined)[] = [];
         while (!this.isAtEnd() && this.peek().type !== TokenType.R_PAREN) {
             params.push(this.consume(TokenType.IDENTIFICADOR, "Se esperaba el nombre del parámetro.").value);
+            paramTypes.push(typeParser.parse());
             if (this.peek().type === TokenType.COMA) this.consume(TokenType.COMA);
         }
         this.consume(TokenType.R_PAREN);
+
+        let returnType: DataType | undefined;
+        if (this.peek().type === TokenType.Flecha) {
+            if (flags.constructor) throw new ChordError({
+                phase: ErrorLevel.Parser,
+                message: "Un constructor no puede declarar un tipo de retorno",
+                location: this.peek().location
+            }).format();
+
+            this.consume(TokenType.Flecha);
+            returnType = typeParser.parseType();
+        }
 
         const body = (this.parent.get(BlockParser) as BlockParser<T, N>).parse().body;
 
@@ -80,6 +98,8 @@ export class FunctionParser<T extends string, N extends BaseNode<T>> extends Sub
                 isAsync
             },
             params,
+            ...(paramTypes.some(type => type !== undefined) && { paramTypes }),
+            ...(returnType && { returnType }),
             body
         });
     }

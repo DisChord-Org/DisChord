@@ -1,0 +1,260 @@
+[
+  {
+    "type": "importar",
+    "identificators": [],
+    "path": "./lib/consoleRuntime.js",
+    "isDestructured": false,
+    "location": {
+      "line": 0,
+      "column": 0
+    }
+  },
+  {
+    "type": "funcion",
+    "id": "hayEn",
+    "metadata": {
+      "isConstructor": false,
+      "isMethod": false,
+      "isStatic": false,
+      "isAsync": false
+    },
+    "params": [
+      "coleccion",
+      "x"
+    ],
+    "paramTypes": [
+      {
+        "kind": "class",
+        "name": "Mapa"
+      },
+      {
+        "kind": "primitive",
+        "name": "texto"
+      }
+    ],
+    "returnType": {
+      "kind": "primitive",
+      "name": "booleano"
+    },
+    "body": [
+      {
+        "type": "devolver",
+        "object": {
+          "type": "Llamada",
+          "object": {
+            "type": "Acceso",
+            "object": {
+              "type": "IDENTIFICADOR",
+              "value": "coleccion",
+              "location": {
+                "line": 2,
+                "column": 14
+              }
+            },
+            "property": "tiene",
+            "location": {
+              "line": 2,
+              "column": 24
+            }
+          },
+          "params": [
+            {
+              "type": "IDENTIFICADOR",
+              "value": "x",
+              "location": {
+                "line": 2,
+                "column": 30
+              }
+            }
+          ],
+          "location": {
+            "line": 2,
+            "column": 31
+          }
+        },
+        "location": {
+          "line": 2,
+          "column": 31
+        }
+      }
+    ],
+    "location": {
+      "line": 3,
+      "column": 1
+    }
+  },
+  {
+    "type": "funcion",
+    "id": "saludar",
+    "metadata": {
+      "isConstructor": false,
+      "isMethod": false,
+      "isStatic": false,
+      "isAsync": false
+    },
+    "params": [
+      "nombre"
+    ],
+    "paramTypes": [
+      {
+        "kind": "primitive",
+        "name": "texto"
+      }
+    ],
+    "body": [
+      {
+        "type": "Llamada",
+        "object": {
+          "type": "Acceso",
+          "object": {
+            "type": "IDENTIFICADOR",
+            "value": "consola",
+            "location": {
+              "line": 6,
+              "column": 5
+            }
+          },
+          "property": "imprimir",
+          "location": {
+            "line": 6,
+            "column": 13
+          }
+        },
+        "params": [
+          {
+            "type": "IDENTIFICADOR",
+            "value": "nombre",
+            "location": {
+              "line": 6,
+              "column": 22
+            }
+          }
+        ],
+        "location": {
+          "line": 6,
+          "column": 28
+        }
+      }
+    ],
+    "location": {
+      "line": 7,
+      "column": 1
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "m",
+    "value": {
+      "type": "nuevo",
+      "object": {
+        "type": "Llamada",
+        "object": {
+          "type": "IDENTIFICADOR",
+          "value": "Mapa",
+          "location": {
+            "line": 9,
+            "column": 16
+          }
+        },
+        "params": [],
+        "location": {
+          "line": 9,
+          "column": 21
+        }
+      },
+      "location": {
+        "line": 9,
+        "column": 21
+      }
+    },
+    "location": {
+      "line": 9,
+      "column": 21
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 10,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 10,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "Llamada",
+        "object": {
+          "type": "IDENTIFICADOR",
+          "value": "hayEn",
+          "location": {
+            "line": 10,
+            "column": 18
+          }
+        },
+        "params": [
+          {
+            "type": "IDENTIFICADOR",
+            "value": "m",
+            "location": {
+              "line": 10,
+              "column": 24
+            }
+          },
+          {
+            "type": "Literal",
+            "value": "a",
+            "raw": "a",
+            "location": {
+              "line": 10,
+              "column": 27
+            }
+          }
+        ],
+        "location": {
+          "line": 10,
+          "column": 30
+        }
+      }
+    ],
+    "location": {
+      "line": 10,
+      "column": 31
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "IDENTIFICADOR",
+      "value": "saludar",
+      "location": {
+        "line": 11,
+        "column": 1
+      }
+    },
+    "params": [
+      {
+        "type": "Literal",
+        "value": "hola",
+        "raw": "hola",
+        "location": {
+          "line": 11,
+          "column": 9
+        }
+      }
+    ],
+    "location": {
+      "line": 11,
+      "column": 15
+    }
+  }
+]

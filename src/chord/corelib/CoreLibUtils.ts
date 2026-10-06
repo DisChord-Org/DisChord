@@ -1,6 +1,6 @@
 import { corelib } from "./corelib.data";
 import { isIdentificatorNode } from "../ast.guards";
-import { AnyDataType, ClassDataType, DataType } from "../DataType";
+import { AnyDataType, ClassDataType, DataType, UnionDataType } from "../DataType";
 import { AccessNode, ASTNode, BaseNode, CallNode, TokenType } from "../types";
 import { CoreLib, CoreLibClass, ResolvedMember } from "./corelib.types";
 
@@ -84,7 +84,7 @@ export class CoreLibUtils<C extends string = string> {
         const staticMember = this.resolveStatic(access);
         if (staticMember) return this.returnTypeOf(staticMember, isCall);
 
-        if (receiverType && !(receiverType instanceof AnyDataType)) {
+        if (receiverType && !this.isUnknownReceiver(receiverType)) {
             const found = this.resolveInstanceOf(access, receiverType);
             return found ? this.returnTypeOf(found, isCall) : undefined;
         }
@@ -149,7 +149,7 @@ export class CoreLibUtils<C extends string = string> {
      * @returns {ResolvedMember | undefined} The member, or `undefined` if there is none or the user's declaration wins.
      */
     resolveInstanceMember<T extends string, N extends BaseNode<T>> (access: AccessNode<T, N>, receiverType?: DataType, declaredByUser: boolean = false): ResolvedMember | undefined {
-        if (receiverType && !(receiverType instanceof AnyDataType)) return this.resolveInstanceOf(access, receiverType);
+        if (receiverType && !this.isUnknownReceiver(receiverType)) return this.resolveInstanceOf(access, receiverType);
         if (declaredByUser && !this.resolveStatic(access)) return undefined;
 
         return this.resolveInstance(access);
@@ -200,6 +200,18 @@ export class CoreLibUtils<C extends string = string> {
      */
     classOf(type: DataType): C | undefined {
         return (Object.keys(this.corelib.classes) as C[]).find(key => this.corelib.classes[key].receiver?.isAssignableFrom(type));
+    }
+
+    /**
+     * Whether a receiver type tells nothing about which class the member belongs to, so the member
+     * is resolved by name as with no type at all: `cualquiera`, or a union (which has no single
+     * class). Provisional: a union stays unknown until receivers of a union type get their own
+     * resolution.
+     * @param {DataType} type - The inferred type of the receiver.
+     * @returns {boolean} `true` if the receiver has to be treated as unknown.
+     */
+    private isUnknownReceiver(type: DataType): boolean {
+        return type instanceof AnyDataType || type instanceof UnionDataType;
     }
 
     private resolveInstanceOf<T extends string, N extends BaseNode<T>> (access: AccessNode<T, N>, receiverType: DataType): ResolvedMember | undefined {

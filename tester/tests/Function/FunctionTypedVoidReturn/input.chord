@@ -1,0 +1,6 @@
+funcion limpiarTodo(m tipo Mapa) -> nada {
+    m.limpiar()
+}
+
+var m es nuevo Mapa()
+limpiarTodo(m)

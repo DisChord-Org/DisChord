@@ -1,0 +1,6 @@
+funcion externa() {
+    funcion interna(c tipo Mapa) {
+        devolver c.tiene(1)
+    }
+    devolver interna
+}

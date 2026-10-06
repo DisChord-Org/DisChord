@@ -1,0 +1,78 @@
+[
+  {
+    "type": "clase",
+    "id": "Util",
+    "body": [
+      {
+        "type": "funcion",
+        "id": "hay",
+        "metadata": {
+          "isConstructor": false,
+          "isMethod": true,
+          "isStatic": false,
+          "isAsync": false
+        },
+        "params": [
+          "c"
+        ],
+        "paramTypes": [
+          {
+            "kind": "class",
+            "name": "Mapa"
+          }
+        ],
+        "body": [
+          {
+            "type": "devolver",
+            "object": {
+              "type": "Llamada",
+              "object": {
+                "type": "Acceso",
+                "object": {
+                  "type": "IDENTIFICADOR",
+                  "value": "c",
+                  "location": {
+                    "line": 3,
+                    "column": 18
+                  }
+                },
+                "property": "tiene",
+                "location": {
+                  "line": 3,
+                  "column": 20
+                }
+              },
+              "params": [
+                {
+                  "type": "Literal",
+                  "value": 1,
+                  "raw": "1",
+                  "location": {
+                    "line": 3,
+                    "column": 26
+                  }
+                }
+              ],
+              "location": {
+                "line": 3,
+                "column": 27
+              }
+            },
+            "location": {
+              "line": 3,
+              "column": 27
+            }
+          }
+        ],
+        "location": {
+          "line": 4,
+          "column": 5
+        }
+      }
+    ],
+    "location": {
+      "line": 5,
+      "column": 1
+    }
+  }
+]

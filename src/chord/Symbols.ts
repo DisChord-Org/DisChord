@@ -25,6 +25,7 @@ export const SymbolTranslationMap: Record<string, typeof TokenType[keyof typeof 
 
     "+": TokenType.Mas,
     "-": TokenType.Menos,
+    "->": TokenType.Flecha,
     "*": TokenType.Por,
     "/": TokenType.Entre,
     "**": TokenType.Exponente,

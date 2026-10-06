@@ -1,0 +1,7 @@
+@asincrono
+funcion cargar(id tipo numero) -> texto {
+    devolver "x"
+}
+
+var r es cargar(1)
+consola.imprimir(r)

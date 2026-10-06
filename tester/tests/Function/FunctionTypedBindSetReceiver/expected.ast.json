@@ -1,0 +1,61 @@
+[
+  {
+    "type": "funcion",
+    "id": "sumar",
+    "metadata": {
+      "isConstructor": false,
+      "isMethod": false,
+      "isStatic": false,
+      "isAsync": false
+    },
+    "params": [
+      "c"
+    ],
+    "paramTypes": [
+      {
+        "kind": "class",
+        "name": "Conjunto"
+      }
+    ],
+    "body": [
+      {
+        "type": "Llamada",
+        "object": {
+          "type": "Acceso",
+          "object": {
+            "type": "IDENTIFICADOR",
+            "value": "c",
+            "location": {
+              "line": 2,
+              "column": 5
+            }
+          },
+          "property": "agregar",
+          "location": {
+            "line": 2,
+            "column": 7
+          }
+        },
+        "params": [
+          {
+            "type": "Literal",
+            "value": 1,
+            "raw": "1",
+            "location": {
+              "line": 2,
+              "column": 15
+            }
+          }
+        ],
+        "location": {
+          "line": 2,
+          "column": 16
+        }
+      }
+    ],
+    "location": {
+      "line": 3,
+      "column": 1
+    }
+  }
+]

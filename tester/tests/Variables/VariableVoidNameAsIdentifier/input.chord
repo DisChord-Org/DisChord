@@ -1,0 +1,11 @@
+var nada es 1
+
+funcion f(nada) {
+    devolver nada
+}
+
+funcion nada2(nada tipo numero) {
+    devolver nada
+}
+
+consola.imprimir(f(nada))

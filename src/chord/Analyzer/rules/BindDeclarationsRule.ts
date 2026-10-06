@@ -45,16 +45,17 @@ export class BindDeclarationsRule<T extends string, N extends BaseNode<T>> exten
                 kind: SymbolKind.Function,
                 metadata: {
                     isAsync: node.metadata.isAsync
-                }
+                },
+                signature: { params: node.params.map((_, index) => node.paramTypes?.[index]), returns: node.returnType }
             }, node.location);
 
             this.context.symbolTable.enterScope(node);
 
-            // Parameters are declared untyped in the function's own scope, so they shadow a global of the same name.
-            node.params.forEach(param => {
+            node.params.forEach((param, index) => {
                 this.context.symbolTable.register(param, {
                     name: param,
-                    kind: SymbolKind.Variable
+                    kind: SymbolKind.Variable,
+                    dataType: node.paramTypes?.[index]
                 }, node.location);
             });
 

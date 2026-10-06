@@ -1,0 +1,162 @@
+[
+  {
+    "type": "clase",
+    "id": "Caja",
+    "body": [
+      {
+        "type": "funcion",
+        "id": "cargar",
+        "metadata": {
+          "isConstructor": false,
+          "isMethod": true,
+          "isStatic": false,
+          "isAsync": true
+        },
+        "params": [],
+        "body": [
+          {
+            "type": "devolver",
+            "object": {
+              "type": "Literal",
+              "value": 1,
+              "raw": "1",
+              "location": {
+                "line": 3,
+                "column": 33
+              }
+            },
+            "location": {
+              "line": 3,
+              "column": 33
+            }
+          }
+        ],
+        "location": {
+          "line": 3,
+          "column": 35
+        }
+      },
+      {
+        "type": "funcion",
+        "id": "buscar",
+        "metadata": {
+          "isConstructor": false,
+          "isMethod": true,
+          "isStatic": false,
+          "isAsync": false
+        },
+        "params": [
+          "x"
+        ],
+        "body": [
+          {
+            "type": "devolver",
+            "object": {
+              "type": "IDENTIFICADOR",
+              "value": "x",
+              "location": {
+                "line": 5,
+                "column": 34
+              }
+            },
+            "location": {
+              "line": 5,
+              "column": 34
+            }
+          }
+        ],
+        "location": {
+          "line": 5,
+          "column": 36
+        }
+      }
+    ],
+    "location": {
+      "line": 6,
+      "column": 1
+    }
+  },
+  {
+    "type": "funcion",
+    "id": "usar",
+    "metadata": {
+      "isConstructor": false,
+      "isMethod": false,
+      "isStatic": false,
+      "isAsync": true
+    },
+    "params": [
+      "c"
+    ],
+    "paramTypes": [
+      {
+        "kind": "userClass",
+        "name": "Caja"
+      }
+    ],
+    "body": [
+      {
+        "type": "Llamada",
+        "object": {
+          "type": "Acceso",
+          "object": {
+            "type": "IDENTIFICADOR",
+            "value": "c",
+            "location": {
+              "line": 10,
+              "column": 5
+            }
+          },
+          "property": "cargar",
+          "location": {
+            "line": 10,
+            "column": 7
+          }
+        },
+        "params": [],
+        "location": {
+          "line": 10,
+          "column": 14
+        }
+      },
+      {
+        "type": "Llamada",
+        "object": {
+          "type": "Acceso",
+          "object": {
+            "type": "IDENTIFICADOR",
+            "value": "c",
+            "location": {
+              "line": 11,
+              "column": 5
+            }
+          },
+          "property": "buscar",
+          "location": {
+            "line": 11,
+            "column": 7
+          }
+        },
+        "params": [
+          {
+            "type": "Literal",
+            "value": "a",
+            "raw": "a",
+            "location": {
+              "line": 11,
+              "column": 14
+            }
+          }
+        ],
+        "location": {
+          "line": 11,
+          "column": 17
+        }
+      }
+    ],
+    "location": {
+      "line": 12,
+      "column": 1
+    }
+  }
+]

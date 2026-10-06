@@ -1,0 +1,165 @@
+[
+  {
+    "type": "importar",
+    "identificators": [],
+    "path": "./lib/consoleRuntime.js",
+    "isDestructured": false,
+    "location": {
+      "line": 0,
+      "column": 0
+    }
+  },
+  {
+    "type": "funcion",
+    "id": "hayEn",
+    "metadata": {
+      "isConstructor": false,
+      "isMethod": false,
+      "isStatic": false,
+      "isAsync": false
+    },
+    "params": [
+      "c",
+      "l",
+      "x"
+    ],
+    "paramTypes": [
+      {
+        "kind": "primitive",
+        "name": "texto"
+      },
+      {
+        "kind": "array",
+        "element": {
+          "kind": "any"
+        }
+      },
+      {
+        "kind": "primitive",
+        "name": "texto"
+      }
+    ],
+    "body": [
+      {
+        "type": "Llamada",
+        "object": {
+          "type": "Acceso",
+          "object": {
+            "type": "IDENTIFICADOR",
+            "value": "consola",
+            "location": {
+              "line": 2,
+              "column": 5
+            }
+          },
+          "property": "imprimir",
+          "location": {
+            "line": 2,
+            "column": 13
+          }
+        },
+        "params": [
+          {
+            "type": "Llamada",
+            "object": {
+              "type": "Acceso",
+              "object": {
+                "type": "IDENTIFICADOR",
+                "value": "c",
+                "location": {
+                  "line": 2,
+                  "column": 22
+                }
+              },
+              "property": "tiene",
+              "location": {
+                "line": 2,
+                "column": 24
+              }
+            },
+            "params": [
+              {
+                "type": "IDENTIFICADOR",
+                "value": "x",
+                "location": {
+                  "line": 2,
+                  "column": 30
+                }
+              }
+            ],
+            "location": {
+              "line": 2,
+              "column": 31
+            }
+          }
+        ],
+        "location": {
+          "line": 2,
+          "column": 32
+        }
+      },
+      {
+        "type": "Llamada",
+        "object": {
+          "type": "Acceso",
+          "object": {
+            "type": "IDENTIFICADOR",
+            "value": "consola",
+            "location": {
+              "line": 3,
+              "column": 5
+            }
+          },
+          "property": "imprimir",
+          "location": {
+            "line": 3,
+            "column": 13
+          }
+        },
+        "params": [
+          {
+            "type": "Llamada",
+            "object": {
+              "type": "Acceso",
+              "object": {
+                "type": "IDENTIFICADOR",
+                "value": "l",
+                "location": {
+                  "line": 3,
+                  "column": 22
+                }
+              },
+              "property": "tiene",
+              "location": {
+                "line": 3,
+                "column": 24
+              }
+            },
+            "params": [
+              {
+                "type": "IDENTIFICADOR",
+                "value": "x",
+                "location": {
+                  "line": 3,
+                  "column": 30
+                }
+              }
+            ],
+            "location": {
+              "line": 3,
+              "column": 31
+            }
+          }
+        ],
+        "location": {
+          "line": 3,
+          "column": 32
+        }
+      }
+    ],
+    "location": {
+      "line": 4,
+      "column": 1
+    }
+  }
+]

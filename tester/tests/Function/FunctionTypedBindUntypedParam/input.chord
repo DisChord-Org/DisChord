@@ -1,0 +1,11 @@
+clase Buscador {
+    funcion buscar(x) { devolver x }
+}
+
+funcion hayEn(p, x) {
+    devolver p.tiene(x)
+}
+
+funcion encontrar(p) {
+    devolver p.buscar("a")
+}

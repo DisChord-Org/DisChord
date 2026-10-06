@@ -234,7 +234,8 @@ export class SymbolTable {
                 isExported: info.metadata?.isExported || false,
                 isStatic: info.metadata?.isStatic || false
             },
-            dataType: info.dataType
+            dataType: info.dataType,
+            signature: info.signature
         });
     }
 

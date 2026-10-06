@@ -1,0 +1,12 @@
+clase Caja {
+    @asincrono
+    funcion cargar() { devolver 1 }
+
+    funcion buscar(x) { devolver x }
+}
+
+@asincrono
+funcion usar(c tipo Caja) {
+    c.cargar()
+    c.buscar("a")
+}

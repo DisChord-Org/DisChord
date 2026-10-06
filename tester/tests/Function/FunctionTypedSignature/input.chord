@@ -1,0 +1,11 @@
+funcion hayEn(coleccion tipo Mapa, x tipo texto) -> booleano {
+    devolver coleccion.tiene(x)
+}
+
+funcion saludar(nombre tipo texto) {
+    consola.imprimir(nombre)
+}
+
+var m es nuevo Mapa()
+consola.imprimir(hayEn(m, "a"))
+saludar("hola")

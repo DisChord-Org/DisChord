@@ -1,0 +1,4 @@
+funcion hayEn(c tipo texto, l tipo Lista, x tipo texto) {
+    consola.imprimir(c.tiene(x))
+    consola.imprimir(l.tiene(x))
+}

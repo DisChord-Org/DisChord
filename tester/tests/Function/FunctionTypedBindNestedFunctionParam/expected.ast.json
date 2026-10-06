@@ -1,0 +1,100 @@
+[
+  {
+    "type": "funcion",
+    "id": "externa",
+    "metadata": {
+      "isConstructor": false,
+      "isMethod": false,
+      "isStatic": false,
+      "isAsync": false
+    },
+    "params": [],
+    "body": [
+      {
+        "type": "funcion",
+        "id": "interna",
+        "metadata": {
+          "isConstructor": false,
+          "isMethod": false,
+          "isStatic": false,
+          "isAsync": false
+        },
+        "params": [
+          "c"
+        ],
+        "paramTypes": [
+          {
+            "kind": "class",
+            "name": "Mapa"
+          }
+        ],
+        "body": [
+          {
+            "type": "devolver",
+            "object": {
+              "type": "Llamada",
+              "object": {
+                "type": "Acceso",
+                "object": {
+                  "type": "IDENTIFICADOR",
+                  "value": "c",
+                  "location": {
+                    "line": 3,
+                    "column": 18
+                  }
+                },
+                "property": "tiene",
+                "location": {
+                  "line": 3,
+                  "column": 20
+                }
+              },
+              "params": [
+                {
+                  "type": "Literal",
+                  "value": 1,
+                  "raw": "1",
+                  "location": {
+                    "line": 3,
+                    "column": 26
+                  }
+                }
+              ],
+              "location": {
+                "line": 3,
+                "column": 27
+              }
+            },
+            "location": {
+              "line": 3,
+              "column": 27
+            }
+          }
+        ],
+        "location": {
+          "line": 4,
+          "column": 5
+        }
+      },
+      {
+        "type": "devolver",
+        "object": {
+          "type": "IDENTIFICADOR",
+          "value": "interna",
+          "location": {
+            "line": 5,
+            "column": 14
+          }
+        },
+        "location": {
+          "line": 5,
+          "column": 14
+        }
+      }
+    ],
+    "location": {
+      "line": 6,
+      "column": 1
+    }
+  }
+]

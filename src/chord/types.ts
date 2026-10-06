@@ -105,6 +105,15 @@ export interface Symbol {
      * `SymbolTable.setDataType`), once the whole file's declarations are visible.
      */
     dataType?: DataType;
+    /**
+     * For a function, the types its signature declares: one entry per parameter (`undefined` for
+     * one written without a type) and the return type, if any. Absent when the signature has no
+     * annotation at all.
+     */
+    signature?: {
+        params: (DataType | undefined)[];
+        returns?: DataType;
+    };
 };
 
 /**
@@ -159,6 +168,7 @@ export const TokenType = {
     Espacio: 'espacio',
     Mas: 'mas',
     Menos: 'menos',
+    Flecha: 'flecha',
     Por: 'por',
     Entre: 'entre',
     Punto: 'punto',
@@ -340,6 +350,13 @@ export interface FunctionNode<T extends string, N extends BaseNode<T>> extends B
     };
     /** Parameter identifier names requested by the signature */
     params: string[];
+    /**
+     * The type written after `tipo` for each parameter, in order (`undefined` for one without a
+     * type). Only present when at least one parameter is annotated.
+     */
+    paramTypes?: (DataType | undefined)[];
+    /** The type written after `->`. Only present when the signature declares one. */
+    returnType?: DataType;
     /** Internal execution statements body */
     body: ASTNode<T, N>[];
 }

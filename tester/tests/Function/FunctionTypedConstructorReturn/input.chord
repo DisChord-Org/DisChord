@@ -1,0 +1,5 @@
+clase Caja {
+    Caja(a) -> texto {
+        esta.a es a
+    }
+}
