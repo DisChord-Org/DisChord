@@ -1,0 +1,11 @@
+var c tipo Conjunto es nuevo Conjunto()
+var a tipo Conjunto es c.agregar(1)
+var b tipo booleano es c.tiene(1)
+var d tipo booleano es c.borrar(1)
+c.limpiar()
+var n tipo numero es c.tamano
+
+consola.imprimir(a)
+consola.imprimir(b)
+consola.imprimir(d)
+consola.imprimir(n)

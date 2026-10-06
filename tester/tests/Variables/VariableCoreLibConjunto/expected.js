@@ -1,0 +1,11 @@
+import './lib/consoleRuntime.js';
+let c = new Set();
+let a = c.add(1);
+let b = c.has(1);
+let d = c.delete(1);
+c.clear();
+let n = c.size;
+console.log(a);
+console.log(b);
+console.log(d);
+console.log(n);

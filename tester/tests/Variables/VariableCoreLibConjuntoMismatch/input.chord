@@ -1,0 +1,2 @@
+var c tipo Conjunto es nuevo Conjunto()
+var n tipo texto es c.tamano

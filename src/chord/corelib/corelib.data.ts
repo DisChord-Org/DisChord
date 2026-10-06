@@ -705,6 +705,12 @@ export const corelib = {
                 }
             }
         },
+        /**
+         * `tiene`, `borrar` and `limpiar` share their names with members of `Texto`, `Lista` or
+         * `Mapa`. With a receiver of known type (`nuevo Conjunto()`, a typed variable) the class is
+         * resolved from it; with an unknown one, such as a function parameter, the first class
+         * declaring the name wins, so `c.tiene(x)` is emitted as `includes`, not `has`.
+         */
         [ClassesEnum.Conjunto]: {
             receiver: ClassDataType.of(ClassesEnum.Conjunto),
             constructs: 'Set',
@@ -712,6 +718,24 @@ export const corelib = {
                 agregar: {
                     transpile: 'add',
                     returns: ClassDataType.of(ClassesEnum.Conjunto)
+                },
+                tiene: {
+                    transpile: 'has',
+                    returns: PrimitiveDataType.Booleano
+                },
+                borrar: {
+                    transpile: 'delete',
+                    returns: PrimitiveDataType.Booleano
+                },
+                limpiar: {
+                    transpile: 'clear',
+                    returns: VoidDataType.Void
+                }
+            },
+            properties: {
+                tamano: {
+                    transpile: 'size',
+                    returns: PrimitiveDataType.Numero
                 }
             }
         },
