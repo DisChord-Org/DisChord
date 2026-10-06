@@ -147,7 +147,11 @@ export class Lexer<T extends string> {
                     value += this.advance();
                 }
 
-                if (value === TokenType.Verdadero || value === TokenType.Falso) {
+                // A word right after `.` is always a member name, even if it is a reserved word
+                // (`lista.en(0)`, `fecha.entre`), so it never goes through the keyword lookup.
+                if (tokens[tokens.length - 1]?.type === TokenType.Punto) {
+                    tokens.push(this.createToken(TokenType.IDENTIFICADOR, value, startLine, startCol));
+                } else if (value === TokenType.Verdadero || value === TokenType.Falso) {
                     tokens.push(this.createToken(TokenType.BOOLEANO, value, startLine, startCol));
                 } else if (value === TokenType.Indefinido) {
                     tokens.push(this.createToken(TokenType.Indefinido, value, startLine, startCol));
