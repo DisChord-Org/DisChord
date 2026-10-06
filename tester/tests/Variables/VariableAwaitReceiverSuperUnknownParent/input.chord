@@ -1,0 +1,9 @@
+clase B extiende Externa {
+    @asincrono
+    funcion m() { devolver 1 }
+
+    @asincrono
+    funcion n() {
+        super.m()
+    }
+}

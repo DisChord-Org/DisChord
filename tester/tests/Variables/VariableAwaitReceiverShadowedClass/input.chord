@@ -1,0 +1,9 @@
+clase Caja {
+    @asincrono
+    funcion m() { devolver 1 }
+}
+
+@asincrono
+funcion f(Caja) {
+    Caja.m()
+}

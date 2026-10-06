@@ -1,11 +1,11 @@
 import { AnalysisRule } from "../AnalysisRule";
 import { walkAST } from "../walkAST";
 import { TypeInferrer } from "../TypeInferrer";
+import { UserMemberResolver } from "../UserMemberResolver";
 import { ASTNode, AccessNode, BaseNode, CallNode, ClassNode, FunctionNode, TokenType } from "../../types";
 import { isAccessNode, isIdentificatorNode } from "../../ast.guards";
 import { AnyDataType, UnionDataType, UserClassDataType } from "../../DataType";
 import { asyncRuntimeHelperNames, corelib, coreLibUtils } from "../../corelib";
-import { CompilerMetadataKind } from "../../types";
 import { ChordError, ErrorLevel } from "../../../errors/ChordError";
 
 /**
@@ -29,6 +29,7 @@ import { ChordError, ErrorLevel } from "../../../errors/ChordError";
  */
 export class ResolveAwaitedCallsRule<T extends string, N extends BaseNode<T>> extends AnalysisRule<T, N> {
     private readonly typeInferrer: TypeInferrer<T, N> = new TypeInferrer(this.context);
+    private readonly members: UserMemberResolver<T> = new UserMemberResolver(this.context);
 
     /**
      * Whether each enclosing function-like body (innermost last) may `await`. Empty at the top level.
@@ -138,26 +139,21 @@ export class ResolveAwaitedCallsRule<T extends string, N extends BaseNode<T>> ex
     private isAsyncMethod (access: AccessNode<T, N>): boolean {
         const symbolTable = this.context.symbolTable;
         const receiver = access.object;
-        const currentClass = symbolTable.getMetadata<string>(CompilerMetadataKind.CurrentClass);
 
-        if (receiver.type === TokenType.Esta) {
-            return currentClass !== undefined && !!symbolTable.findMember(currentClass, access.property)?.metadata.isAsync;
-        }
-
-        if (receiver.type === TokenType.Super) {
-            const parent = currentClass === undefined ? undefined : symbolTable.superClassOf(currentClass);
-            return parent !== undefined && !!symbolTable.findMember(parent, access.property)?.metadata.isAsync;
+        // `esta`, `super` and a class of the file named directly are resolved without the receiver's type, and
+        // never fall back to the checks below, even when the class or its parent is unknown.
+        if (receiver.type === TokenType.Esta || receiver.type === TokenType.Super || (isIdentificatorNode(receiver) && symbolTable.isUserClass(receiver.value))) {
+            return !!this.members.resolve(access)?.metadata.isAsync;
         }
 
         if (isIdentificatorNode(receiver)) {
-            if (symbolTable.isUserClass(receiver.value)) return !!symbolTable.findMember(receiver.value, access.property)?.metadata.isAsync;
             if (Object.prototype.hasOwnProperty.call(corelib.classes, receiver.value) && !symbolTable.lookup(receiver.value)) {
                 return !!coreLibUtils.resolveStatic(access)?.member.async;
             }
         }
 
         const type = this.typeInferrer.infer(receiver);
-        if (type instanceof UserClassDataType) return !!symbolTable.findMember(type.name, access.property)?.metadata.isAsync;
+        if (type instanceof UserClassDataType) return !!this.members.resolve(access, type)?.metadata.isAsync;
         if (type instanceof UnionDataType) return this.isAsyncOnUnion(type, access.property);
         if (type && !(type instanceof AnyDataType)) return false;
 

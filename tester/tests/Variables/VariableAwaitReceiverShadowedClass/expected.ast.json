@@ -1,0 +1,88 @@
+[
+  {
+    "type": "clase",
+    "id": "Caja",
+    "body": [
+      {
+        "type": "funcion",
+        "id": "m",
+        "metadata": {
+          "isConstructor": false,
+          "isMethod": true,
+          "isStatic": false,
+          "isAsync": true
+        },
+        "params": [],
+        "body": [
+          {
+            "type": "devolver",
+            "object": {
+              "type": "Literal",
+              "value": 1,
+              "raw": "1",
+              "location": {
+                "line": 3,
+                "column": 28
+              }
+            },
+            "location": {
+              "line": 3,
+              "column": 28
+            }
+          }
+        ],
+        "location": {
+          "line": 3,
+          "column": 30
+        }
+      }
+    ],
+    "location": {
+      "line": 4,
+      "column": 1
+    }
+  },
+  {
+    "type": "funcion",
+    "id": "f",
+    "metadata": {
+      "isConstructor": false,
+      "isMethod": false,
+      "isStatic": false,
+      "isAsync": true
+    },
+    "params": [
+      "Caja"
+    ],
+    "body": [
+      {
+        "type": "Llamada",
+        "object": {
+          "type": "Acceso",
+          "object": {
+            "type": "IDENTIFICADOR",
+            "value": "Caja",
+            "location": {
+              "line": 8,
+              "column": 5
+            }
+          },
+          "property": "m",
+          "location": {
+            "line": 8,
+            "column": 10
+          }
+        },
+        "params": [],
+        "location": {
+          "line": 8,
+          "column": 12
+        }
+      }
+    ],
+    "location": {
+      "line": 9,
+      "column": 1
+    }
+  }
+]
