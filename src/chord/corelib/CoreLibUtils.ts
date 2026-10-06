@@ -80,9 +80,8 @@ export class CoreLibUtils<C extends string = string> {
         if (staticMember) return this.returnTypeOf(staticMember, isCall);
 
         if (receiverType && !(receiverType instanceof AnyDataType)) {
-            const className = this.classOf(receiverType);
-            const found = className && this.findInClass(className, access.property);
-            return found && !found.member.static ? this.returnTypeOf(found, isCall) : undefined;
+            const found = this.resolveInstanceOf(access, receiverType);
+            return found ? this.returnTypeOf(found, isCall) : undefined;
         }
 
         const [first, ...rest] = this.resolveInstanceMembers(access);
@@ -129,6 +128,21 @@ export class CoreLibUtils<C extends string = string> {
     }
 
     /**
+     * Resolves an instance member the way the generator needs it: through the class the receiver's
+     * type belongs to when that type is known (a member of another class sharing the name, or a
+     * field of a `bdo` that happens to be called like one, is never picked up), and otherwise, like
+     * {@link resolveInstance}, by name across every class.
+     * @param {AccessNode<T, N>} access - The access node.
+     * @param {DataType} [receiverType] - The inferred type of `access.object`, if known.
+     * @returns {ResolvedMember | undefined} The member, or `undefined` if there is none.
+     */
+    resolveInstanceMember<T extends string, N extends BaseNode<T>> (access: AccessNode<T, N>, receiverType?: DataType): ResolvedMember | undefined {
+        if (receiverType && !(receiverType instanceof AnyDataType)) return this.resolveInstanceOf(access, receiverType);
+
+        return this.resolveInstance(access);
+    }
+
+    /**
      * @param {ASTNode<T, N>} target - What follows `nuevo`: a class name, called (`Mapa()`) or not.
      * @returns {string | undefined} The JavaScript constructor it is emitted as (`Mapa` → `Map`), or `undefined` if it isn't an instantiable core library class.
      */
@@ -163,6 +177,13 @@ export class CoreLibUtils<C extends string = string> {
      */
     classOf(type: DataType): C | undefined {
         return (Object.keys(this.corelib.classes) as C[]).find(key => this.corelib.classes[key].receiver?.isAssignableFrom(type));
+    }
+
+    private resolveInstanceOf<T extends string, N extends BaseNode<T>> (access: AccessNode<T, N>, receiverType: DataType): ResolvedMember | undefined {
+        const className = this.classOf(receiverType);
+        const found = className && this.findInClass(className, access.property);
+
+        return found && !found.member.static ? found : undefined;
     }
 
     private instantiatedName<T extends string, N extends BaseNode<T>> (target: ASTNode<T, N>): string | undefined {

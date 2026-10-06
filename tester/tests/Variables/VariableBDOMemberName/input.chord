@@ -1,0 +1,5 @@
+var datos es { longitud 5 }
+var lista es [1, 2]
+
+consola.imprimir(datos.longitud)
+consola.imprimir(lista.longitud)

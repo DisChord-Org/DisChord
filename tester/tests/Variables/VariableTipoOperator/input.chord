@@ -1,0 +1,4 @@
+consola.imprimir(tipo 5)
+consola.imprimir(tipo "a")
+consola.imprimir(tipo [1, 2])
+consola.imprimir(tipo { a 1 })

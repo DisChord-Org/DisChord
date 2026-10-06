@@ -1,6 +1,7 @@
 import { AccessNode, BaseNode, TokenType, TokenTypeUnion } from "../../../types";
 import { SubGenerator } from "../../SubGenerator";
 import { coreLibUtils } from "../../../corelib";
+import { TypeInferrer } from "../../../Analyzer/TypeInferrer";
 
 /**
  * Atomic SubGenerator mapping properties, fields, and core native dictionary methods.
@@ -18,6 +19,15 @@ export class AccessVisitor<T extends string, N extends BaseNode<T>> extends SubG
     public static triggerToken: TokenTypeUnion<TokenType> | undefined = TokenType.ACCESO;
 
     /**
+     * Infers the receiver's type, so a member is picked through the class that type belongs to (the
+     * analyzer resolves it the same way). Like the analyzer, it only knows the types of variables
+     * the `SymbolTable` still holds, which doesn't include the locals of a function or class.
+     * @private
+     * @readonly
+     */
+    private readonly typeInferrer: TypeInferrer<T, N> = new TypeInferrer(this.parent.context);
+
+    /**
      * Evaluates a property accessor structure routing matches directly into core polyfills.
      * @param {AccessNode<T>} node - The target field access syntax tree node.
      * @returns {string} The fully resolved and chained member dot-notation string.
@@ -27,7 +37,8 @@ export class AccessVisitor<T extends string, N extends BaseNode<T>> extends SubG
         const staticMember = coreLibUtils.resolveStatic(node);
         if (staticMember) return staticMember.member.transpile;
 
-        const property = coreLibUtils.resolveInstance(node)?.member.transpile ?? node.property;
+        const receiverType = this.typeInferrer.infer(node.object);
+        const property = coreLibUtils.resolveInstanceMember(node, receiverType)?.member.transpile ?? node.property;
 
         return `${this.parent.visit(node.object)}.${property}`;
     }
