@@ -1,0 +1,131 @@
+[
+  {
+    "type": "importar",
+    "identificators": [],
+    "path": "./lib/consoleRuntime.js",
+    "isDestructured": false,
+    "location": {
+      "line": 0,
+      "column": 0
+    }
+  },
+  {
+    "type": "clase",
+    "id": "Redondeador",
+    "body": [
+      {
+        "type": "funcion",
+        "id": "redondear",
+        "metadata": {
+          "isConstructor": false,
+          "isMethod": true,
+          "isStatic": false,
+          "isAsync": false
+        },
+        "params": [
+          "x"
+        ],
+        "body": [
+          {
+            "type": "devolver",
+            "object": {
+              "type": "IDENTIFICADOR",
+              "value": "x",
+              "location": {
+                "line": 2,
+                "column": 37
+              }
+            },
+            "location": {
+              "line": 2,
+              "column": 37
+            }
+          }
+        ],
+        "location": {
+          "line": 2,
+          "column": 39
+        }
+      }
+    ],
+    "location": {
+      "line": 3,
+      "column": 1
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "r",
+    "value": {
+      "type": "Llamada",
+      "object": {
+        "type": "Acceso",
+        "object": {
+          "type": "IDENTIFICADOR",
+          "value": "Mates",
+          "location": {
+            "line": 5,
+            "column": 10
+          }
+        },
+        "property": "redondear",
+        "location": {
+          "line": 5,
+          "column": 16
+        }
+      },
+      "params": [
+        {
+          "type": "Literal",
+          "value": 1.5,
+          "raw": "1.5",
+          "location": {
+            "line": 5,
+            "column": 26
+          }
+        }
+      ],
+      "location": {
+        "line": 5,
+        "column": 29
+      }
+    },
+    "location": {
+      "line": 5,
+      "column": 29
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 6,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 6,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "IDENTIFICADOR",
+        "value": "r",
+        "location": {
+          "line": 6,
+          "column": 18
+        }
+      }
+    ],
+    "location": {
+      "line": 6,
+      "column": 19
+    }
+  }
+]

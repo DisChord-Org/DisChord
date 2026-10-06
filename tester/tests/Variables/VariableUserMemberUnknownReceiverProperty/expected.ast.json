@@ -1,0 +1,72 @@
+[
+  {
+    "type": "clase",
+    "id": "Caja",
+    "body": [
+      {
+        "type": "Propiedad",
+        "id": "longitud",
+        "value": {
+          "type": "Literal",
+          "value": 0,
+          "raw": "0",
+          "location": {
+            "line": 2,
+            "column": 22
+          }
+        },
+        "isStatic": false,
+        "location": {
+          "line": 2,
+          "column": 22
+        }
+      }
+    ],
+    "location": {
+      "line": 3,
+      "column": 1
+    }
+  },
+  {
+    "type": "funcion",
+    "id": "h",
+    "metadata": {
+      "isConstructor": false,
+      "isMethod": false,
+      "isStatic": false,
+      "isAsync": false
+    },
+    "params": [
+      "p"
+    ],
+    "body": [
+      {
+        "type": "devolver",
+        "object": {
+          "type": "Acceso",
+          "object": {
+            "type": "IDENTIFICADOR",
+            "value": "p",
+            "location": {
+              "line": 6,
+              "column": 14
+            }
+          },
+          "property": "longitud",
+          "location": {
+            "line": 6,
+            "column": 16
+          }
+        },
+        "location": {
+          "line": 6,
+          "column": 16
+        }
+      }
+    ],
+    "location": {
+      "line": 7,
+      "column": 1
+    }
+  }
+]

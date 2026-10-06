@@ -1,0 +1,7 @@
+clase Buscador {
+    funcion buscar(x) { devolver x }
+}
+
+funcion h(p) {
+    devolver p.buscar("a")
+}

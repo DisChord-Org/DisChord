@@ -1,0 +1,6 @@
+clase Redondeador {
+    funcion redondear(x) { devolver x }
+}
+
+var r es Mates.redondear(1.5)
+consola.imprimir(r)

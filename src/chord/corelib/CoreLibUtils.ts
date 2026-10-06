@@ -68,14 +68,19 @@ export class CoreLibUtils<C extends string = string> {
      * guessing there would type a user's field after a core library one that happens to share its
      * name. With no receiver type (or `cualquiera`), falls back to looking the name up in every
      * class and only resolves if they all agree on its type instance. A method yields its type only
-     * as a call, and a property only as a plain access.
+     * as a call, and a property only as a plain access. A member the file itself declares in a
+     * class (`declaredByUser`) wins over the core library one of the same name when the receiver's
+     * type is unknown, so the name is left to the user's declaration. A known receiver type or a
+     * static access is unaffected: the receiver decides once it is known. Classes imported from
+     * another file aren't seen by the caller, so a member they declare is still resolved by name.
      * @param {AccessNode<T, N>} access - The access node.
      * @param {boolean} isCall - Whether the access is the callee of a call.
      * @param {DataType} [receiverType] - The inferred type of `access.object`, if known.
+     * @param {boolean} [declaredByUser=false] - Whether a class of the file declares a member named like `access.property`.
      * @returns {DataType | undefined} The type, or `undefined` if the core library has no such
-     * member, its name is ambiguous, or it is used the wrong way (a method read without calling it).
+     * member, its name is ambiguous, the user's declaration wins, or it is used the wrong way (a method read without calling it).
      */
-    resolveReturnType<T extends string, N extends BaseNode<T>> (access: AccessNode<T, N>, isCall: boolean, receiverType?: DataType): DataType | undefined {
+    resolveReturnType<T extends string, N extends BaseNode<T>> (access: AccessNode<T, N>, isCall: boolean, receiverType?: DataType, declaredByUser: boolean = false): DataType | undefined {
         const staticMember = this.resolveStatic(access);
         if (staticMember) return this.returnTypeOf(staticMember, isCall);
 
@@ -83,6 +88,8 @@ export class CoreLibUtils<C extends string = string> {
             const found = this.resolveInstanceOf(access, receiverType);
             return found ? this.returnTypeOf(found, isCall) : undefined;
         }
+
+        if (declaredByUser) return undefined;
 
         const [first, ...rest] = this.resolveInstanceMembers(access);
         if (!first || rest.some(other => other.isProperty !== first.isProperty || other.member.returns !== first.member.returns)) return undefined;
@@ -131,13 +138,19 @@ export class CoreLibUtils<C extends string = string> {
      * Resolves an instance member the way the generator needs it: through the class the receiver's
      * type belongs to when that type is known (a member of another class sharing the name, or a
      * field of a `bdo` that happens to be called like one, is never picked up), and otherwise, like
-     * {@link resolveInstance}, by name across every class.
+     * {@link resolveInstance}, by name across every class. A member the file itself declares in a
+     * class (`declaredByUser`) wins over the core library one of the same name when the receiver's
+     * type is unknown, so the name is left to the user's declaration. A known receiver type or a
+     * static access is unaffected: the receiver decides once it is known. Classes imported from
+     * another file aren't seen by the caller, so a member they declare is still resolved by name.
      * @param {AccessNode<T, N>} access - The access node.
      * @param {DataType} [receiverType] - The inferred type of `access.object`, if known.
-     * @returns {ResolvedMember | undefined} The member, or `undefined` if there is none.
+     * @param {boolean} [declaredByUser=false] - Whether a class of the file declares a member named like `access.property`.
+     * @returns {ResolvedMember | undefined} The member, or `undefined` if there is none or the user's declaration wins.
      */
-    resolveInstanceMember<T extends string, N extends BaseNode<T>> (access: AccessNode<T, N>, receiverType?: DataType): ResolvedMember | undefined {
+    resolveInstanceMember<T extends string, N extends BaseNode<T>> (access: AccessNode<T, N>, receiverType?: DataType, declaredByUser: boolean = false): ResolvedMember | undefined {
         if (receiverType && !(receiverType instanceof AnyDataType)) return this.resolveInstanceOf(access, receiverType);
+        if (declaredByUser && !this.resolveStatic(access)) return undefined;
 
         return this.resolveInstance(access);
     }

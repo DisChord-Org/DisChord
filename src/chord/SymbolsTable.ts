@@ -142,6 +142,14 @@ export class SymbolTable {
     }
 
     /**
+     * @param {string} member - A member name.
+     * @returns {boolean} Whether any class of the file declares a member with that name itself.
+     */
+    public hasMemberNamed(member: string): boolean {
+        return this.membersNamed(member).length > 0;
+    }
+
+    /**
      * Records that the analyzer decided this call must be awaited, so the generator only has to
      * read the decision.
      *

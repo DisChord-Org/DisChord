@@ -28,7 +28,9 @@ export class AccessVisitor<T extends string, N extends BaseNode<T>> extends SubG
     private readonly typeInferrer: TypeInferrer<T, N> = new TypeInferrer(this.parent.context);
 
     /**
-     * Evaluates a property accessor structure routing matches directly into core polyfills.
+     * Evaluates a property accessor structure routing matches directly into core polyfills. A member
+     * a class of the file declares keeps its name when the receiver's type is unknown (see
+     * `CoreLibUtils.resolveInstanceMember`).
      * @param {AccessNode<T>} node - The target field access syntax tree node.
      * @returns {string} The fully resolved and chained member dot-notation string.
      * @public
@@ -38,7 +40,8 @@ export class AccessVisitor<T extends string, N extends BaseNode<T>> extends SubG
         if (staticMember) return staticMember.member.transpile;
 
         const receiverType = this.typeInferrer.infer(node.object);
-        const property = coreLibUtils.resolveInstanceMember(node, receiverType)?.member.transpile ?? node.property;
+        const declaredByUser = this.parent.context.symbolTable.hasMemberNamed(node.property);
+        const property = coreLibUtils.resolveInstanceMember(node, receiverType, declaredByUser)?.member.transpile ?? node.property;
 
         return `${this.parent.visit(node.object)}.${property}`;
     }

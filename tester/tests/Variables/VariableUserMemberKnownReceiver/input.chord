@@ -1,0 +1,7 @@
+clase Buscador {
+    funcion buscar(x) { devolver x }
+}
+
+var s es "hola"
+var r es s.buscar("a")
+consola.imprimir(r)

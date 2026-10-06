@@ -1,0 +1,7 @@
+clase Caja {
+    prop longitud es 0
+}
+
+funcion h(p) {
+    devolver p.longitud
+}

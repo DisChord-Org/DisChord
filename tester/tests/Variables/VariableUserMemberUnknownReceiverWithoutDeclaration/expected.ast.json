@@ -1,0 +1,62 @@
+[
+  {
+    "type": "funcion",
+    "id": "h",
+    "metadata": {
+      "isConstructor": false,
+      "isMethod": false,
+      "isStatic": false,
+      "isAsync": false
+    },
+    "params": [
+      "p"
+    ],
+    "body": [
+      {
+        "type": "devolver",
+        "object": {
+          "type": "Llamada",
+          "object": {
+            "type": "Acceso",
+            "object": {
+              "type": "IDENTIFICADOR",
+              "value": "p",
+              "location": {
+                "line": 2,
+                "column": 14
+              }
+            },
+            "property": "buscar",
+            "location": {
+              "line": 2,
+              "column": 16
+            }
+          },
+          "params": [
+            {
+              "type": "Literal",
+              "value": "a",
+              "raw": "a",
+              "location": {
+                "line": 2,
+                "column": 23
+              }
+            }
+          ],
+          "location": {
+            "line": 2,
+            "column": 26
+          }
+        },
+        "location": {
+          "line": 2,
+          "column": 26
+        }
+      }
+    ],
+    "location": {
+      "line": 3,
+      "column": 1
+    }
+  }
+]
