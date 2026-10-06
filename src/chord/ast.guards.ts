@@ -1,4 +1,4 @@
-import { AccessNode, ASTNode, BaseNode, ClassNode, FunctionNode, IdentificatorNode, ImportNode, PropertyNode, TokenType, VariableNode } from "./types";
+import { AccessNode, ASTNode, BaseNode, CallNode, ClassNode, FunctionNode, IdentificatorNode, ImportNode, PropertyNode, TokenType, VariableNode } from "./types";
 
 /**
  * Type guards for `ASTNode`. `ASTNode` is a union that ends in the extensible `N`, whose `type`
@@ -12,6 +12,14 @@ import { AccessNode, ASTNode, BaseNode, ClassNode, FunctionNode, IdentificatorNo
  */
 export function isAccessNode<T extends string, N extends BaseNode<T>> (node: ASTNode<T, N>): node is AccessNode<T, N> {
     return node.type === TokenType.ACCESO;
+}
+
+/**
+ * @param {ASTNode<T, N>} node - Node to check.
+ * @returns {boolean} `true` if the node is a call (`f(...)`).
+ */
+export function isCallNode<T extends string, N extends BaseNode<T>> (node: ASTNode<T, N>): node is CallNode<T, N> {
+    return node.type === TokenType.LLAMADA;
 }
 
 /**

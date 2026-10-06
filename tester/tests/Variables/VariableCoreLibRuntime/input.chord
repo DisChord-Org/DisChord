@@ -1,0 +1,10 @@
+esperar(10)
+var a tipo numero es Mates.limitar(10, 0, 5)
+var c tipo numero es Aleatorio.entre(1, 6)
+var d tipo numero[] es Aleatorio.mezclar([1, 2, 3])
+var e tipo numero es Aleatorio.elegir([1, 2, 3])
+
+consola.imprimir(a)
+consola.imprimir(c)
+consola.imprimir(d)
+consola.imprimir(e)

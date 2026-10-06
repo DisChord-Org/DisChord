@@ -1,0 +1,192 @@
+[
+  {
+    "type": "importar",
+    "identificators": [],
+    "path": "./lib/consoleRuntime.js",
+    "isDestructured": false,
+    "location": {
+      "line": 0,
+      "column": 0
+    }
+  },
+  {
+    "type": "funcion",
+    "id": "limitar",
+    "metadata": {
+      "isConstructor": false,
+      "isMethod": false,
+      "isStatic": false,
+      "isAsync": false
+    },
+    "params": [
+      "x"
+    ],
+    "body": [
+      {
+        "type": "devolver",
+        "object": {
+          "type": "IDENTIFICADOR",
+          "value": "x",
+          "location": {
+            "line": 2,
+            "column": 14
+          }
+        },
+        "location": {
+          "line": 2,
+          "column": 14
+        }
+      }
+    ],
+    "location": {
+      "line": 3,
+      "column": 1
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "a",
+    "value": {
+      "type": "Llamada",
+      "object": {
+        "type": "Acceso",
+        "object": {
+          "type": "IDENTIFICADOR",
+          "value": "Mates",
+          "location": {
+            "line": 4,
+            "column": 22
+          }
+        },
+        "property": "redondear",
+        "location": {
+          "line": 4,
+          "column": 28
+        }
+      },
+      "params": [
+        {
+          "type": "Literal",
+          "value": 1.5,
+          "raw": "1.5",
+          "location": {
+            "line": 4,
+            "column": 38
+          }
+        }
+      ],
+      "location": {
+        "line": 4,
+        "column": 41
+      }
+    },
+    "dataType": {
+      "kind": "primitive",
+      "name": "numero"
+    },
+    "location": {
+      "line": 4,
+      "column": 41
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "b",
+    "value": {
+      "type": "Llamada",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "limitar",
+        "location": {
+          "line": 5,
+          "column": 10
+        }
+      },
+      "params": [
+        {
+          "type": "Literal",
+          "value": 3,
+          "raw": "3",
+          "location": {
+            "line": 5,
+            "column": 18
+          }
+        }
+      ],
+      "location": {
+        "line": 5,
+        "column": 19
+      }
+    },
+    "location": {
+      "line": 5,
+      "column": 19
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 7,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 7,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "IDENTIFICADOR",
+        "value": "a",
+        "location": {
+          "line": 7,
+          "column": 18
+        }
+      }
+    ],
+    "location": {
+      "line": 7,
+      "column": 19
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 8,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 8,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "IDENTIFICADOR",
+        "value": "b",
+        "location": {
+          "line": 8,
+          "column": 18
+        }
+      }
+    ],
+    "location": {
+      "line": 8,
+      "column": 19
+    }
+  }
+]

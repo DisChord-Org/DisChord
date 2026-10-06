@@ -1,7 +1,7 @@
 import { CallNode, BaseNode, TokenType, TokenTypeUnion } from "../../../types";
 import { isAccessNode, isIdentificatorNode } from "../../../ast.guards";
 import { SubGenerator } from "../../SubGenerator";
-import { coreLibUtils } from "../../../corelib";
+import { asyncRuntimeHelperNames, coreLibUtils } from "../../../corelib";
 
 /**
  * Atomic SubGenerator that handles function and method execution structures.
@@ -43,6 +43,7 @@ export class CallVisitor<T extends string, N extends BaseNode<T>> extends SubGen
         } else if (isIdentificatorNode(node.object)) {
             const name = node.object.value;
             translation = coreLibUtils.resolveFunction(node.object) ?? name;
+            isAsyncCall = asyncRuntimeHelperNames.has(translation);
 
             const symbol = this.parent.context.symbolTable.lookup(name);
             if (symbol?.metadata.isAsync) {

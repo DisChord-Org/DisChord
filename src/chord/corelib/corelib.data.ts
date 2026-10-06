@@ -17,14 +17,15 @@ export enum ClassesEnum {
     Conjunto = 'Conjunto',
     Promesa = 'Promesa',
     Expresion = 'Expresion',
-    Fecha = 'Fecha'
+    Fecha = 'Fecha',
+    Aleatorio = 'Aleatorio'
 }
 
 /**
  * Core library definition: maps every class, and each of its methods and properties, from its
  * name in the source language to the JavaScript it is transpiled to. `functions` holds free
- * functions rewritten to another callee; it is empty here and left for layers built on top of
- * chord to fill.
+ * functions rewritten to another callee; layers built on top of chord add their own. A
+ * `transpile` that names a `runtimeHelperNames` function is provided by the runtime helpers module.
  * @type {CoreLib<ClassesEnum>}
  */
 export const corelib = {
@@ -490,6 +491,11 @@ export const corelib = {
                     transpile: 'Math.clz32',
                     returns: PrimitiveDataType.Numero,
                     static: true
+                },
+                limitar: {
+                    transpile: 'chordLimitar',
+                    returns: PrimitiveDataType.Numero,
+                    static: true
                 }
             },
             properties: {
@@ -763,7 +769,28 @@ export const corelib = {
             receiver: ClassDataType.of(ClassesEnum.Fecha),
             constructs: 'Date',
             methods: {}
+        },
+        [ClassesEnum.Aleatorio]: {
+            methods: {
+                elegir: {
+                    transpile: 'chordElegir',
+                    returns: AnyDataType.Any,
+                    static: true
+                },
+                mezclar: {
+                    transpile: 'chordMezclar',
+                    returns: ArrayDataType.AnyList,
+                    static: true
+                },
+                entre: {
+                    transpile: 'chordEntre',
+                    returns: PrimitiveDataType.Numero,
+                    static: true
+                }
+            }
         }
     },
-    functions: {}
+    functions: {
+        esperar: 'chordEsperar'
+    }
 } as const satisfies CoreLib<ClassesEnum>;

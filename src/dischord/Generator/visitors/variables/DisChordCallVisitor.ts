@@ -1,6 +1,7 @@
 import { CallVisitor } from "../../../../chord/Generator/visitors/variables/CallVisitor";
 import { DisChordNodeType, DisChordNode } from "../../../types";
 import { CallNode, TokenType, TokenTypeUnion } from "../../../../chord/types";
+import { asyncRuntimeHelperNames } from "../../../../chord/corelib";
 import { disChordCoreLibUtils } from "../../../corelib";
 
 export class DisChordCallVisitor extends CallVisitor<DisChordNodeType, DisChordNode> {
@@ -23,7 +24,8 @@ export class DisChordCallVisitor extends CallVisitor<DisChordNodeType, DisChordN
 
         if (translation) {
             const args = node.params.map(arg => this.parent.visit(arg)).join(', ');
-            return `${translation}(${args})`;
+            const awaitPrefix = asyncRuntimeHelperNames.has(translation) ? 'await ' : '';
+            return `${awaitPrefix}${translation}(${args})`;
         }
 
         return super.visit(node);

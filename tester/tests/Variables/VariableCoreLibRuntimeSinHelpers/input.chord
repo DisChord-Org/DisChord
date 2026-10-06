@@ -1,0 +1,8 @@
+funcion limitar(x) {
+    devolver x
+}
+var a tipo numero es Mates.redondear(1.5)
+var b es limitar(3)
+
+consola.imprimir(a)
+consola.imprimir(b)

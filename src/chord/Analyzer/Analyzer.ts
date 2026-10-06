@@ -8,6 +8,7 @@ import { ResolveVariableTypesRule } from "./rules/ResolveVariableTypesRule";
 import { ValidateAssignmentTypesRule } from "./rules/ValidateAssignmentTypesRule";
 import { ValidateCallTargetsRule } from "./rules/ValidateCallTargetsRule";
 import { RequiresConsoleRuntimeRule } from "./rules/RequiresConsoleRuntimeRule";
+import { RequiresRuntimeHelpersRule } from "./rules/RequiresRuntimeHelpersRule";
 
 /**
  * Engine for the semantic analysis phase, run once per file between parsing and generation:
@@ -62,7 +63,8 @@ export class Analyzer<T extends string, N extends BaseNode<T>> {
 
         // Lowering rules — independent of the 3-pass binding model above, they don't touch
         // SymbolTable at all.
-        RequiresConsoleRuntimeRule
+        RequiresConsoleRuntimeRule,
+        RequiresRuntimeHelpersRule
     ];
 
     /**

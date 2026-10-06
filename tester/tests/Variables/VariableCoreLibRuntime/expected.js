@@ -1,0 +1,11 @@
+import { chordElegir, chordEntre, chordEsperar, chordLimitar, chordMezclar } from './lib/runtimeHelpers.js';
+import './lib/consoleRuntime.js';
+await chordEsperar(10);
+let a = chordLimitar(10, 0, 5);
+let c = chordEntre(1, 6);
+let d = chordMezclar([1, 2, 3]);
+let e = chordElegir([1, 2, 3]);
+console.log(a);
+console.log(c);
+console.log(d);
+console.log(e);
