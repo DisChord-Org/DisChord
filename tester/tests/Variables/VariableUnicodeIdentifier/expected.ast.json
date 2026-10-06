@@ -1,0 +1,487 @@
+[
+  {
+    "type": "importar",
+    "identificators": [],
+    "path": "./lib/consoleRuntime.js",
+    "isDestructured": false,
+    "location": {
+      "line": 0,
+      "column": 0
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "año",
+    "value": {
+      "type": "Literal",
+      "value": 2026,
+      "raw": "2026",
+      "location": {
+        "line": 1,
+        "column": 12
+      }
+    },
+    "location": {
+      "line": 1,
+      "column": 12
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "canción",
+    "value": {
+      "type": "Literal",
+      "value": "x",
+      "raw": "x",
+      "location": {
+        "line": 2,
+        "column": 16
+      }
+    },
+    "location": {
+      "line": 2,
+      "column": 16
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "ñu",
+    "value": {
+      "type": "Literal",
+      "value": 1,
+      "raw": "1",
+      "location": {
+        "line": 3,
+        "column": 11
+      }
+    },
+    "location": {
+      "line": 3,
+      "column": 11
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "sí",
+    "value": {
+      "type": "Literal",
+      "value": 2,
+      "raw": "2",
+      "location": {
+        "line": 4,
+        "column": 11
+      }
+    },
+    "location": {
+      "line": 4,
+      "column": 11
+    }
+  },
+  {
+    "type": "funcion",
+    "id": "año2",
+    "metadata": {
+      "isConstructor": false,
+      "isMethod": false,
+      "isStatic": false,
+      "isAsync": false
+    },
+    "params": [],
+    "body": [
+      {
+        "type": "devolver",
+        "object": {
+          "type": "IDENTIFICADOR",
+          "value": "año",
+          "location": {
+            "line": 7,
+            "column": 14
+          }
+        },
+        "location": {
+          "line": 7,
+          "column": 14
+        }
+      }
+    ],
+    "location": {
+      "line": 8,
+      "column": 1
+    }
+  },
+  {
+    "type": "clase",
+    "id": "Reloj",
+    "body": [
+      {
+        "type": "funcion",
+        "id": "año",
+        "metadata": {
+          "isConstructor": false,
+          "isMethod": true,
+          "isStatic": false,
+          "isAsync": false
+        },
+        "params": [],
+        "body": [
+          {
+            "type": "devolver",
+            "object": {
+              "type": "Literal",
+              "value": 2026,
+              "raw": "2026",
+              "location": {
+                "line": 12,
+                "column": 18
+              }
+            },
+            "location": {
+              "line": 12,
+              "column": 18
+            }
+          }
+        ],
+        "location": {
+          "line": 13,
+          "column": 5
+        }
+      }
+    ],
+    "location": {
+      "line": 14,
+      "column": 1
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "r",
+    "value": {
+      "type": "nuevo",
+      "object": {
+        "type": "Llamada",
+        "object": {
+          "type": "IDENTIFICADOR",
+          "value": "Reloj",
+          "location": {
+            "line": 16,
+            "column": 16
+          }
+        },
+        "params": [],
+        "location": {
+          "line": 16,
+          "column": 22
+        }
+      },
+      "location": {
+        "line": 16,
+        "column": 22
+      }
+    },
+    "location": {
+      "line": 16,
+      "column": 22
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "a",
+    "value": {
+      "type": "Llamada",
+      "object": {
+        "type": "Acceso",
+        "object": {
+          "type": "IDENTIFICADOR",
+          "value": "r",
+          "location": {
+            "line": 17,
+            "column": 10
+          }
+        },
+        "property": "año",
+        "location": {
+          "line": 17,
+          "column": 12
+        }
+      },
+      "params": [],
+      "location": {
+        "line": 17,
+        "column": 16
+      }
+    },
+    "location": {
+      "line": 17,
+      "column": 16
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "f",
+    "value": {
+      "type": "nuevo",
+      "object": {
+        "type": "Llamada",
+        "object": {
+          "type": "IDENTIFICADOR",
+          "value": "Fecha",
+          "location": {
+            "line": 18,
+            "column": 27
+          }
+        },
+        "params": [],
+        "location": {
+          "line": 18,
+          "column": 33
+        }
+      },
+      "location": {
+        "line": 18,
+        "column": 33
+      }
+    },
+    "dataType": {
+      "kind": "class",
+      "name": "Fecha"
+    },
+    "location": {
+      "line": 18,
+      "column": 33
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "y2",
+    "value": {
+      "type": "Llamada",
+      "object": {
+        "type": "Acceso",
+        "object": {
+          "type": "IDENTIFICADOR",
+          "value": "f",
+          "location": {
+            "line": 19,
+            "column": 23
+          }
+        },
+        "property": "año",
+        "location": {
+          "line": 19,
+          "column": 25
+        }
+      },
+      "params": [],
+      "location": {
+        "line": 19,
+        "column": 29
+      }
+    },
+    "dataType": {
+      "kind": "primitive",
+      "name": "numero"
+    },
+    "location": {
+      "line": 19,
+      "column": 29
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 21,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 21,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "IDENTIFICADOR",
+        "value": "año",
+        "location": {
+          "line": 21,
+          "column": 18
+        }
+      }
+    ],
+    "location": {
+      "line": 21,
+      "column": 21
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 22,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 22,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "IDENTIFICADOR",
+        "value": "canción",
+        "location": {
+          "line": 22,
+          "column": 18
+        }
+      }
+    ],
+    "location": {
+      "line": 22,
+      "column": 25
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 23,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 23,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "IDENTIFICADOR",
+        "value": "ñu",
+        "location": {
+          "line": 23,
+          "column": 18
+        }
+      }
+    ],
+    "location": {
+      "line": 23,
+      "column": 20
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 24,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 24,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "IDENTIFICADOR",
+        "value": "sí",
+        "location": {
+          "line": 24,
+          "column": 18
+        }
+      }
+    ],
+    "location": {
+      "line": 24,
+      "column": 20
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 25,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 25,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "IDENTIFICADOR",
+        "value": "a",
+        "location": {
+          "line": 25,
+          "column": 18
+        }
+      }
+    ],
+    "location": {
+      "line": 25,
+      "column": 19
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 26,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 26,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "IDENTIFICADOR",
+        "value": "y2",
+        "location": {
+          "line": 26,
+          "column": 18
+        }
+      }
+    ],
+    "location": {
+      "line": 26,
+      "column": 20
+    }
+  }
+]

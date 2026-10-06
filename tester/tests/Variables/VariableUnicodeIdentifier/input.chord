@@ -1,0 +1,26 @@
+var año es 2026
+var canción es "x"
+var ñu es 1
+var sí es 2
+
+funcion año2() {
+    devolver año
+}
+
+clase Reloj {
+    funcion año() {
+        devolver 2026
+    }
+}
+
+var r es nuevo Reloj()
+var a es r.año()
+var f tipo Fecha es nuevo Fecha()
+var y2 tipo numero es f.año()
+
+consola.imprimir(año)
+consola.imprimir(canción)
+consola.imprimir(ñu)
+consola.imprimir(sí)
+consola.imprimir(a)
+consola.imprimir(y2)

@@ -768,7 +768,66 @@ export const corelib = {
         [ClassesEnum.Fecha]: {
             receiver: ClassDataType.of(ClassesEnum.Fecha),
             constructs: 'Date',
-            methods: {}
+            methods: {
+                ahora: {
+                    transpile: 'Date.now',
+                    returns: PrimitiveDataType.Numero,
+                    static: true
+                },
+                parsear: {
+                    transpile: 'Date.parse',
+                    returns: PrimitiveDataType.Numero,
+                    static: true
+                },
+                año: {
+                    transpile: 'getFullYear',
+                    returns: PrimitiveDataType.Numero
+                },
+                mes: {
+                    transpile: 'getMonth',
+                    returns: PrimitiveDataType.Numero
+                },
+                dia: {
+                    transpile: 'getDate',
+                    returns: PrimitiveDataType.Numero
+                },
+                diaSemana: {
+                    transpile: 'getDay',
+                    returns: PrimitiveDataType.Numero
+                },
+                hora: {
+                    transpile: 'getHours',
+                    returns: PrimitiveDataType.Numero
+                },
+                minuto: {
+                    transpile: 'getMinutes',
+                    returns: PrimitiveDataType.Numero
+                },
+                segundo: {
+                    transpile: 'getSeconds',
+                    returns: PrimitiveDataType.Numero
+                },
+                milisegundo: {
+                    transpile: 'getMilliseconds',
+                    returns: PrimitiveDataType.Numero
+                },
+                marcaDeTiempo: {
+                    transpile: 'getTime',
+                    returns: PrimitiveDataType.Numero
+                },
+                aISO: {
+                    transpile: 'toISOString',
+                    returns: PrimitiveDataType.Texto
+                },
+                aTexto: {
+                    transpile: 'toString',
+                    returns: PrimitiveDataType.Texto
+                },
+                aLocal: {
+                    transpile: 'toLocaleString',
+                    returns: PrimitiveDataType.Texto
+                }
+            }
         },
         [ClassesEnum.Aleatorio]: {
             methods: {
