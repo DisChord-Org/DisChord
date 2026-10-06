@@ -1,0 +1,11 @@
+import './lib/consoleRuntime.js';
+let m = new Map();
+let cj = new Set();
+let a = m.set('a', 1).has('a');
+let b = cj.add(1).add(2);
+let c = m.set('b', 2);
+let d = Object.freeze({ x: 1 });
+console.log(a);
+console.log(b);
+console.log(c);
+console.log(d);

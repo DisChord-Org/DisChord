@@ -1,0 +1,13 @@
+var m tipo Mapa es nuevo Mapa()
+var cj tipo Conjunto es nuevo Conjunto()
+var a tipo booleano es m.poner("a", 1).tiene("a")
+var b tipo Conjunto es cj.agregar(1).agregar(2)
+var c tipo Mapa es m.poner("b", 2)
+var d tipo bdo es BDO.congelar({
+    x 1
+})
+
+consola.imprimir(a)
+consola.imprimir(b)
+consola.imprimir(c)
+consola.imprimir(d)

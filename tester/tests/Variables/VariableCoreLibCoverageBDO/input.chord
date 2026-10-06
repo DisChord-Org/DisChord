@@ -4,8 +4,10 @@ var obj es {
 var a tipo texto[] es BDO.claves(obj)
 var b tipo booleano es BDO.tienePropia(obj, "a")
 var c tipo bdo es BDO.unir(obj, obj)
+var d tipo bdo es BDO.congelar(obj)
 
 consola.imprimir(obj)
 consola.imprimir(a)
 consola.imprimir(b)
 consola.imprimir(c)
+consola.imprimir(d)

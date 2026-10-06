@@ -658,7 +658,7 @@ export const corelib = {
                 },
                 congelar: {
                     transpile: 'Object.freeze',
-                    returns: AnyDataType.Any,
+                    returns: PrimitiveDataType.BDO,
                     static: true
                 },
                 desdeEntradas: {
@@ -683,7 +683,7 @@ export const corelib = {
                 },
                 poner: {
                     transpile: 'set',
-                    returns: AnyDataType.Any
+                    returns: ClassDataType.of(ClassesEnum.Mapa)
                 },
                 tiene: {
                     transpile: 'has',
@@ -711,7 +711,7 @@ export const corelib = {
             methods: {
                 agregar: {
                     transpile: 'add',
-                    returns: AnyDataType.Any
+                    returns: ClassDataType.of(ClassesEnum.Conjunto)
                 }
             }
         },

@@ -222,13 +222,13 @@
           "value": "m",
           "location": {
             "line": 6,
-            "column": 21
+            "column": 20
           }
         },
         "property": "poner",
         "location": {
           "line": 6,
-          "column": 23
+          "column": 22
         }
       },
       "params": [
@@ -238,7 +238,7 @@
           "raw": "a",
           "location": {
             "line": 6,
-            "column": 29
+            "column": 28
           }
         },
         {
@@ -247,22 +247,22 @@
           "raw": "1",
           "location": {
             "line": 6,
-            "column": 34
+            "column": 33
           }
         }
       ],
       "location": {
         "line": 6,
-        "column": 35
+        "column": 34
       }
     },
     "dataType": {
-      "kind": "primitive",
-      "name": "texto"
+      "kind": "class",
+      "name": "Mapa"
     },
     "location": {
       "line": 6,
-      "column": 35
+      "column": 34
     }
   },
   {
@@ -312,13 +312,13 @@
           "value": "cj",
           "location": {
             "line": 8,
-            "column": 21
+            "column": 24
           }
         },
         "property": "agregar",
         "location": {
           "line": 8,
-          "column": 24
+          "column": 27
         }
       },
       "params": [
@@ -328,22 +328,22 @@
           "raw": "1",
           "location": {
             "line": 8,
-            "column": 32
+            "column": 35
           }
         }
       ],
       "location": {
         "line": 8,
-        "column": 33
+        "column": 36
       }
     },
     "dataType": {
-      "kind": "primitive",
-      "name": "texto"
+      "kind": "class",
+      "name": "Conjunto"
     },
     "location": {
       "line": 8,
-      "column": 33
+      "column": 36
     }
   },
   {

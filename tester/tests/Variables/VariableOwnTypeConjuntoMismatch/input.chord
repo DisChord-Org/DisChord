@@ -1,0 +1,2 @@
+var cj tipo Conjunto es nuevo Conjunto()
+var x tipo numero es cj.agregar(1)
