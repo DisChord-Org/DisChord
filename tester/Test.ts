@@ -210,22 +210,47 @@ export abstract class Test {
         const targetPath = path.join(this.fixturePath, targetFilename);
 
         if (this.forceUpdate || !fs.existsSync(targetPath)) {
-            switch (snapshotType) {
-                case 'code':
-                    await Prettifier.savePrettified(targetPath, actualContent.trim() + '\n');
-                    break;
-                case 'ast':
-                    const formattedActual = JSON.stringify(JSON.parse(actualContent), null, 2);
-                    fs.writeFileSync(targetPath, formattedActual, 'utf-8');
-                    break;
-            }
+            const formatted = snapshotType === 'code'
+                ? await Prettifier.prettify(actualContent.trim() + '\n')
+                : JSON.stringify(JSON.parse(actualContent), null, 2);
 
-            console.log(`[SNAPSHOT UPDATED] ${targetPath}`);
+            if (this.writeSnapshotIfChanged(targetPath, formatted, snapshotType)) {
+                console.log(`[SNAPSHOT UPDATED] ${targetPath}`);
+            }
             return;
         }
 
         const expectedContent = snapshotType === 'ast' ? this.expectedAST : this.expectedCode;
         this.assertDeepEqual(actualContent, expectedContent, snapshotType);
+    }
+
+    /**
+     * Writes a snapshot only when its content differs from the existing file, ignoring line-ending
+     * differences, and keeps the existing file's line endings (CRLF or LF) when it does write.
+     *
+     * @method writeSnapshotIfChanged
+     * @param {string} targetPath - Snapshot file to write.
+     * @param {string} content - New snapshot content.
+     * @param {'ast' | 'code'} snapshotType - Snapshot type, which decides how contents are compared.
+     * @returns {boolean} True if the file was written.
+     * @protected
+     */
+    protected writeSnapshotIfChanged(targetPath: string, content: string, snapshotType: 'ast' | 'code'): boolean {
+        const normalize = (text: string): string => {
+            const unified = text.replace(/\r\n/g, '\n');
+            return snapshotType === 'code' ? unified.trim() : unified;
+        };
+
+        let eol = '\n';
+
+        if (fs.existsSync(targetPath)) {
+            const existing = fs.readFileSync(targetPath, 'utf-8');
+            if (normalize(existing) === normalize(content)) return false;
+            if (existing.includes('\r\n')) eol = '\r\n';
+        }
+
+        fs.writeFileSync(targetPath, content.replace(/\r\n/g, '\n').replace(/\n/g, eol), 'utf-8');
+        return true;
     }
 
     /**
