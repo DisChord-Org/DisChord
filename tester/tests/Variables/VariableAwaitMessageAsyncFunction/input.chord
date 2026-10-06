@@ -1,0 +1,6 @@
+@asincrono
+funcion f() {
+    enviar mensaje {
+        contenido "hola"
+    }
+}

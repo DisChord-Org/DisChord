@@ -1,0 +1,5 @@
+funcion f() {
+    enviar mensaje {
+        contenido "hola"
+    }
+}

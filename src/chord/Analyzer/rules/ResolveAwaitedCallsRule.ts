@@ -52,6 +52,34 @@ export class ResolveAwaitedCallsRule<T extends string, N extends BaseNode<T>> ex
         }
 
         if (node.type === TokenType.LLAMADA) this.resolve(node as CallNode<T, N>);
+
+        const awaitingMessage = this.awaitingConstruct(node);
+        if (awaitingMessage !== undefined) this.assertMayAwait(awaitingMessage, node.location);
+    }
+
+    /**
+     * Hook for a dialect whose constructs, not being calls, are emitted with a fixed `await`
+     * (dischord's `enviar mensaje`): the same rule applies to them as to an awaited call.
+     * @param {ASTNode<T, N>} node - Any node of the tree.
+     * @returns {string | undefined} The error to report if the node awaits and can't be used from a function that isn't async, or `undefined` if it doesn't await.
+     * @protected
+     */
+    protected awaitingConstruct (node: ASTNode<T, N>): string | undefined {
+        return undefined;
+    }
+
+    /**
+     * @param {string} message - The error to report.
+     * @param {BaseNode<T>['location']} location - Where.
+     * @throws {ChordError} If the innermost enclosing function-like body can't `await`.
+     * @private
+     */
+    private assertMayAwait (message: string, location: BaseNode<T>['location']): void {
+        if (this.callers.length > 0 && !this.callers[this.callers.length - 1]) throw new ChordError({
+            phase: ErrorLevel.Analysis,
+            message,
+            location
+        }).format();
     }
 
     private exit (node: ASTNode<T, N>): void {
@@ -83,11 +111,7 @@ export class ResolveAwaitedCallsRule<T extends string, N extends BaseNode<T>> ex
 
         if (!awaited) return;
 
-        if (this.callers.length > 0 && !this.callers[this.callers.length - 1]) throw new ChordError({
-            phase: ErrorLevel.Analysis,
-            message: `Se llama a la función asíncrona '${name}' desde una función que no es asíncrona; márcala con @asincrono`,
-            location: call.location
-        }).format();
+        this.assertMayAwait(`Se llama a la función asíncrona '${name}' desde una función que no es asíncrona; márcala con @asincrono`, call.location);
 
         this.context.symbolTable.markAwaited(call);
     }

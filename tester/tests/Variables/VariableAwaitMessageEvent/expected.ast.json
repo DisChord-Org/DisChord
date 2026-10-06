@@ -1,0 +1,59 @@
+[
+  {
+    "type": "importar",
+    "identificators": [
+      "createMessage"
+    ],
+    "isDestructured": true,
+    "path": "./lib/createMessage.js",
+    "location": {
+      "line": 0,
+      "column": 0
+    }
+  },
+  {
+    "type": "Evento",
+    "name": "mensajeCreado",
+    "body": [
+      {
+        "type": "CrearMensaje",
+        "object": {
+          "type": "BDO",
+          "mode": 0,
+          "blocks": {
+            "canal": {
+              "type": "IDENTIFICADOR",
+              "value": "canal",
+              "location": {
+                "line": 3,
+                "column": 15
+              }
+            },
+            "contenido": {
+              "type": "Literal",
+              "value": "hola",
+              "raw": "hola",
+              "location": {
+                "line": 4,
+                "column": 19
+              }
+            }
+          },
+          "body": [],
+          "location": {
+            "line": 5,
+            "column": 5
+          }
+        },
+        "location": {
+          "line": 5,
+          "column": 5
+        }
+      }
+    ],
+    "location": {
+      "line": 6,
+      "column": 1
+    }
+  }
+]

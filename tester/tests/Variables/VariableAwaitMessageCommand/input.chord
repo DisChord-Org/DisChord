@@ -1,0 +1,7 @@
+nuevo comando uno {
+    descripcion "uno";
+
+    enviar mensaje {
+        contenido "hola"
+    }
+}

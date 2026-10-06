@@ -11,6 +11,8 @@ import { ValidateButtonsRule } from "./rules/ValidateButtonsRule";
 import { ValidateEmbedsRule } from "./rules/ValidateEmbedsRule";
 import { RequiresMessageHelperRule } from "./rules/RequiresMessageHelperRule";
 import { RequiresUserExtensionsRule } from "./rules/RequiresUserExtensionsRule";
+import { DisChordResolveAwaitedCallsRule } from "./rules/DisChordResolveAwaitedCallsRule";
+import { ResolveAwaitedCallsRule } from "../../chord/Analyzer/rules/ResolveAwaitedCallsRule";
 
 /**
  * DisChord's semantic analysis rules, run over a file's complete AST between parsing and
@@ -49,6 +51,10 @@ export class DisChordAnalyzer extends Analyzer<DisChordNodeType, DisChordNode> {
         this.context.symbolTable.registerScopeOwner(DisChordTokenType.EVENTO, true);
 
         super.registerRules();
+
+        // Chord's awaited-calls rule is swapped for the dialect's, which also covers `enviar mensaje`,
+        // so the context stack is tracked once and not duplicated in a second rule.
+        this.rules = this.rules.map(rule => rule instanceof ResolveAwaitedCallsRule ? new DisChordResolveAwaitedCallsRule(this.context) : rule);
 
         DisChordAnalyzer.DisChordRules.forEach(RuleClass => {
             this.rules.push(new RuleClass(this.context));

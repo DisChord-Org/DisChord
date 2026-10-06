@@ -1,0 +1,6 @@
+nuevo evento mensajeCreado {
+    enviar mensaje {
+        canal canal
+        contenido "hola"
+    }
+}
