@@ -1,0 +1,32 @@
+var lista tipo numero[] es [1, 2]
+var a es lista.en(0)
+var r tipo numero es Aleatorio.entre(1, 6)
+var x es 1.5
+var obj es { clave 1 }
+var s es obj.si
+var m es obj.mas
+var w es obj.y(1)
+var v es obj.verdadero
+var e es obj.espacio
+var enc es lista.en(0).entre(1)
+
+clase Caja {
+    prop en es 1
+    prop entre es 2
+
+    funcion si() {
+        devolver esta.en
+    }
+
+    funcion y(n) {
+        devolver n
+    }
+}
+
+var c es nuevo Caja()
+var d es c.en
+var f es c.si()
+var g es c.y(1)
+
+consola.imprimir(a)
+consola.imprimir(r)

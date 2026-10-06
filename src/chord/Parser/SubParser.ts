@@ -1,4 +1,4 @@
-import { ASTNode, BaseNode, PeekType, Token, TokenTypeUnion } from "../types";
+import { ASTNode, BaseNode, PeekType, Token, TokenType, TokenTypeUnion } from "../types";
 import { SymbolTable } from "../SymbolsTable";
 import { Parser } from "./Parser";
 
@@ -10,6 +10,15 @@ import { Parser } from "./Parser";
  * It provides a proxy interface to the parent Parser's state and utility methods.
  */
 export abstract class SubParser<T extends string, N extends BaseNode<T>> {
+    /**
+     * Token types that look like a word but can't be taken as a member name: literals the lexer
+     * resolves from a word (`verdadero`, `indefinido`, ...), whose own value doesn't survive in
+     * a form that can be reused.
+     */
+    private static readonly NON_RECOVERABLE_MEMBER_NAMES: ReadonlySet<string> = new Set([
+        TokenType.IDENTIFICADOR, TokenType.BOOLEANO, TokenType.TEXTO, TokenType.NUMERO, TokenType.BIGINT, TokenType.Decorador, TokenType.Indefinido
+    ]);
+
     /**
      * @param parent - Reference to the orchestrator Parser instance (Chord or DisChord).
      */
@@ -35,6 +44,18 @@ export abstract class SubParser<T extends string, N extends BaseNode<T>> {
      */
     protected peek(type: PeekType = 'this'): Token<T> {
         return this.parent.peek(type);
+    }
+
+    /**
+     * Whether a token is a reserved word whose own text can be used as the name of a class member
+     * (`funcion en() {}`, `prop entre`), so members can carry the names of the core library's
+     * (`Lista.en`). Free functions, variables, parameters and class names don't use this: they keep
+     * rejecting reserved words.
+     * @param token - The token to check.
+     * @returns `true` if it is a keyword written as a plain word.
+     */
+    protected isReservedMemberName(token: Token<T>): boolean {
+        return !SubParser.NON_RECOVERABLE_MEMBER_NAMES.has(token.type) && /^[a-zA-Z][a-zA-Z0-9_]*$/.test(token.value);
     }
 
     /**

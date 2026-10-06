@@ -48,7 +48,11 @@ export class FunctionParser<T extends string, N extends BaseNode<T>> extends Sub
             id = this.consume(TokenType.IDENTIFICADOR, "Se esperaba el nombre del constructor.").value;
         } else {
             this.consume(TokenType.Funcion);
-            id = this.consume(TokenType.IDENTIFICADOR, "Se esperaba el nombre de la función.").value;
+
+            // a method may be named after a reserved word (`funcion en() {}`); a free function may not.
+            const nextToken = this.peek();
+            const nameType = flags.method && this.isReservedMemberName(nextToken) ? nextToken.type : TokenType.IDENTIFICADOR;
+            id = this.consume(nameType, "Se esperaba el nombre de la función.").value;
         }
 
         this.consume(TokenType.L_PAREN, `Después del nombre de la función se debe abrir una expresión con '(' para especificar los parámetros.`);

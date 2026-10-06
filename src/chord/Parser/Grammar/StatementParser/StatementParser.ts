@@ -4,6 +4,7 @@ import { Parser } from "../../Parser";
 import { SubParser } from "../../SubParser";
 import { ExpressionParser } from "../Expressions/ExpressionParser";
 import { FunctionParser } from "./FunctionParser";
+import { PropertyParser } from "./PropertyParser";
 
 /**
  * Structural statement dispatcher routing token flows down to specialized statement subparsers.
@@ -52,6 +53,10 @@ export class StatementParser<T extends string, N extends BaseNode<T>> extends Su
                 .setConstructor(false)
                 .setMethod(!!classContext)
                 .parse();
+        }
+
+        if (token.type === TokenType.Prop) {
+            return this.parent.get(PropertyParser).setClassMember(!!classContext).parse();
         }
 
         const targetSubParser = this.parent.getChordSubParserByToken(token.type);

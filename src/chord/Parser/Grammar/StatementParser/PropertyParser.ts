@@ -19,9 +19,26 @@ export class PropertyParser<T extends string, N extends BaseNode<T>> extends Sub
         super(parent);
     }
 
+    private isClassMember: boolean = false;
+
+    /**
+     * @param {boolean} value - Whether the property being parsed belongs to a class, which lets it be named after a reserved word.
+     * @returns {this}
+     */
+    public setClassMember (value: boolean): this {
+        this.isClassMember = value;
+        return this;
+    }
+
     public parse(): PropertyNode<T, N> {
+        const isClassMember = this.isClassMember;
+        this.isClassMember = false;
+
         this.consume(TokenType.Prop);
-        const id = this.consume(TokenType.IDENTIFICADOR, "Se esperaba el nombre de la propiedad").value;
+
+        const nextToken = this.peek();
+        const nameType = isClassMember && this.isReservedMemberName(nextToken) ? nextToken.type : TokenType.IDENTIFICADOR;
+        const id = this.consume(nameType, "Se esperaba el nombre de la propiedad").value;
         
         let value: ASTNode<T, N> = this.createNode<LiteralNode<T>>({
             type: TokenType.LITERAL,
