@@ -1,4 +1,5 @@
-import { CallNode, BaseNode, TokenType, TokenTypeUnion, IdentificatorNode, AccessNode } from "../../../types";
+import { CallNode, BaseNode, TokenType, TokenTypeUnion } from "../../../types";
+import { isAccessNode, isIdentificatorNode } from "../../../ast.guards";
 import { SubGenerator } from "../../SubGenerator";
 import { coreLibUtils } from "../../../corelib";
 
@@ -32,18 +33,16 @@ export class CallVisitor<T extends string, N extends BaseNode<T>> extends SubGen
         let translation: string;
         let isAsyncCall = false;
 
-        if (node.object.type === TokenType.ACCESO) {
-            const accessNode = node.object as AccessNode<T, N>;
-            translation = this.parent.visit(accessNode);
+        if (isAccessNode(node.object)) {
+            translation = this.parent.visit(node.object);
 
-            const symbol = this.parent.context.symbolTable.lookup(accessNode.property);
+            const symbol = this.parent.context.symbolTable.lookup(node.object.property);
             if (symbol?.metadata.isAsync) {
                 isAsyncCall = true;
             }
-        } else if (node.object.type === TokenType.IDENTIFICADOR) {
-            const identificatorNode = node.object as IdentificatorNode<T>;
-            const name = identificatorNode.value;
-            translation = coreLibUtils.resolveFunction(name) ?? name;
+        } else if (isIdentificatorNode(node.object)) {
+            const name = node.object.value;
+            translation = coreLibUtils.resolveFunction(node.object) ?? name;
 
             const symbol = this.parent.context.symbolTable.lookup(name);
             if (symbol?.metadata.isAsync) {

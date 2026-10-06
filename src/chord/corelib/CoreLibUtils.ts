@@ -1,7 +1,7 @@
 import { corelib } from "./corelib.data";
 import { isIdentificatorNode } from "../ast.guards";
 import { AnyDataType, DataType } from "../DataType";
-import { AccessNode, BaseNode } from "../types";
+import { AccessNode, ASTNode, BaseNode } from "../types";
 import { CoreLib, CoreLibClass, ResolvedMember } from "./corelib.types";
 
 /**
@@ -92,11 +92,11 @@ export class CoreLibUtils<C extends string = string> {
     }
 
     /**
-     * @param {string} name - Function name as written in source code.
-     * @returns {string | undefined} The callee it is transpiled to, or `undefined` if the core library doesn't map it.
+     * @param {ASTNode<T, N>} callee - What is being called.
+     * @returns {string | undefined} The callee it is transpiled to, or `undefined` if it isn't a plain name the core library maps.
      */
-    resolveFunction(name: string): string | undefined {
-        return this.hasOwn(this.corelib.functions, name) ? this.corelib.functions[name] : undefined;
+    resolveFunction<T extends string, N extends BaseNode<T>> (callee: ASTNode<T, N>): string | undefined {
+        return isIdentificatorNode(callee) && this.hasOwn(this.corelib.functions, callee.value) ? this.corelib.functions[callee.value] : undefined;
     }
 
     /**

@@ -2,7 +2,8 @@ import path from "node:path";
 import { AnalysisRule } from "../../../chord/Analyzer/AnalysisRule";
 import { walkAST } from "../../../chord/Analyzer/walkAST";
 import { buildSharedModuleImportSpecifier } from "../../../chord/Analyzer/sharedModulePath";
-import { ASTNode, ImportNode, LiteralNode, ODBNode, TokenType } from "../../../chord/types";
+import { ImportNode, LiteralNode, ODBNode, TokenType } from "../../../chord/types";
+import { isAccessNode, isIdentificatorNode } from "../../../chord/ast.guards";
 import { DisChordASTNode, DisChordNode, DisChordNodeType } from "../../types";
 import { userExtensionsModuleContent, userExtensionsModulePath, userPropertyNames } from "../../corelib";
 
@@ -34,13 +35,10 @@ export class RequiresUserExtensionsRule extends AnalysisRule<DisChordNodeType, D
         nodes.forEach(node => walkAST<DisChordNodeType, DisChordNode>(node, current => {
             if (needsUserExtensions) return;
 
-            if (current.type === TokenType.ACCESO) {
-                const access = current as unknown as { object: ASTNode<DisChordNodeType, DisChordNode>; property: string };
-                const objName = access.object.type === TokenType.IDENTIFICADOR
-                    ? (access.object as unknown as { value: string }).value
-                    : null;
+            if (isAccessNode(current)) {
+                const objName = isIdentificatorNode(current.object) ? current.object.value : null;
 
-                if (objName === 'usuario' && access.property in userPropertyNames) needsUserExtensions = true;
+                if (objName === 'usuario' && current.property in userPropertyNames) needsUserExtensions = true;
                 return;
             }
 

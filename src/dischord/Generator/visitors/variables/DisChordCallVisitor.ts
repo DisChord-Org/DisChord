@@ -19,13 +19,11 @@ export class DisChordCallVisitor extends CallVisitor<DisChordNodeType, DisChordN
      * @returns The generated code for the function call, which may be translated based on the core library mappings or fall back to the default generation if no mapping is found.
      */
     public override visit(node: CallNode<DisChordNodeType, DisChordNode>): string {
-        if (node.object.type === TokenType.IDENTIFICADOR) {
-            const translation = disChordCoreLibUtils.resolveFunction(node.object.value);
+        const translation = disChordCoreLibUtils.resolveFunction(node.object);
 
-            if (translation) {
-                const args = node.params.map(arg => this.parent.visit(arg)).join(', ');
-                return `${translation}(${args})`;
-            }
+        if (translation) {
+            const args = node.params.map(arg => this.parent.visit(arg)).join(', ');
+            return `${translation}(${args})`;
         }
 
         return super.visit(node);

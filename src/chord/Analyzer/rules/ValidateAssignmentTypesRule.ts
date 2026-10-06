@@ -1,6 +1,7 @@
 import { AnalysisRule } from "../AnalysisRule";
 import { walkAST } from "../walkAST";
-import { AssignmentNode, ASTNode, BaseNode, IdentificatorNode, TokenType } from "../../types";
+import { AssignmentNode, ASTNode, BaseNode, TokenType } from "../../types";
+import { isIdentificatorNode } from "../../ast.guards";
 import { TypeInferrer } from "../TypeInferrer";
 import { ChordError, ErrorLevel } from "../../../errors/ChordError";
 
@@ -73,10 +74,9 @@ export class ValidateAssignmentTypesRule<T extends string, N extends BaseNode<T>
      * target's resolved type.
      */
     private validateAssignment (node: AssignmentNode<T, N>): void {
-        if (node.left.type !== TokenType.IDENTIFICADOR) return;
+        if (!isIdentificatorNode(node.left)) return;
 
-        const name = (node.left as IdentificatorNode<T>).value;
-        const declaredType = this.context.symbolTable.lookup(name)?.dataType;
+        const declaredType = this.context.symbolTable.lookup(node.left.value)?.dataType;
         if (!declaredType) return;
 
         const assignedType = this.typeInferrer.infer(node.assignment);
@@ -84,7 +84,7 @@ export class ValidateAssignmentTypesRule<T extends string, N extends BaseNode<T>
 
         if (!declaredType.isAssignableFrom(assignedType)) throw new ChordError({
             phase: ErrorLevel.Analysis,
-            message: `La variable '${name}' es de tipo '${declaredType.format()}' pero se le asignó un valor de tipo '${assignedType.format()}'`,
+            message: `La variable '${node.left.value}' es de tipo '${declaredType.format()}' pero se le asignó un valor de tipo '${assignedType.format()}'`,
             location: node.location
         }).format();
     }

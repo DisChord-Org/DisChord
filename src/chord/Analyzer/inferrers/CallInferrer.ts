@@ -1,4 +1,5 @@
-import { ASTNode, AccessNode, BaseNode, CallNode, TokenType, TokenTypeUnion } from "../../types";
+import { ASTNode, BaseNode, CallNode, TokenType, TokenTypeUnion } from "../../types";
+import { isAccessNode } from "../../ast.guards";
 import { DataType } from "../../DataType";
 import { coreLibUtils } from "../../corelib";
 import { SubInferrer } from "../SubInferrer";
@@ -13,9 +14,8 @@ export class CallInferrer<T extends string, N extends BaseNode<T>> extends SubIn
 
     public infer (node: ASTNode<T, N>): DataType | undefined {
         const callee = (node as CallNode<T, N>).object;
-        if (callee.type !== TokenType.ACCESO) return undefined;
+        if (!isAccessNode(callee)) return undefined;
 
-        const access = callee as AccessNode<T, N>;
-        return coreLibUtils.resolveReturnType(access, true, this.parent.infer(access.object));
+        return coreLibUtils.resolveReturnType(callee, true, this.parent.infer(callee.object));
     }
 }
