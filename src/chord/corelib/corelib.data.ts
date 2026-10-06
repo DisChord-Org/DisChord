@@ -685,7 +685,7 @@ export const corelib = {
                     transpile: 'set',
                     returns: AnyDataType.Any
                 },
-                existe: {
+                tiene: {
                     transpile: 'has',
                     returns: PrimitiveDataType.Booleano
                 },
@@ -693,7 +693,7 @@ export const corelib = {
                     transpile: 'delete',
                     returns: PrimitiveDataType.Booleano
                 },
-                vaciar: {
+                limpiar: {
                     transpile: 'clear',
                     returns: VoidDataType.Void
                 }
@@ -709,7 +709,7 @@ export const corelib = {
             receiver: ClassDataType.of(ClassesEnum.Conjunto),
             constructs: 'Set',
             methods: {
-                sumar: {
+                agregar: {
                     transpile: 'add',
                     returns: AnyDataType.Any
                 }

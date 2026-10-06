@@ -1,9 +1,9 @@
 var m tipo Mapa es nuevo Mapa()
 m.poner("a", 1)
-var hay tipo booleano es m.existe("a")
+var hay tipo booleano es m.tiene("a")
 var tam tipo numero es m.tamano
 var c es nuevo Conjunto()
-c.sumar(1)
+c.agregar(1)
 var f tipo Fecha es nuevo Fecha()
 
 consola.imprimir(hay)

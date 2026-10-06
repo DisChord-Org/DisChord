@@ -1,0 +1,7 @@
+var m tipo Mapa es nuevo Mapa()
+var a tipo booleano es m.tiene("a")
+m.limpiar()
+var c tipo Conjunto es nuevo Conjunto()
+c.agregar(1)
+
+consola.imprimir(a)
