@@ -1,5 +1,4 @@
 import { AnalysisRule } from "../AnalysisRule";
-import { walkAST } from "../walkAST";
 import { ASTNode, BaseNode, ListNode, TokenType, VariableNode } from "../../types";
 import { DataType, TupleDataType, VoidDataType } from "../../DataType";
 import { TypeInferrer } from "../TypeInferrer";
@@ -26,7 +25,7 @@ import { ChordError, ErrorLevel } from "../../../errors/ChordError";
  *    ...), or a function's return value (functions have no declared return type yet).
  *
  * Mirrors `BindDeclarationsRule`'s own traversal: classes and functions get their own lexical
- * scope for their body, entered/exited via `walkAST`'s `exit` hook, so a variable's resolved type
+ * scope for their body, kept entered by `walkScoped` while it is visited, so a variable's resolved type
  * lands on the same `SymbolTable` scope entry `BindDeclarationsRule` created for it.
  */
 export class ResolveVariableTypesRule<T extends string, N extends BaseNode<T>> extends AnalysisRule<T, N> {
@@ -41,35 +40,20 @@ export class ResolveVariableTypesRule<T extends string, N extends BaseNode<T>> e
      * @override
      */
     check (nodes: ASTNode<T, N>[]): void {
-        nodes.forEach(node => walkAST<T, N>(node, current => this.enter(current), current => this.exit(current)));
+        this.walkScoped(nodes, current => this.enter(current));
     }
 
     /**
-     * Mirrors {@link BindDeclarationsRule}'s scope tracking (enter the scope of each node owning one) and, for
-     * a `VariableNode`, resolves and stores its `dataType` via {@link resolveDataType}.
+     * For a `VariableNode`, resolves and stores its `dataType` via {@link resolveDataType}.
      * @private
      */
     private enter (node: ASTNode<T, N>): void {
-        if (this.context.symbolTable.ownsScope(node)) {
-            this.context.symbolTable.enterScope(node);
-        }
-
         switch (node.type) {
             case TokenType.VARIABLE:
                 const variableNode = node as VariableNode<T, N>;
                 const dataType = this.resolveDataType(variableNode);
                 this.context.symbolTable.setDataType(variableNode.id, dataType);
                 break;
-        }
-    }
-
-    /**
-     * Mirrors {@link BindDeclarationsRule}'s scope tracking (exit it again).
-     * @private
-     */
-    private exit (node: ASTNode<T, N>): void {
-        if (this.context.symbolTable.ownsScope(node)) {
-            this.context.symbolTable.exitScope();
         }
     }
 

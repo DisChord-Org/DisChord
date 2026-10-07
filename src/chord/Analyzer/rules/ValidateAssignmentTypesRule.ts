@@ -1,5 +1,4 @@
 import { AnalysisRule } from "../AnalysisRule";
-import { walkAST } from "../walkAST";
 import { AssignmentNode, ASTNode, BaseNode, TokenType } from "../../types";
 import { isIdentificatorNode } from "../../ast.guards";
 import { TypeInferrer } from "../TypeInferrer";
@@ -31,34 +30,20 @@ export class ValidateAssignmentTypesRule<T extends string, N extends BaseNode<T>
      * @override
      */
     check (nodes: ASTNode<T, N>[]): void {
-        nodes.forEach(node => walkAST<T, N>(node, current => this.enter(current), current => this.exit(current)));
+        this.walkScoped(nodes, current => this.enter(current));
     }
 
     /**
-     * Mirrors `ResolveVariableTypesRule`'s scope tracking (enter the scope of each node owning one) so a
+     * Validates each reassignment. `walkScoped` keeps the scope of the enclosing nodes entered, so a
      * reassignment inside a nested scope resolves its target against the same `SymbolTable` entry
      * earlier passes created for it.
      * @private
      */
     private enter (node: ASTNode<T, N>): void {
-        if (this.context.symbolTable.ownsScope(node)) {
-            this.context.symbolTable.enterScope(node);
-        }
-
         switch (node.type) {
             case TokenType.ASIGNACION:
                 this.validateAssignment(node as AssignmentNode<T, N>);
                 break;
-        }
-    }
-
-    /**
-     * Mirrors `ResolveVariableTypesRule`'s scope tracking (exit it again).
-     * @private
-     */
-    private exit (node: ASTNode<T, N>): void {
-        if (this.context.symbolTable.ownsScope(node)) {
-            this.context.symbolTable.exitScope();
         }
     }
 

@@ -1,5 +1,4 @@
 import { AnalysisRule } from "../AnalysisRule";
-import { walkAST } from "../walkAST";
 import { TypeInferrer } from "../TypeInferrer";
 import { ASTNode, BaseNode, FunctionNode, ReturnNode, TokenType } from "../../types";
 import { isFunctionNode } from "../../ast.guards";
@@ -30,12 +29,10 @@ export class ValidateReturnTypesRule<T extends string, N extends BaseNode<T>> ex
      * @override
      */
     check (nodes: ASTNode<T, N>[]): void {
-        nodes.forEach(node => walkAST<T, N>(node, current => this.enter(current), current => this.exit(current)));
+        this.walkScoped(nodes, current => this.enter(current), current => this.exit(current));
     }
 
     private enter (node: ASTNode<T, N>): void {
-        if (this.context.symbolTable.ownsScope(node)) this.context.symbolTable.enterScope(node);
-
         if (isFunctionNode(node)) this.functions.push({ node, returns: false });
         else if (node.type === TokenType.Devolver) this.validate(node as ReturnNode<T, N>);
     }
@@ -50,8 +47,6 @@ export class ValidateReturnTypesRule<T extends string, N extends BaseNode<T>> ex
                 frame.node
             );
         }
-
-        if (this.context.symbolTable.ownsScope(node)) this.context.symbolTable.exitScope();
     }
 
     /**

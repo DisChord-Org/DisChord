@@ -1,5 +1,4 @@
 import { AnalysisRule } from "../AnalysisRule";
-import { walkAST } from "../walkAST";
 import { TypeInferrer } from "../TypeInferrer";
 import { UserMemberResolver } from "../UserMemberResolver";
 import { ASTNode, BaseNode, CallNode, Symbol, SymbolKind, TokenType } from "../../types";
@@ -31,16 +30,11 @@ export class ValidateCallArgumentsRule<T extends string, N extends BaseNode<T>> 
      * @override
      */
     check (nodes: ASTNode<T, N>[]): void {
-        nodes.forEach(node => walkAST<T, N>(node, current => this.enter(current), current => this.exit(current)));
+        this.walkScoped(nodes, current => this.enter(current));
     }
 
     private enter (node: ASTNode<T, N>): void {
-        if (this.context.symbolTable.ownsScope(node)) this.context.symbolTable.enterScope(node);
         if (node.type === TokenType.LLAMADA) this.validate(node as CallNode<T, N>);
-    }
-
-    private exit (node: ASTNode<T, N>): void {
-        if (this.context.symbolTable.ownsScope(node)) this.context.symbolTable.exitScope();
     }
 
     /**

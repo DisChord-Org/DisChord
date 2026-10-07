@@ -12,8 +12,8 @@ import { ASTNode, BaseNode, CompilerMetadataKind, SymbolKind } from "../../types
  * whatever had already been parsed earlier in the same left-to-right pass.
  *
  * Classes and functions (and whatever else the dialect declares through `SymbolTable.registerScopeOwner`)
- * get their own lexical scope for their body, bound to their node and entered/exited via `walkAST`'s
- * `exit` hook. Later passes reopen the same scope through `enterScope(node)`, and this is the only
+ * get their own lexical scope for their body, bound to their node and entered/exited by its own
+ * `enter`/`exit` hooks. Later passes reopen the same scope through `enterScope(node)`, and this is the only
  * pass that registers symbols in them.
  */
 export class BindDeclarationsRule<T extends string, N extends BaseNode<T>> extends AnalysisRule<T, N> {

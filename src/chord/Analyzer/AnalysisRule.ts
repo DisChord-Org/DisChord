@@ -1,5 +1,6 @@
 import { ASTNode, BaseNode } from "../types";
 import { CompilationContext } from "../../cli/commands/CompileCommand";
+import { walkAST } from "./walkAST";
 
 /**
  * Base class for a single semantic analysis rule.
@@ -29,6 +30,41 @@ export abstract class AnalysisRule<T extends string, N extends BaseNode<T>> {
      * @throws {ChordError} For any violation this rule finds.
      */
     abstract check (nodes: ASTNode<T, N>[]): void;
+
+    /**
+     * Walks `nodes` like `walkAST`, keeping the `SymbolTable` scope of every node that owns one
+     * (see `SymbolTable.ownsScope`) entered while its subtree is visited: the scope is entered
+     * before `visit` and exited after `exit`, which still sees it open. If a hook throws, the
+     * scopes opened so far are exited before the error propagates, so the stack stays balanced.
+     * @param {ASTNode<T, N>[]} nodes - The top-level AST nodes to walk.
+     * @param {(node: ASTNode<T, N>) => void} visit - Called for each node, pre-order.
+     * @param {(node: ASTNode<T, N>) => void} [exit] - Called for each node, post-order.
+     * @protected
+     */
+    protected walkScoped (nodes: ASTNode<T, N>[], visit: (node: ASTNode<T, N>) => void, exit?: (node: ASTNode<T, N>) => void): void {
+        const symbolTable = this.context.symbolTable;
+        let opened = 0;
+
+        try {
+            nodes.forEach(node => walkAST<T, N>(node, current => {
+                if (symbolTable.ownsScope(current)) {
+                    symbolTable.enterScope(current);
+                    opened++;
+                }
+
+                visit(current);
+            }, current => {
+                exit?.(current);
+
+                if (symbolTable.ownsScope(current)) {
+                    symbolTable.exitScope();
+                    opened--;
+                }
+            }));
+        } finally {
+            while (opened-- > 0) symbolTable.exitScope();
+        }
+    }
 }
 
 /**
