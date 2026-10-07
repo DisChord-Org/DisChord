@@ -1,0 +1,11 @@
+var llamadas es 0
+
+funcion obtener() {
+    llamadas es llamadas mas 1
+    devolver [ "a", "b" ]
+}
+
+para (item en obtener()) {
+    consola.imprimir(item)
+}
+consola.imprimir(llamadas)

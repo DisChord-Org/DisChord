@@ -1,0 +1,14 @@
+var lista es [ 1, 2 ]
+var obj es {
+    k 1
+}
+
+para (i en rango(2)) {
+    consola.imprimir(i)
+}
+para (x en lista) {
+    consola.imprimir(x)
+}
+para (k en obj) {
+    consola.imprimir(k)
+}

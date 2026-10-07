@@ -1,6 +1,7 @@
 import { LoopNode, BaseNode, TokenType, TokenTypeUnion, ASTNode, CallNode } from "../../../types";
 import { isIdentificatorNode } from "../../../ast.guards";
 import { SubGenerator } from "../../SubGenerator";
+import { walkAST } from "../../../Analyzer/walkAST";
 
 /**
  * Atomic SubGenerator compiling Chord loop structures ('bucle').
@@ -51,6 +52,25 @@ export class LoopVisitor<T extends string, N extends BaseNode<T>> extends SubGen
             }
         }
 
+        if (this.runsCode(node.iterable)) {
+            return `for (let ${varName} of ((value) => Array.isArray(value) ? value : Object.keys(value))(${iterable})) {\n${body}\n}`;
+        }
+
         return `for (let ${varName} of (Array.isArray(${iterable}) ? ${iterable} : Object.keys(${iterable}))) {\n${body}\n}`;
+    }
+
+    /**
+     * @param {ASTNode<T, N>} node - An expression.
+     * @returns {boolean} Whether evaluating it can run code, so evaluating it twice is not safe.
+     * @private
+     */
+    private runsCode(node: ASTNode<T, N>): boolean {
+        let runs = false;
+
+        walkAST<T, N>(node, current => {
+            if (current.type === TokenType.LLAMADA || current.type === TokenType.Nuevo) runs = true;
+        });
+
+        return runs;
     }
 }

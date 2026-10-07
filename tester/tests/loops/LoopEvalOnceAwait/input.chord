@@ -1,0 +1,12 @@
+var llamadas es 0
+
+@asincrono
+funcion obtener() {
+    llamadas es llamadas mas 1
+    devolver [ 1, 2, 3 ]
+}
+
+para (n en obtener()) {
+    consola.imprimir(n)
+}
+consola.imprimir(llamadas)

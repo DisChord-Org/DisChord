@@ -1,0 +1,246 @@
+[
+  {
+    "type": "importar",
+    "identificators": [],
+    "path": "./lib/consoleRuntime.js",
+    "isDestructured": false,
+    "location": {
+      "line": 0,
+      "column": 0
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "lista",
+    "value": {
+      "type": "Lista",
+      "body": [
+        {
+          "type": "Literal",
+          "value": 1,
+          "raw": "1",
+          "location": {
+            "line": 1,
+            "column": 16
+          }
+        },
+        {
+          "type": "Literal",
+          "value": 2,
+          "raw": "2",
+          "location": {
+            "line": 1,
+            "column": 19
+          }
+        }
+      ],
+      "location": {
+        "line": 1,
+        "column": 21
+      }
+    },
+    "location": {
+      "line": 1,
+      "column": 21
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "obj",
+    "value": {
+      "type": "BDO",
+      "mode": 0,
+      "blocks": {
+        "k": {
+          "type": "Literal",
+          "value": 1,
+          "raw": "1",
+          "location": {
+            "line": 3,
+            "column": 7
+          }
+        }
+      },
+      "body": [],
+      "location": {
+        "line": 4,
+        "column": 1
+      }
+    },
+    "location": {
+      "line": 4,
+      "column": 1
+    }
+  },
+  {
+    "type": "Bucle",
+    "var": "i",
+    "iterable": {
+      "type": "Llamada",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "rango",
+        "location": {
+          "line": 6,
+          "column": 12
+        }
+      },
+      "params": [
+        {
+          "type": "Literal",
+          "value": 2,
+          "raw": "2",
+          "location": {
+            "line": 6,
+            "column": 18
+          }
+        }
+      ],
+      "location": {
+        "line": 6,
+        "column": 19
+      }
+    },
+    "body": [
+      {
+        "type": "Llamada",
+        "object": {
+          "type": "Acceso",
+          "object": {
+            "type": "IDENTIFICADOR",
+            "value": "consola",
+            "location": {
+              "line": 7,
+              "column": 5
+            }
+          },
+          "property": "imprimir",
+          "location": {
+            "line": 7,
+            "column": 13
+          }
+        },
+        "params": [
+          {
+            "type": "IDENTIFICADOR",
+            "value": "i",
+            "location": {
+              "line": 7,
+              "column": 22
+            }
+          }
+        ],
+        "location": {
+          "line": 7,
+          "column": 23
+        }
+      }
+    ],
+    "location": {
+      "line": 8,
+      "column": 1
+    }
+  },
+  {
+    "type": "Bucle",
+    "var": "x",
+    "iterable": {
+      "type": "IDENTIFICADOR",
+      "value": "lista",
+      "location": {
+        "line": 9,
+        "column": 12
+      }
+    },
+    "body": [
+      {
+        "type": "Llamada",
+        "object": {
+          "type": "Acceso",
+          "object": {
+            "type": "IDENTIFICADOR",
+            "value": "consola",
+            "location": {
+              "line": 10,
+              "column": 5
+            }
+          },
+          "property": "imprimir",
+          "location": {
+            "line": 10,
+            "column": 13
+          }
+        },
+        "params": [
+          {
+            "type": "IDENTIFICADOR",
+            "value": "x",
+            "location": {
+              "line": 10,
+              "column": 22
+            }
+          }
+        ],
+        "location": {
+          "line": 10,
+          "column": 23
+        }
+      }
+    ],
+    "location": {
+      "line": 11,
+      "column": 1
+    }
+  },
+  {
+    "type": "Bucle",
+    "var": "k",
+    "iterable": {
+      "type": "IDENTIFICADOR",
+      "value": "obj",
+      "location": {
+        "line": 12,
+        "column": 12
+      }
+    },
+    "body": [
+      {
+        "type": "Llamada",
+        "object": {
+          "type": "Acceso",
+          "object": {
+            "type": "IDENTIFICADOR",
+            "value": "consola",
+            "location": {
+              "line": 13,
+              "column": 5
+            }
+          },
+          "property": "imprimir",
+          "location": {
+            "line": 13,
+            "column": 13
+          }
+        },
+        "params": [
+          {
+            "type": "IDENTIFICADOR",
+            "value": "k",
+            "location": {
+              "line": 13,
+              "column": 22
+            }
+          }
+        ],
+        "location": {
+          "line": 13,
+          "column": 23
+        }
+      }
+    ],
+    "location": {
+      "line": 14,
+      "column": 1
+    }
+  }
+]
