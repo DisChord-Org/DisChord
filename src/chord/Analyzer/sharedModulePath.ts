@@ -7,9 +7,9 @@ import { CompilationContext } from "../../cli/commands/CompileCommand";
  * specific file's* own compiled output location, which can sit at any depth under `dist/` since
  * source files mirror arbitrarily nested `src/` folders.
  *
- * Lives alongside `walkAST` as a tool for `AnalysisRule`s specifically (its only callers): both
- * are what a rule needs to insert a synthetic shared-module import correctly, before generation
- * ever runs.
+ * Lives in the Analyzer folder as a tool for `AnalysisRule`s specifically (its only callers): it is
+ * what a rule needs to insert a synthetic shared-module import correctly, before generation ever
+ * runs.
  * @template {string} T - Extensible token type string vector.
  * @param {CompilationContext<T>} context - The active compilation context.
  * @param {string} modulePathRelativeToDist - The shared module's path, relative to `dist/`.

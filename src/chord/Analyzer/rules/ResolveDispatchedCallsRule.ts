@@ -1,5 +1,5 @@
 import { AnalysisRule } from "../AnalysisRule";
-import { walkAST } from "../walkAST";
+import { walkAST } from "../../walkAST";
 import { TypeInferrer } from "../TypeInferrer";
 import { ASTNode, AccessNode, BaseNode, CallNode, TokenType } from "../../types";
 import { isCallNode, isAccessNode } from "../../ast.guards";

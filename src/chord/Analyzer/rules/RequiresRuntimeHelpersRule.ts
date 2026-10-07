@@ -1,6 +1,6 @@
 import path from "node:path";
 import { AnalysisRule } from "../AnalysisRule";
-import { walkAST } from "../walkAST";
+import { walkAST } from "../../walkAST";
 import { ASTNode, BaseNode, ImportNode, TokenType } from "../../types";
 import { coreLibUtils, runtimeHelperNames, runtimeHelpersModuleContent, runtimeHelpersModulePath } from "../../corelib";
 import { isAccessNode, isCallNode, isIdentificatorNode } from "../../ast.guards";

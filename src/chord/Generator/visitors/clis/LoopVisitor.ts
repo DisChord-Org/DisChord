@@ -1,7 +1,7 @@
 import { LoopNode, BaseNode, TokenType, TokenTypeUnion, ASTNode, CallNode } from "../../../types";
 import { isIdentificatorNode } from "../../../ast.guards";
 import { SubGenerator } from "../../SubGenerator";
-import { walkAST } from "../../../Analyzer/walkAST";
+import { walkAST } from "../../../walkAST";
 
 /**
  * Atomic SubGenerator compiling Chord loop structures ('bucle').

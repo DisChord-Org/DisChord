@@ -1,5 +1,5 @@
 import { AnalysisRule } from "../../../chord/Analyzer/AnalysisRule";
-import { walkAST } from "../../../chord/Analyzer/walkAST";
+import { walkAST } from "../../../chord/walkAST";
 import { SymbolKind } from "../../../chord/types";
 import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType, CommandNode, EventNode, StartBotNode } from "../../types";
 import { DisChordError, ErrorLevel } from "../../../errors/ChordError";

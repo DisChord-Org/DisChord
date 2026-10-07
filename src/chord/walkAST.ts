@@ -1,4 +1,4 @@
-import { ASTNode, BaseNode } from "../types";
+import { ASTNode, BaseNode } from "./types";
 
 /**
  * Checks whether a value looks like an AST node (has both `type` and `location`), without

@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { AnalysisRule } from "../AnalysisRule";
-import { walkAST } from "../walkAST";
+import { walkAST } from "../../walkAST";
 import { isImportNode } from "../../ast.guards";
 import { ASTNode, BaseNode } from "../../types";
 import { ChordError, ErrorLevel } from "../../../errors/ChordError";

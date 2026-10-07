@@ -1,5 +1,5 @@
 import { AnalysisRule } from "../AnalysisRule";
-import { walkAST } from "../walkAST";
+import { walkAST } from "../../walkAST";
 import { isClassNode, isFunctionNode, isPropertyNode, isVariableNode } from "../../ast.guards";
 import { ASTNode, BaseNode, CompilerMetadataKind, SymbolKind } from "../../types";
 

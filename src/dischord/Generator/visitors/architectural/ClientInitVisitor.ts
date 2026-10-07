@@ -5,7 +5,7 @@ import { DisChordNode, DisChordNodeType, DisChordTokenType, StartBotNode } from 
 import { intentsMap } from "../../constants/mappings";
 import { SubGenerator } from "../../../../chord/Generator/SubGenerator";
 import { IdentificatorNode, ImportNode, TokenType, TokenTypeUnion } from "../../../../chord/types";
-import { walkAST } from "../../../../chord/Analyzer/walkAST";
+import { walkAST } from "../../../../chord/walkAST";
 import { ImportVisitor } from "../../../../chord/Generator/visitors/modularity/ImportVisitor";
 
 /**

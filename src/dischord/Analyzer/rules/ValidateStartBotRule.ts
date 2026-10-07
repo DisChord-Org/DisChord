@@ -1,5 +1,5 @@
 import { AnalysisRule } from "../../../chord/Analyzer/AnalysisRule";
-import { walkAST } from "../../../chord/Analyzer/walkAST";
+import { walkAST } from "../../../chord/walkAST";
 import { BDOValidator } from "../../../chord/Analyzer/BDOValidator";
 import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType, StartBotNode } from "../../types";
 import { StartBotSchema } from "../../Generator/constants/schemas";

@@ -1,6 +1,6 @@
 import path from "node:path";
 import { AnalysisRule } from "../../../chord/Analyzer/AnalysisRule";
-import { walkAST } from "../../../chord/Analyzer/walkAST";
+import { walkAST } from "../../../chord/walkAST";
 import { buildSharedModuleImportSpecifier } from "../../../chord/Analyzer/sharedModulePath";
 import { ImportNode, LiteralNode, ODBNode, TokenType } from "../../../chord/types";
 import { isAccessNode, isIdentificatorNode } from "../../../chord/ast.guards";

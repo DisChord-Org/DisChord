@@ -1,6 +1,6 @@
 import { ASTNode, BaseNode } from "../types";
 import { CompilationContext } from "../../cli/commands/CompileCommand";
-import { walkAST } from "./walkAST";
+import { walkAST } from "../walkAST";
 
 /**
  * Base class for a single semantic analysis rule.

@@ -1,5 +1,5 @@
 import { AnalysisRule } from "../../../chord/Analyzer/AnalysisRule";
-import { walkAST } from "../../../chord/Analyzer/walkAST";
+import { walkAST } from "../../../chord/walkAST";
 import { BDOValidator } from "../../../chord/Analyzer/BDOValidator";
 import { TokenType } from "../../../chord/types";
 import { DisChordError, ErrorLevel } from "../../../errors/ChordError";

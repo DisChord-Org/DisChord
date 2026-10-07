@@ -1,5 +1,5 @@
 import { AnalysisRule } from "../AnalysisRule";
-import { walkAST } from "../walkAST";
+import { walkAST } from "../../walkAST";
 import { ASTNode, BaseNode, CallNode, TokenType } from "../../types";
 import { ChordError, ErrorLevel } from "../../../errors/ChordError";
 
