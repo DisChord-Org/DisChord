@@ -1,0 +1,11 @@
+clase Caja {
+    funcion tiene(x) {
+        devolver "caja " mas x
+    }
+}
+
+funcion hayEn(c, x) {
+    devolver c.tiene(x)
+}
+
+consola.imprimir(hayEn(nuevo Caja(), "a"))

@@ -1,0 +1,11 @@
+funcion sumar(c, x) {
+    c.agregar(x)
+}
+
+var l es [1]
+var cj es nuevo Conjunto()
+sumar(l, 2)
+sumar(cj, 2)
+
+consola.imprimir(l)
+consola.imprimir(cj.tamano)

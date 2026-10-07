@@ -1,0 +1,10 @@
+funcion limpio(c) {
+    devolver c.limpiar()
+}
+
+var m es nuevo Mapa()
+m.poner("a", 1)
+
+consola.imprimir(limpio("  hola  "))
+limpio(m)
+consola.imprimir(m.tamano)

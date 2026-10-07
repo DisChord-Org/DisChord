@@ -34,8 +34,9 @@ export const asyncRuntimeHelperNames: ReadonlySet<string> = new Set([ 'chordEspe
  * Raw JavaScript string content for the shared helpers that have no one-to-one JavaScript
  * equivalent (`esperar`, `Aleatorio.*`, `Mates.limitar`) and the three that dispatch on the receiver at
  * run time (`chordTiene`, `chordLimpiar`, `chordAgregar`, see `CoreLibUtils.resolveUnionDispatch`), each
- * delegating to the receiver's own method of the original name when it is neither a core library
- * value nor a list/string. Written once to
+ * falling back, when the receiver is neither a core library value nor a list/string, to its own method
+ * of the original name if it has one, and else to the native JavaScript member the name has always
+ * been emitted as (`includes`, `trim`, `push`). Written once to
  * `dist/lib/runtimeHelpers.js` (only when a compiled file uses at least one) and imported by name
  * by the files that do, instead of each one duplicating them inline.
  * @type {string}
@@ -71,21 +72,27 @@ export const runtimeHelpersModuleContent = `
         if (receiver instanceof Map || receiver instanceof Set) return receiver.has(value);
         if (typeof receiver === 'string' || Array.isArray(receiver)) return receiver.includes(value);
 
-        return receiver.tiene(value);
+        if (typeof receiver.tiene === 'function') return receiver.tiene(value);
+
+        return receiver.includes(value);
     }
 
     export function chordLimpiar(receiver) {
         if (receiver instanceof Map || receiver instanceof Set) return receiver.clear();
         if (typeof receiver === 'string') return receiver.trim();
 
-        return receiver.limpiar();
+        if (typeof receiver.limpiar === 'function') return receiver.limpiar();
+
+        return receiver.trim();
     }
 
     export function chordAgregar(receiver, ...args) {
         if (receiver instanceof Set) return receiver.add(...args);
         if (Array.isArray(receiver)) return receiver.push(...args);
 
-        return receiver.agregar(...args);
+        if (typeof receiver.agregar === 'function') return receiver.agregar(...args);
+
+        return receiver.push(...args);
     }
 
     export function chordLimitar(value, min, max) {

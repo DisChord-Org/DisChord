@@ -1,9 +1,9 @@
 import { AnalysisRule } from "../AnalysisRule";
 import { walkAST } from "../walkAST";
 import { TypeInferrer } from "../TypeInferrer";
-import { ASTNode, BaseNode, CallNode } from "../../types";
+import { ASTNode, AccessNode, BaseNode, CallNode, TokenType } from "../../types";
 import { isCallNode, isAccessNode } from "../../ast.guards";
-import { UnionDataType } from "../../DataType";
+import { AnyDataType, DataType, UnionDataType } from "../../DataType";
 import { coreLibUtils } from "../../corelib";
 
 /**
@@ -12,8 +12,9 @@ import { coreLibUtils } from "../../corelib";
  * `c tipo texto|Mapa` doesn't say which class `c.tiene(x)` is a member of, so the call is either
  * emitted as the member every class of the union agrees on (`has`), or, when they differ, as a call
  * to a runtime helper that picks by what `c` really is when it runs (`chordTiene(c, x)`); see
- * `CoreLibUtils.resolveUnionDispatch` for the cases it leaves alone. Receivers of any other type are
- * not touched.
+ * `CoreLibUtils.resolveUnionDispatch` for the cases it leaves alone. A receiver of unknown type gets the
+ * same helper for the names that mean different members in different classes
+ * (`CoreLibUtils.resolveUnknownDispatch`). Receivers of any other type are not touched.
  *
  * Runs after every variable's type is resolved, walking the tree with the same scopes as the
  * earlier passes, and before `RequiresRuntimeHelpersRule`, which imports the helpers it picks.
@@ -39,15 +40,30 @@ export class ResolveDispatchedCallsRule<T extends string, N extends BaseNode<T>>
         if (this.context.symbolTable.ownsScope(node)) this.context.symbolTable.exitScope();
     }
 
+    /**
+     * Whether the receiver of a call has no known type: it has none (or `cualquiera`) and is a value, not
+     * a core library class (`Mapa.tiene`), `esta` or `super`.
+     */
+    private isUnknown (callee: AccessNode<T, N>, type: DataType | undefined): boolean {
+        if (callee.object.type === TokenType.Esta || callee.object.type === TokenType.Super) return false;
+        if (coreLibUtils.resolveStatic(callee)) return false;
+
+        return type === undefined || type instanceof AnyDataType;
+    }
+
     private resolve (call: CallNode<T, N>): void {
         const callee = call.object;
         if (!isAccessNode(callee)) return;
 
         const receiverType = this.typeInferrer.infer(callee.object);
-        if (!(receiverType instanceof UnionDataType)) return;
-
         const symbolTable = this.context.symbolTable;
-        const dispatch = coreLibUtils.resolveUnionDispatch(callee, receiverType, className => !!symbolTable.findMember(className, callee.property));
+        let dispatch;
+
+        if (receiverType instanceof UnionDataType) {
+            dispatch = coreLibUtils.resolveUnionDispatch(callee, receiverType, className => !!symbolTable.findMember(className, callee.property));
+        } else if (this.isUnknown(callee, receiverType)) {
+            dispatch = coreLibUtils.resolveUnknownDispatch(callee);
+        }
 
         if (dispatch) symbolTable.markDispatched(call, dispatch);
     }

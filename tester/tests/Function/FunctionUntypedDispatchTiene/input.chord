@@ -1,0 +1,13 @@
+funcion hayEn(c, x) {
+    devolver c.tiene(x)
+}
+
+var m es nuevo Mapa()
+m.poner("a", 1)
+var cj es nuevo Conjunto()
+cj.agregar("a")
+
+consola.imprimir(hayEn("abc", "b"))
+consola.imprimir(hayEn(["a"], "a"))
+consola.imprimir(hayEn(m, "a"))
+consola.imprimir(hayEn(cj, "z"))

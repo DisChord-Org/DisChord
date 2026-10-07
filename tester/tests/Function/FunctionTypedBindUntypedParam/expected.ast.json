@@ -1,5 +1,17 @@
 [
   {
+    "type": "importar",
+    "identificators": [
+      "chordTiene"
+    ],
+    "isDestructured": true,
+    "path": "./lib/runtimeHelpers.js",
+    "location": {
+      "line": 0,
+      "column": 0
+    }
+  },
+  {
     "type": "clase",
     "id": "Buscador",
     "body": [

@@ -262,7 +262,28 @@ export class CoreLibUtils<C extends string = string> {
         if (hasUserClass) transpiles.add(access.property);
         if (transpiles.size === 1) return hasUserClass ? undefined : { member: [ ...transpiles ][0] };
 
-        const helper = `chord${access.property.charAt(0).toUpperCase()}${access.property.slice(1)}`;
+        return this.dispatchHelper(access.property);
+    }
+
+    /**
+     * Decides how a method called on a receiver of unknown type (no type, or `cualquiera`) is emitted
+     * when the name means different members in different classes (`tiene` is `includes` in `Texto` and
+     * `Lista` but `has` in `Mapa` and `Conjunto`): through the runtime helper that picks at run time.
+     * The ambiguity is computed over the table. A member a class of the file declares under that name
+     * doesn't prevent it, since the helper calls the receiver's own method when it has one.
+     * @param {AccessNode<T, N>} access - The callee of the call.
+     * @returns {UnionDispatch | undefined} The helper, or `undefined` if the name is not ambiguous, is a property, or has no helper.
+     */
+    resolveUnknownDispatch<T extends string, N extends BaseNode<T>> (access: AccessNode<T, N>): UnionDispatch | undefined {
+        const members = this.resolveInstanceMembers(access);
+        if (members.some(found => found.isProperty)) return undefined;
+        if (new Set(members.map(found => found.member.transpile)).size < 2) return undefined;
+
+        return this.dispatchHelper(access.property);
+    }
+
+    private dispatchHelper (property: string): UnionDispatch | undefined {
+        const helper = `chord${property.charAt(0).toUpperCase()}${property.slice(1)}`;
         return runtimeHelperNames.has(helper) ? { helper } : undefined;
     }
 

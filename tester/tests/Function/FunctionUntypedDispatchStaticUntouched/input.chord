@@ -1,0 +1,11 @@
+clase Caja {
+    funcion tiene(x) {
+        devolver verdadero
+    }
+
+    funcion usar() {
+        devolver esta.tiene(1)
+    }
+}
+
+consola.imprimir(nuevo Caja().usar())

@@ -1,0 +1,179 @@
+[
+  {
+    "type": "importar",
+    "identificators": [],
+    "path": "./lib/consoleRuntime.js",
+    "isDestructured": false,
+    "location": {
+      "line": 0,
+      "column": 0
+    }
+  },
+  {
+    "type": "clase",
+    "id": "Caja",
+    "body": [
+      {
+        "type": "funcion",
+        "id": "tiene",
+        "metadata": {
+          "isConstructor": false,
+          "isMethod": true,
+          "isStatic": false,
+          "isAsync": false
+        },
+        "params": [
+          "x"
+        ],
+        "body": [
+          {
+            "type": "devolver",
+            "object": {
+              "type": "Literal",
+              "value": true,
+              "raw": "verdadero",
+              "location": {
+                "line": 3,
+                "column": 18
+              }
+            },
+            "location": {
+              "line": 3,
+              "column": 18
+            }
+          }
+        ],
+        "location": {
+          "line": 4,
+          "column": 5
+        }
+      },
+      {
+        "type": "funcion",
+        "id": "usar",
+        "metadata": {
+          "isConstructor": false,
+          "isMethod": true,
+          "isStatic": false,
+          "isAsync": false
+        },
+        "params": [],
+        "body": [
+          {
+            "type": "devolver",
+            "object": {
+              "type": "Llamada",
+              "object": {
+                "type": "Acceso",
+                "object": {
+                  "type": "esta",
+                  "value": "",
+                  "location": {
+                    "line": 7,
+                    "column": 18
+                  }
+                },
+                "property": "tiene",
+                "location": {
+                  "line": 7,
+                  "column": 23
+                }
+              },
+              "params": [
+                {
+                  "type": "Literal",
+                  "value": 1,
+                  "raw": "1",
+                  "location": {
+                    "line": 7,
+                    "column": 29
+                  }
+                }
+              ],
+              "location": {
+                "line": 7,
+                "column": 30
+              }
+            },
+            "location": {
+              "line": 7,
+              "column": 30
+            }
+          }
+        ],
+        "location": {
+          "line": 8,
+          "column": 5
+        }
+      }
+    ],
+    "location": {
+      "line": 9,
+      "column": 1
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 11,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 11,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "nuevo",
+        "object": {
+          "type": "Llamada",
+          "object": {
+            "type": "Acceso",
+            "object": {
+              "type": "Llamada",
+              "object": {
+                "type": "IDENTIFICADOR",
+                "value": "Caja",
+                "location": {
+                  "line": 11,
+                  "column": 24
+                }
+              },
+              "params": [],
+              "location": {
+                "line": 11,
+                "column": 29
+              }
+            },
+            "property": "usar",
+            "location": {
+              "line": 11,
+              "column": 31
+            }
+          },
+          "params": [],
+          "location": {
+            "line": 11,
+            "column": 36
+          }
+        },
+        "location": {
+          "line": 11,
+          "column": 36
+        }
+      }
+    ],
+    "location": {
+      "line": 11,
+      "column": 37
+    }
+  }
+]
