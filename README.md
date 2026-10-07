@@ -5,7 +5,7 @@
 DisChord is a modern, intuitive, and human-friendly programming language designed to bridge the gap between human language and machine code. By replacing cold, symbolic operators with natural word-based keywords, DisChord offers a readable and expressive syntax that feels as natural as writing a sentence.
 
 [![License: ISC](https://img.shields.io/badge/License-ISC-blue.svg)](https://opensource.org/licenses/ISC)
-[![Version](https://img.shields.io/badge/Version-1.4.7-green.svg)](package.json)
+[![Version](https://img.shields.io/badge/Version-1.5.0-green.svg)](package.json)
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/DisChord-Org/DisChord)
 
 ---
@@ -15,6 +15,7 @@ DisChord is a modern, intuitive, and human-friendly programming language designe
 - **Natural Operators**: Use `mas`, `menos`, `por`, and `entre` instead of `+`, `-`, `*`, and `/`.
 - **Expressive Logic**: Write logical conditions using `y`, `o`, `no`, `igual`, `mayor`, and `menor`.
 - **Human-Readable Flow**: Control program execution with `si`, `sino`, `para`, and `funcion`.
+- **Optional Static Types**: Annotate variables, parameters and return values with `tipo` and `->`; the compiler checks them before generating any code.
 - **Zero-Config Transpilation**: Compiles directly to standard JavaScript (ES Modules).
 - **Lightweight & Fast**: A minimalist lexer and parser architecture.
 
@@ -109,6 +110,65 @@ evento entradaMiembro {
 | **Text** | `var t es "Hola"` |
 | **Boolean** | `var b es verdadero` |
 | **Undefined** | `var u es indefinido` |
+| **List** | `var l es [ 1, 2, 3 ]` |
+| **Object (BDO)** | `var o es { modo "rapido" }` |
+
+There is no `null`: the absence of a value is always `indefinido`.
+
+### Types
+
+Types are optional. A variable, parameter or return value without an annotation is still inferred
+from what it holds; one with an annotation is checked, and a mismatch stops the compilation.
+
+| Type | Meaning | Example |
+| :--- | :--- | :--- |
+| `texto`, `numero`, `booleano`, `indefinido` | The primitives | `var n tipo numero es 5` |
+| `bdo` | A plain object (`{}`) | `var c tipo bdo es { modo "rapido" }` |
+| `T[]` | A list of `T` | `var tags tipo texto[] es [ "a", "b" ]` |
+| `[A, B]` | A tuple, position by position | `var par tipo [texto, numero] es [ "ether", 5 ]` |
+| `A\|B` | A union | `var id tipo texto\|numero es 7` |
+| `cualquiera` | Any value, unchecked | `var x tipo cualquiera es 1` |
+| `Mapa`, `Conjunto`, `Fecha`, ... | A core library class | `var m tipo Mapa es nuevo Mapa()` |
+| `MiClase` | A class declared in the file | `var c tipo Caja es nuevo Caja()` |
+
+Functions annotate their parameters with `tipo` and their return value with `->`. `nada` is the
+return type of a function that returns no value, and is only valid there.
+
+```js
+funcion saludar(quien tipo texto, veces tipo numero) -> texto {
+    para (_ en rango(veces)) {
+        devolver "Hola " mas quien
+    }
+}
+
+funcion avisar(mensaje tipo texto) -> nada {
+    consola.imprimir(mensaje)
+}
+
+@asincrono
+funcion cargar(id tipo numero) -> texto {
+    devolver "x"
+}
+```
+
+Types are checked when a variable is declared or reassigned, when a function returns, and when it
+is called:
+
+```js
+var edad tipo numero es 5
+edad es "veinte"
+// La variable 'edad' es de tipo 'numero' pero se le asignó un valor de tipo 'texto'
+
+funcion doble(n tipo numero) -> numero {
+    devolver n por 2
+}
+doble("tres")
+// El argumento 1 de 'doble' es de tipo 'texto', se esperaba 'numero'
+```
+
+The checks are structural for core library classes (a `Mapa` is not a `Conjunto`) and permissive for
+the classes you declare (any class instance is accepted where another is expected). Generic types
+(`Mapa<texto, numero>`) are not supported yet.
 
 ### Natural Operators
 
