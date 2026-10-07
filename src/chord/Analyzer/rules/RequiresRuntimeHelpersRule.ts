@@ -1,6 +1,5 @@
 import path from "node:path";
 import { AnalysisRule } from "../AnalysisRule";
-import { walkAST } from "../../walkAST";
 import { ASTNode, BaseNode, ImportNode, TokenType } from "../../types";
 import { coreLibUtils, runtimeHelperNames, runtimeHelpersModuleContent, runtimeHelpersModulePath } from "../../corelib";
 import { isAccessNode, isCallNode, isIdentificatorNode } from "../../ast.guards";
@@ -20,30 +19,57 @@ export class RequiresRuntimeHelpersRule<T extends string, N extends BaseNode<T>>
      * @override
      */
     check (nodes: ASTNode<T, N>[]): void {
-        const used = new Set<string>();
+        const helpers = this.collectHelpers(nodes);
+        if (helpers.size === 0) return;
 
-        const symbolTable = this.context.symbolTable;
+        this.insertImport(nodes, helpers);
+    }
 
-        nodes.forEach(node => walkAST<T, N>(node, current => {
-            if (symbolTable.ownsScope(current)) symbolTable.enterScope(current);
+    /**
+     * The runtime helper a node is emitted through, if any: the one the analyzer decided to dispatch
+     * a call through, the `transpile` of a static core library member, or the one a free function
+     * of the core library maps to (unless the file declares its own of that name).
+     * @param {ASTNode<T, N>} node - Any node of the tree, with the scope it lies in open.
+     * @returns {string | undefined} The helper's name, or `undefined` if the node uses none.
+     * @private
+     */
+    private helperOf (node: ASTNode<T, N>): string | undefined {
+        const dispatch = isCallNode(node) ? this.context.symbolTable.dispatchOf(node) : undefined;
+        const transpiled = dispatch
+            ? ('helper' in dispatch ? dispatch.helper : undefined)
+            : isAccessNode(node)
+                ? coreLibUtils.resolveStatic(node)?.member.transpile
+                : isCallNode(node) ? coreLibUtils.resolveFunction(node.object, this.isDeclared(node.object)) : undefined;
 
-            const dispatch = isCallNode(current) ? this.context.symbolTable.dispatchOf(current) : undefined;
-            const transpiled = dispatch
-                ? ('helper' in dispatch ? dispatch.helper : undefined)
-                : isAccessNode(current)
-                    ? coreLibUtils.resolveStatic(current)?.member.transpile
-                    : isCallNode(current) ? coreLibUtils.resolveFunction(current.object, this.isDeclared(current.object)) : undefined;
+        return transpiled !== undefined && runtimeHelperNames.has(transpiled) ? transpiled : undefined;
+    }
 
-            if (transpiled !== undefined && runtimeHelperNames.has(transpiled)) used.add(transpiled);
-        }, current => {
-            if (symbolTable.ownsScope(current)) symbolTable.exitScope();
-        }));
+    /**
+     * Walks the whole tree, with each node's scope open, and gathers the helpers it uses.
+     * @param {ASTNode<T, N>[]} nodes - The top-level AST nodes of the file.
+     * @returns {Set<string>} The names of the helpers used.
+     * @private
+     */
+    private collectHelpers (nodes: ASTNode<T, N>[]): Set<string> {
+        const helpers = new Set<string>();
 
-        if (used.size === 0) return;
+        this.walkScoped(nodes, node => {
+            const helper = this.helperOf(node);
+            if (helper !== undefined) helpers.add(helper);
+        });
 
+        return helpers;
+    }
+
+    /**
+     * Puts the import of `helpers` (sorted) at the front of the file and registers the module's
+     * content as an extra file to write.
+     * @private
+     */
+    private insertImport (nodes: ASTNode<T, N>[], helpers: Set<string>): void {
         const importNode: ImportNode<T> = {
             type: TokenType.Importar,
-            identificators: [ ...used ].sort(),
+            identificators: [ ...helpers ].sort(),
             isDestructured: true,
             path: buildSharedModuleImportSpecifier(this.context, runtimeHelpersModulePath),
             location: { line: 0, column: 0 }
