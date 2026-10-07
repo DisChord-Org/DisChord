@@ -1,5 +1,4 @@
 import { AnalysisRule } from "../AnalysisRule";
-import { walkAST } from "../../walkAST";
 import { TypeInferrer } from "../TypeInferrer";
 import { ASTNode, AccessNode, BaseNode, CallNode, TokenType } from "../../types";
 import { isCallNode, isAccessNode } from "../../ast.guards";
@@ -26,18 +25,11 @@ export class ResolveDispatchedCallsRule<T extends string, N extends BaseNode<T>>
      * @override
      */
     check (nodes: ASTNode<T, N>[]): void {
-        nodes.forEach(node => walkAST<T, N>(node, current => this.enter(current), current => this.exit(current)));
+        this.walkScoped(nodes, current => this.enter(current));
     }
 
     private enter (node: ASTNode<T, N>): void {
-        const symbolTable = this.context.symbolTable;
-
-        if (symbolTable.ownsScope(node)) symbolTable.enterScope(node);
         if (isCallNode(node)) this.resolve(node);
-    }
-
-    private exit (node: ASTNode<T, N>): void {
-        if (this.context.symbolTable.ownsScope(node)) this.context.symbolTable.exitScope();
     }
 
     /**

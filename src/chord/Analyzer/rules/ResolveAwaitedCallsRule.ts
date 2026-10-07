@@ -1,5 +1,4 @@
 import { AnalysisRule } from "../AnalysisRule";
-import { walkAST } from "../../walkAST";
 import { TypeInferrer } from "../TypeInferrer";
 import { UserMemberResolver } from "../UserMemberResolver";
 import { ASTNode, AccessNode, BaseNode, CallNode, ClassNode, FunctionNode, TokenType } from "../../types";
@@ -40,15 +39,13 @@ export class ResolveAwaitedCallsRule<T extends string, N extends BaseNode<T>> ex
      * @override
      */
     check (nodes: ASTNode<T, N>[]): void {
-        nodes.forEach(node => walkAST<T, N>(node, current => this.enter(current), current => this.exit(current)));
+        this.walkScoped(nodes, current => this.enter(current), current => this.exit(current));
     }
 
     private enter (node: ASTNode<T, N>): void {
         const symbolTable = this.context.symbolTable;
 
         if (symbolTable.ownsScope(node)) {
-            symbolTable.enterScope(node);
-
             if (node.type === TokenType.Funcion) this.callers.push(!!(node as FunctionNode<T, N>).metadata.isAsync);
             else if (node.type === TokenType.Clase) this.callers.push(false);
             else this.callers.push(symbolTable.hasAsyncBody(node));
@@ -86,10 +83,7 @@ export class ResolveAwaitedCallsRule<T extends string, N extends BaseNode<T>> ex
     }
 
     private exit (node: ASTNode<T, N>): void {
-        if (this.context.symbolTable.ownsScope(node)) {
-            this.callers.pop();
-            this.context.symbolTable.exitScope();
-        }
+        if (this.context.symbolTable.ownsScope(node)) this.callers.pop();
     }
 
     /**
