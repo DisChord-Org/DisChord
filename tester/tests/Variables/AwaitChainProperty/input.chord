@@ -1,0 +1,7 @@
+clase Repo {
+    @asincrono
+    funcion leer(x) { devolver "abcd" }
+}
+
+var repo es nuevo Repo()
+consola.imprimir(repo.leer(3).longitud)

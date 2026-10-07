@@ -51,6 +51,7 @@ export class AccessVisitor<T extends string, N extends BaseNode<T>> extends SubG
 
         const property = resolved && !isFieldUse ? resolved.member.transpile : node.property;
 
-        return `${this.parent.visit(node.object)}.${property}`;
+        const receiver = this.parent.visit(node.object);
+        return `${receiver.startsWith('await ') ? `(${receiver})` : receiver}.${property}`;
     }
 }

@@ -1,0 +1,16 @@
+@asincrono
+funcion lista() { devolver [7, 8] }
+
+@asincrono
+funcion nombre() { devolver "a" }
+
+consola.imprimir(lista())
+var s es nombre() mas "x"
+
+@asincrono
+funcion principal() {
+    si (lista()) {
+        consola.imprimir(1)
+    }
+    devolver lista()
+}

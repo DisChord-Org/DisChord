@@ -1,0 +1,9 @@
+clase Hoja {
+    @asincrono
+    funcion dato() { devolver { c 5 } }
+}
+
+@asincrono
+funcion raiz() { devolver nuevo Hoja() }
+
+consola.imprimir(raiz().dato().c)

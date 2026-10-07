@@ -1,0 +1,5 @@
+@asincrono
+funcion lista() { devolver [7, 8] }
+
+consola.imprimir(lista()[0])
+consola.imprimir(lista().longitud)

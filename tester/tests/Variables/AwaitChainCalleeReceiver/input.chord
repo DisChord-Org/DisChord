@@ -1,0 +1,5 @@
+@asincrono
+funcion nombre() { devolver " ab " }
+
+consola.imprimir(nombre().mayusculas())
+consola.imprimir(nombre().limpiar())
