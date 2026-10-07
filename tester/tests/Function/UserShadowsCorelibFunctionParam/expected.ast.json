@@ -1,0 +1,203 @@
+[
+  {
+    "type": "importar",
+    "identificators": [
+      "chordEsperar"
+    ],
+    "isDestructured": true,
+    "path": "./lib/runtimeHelpers.js",
+    "location": {
+      "line": 0,
+      "column": 0
+    }
+  },
+  {
+    "type": "importar",
+    "identificators": [],
+    "path": "./lib/consoleRuntime.js",
+    "isDestructured": false,
+    "location": {
+      "line": 0,
+      "column": 0
+    }
+  },
+  {
+    "type": "funcion",
+    "id": "f",
+    "metadata": {
+      "isConstructor": false,
+      "isMethod": false,
+      "isStatic": false,
+      "isAsync": false
+    },
+    "params": [
+      "esperar"
+    ],
+    "body": [
+      {
+        "type": "devolver",
+        "object": {
+          "type": "Llamada",
+          "object": {
+            "type": "IDENTIFICADOR",
+            "value": "esperar",
+            "location": {
+              "line": 2,
+              "column": 14
+            }
+          },
+          "params": [
+            {
+              "type": "Literal",
+              "value": 5,
+              "raw": "5",
+              "location": {
+                "line": 2,
+                "column": 22
+              }
+            }
+          ],
+          "location": {
+            "line": 2,
+            "column": 23
+          }
+        },
+        "location": {
+          "line": 2,
+          "column": 23
+        }
+      }
+    ],
+    "location": {
+      "line": 3,
+      "column": 1
+    }
+  },
+  {
+    "type": "funcion",
+    "id": "mas1",
+    "metadata": {
+      "isConstructor": false,
+      "isMethod": false,
+      "isStatic": false,
+      "isAsync": false
+    },
+    "params": [
+      "x"
+    ],
+    "body": [
+      {
+        "type": "devolver",
+        "object": {
+          "type": "ExpresionBinaria",
+          "left": {
+            "type": "IDENTIFICADOR",
+            "value": "x",
+            "location": {
+              "line": 6,
+              "column": 14
+            }
+          },
+          "operator": "mas",
+          "right": {
+            "type": "Literal",
+            "value": 1,
+            "raw": "1",
+            "location": {
+              "line": 6,
+              "column": 20
+            }
+          },
+          "location": {
+            "line": 6,
+            "column": 20
+          }
+        },
+        "location": {
+          "line": 6,
+          "column": 20
+        }
+      }
+    ],
+    "location": {
+      "line": 7,
+      "column": 1
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 9,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 9,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "Llamada",
+        "object": {
+          "type": "IDENTIFICADOR",
+          "value": "f",
+          "location": {
+            "line": 9,
+            "column": 18
+          }
+        },
+        "params": [
+          {
+            "type": "IDENTIFICADOR",
+            "value": "mas1",
+            "location": {
+              "line": 9,
+              "column": 20
+            }
+          }
+        ],
+        "location": {
+          "line": 9,
+          "column": 24
+        }
+      }
+    ],
+    "location": {
+      "line": 9,
+      "column": 25
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "IDENTIFICADOR",
+      "value": "esperar",
+      "location": {
+        "line": 10,
+        "column": 1
+      }
+    },
+    "params": [
+      {
+        "type": "Literal",
+        "value": 1,
+        "raw": "1",
+        "location": {
+          "line": 10,
+          "column": 9
+        }
+      }
+    ],
+    "location": {
+      "line": 10,
+      "column": 10
+    }
+  }
+]

@@ -1,0 +1,5 @@
+funcion imprimir(valor) {
+    devolver valor
+}
+
+consola.imprimir(imprimir("a"))

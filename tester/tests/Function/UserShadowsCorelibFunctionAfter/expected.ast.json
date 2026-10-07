@@ -1,0 +1,124 @@
+[
+  {
+    "type": "importar",
+    "identificators": [],
+    "path": "./lib/consoleRuntime.js",
+    "isDestructured": false,
+    "location": {
+      "line": 0,
+      "column": 0
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 1,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 1,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "Llamada",
+        "object": {
+          "type": "IDENTIFICADOR",
+          "value": "esperar",
+          "location": {
+            "line": 1,
+            "column": 18
+          }
+        },
+        "params": [
+          {
+            "type": "Literal",
+            "value": 1,
+            "raw": "1",
+            "location": {
+              "line": 1,
+              "column": 26
+            }
+          }
+        ],
+        "location": {
+          "line": 1,
+          "column": 27
+        }
+      }
+    ],
+    "location": {
+      "line": 1,
+      "column": 28
+    }
+  },
+  {
+    "type": "funcion",
+    "id": "esperar",
+    "metadata": {
+      "isConstructor": false,
+      "isMethod": false,
+      "isStatic": false,
+      "isAsync": false
+    },
+    "params": [
+      "valor"
+    ],
+    "paramTypes": [
+      {
+        "kind": "primitive",
+        "name": "numero"
+      }
+    ],
+    "returnType": {
+      "kind": "primitive",
+      "name": "numero"
+    },
+    "body": [
+      {
+        "type": "devolver",
+        "object": {
+          "type": "ExpresionBinaria",
+          "left": {
+            "type": "IDENTIFICADOR",
+            "value": "valor",
+            "location": {
+              "line": 4,
+              "column": 14
+            }
+          },
+          "operator": "mas",
+          "right": {
+            "type": "Literal",
+            "value": 100,
+            "raw": "100",
+            "location": {
+              "line": 4,
+              "column": 24
+            }
+          },
+          "location": {
+            "line": 4,
+            "column": 24
+          }
+        },
+        "location": {
+          "line": 4,
+          "column": 24
+        }
+      }
+    ],
+    "location": {
+      "line": 5,
+      "column": 1
+    }
+  }
+]

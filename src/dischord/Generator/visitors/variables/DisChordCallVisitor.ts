@@ -1,6 +1,7 @@
 import { CallVisitor } from "../../../../chord/Generator/visitors/variables/CallVisitor";
 import { DisChordNodeType, DisChordNode } from "../../../types";
 import { CallNode, TokenType, TokenTypeUnion } from "../../../../chord/types";
+import { isIdentificatorNode } from "../../../../chord/ast.guards";
 import { asyncRuntimeHelperNames } from "../../../../chord/corelib";
 import { disChordCoreLibUtils } from "../../../corelib";
 
@@ -20,7 +21,7 @@ export class DisChordCallVisitor extends CallVisitor<DisChordNodeType, DisChordN
      * @returns The generated code for the function call, which may be translated based on the core library mappings or fall back to the default generation if no mapping is found.
      */
     public override visit(node: CallNode<DisChordNodeType, DisChordNode>): string {
-        const translation = disChordCoreLibUtils.resolveFunction(node.object);
+        const translation = disChordCoreLibUtils.resolveFunction(node.object, isIdentificatorNode(node.object) && !!this.parent.context.symbolTable.lookup(node.object.value));
 
         if (translation) {
             const args = node.params.map(arg => this.parent.visit(arg)).join(', ');

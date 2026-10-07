@@ -1,0 +1,11 @@
+@asincrono
+funcion esperar(valor tipo numero) -> numero {
+    devolver valor mas 100
+}
+
+@asincrono
+funcion principal() {
+    consola.imprimir(esperar(1))
+}
+
+principal()

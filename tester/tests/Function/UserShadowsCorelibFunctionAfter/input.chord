@@ -1,0 +1,5 @@
+consola.imprimir(esperar(1))
+
+funcion esperar(valor tipo numero) -> numero {
+    devolver valor mas 100
+}

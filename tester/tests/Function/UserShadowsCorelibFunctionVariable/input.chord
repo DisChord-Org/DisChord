@@ -1,0 +1,6 @@
+funcion f() {
+    var esperar es 5
+    devolver esperar(5)
+}
+
+consola.imprimir(f)

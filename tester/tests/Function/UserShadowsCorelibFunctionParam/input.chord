@@ -1,0 +1,10 @@
+funcion f(esperar) {
+    devolver esperar(5)
+}
+
+funcion mas1(x) {
+    devolver x mas 1
+}
+
+consola.imprimir(f(mas1))
+esperar(1)

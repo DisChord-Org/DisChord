@@ -3,7 +3,7 @@ import { AnalysisRule } from "../AnalysisRule";
 import { walkAST } from "../walkAST";
 import { ASTNode, BaseNode, ImportNode, TokenType } from "../../types";
 import { coreLibUtils, runtimeHelperNames, runtimeHelpersModuleContent, runtimeHelpersModulePath } from "../../corelib";
-import { isAccessNode, isCallNode } from "../../ast.guards";
+import { isAccessNode, isCallNode, isIdentificatorNode } from "../../ast.guards";
 import { buildSharedModuleImportSpecifier } from "../sharedModulePath";
 
 /**
@@ -22,15 +22,21 @@ export class RequiresRuntimeHelpersRule<T extends string, N extends BaseNode<T>>
     check (nodes: ASTNode<T, N>[]): void {
         const used = new Set<string>();
 
+        const symbolTable = this.context.symbolTable;
+
         nodes.forEach(node => walkAST<T, N>(node, current => {
+            if (symbolTable.ownsScope(current)) symbolTable.enterScope(current);
+
             const dispatch = isCallNode(current) ? this.context.symbolTable.dispatchOf(current) : undefined;
             const transpiled = dispatch
                 ? ('helper' in dispatch ? dispatch.helper : undefined)
                 : isAccessNode(current)
                     ? coreLibUtils.resolveStatic(current)?.member.transpile
-                    : isCallNode(current) ? coreLibUtils.resolveFunction(current.object) : undefined;
+                    : isCallNode(current) ? coreLibUtils.resolveFunction(current.object, this.isDeclared(current.object)) : undefined;
 
             if (transpiled !== undefined && runtimeHelperNames.has(transpiled)) used.add(transpiled);
+        }, current => {
+            if (symbolTable.ownsScope(current)) symbolTable.exitScope();
         }));
 
         if (used.size === 0) return;
@@ -46,5 +52,14 @@ export class RequiresRuntimeHelpersRule<T extends string, N extends BaseNode<T>>
         nodes.unshift(importNode);
 
         this.context.extraFiles.set(path.join(this.context.projectRoot, 'dist', runtimeHelpersModulePath), runtimeHelpersModuleContent);
+    }
+
+    /**
+     * Whether the callee is a name the file declares and that is visible where the call is, which
+     * then wins over a core library function of the same name.
+     * @private
+     */
+    private isDeclared (callee: ASTNode<T, N>): boolean {
+        return isIdentificatorNode(callee) && !!this.context.symbolTable.lookup(callee.value);
     }
 }
