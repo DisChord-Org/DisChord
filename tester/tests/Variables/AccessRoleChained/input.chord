@@ -1,0 +1,16 @@
+funcion contar(t) {
+    devolver t.partir(",").longitud
+}
+
+funcion fijar(p) {
+    p.dia.mes es 3
+    devolver p.dia.mes
+}
+
+var u es {
+    dia {
+        mes 1
+    }
+}
+consola.imprimir(contar("a,b"))
+consola.imprimir(fijar(u))

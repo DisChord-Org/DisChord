@@ -1,0 +1,216 @@
+[
+  {
+    "type": "importar",
+    "identificators": [],
+    "path": "./lib/consoleRuntime.js",
+    "isDestructured": false,
+    "location": {
+      "line": 0,
+      "column": 0
+    }
+  },
+  {
+    "type": "funcion",
+    "id": "f",
+    "metadata": {
+      "isConstructor": false,
+      "isMethod": false,
+      "isStatic": false,
+      "isAsync": false
+    },
+    "params": [
+      "t",
+      "l"
+    ],
+    "paramTypes": [
+      {
+        "kind": "primitive",
+        "name": "texto"
+      },
+      {
+        "kind": "array",
+        "element": {
+          "kind": "any"
+        }
+      }
+    ],
+    "body": [
+      {
+        "type": "Llamada",
+        "object": {
+          "type": "Acceso",
+          "object": {
+            "type": "IDENTIFICADOR",
+            "value": "consola",
+            "location": {
+              "line": 2,
+              "column": 5
+            }
+          },
+          "property": "imprimir",
+          "location": {
+            "line": 2,
+            "column": 13
+          }
+        },
+        "params": [
+          {
+            "type": "Acceso",
+            "object": {
+              "type": "IDENTIFICADOR",
+              "value": "t",
+              "location": {
+                "line": 2,
+                "column": 22
+              }
+            },
+            "property": "longitud",
+            "location": {
+              "line": 2,
+              "column": 24
+            }
+          }
+        ],
+        "location": {
+          "line": 2,
+          "column": 32
+        }
+      },
+      {
+        "type": "Llamada",
+        "object": {
+          "type": "Acceso",
+          "object": {
+            "type": "IDENTIFICADOR",
+            "value": "consola",
+            "location": {
+              "line": 3,
+              "column": 5
+            }
+          },
+          "property": "imprimir",
+          "location": {
+            "line": 3,
+            "column": 13
+          }
+        },
+        "params": [
+          {
+            "type": "Acceso",
+            "object": {
+              "type": "IDENTIFICADOR",
+              "value": "l",
+              "location": {
+                "line": 3,
+                "column": 22
+              }
+            },
+            "property": "longitud",
+            "location": {
+              "line": 3,
+              "column": 24
+            }
+          }
+        ],
+        "location": {
+          "line": 3,
+          "column": 32
+        }
+      },
+      {
+        "type": "Llamada",
+        "object": {
+          "type": "Acceso",
+          "object": {
+            "type": "IDENTIFICADOR",
+            "value": "consola",
+            "location": {
+              "line": 4,
+              "column": 5
+            }
+          },
+          "property": "imprimir",
+          "location": {
+            "line": 4,
+            "column": 13
+          }
+        },
+        "params": [
+          {
+            "type": "Llamada",
+            "object": {
+              "type": "Acceso",
+              "object": {
+                "type": "IDENTIFICADOR",
+                "value": "t",
+                "location": {
+                  "line": 4,
+                  "column": 22
+                }
+              },
+              "property": "mayusculas",
+              "location": {
+                "line": 4,
+                "column": 24
+              }
+            },
+            "params": [],
+            "location": {
+              "line": 4,
+              "column": 35
+            }
+          }
+        ],
+        "location": {
+          "line": 4,
+          "column": 36
+        }
+      }
+    ],
+    "location": {
+      "line": 5,
+      "column": 1
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 7,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 7,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "Acceso",
+        "object": {
+          "type": "IDENTIFICADOR",
+          "value": "Mates",
+          "location": {
+            "line": 7,
+            "column": 18
+          }
+        },
+        "property": "PI",
+        "location": {
+          "line": 7,
+          "column": 24
+        }
+      }
+    ],
+    "location": {
+      "line": 7,
+      "column": 26
+    }
+  }
+]

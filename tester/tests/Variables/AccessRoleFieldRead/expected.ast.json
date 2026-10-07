@@ -1,0 +1,422 @@
+[
+  {
+    "type": "importar",
+    "identificators": [],
+    "path": "./lib/consoleRuntime.js",
+    "isDestructured": false,
+    "location": {
+      "line": 0,
+      "column": 0
+    }
+  },
+  {
+    "type": "funcion",
+    "id": "leer",
+    "metadata": {
+      "isConstructor": false,
+      "isMethod": false,
+      "isStatic": false,
+      "isAsync": false
+    },
+    "params": [
+      "p"
+    ],
+    "body": [
+      {
+        "type": "Llamada",
+        "object": {
+          "type": "Acceso",
+          "object": {
+            "type": "IDENTIFICADOR",
+            "value": "consola",
+            "location": {
+              "line": 2,
+              "column": 5
+            }
+          },
+          "property": "imprimir",
+          "location": {
+            "line": 2,
+            "column": 13
+          }
+        },
+        "params": [
+          {
+            "type": "Acceso",
+            "object": {
+              "type": "IDENTIFICADOR",
+              "value": "p",
+              "location": {
+                "line": 2,
+                "column": 22
+              }
+            },
+            "property": "dia",
+            "location": {
+              "line": 2,
+              "column": 24
+            }
+          }
+        ],
+        "location": {
+          "line": 2,
+          "column": 27
+        }
+      },
+      {
+        "type": "Llamada",
+        "object": {
+          "type": "Acceso",
+          "object": {
+            "type": "IDENTIFICADOR",
+            "value": "consola",
+            "location": {
+              "line": 3,
+              "column": 5
+            }
+          },
+          "property": "imprimir",
+          "location": {
+            "line": 3,
+            "column": 13
+          }
+        },
+        "params": [
+          {
+            "type": "Acceso",
+            "object": {
+              "type": "IDENTIFICADOR",
+              "value": "p",
+              "location": {
+                "line": 3,
+                "column": 22
+              }
+            },
+            "property": "claves",
+            "location": {
+              "line": 3,
+              "column": 24
+            }
+          }
+        ],
+        "location": {
+          "line": 3,
+          "column": 30
+        }
+      },
+      {
+        "type": "Llamada",
+        "object": {
+          "type": "Acceso",
+          "object": {
+            "type": "IDENTIFICADOR",
+            "value": "consola",
+            "location": {
+              "line": 4,
+              "column": 5
+            }
+          },
+          "property": "imprimir",
+          "location": {
+            "line": 4,
+            "column": 13
+          }
+        },
+        "params": [
+          {
+            "type": "Acceso",
+            "object": {
+              "type": "IDENTIFICADOR",
+              "value": "p",
+              "location": {
+                "line": 4,
+                "column": 22
+              }
+            },
+            "property": "valores",
+            "location": {
+              "line": 4,
+              "column": 24
+            }
+          }
+        ],
+        "location": {
+          "line": 4,
+          "column": 31
+        }
+      },
+      {
+        "type": "Llamada",
+        "object": {
+          "type": "Acceso",
+          "object": {
+            "type": "IDENTIFICADOR",
+            "value": "consola",
+            "location": {
+              "line": 5,
+              "column": 5
+            }
+          },
+          "property": "imprimir",
+          "location": {
+            "line": 5,
+            "column": 13
+          }
+        },
+        "params": [
+          {
+            "type": "Acceso",
+            "object": {
+              "type": "IDENTIFICADOR",
+              "value": "p",
+              "location": {
+                "line": 5,
+                "column": 22
+              }
+            },
+            "property": "buscar",
+            "location": {
+              "line": 5,
+              "column": 24
+            }
+          }
+        ],
+        "location": {
+          "line": 5,
+          "column": 30
+        }
+      },
+      {
+        "type": "Variable",
+        "id": "copia",
+        "value": {
+          "type": "Acceso",
+          "object": {
+            "type": "IDENTIFICADOR",
+            "value": "p",
+            "location": {
+              "line": 6,
+              "column": 18
+            }
+          },
+          "property": "dia",
+          "location": {
+            "line": 6,
+            "column": 20
+          }
+        },
+        "location": {
+          "line": 6,
+          "column": 20
+        }
+      },
+      {
+        "type": "Condicion",
+        "test": {
+          "type": "ExpresionBinaria",
+          "left": {
+            "type": "Acceso",
+            "object": {
+              "type": "IDENTIFICADOR",
+              "value": "p",
+              "location": {
+                "line": 7,
+                "column": 9
+              }
+            },
+            "property": "dia",
+            "location": {
+              "line": 7,
+              "column": 11
+            }
+          },
+          "operator": "mayor",
+          "right": {
+            "type": "Literal",
+            "value": 1,
+            "raw": "1",
+            "location": {
+              "line": 7,
+              "column": 21
+            }
+          },
+          "location": {
+            "line": 7,
+            "column": 21
+          }
+        },
+        "consequent": [
+          {
+            "type": "Llamada",
+            "object": {
+              "type": "Acceso",
+              "object": {
+                "type": "IDENTIFICADOR",
+                "value": "consola",
+                "location": {
+                  "line": 8,
+                  "column": 9
+                }
+              },
+              "property": "imprimir",
+              "location": {
+                "line": 8,
+                "column": 17
+              }
+            },
+            "params": [
+              {
+                "type": "IDENTIFICADOR",
+                "value": "copia",
+                "location": {
+                  "line": 8,
+                  "column": 26
+                }
+              }
+            ],
+            "location": {
+              "line": 8,
+              "column": 31
+            }
+          }
+        ],
+        "location": {
+          "line": 9,
+          "column": 5
+        }
+      },
+      {
+        "type": "devolver",
+        "object": {
+          "type": "Acceso",
+          "object": {
+            "type": "IDENTIFICADOR",
+            "value": "p",
+            "location": {
+              "line": 10,
+              "column": 14
+            }
+          },
+          "property": "dia",
+          "location": {
+            "line": 10,
+            "column": 16
+          }
+        },
+        "location": {
+          "line": 10,
+          "column": 16
+        }
+      }
+    ],
+    "location": {
+      "line": 11,
+      "column": 1
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "u",
+    "value": {
+      "type": "BDO",
+      "mode": 0,
+      "blocks": {
+        "dia": {
+          "type": "Literal",
+          "value": 3,
+          "raw": "3",
+          "location": {
+            "line": 14,
+            "column": 9
+          }
+        },
+        "claves": {
+          "type": "Literal",
+          "value": "k",
+          "raw": "k",
+          "location": {
+            "line": 15,
+            "column": 12
+          }
+        },
+        "valores": {
+          "type": "Literal",
+          "value": "v",
+          "raw": "v",
+          "location": {
+            "line": 16,
+            "column": 13
+          }
+        },
+        "buscar": {
+          "type": "Literal",
+          "value": "b",
+          "raw": "b",
+          "location": {
+            "line": 17,
+            "column": 12
+          }
+        }
+      },
+      "body": [],
+      "location": {
+        "line": 18,
+        "column": 1
+      }
+    },
+    "location": {
+      "line": 18,
+      "column": 1
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 19,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 19,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "Llamada",
+        "object": {
+          "type": "IDENTIFICADOR",
+          "value": "leer",
+          "location": {
+            "line": 19,
+            "column": 18
+          }
+        },
+        "params": [
+          {
+            "type": "IDENTIFICADOR",
+            "value": "u",
+            "location": {
+              "line": 19,
+              "column": 23
+            }
+          }
+        ],
+        "location": {
+          "line": 19,
+          "column": 24
+        }
+      }
+    ],
+    "location": {
+      "line": 19,
+      "column": 25
+    }
+  }
+]

@@ -1,0 +1,7 @@
+funcion f(t tipo texto, l tipo Lista) {
+    consola.imprimir(t.longitud)
+    consola.imprimir(l.longitud)
+    consola.imprimir(t.mayusculas())
+}
+
+consola.imprimir(Mates.PI)

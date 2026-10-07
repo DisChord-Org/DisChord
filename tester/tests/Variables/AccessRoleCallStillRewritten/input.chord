@@ -1,0 +1,10 @@
+funcion partir(t) {
+    devolver t.partir(",")
+}
+
+funcion gritar(t) {
+    devolver t.mayusculas()
+}
+
+consola.imprimir(partir("a,b"))
+consola.imprimir(gritar("a"))

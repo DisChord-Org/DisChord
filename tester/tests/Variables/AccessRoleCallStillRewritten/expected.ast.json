@@ -1,0 +1,224 @@
+[
+  {
+    "type": "importar",
+    "identificators": [],
+    "path": "./lib/consoleRuntime.js",
+    "isDestructured": false,
+    "location": {
+      "line": 0,
+      "column": 0
+    }
+  },
+  {
+    "type": "funcion",
+    "id": "partir",
+    "metadata": {
+      "isConstructor": false,
+      "isMethod": false,
+      "isStatic": false,
+      "isAsync": false
+    },
+    "params": [
+      "t"
+    ],
+    "body": [
+      {
+        "type": "devolver",
+        "object": {
+          "type": "Llamada",
+          "object": {
+            "type": "Acceso",
+            "object": {
+              "type": "IDENTIFICADOR",
+              "value": "t",
+              "location": {
+                "line": 2,
+                "column": 14
+              }
+            },
+            "property": "partir",
+            "location": {
+              "line": 2,
+              "column": 16
+            }
+          },
+          "params": [
+            {
+              "type": "Literal",
+              "value": ",",
+              "raw": ",",
+              "location": {
+                "line": 2,
+                "column": 23
+              }
+            }
+          ],
+          "location": {
+            "line": 2,
+            "column": 26
+          }
+        },
+        "location": {
+          "line": 2,
+          "column": 26
+        }
+      }
+    ],
+    "location": {
+      "line": 3,
+      "column": 1
+    }
+  },
+  {
+    "type": "funcion",
+    "id": "gritar",
+    "metadata": {
+      "isConstructor": false,
+      "isMethod": false,
+      "isStatic": false,
+      "isAsync": false
+    },
+    "params": [
+      "t"
+    ],
+    "body": [
+      {
+        "type": "devolver",
+        "object": {
+          "type": "Llamada",
+          "object": {
+            "type": "Acceso",
+            "object": {
+              "type": "IDENTIFICADOR",
+              "value": "t",
+              "location": {
+                "line": 6,
+                "column": 14
+              }
+            },
+            "property": "mayusculas",
+            "location": {
+              "line": 6,
+              "column": 16
+            }
+          },
+          "params": [],
+          "location": {
+            "line": 6,
+            "column": 27
+          }
+        },
+        "location": {
+          "line": 6,
+          "column": 27
+        }
+      }
+    ],
+    "location": {
+      "line": 7,
+      "column": 1
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 9,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 9,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "Llamada",
+        "object": {
+          "type": "IDENTIFICADOR",
+          "value": "partir",
+          "location": {
+            "line": 9,
+            "column": 18
+          }
+        },
+        "params": [
+          {
+            "type": "Literal",
+            "value": "a,b",
+            "raw": "a,b",
+            "location": {
+              "line": 9,
+              "column": 25
+            }
+          }
+        ],
+        "location": {
+          "line": 9,
+          "column": 30
+        }
+      }
+    ],
+    "location": {
+      "line": 9,
+      "column": 31
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 10,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 10,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "Llamada",
+        "object": {
+          "type": "IDENTIFICADOR",
+          "value": "gritar",
+          "location": {
+            "line": 10,
+            "column": 18
+          }
+        },
+        "params": [
+          {
+            "type": "Literal",
+            "value": "a",
+            "raw": "a",
+            "location": {
+              "line": 10,
+              "column": 25
+            }
+          }
+        ],
+        "location": {
+          "line": 10,
+          "column": 28
+        }
+      }
+    ],
+    "location": {
+      "line": 10,
+      "column": 29
+    }
+  }
+]

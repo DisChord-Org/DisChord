@@ -12,6 +12,7 @@ import { ValidateReturnTypesRule } from "./rules/ValidateReturnTypesRule";
 import { ValidateCallArgumentsRule } from "./rules/ValidateCallArgumentsRule";
 import { ResolveAwaitedCallsRule } from "./rules/ResolveAwaitedCallsRule";
 import { ResolveDispatchedCallsRule } from "./rules/ResolveDispatchedCallsRule";
+import { ResolveAccessRolesRule } from "./rules/ResolveAccessRolesRule";
 import { RequiresConsoleRuntimeRule } from "./rules/RequiresConsoleRuntimeRule";
 import { RequiresRuntimeHelpersRule } from "./rules/RequiresRuntimeHelpersRule";
 
@@ -79,6 +80,9 @@ export class Analyzer<T extends string, N extends BaseNode<T>> {
 
         // Decides how calls on a receiver of union type are emitted; needs the same resolved types.
         ResolveDispatchedCallsRule,
+
+        // Records whether each member access is a callee, an assignment target or a read.
+        ResolveAccessRolesRule,
 
         // Lowering rules — independent of the 3-pass binding model above, they don't touch
         // SymbolTable at all.

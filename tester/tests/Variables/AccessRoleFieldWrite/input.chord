@@ -1,0 +1,9 @@
+funcion fijar(p) {
+    p.longitud es 3
+}
+
+var u es {
+    longitud 1
+}
+fijar(u)
+consola.imprimir(u.longitud)

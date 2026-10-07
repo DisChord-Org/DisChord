@@ -1,0 +1,310 @@
+[
+  {
+    "type": "importar",
+    "identificators": [],
+    "path": "./lib/consoleRuntime.js",
+    "isDestructured": false,
+    "location": {
+      "line": 0,
+      "column": 0
+    }
+  },
+  {
+    "type": "funcion",
+    "id": "contar",
+    "metadata": {
+      "isConstructor": false,
+      "isMethod": false,
+      "isStatic": false,
+      "isAsync": false
+    },
+    "params": [
+      "t"
+    ],
+    "body": [
+      {
+        "type": "devolver",
+        "object": {
+          "type": "Acceso",
+          "object": {
+            "type": "Llamada",
+            "object": {
+              "type": "Acceso",
+              "object": {
+                "type": "IDENTIFICADOR",
+                "value": "t",
+                "location": {
+                  "line": 2,
+                  "column": 14
+                }
+              },
+              "property": "partir",
+              "location": {
+                "line": 2,
+                "column": 16
+              }
+            },
+            "params": [
+              {
+                "type": "Literal",
+                "value": ",",
+                "raw": ",",
+                "location": {
+                  "line": 2,
+                  "column": 23
+                }
+              }
+            ],
+            "location": {
+              "line": 2,
+              "column": 26
+            }
+          },
+          "property": "longitud",
+          "location": {
+            "line": 2,
+            "column": 28
+          }
+        },
+        "location": {
+          "line": 2,
+          "column": 28
+        }
+      }
+    ],
+    "location": {
+      "line": 3,
+      "column": 1
+    }
+  },
+  {
+    "type": "funcion",
+    "id": "fijar",
+    "metadata": {
+      "isConstructor": false,
+      "isMethod": false,
+      "isStatic": false,
+      "isAsync": false
+    },
+    "params": [
+      "p"
+    ],
+    "body": [
+      {
+        "type": "Asignacion",
+        "left": {
+          "type": "Acceso",
+          "object": {
+            "type": "Acceso",
+            "object": {
+              "type": "IDENTIFICADOR",
+              "value": "p",
+              "location": {
+                "line": 6,
+                "column": 5
+              }
+            },
+            "property": "dia",
+            "location": {
+              "line": 6,
+              "column": 7
+            }
+          },
+          "property": "mes",
+          "location": {
+            "line": 6,
+            "column": 11
+          }
+        },
+        "assignment": {
+          "type": "Literal",
+          "value": 3,
+          "raw": "3",
+          "location": {
+            "line": 6,
+            "column": 18
+          }
+        },
+        "location": {
+          "line": 6,
+          "column": 18
+        }
+      },
+      {
+        "type": "devolver",
+        "object": {
+          "type": "Acceso",
+          "object": {
+            "type": "Acceso",
+            "object": {
+              "type": "IDENTIFICADOR",
+              "value": "p",
+              "location": {
+                "line": 7,
+                "column": 14
+              }
+            },
+            "property": "dia",
+            "location": {
+              "line": 7,
+              "column": 16
+            }
+          },
+          "property": "mes",
+          "location": {
+            "line": 7,
+            "column": 20
+          }
+        },
+        "location": {
+          "line": 7,
+          "column": 20
+        }
+      }
+    ],
+    "location": {
+      "line": 8,
+      "column": 1
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "u",
+    "value": {
+      "type": "BDO",
+      "mode": 0,
+      "blocks": {
+        "dia": {
+          "type": "BDO",
+          "mode": 0,
+          "blocks": {
+            "mes": {
+              "type": "Literal",
+              "value": 1,
+              "raw": "1",
+              "location": {
+                "line": 12,
+                "column": 13
+              }
+            }
+          },
+          "body": [],
+          "location": {
+            "line": 13,
+            "column": 5
+          }
+        }
+      },
+      "body": [],
+      "location": {
+        "line": 14,
+        "column": 1
+      }
+    },
+    "location": {
+      "line": 14,
+      "column": 1
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 15,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 15,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "Llamada",
+        "object": {
+          "type": "IDENTIFICADOR",
+          "value": "contar",
+          "location": {
+            "line": 15,
+            "column": 18
+          }
+        },
+        "params": [
+          {
+            "type": "Literal",
+            "value": "a,b",
+            "raw": "a,b",
+            "location": {
+              "line": 15,
+              "column": 25
+            }
+          }
+        ],
+        "location": {
+          "line": 15,
+          "column": 30
+        }
+      }
+    ],
+    "location": {
+      "line": 15,
+      "column": 31
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 16,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 16,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "Llamada",
+        "object": {
+          "type": "IDENTIFICADOR",
+          "value": "fijar",
+          "location": {
+            "line": 16,
+            "column": 18
+          }
+        },
+        "params": [
+          {
+            "type": "IDENTIFICADOR",
+            "value": "u",
+            "location": {
+              "line": 16,
+              "column": 24
+            }
+          }
+        ],
+        "location": {
+          "line": 16,
+          "column": 25
+        }
+      }
+    ],
+    "location": {
+      "line": 16,
+      "column": 26
+    }
+  }
+]

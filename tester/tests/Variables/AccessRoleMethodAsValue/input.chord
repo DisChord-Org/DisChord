@@ -1,0 +1,4 @@
+funcion f(t) {
+    var m es t.mayusculas
+    devolver m
+}

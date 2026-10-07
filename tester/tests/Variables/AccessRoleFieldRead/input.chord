@@ -1,0 +1,19 @@
+funcion leer(p) {
+    consola.imprimir(p.dia)
+    consola.imprimir(p.claves)
+    consola.imprimir(p.valores)
+    consola.imprimir(p.buscar)
+    var copia es p.dia
+    si (p.dia mayor 1) {
+        consola.imprimir(copia)
+    }
+    devolver p.dia
+}
+
+var u es {
+    dia 3
+    claves "k"
+    valores "v"
+    buscar "b"
+}
+consola.imprimir(leer(u))
