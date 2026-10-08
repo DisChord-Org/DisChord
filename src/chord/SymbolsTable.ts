@@ -10,12 +10,6 @@ import { ChordError, ErrorLevel } from "../errors/ChordError";
 export type CallDispatch = { readonly member: string } | { readonly helper: string };
 
 /**
- * What a member access is used as, which decides whether a core library name is rewritten: a
- * method only as the `callee` of a call, a property only as a `read`, never as an `assignment` target.
- */
-export type AccessRole = 'callee' | 'assignment' | 'read';
-
-/**
  * One lexical scope: the symbols declared in it plus its contextual compilation metadata.
  */
 interface Scope {
@@ -70,16 +64,6 @@ export class SymbolTable {
      * The name each member access is emitted with (see {@link markMember}).
      */
     private readonly memberNames: WeakMap<object, string> = new WeakMap();
-
-    /**
-     * Member accesses that are the callee of a call (see {@link markCallee}).
-     */
-    private readonly calleeAccesses: WeakSet<object> = new WeakSet();
-
-    /**
-     * Member accesses that are the target of an assignment (see {@link markAssignmentTarget}).
-     */
-    private readonly assignmentTargets: WeakSet<object> = new WeakSet();
 
     /**
      * Calls on a receiver of union type that the analyzer decided to emit differently (see
@@ -199,34 +183,6 @@ export class SymbolTable {
      */
     public isAwaited(call: object): boolean {
         return this.awaitedCalls.has(call);
-    }
-
-    /**
-     * Records that a member access is the callee of a call (`objeto.metodo(...)`).
-     *
-     * @param {object} access - The access node.
-     */
-    public markCallee(access: object): void {
-        this.calleeAccesses.add(access);
-    }
-
-    /**
-     * Records that a member access is the target of an assignment (`objeto.campo es valor`).
-     *
-     * @param {object} access - The access node.
-     */
-    public markAssignmentTarget(access: object): void {
-        this.assignmentTargets.add(access);
-    }
-
-    /**
-     * @param {object} access - The access node.
-     * @returns {AccessRole} What the access is used as: the callee of a call, the target of an
-     * assignment, or a plain read.
-     */
-    public roleOf(access: object): AccessRole {
-        if (this.calleeAccesses.has(access)) return 'callee';
-        return this.assignmentTargets.has(access) ? 'assignment' : 'read';
     }
 
     /**
