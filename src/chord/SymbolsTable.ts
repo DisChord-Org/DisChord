@@ -1,3 +1,9 @@
+// if this file exceeds 500 lines of code, it will be refactored
+
+/*
+    before, only Claude and I knew what this file did, now only Claude knows. good luck
+*/
+
 import { Location, Symbol, SymbolKind, CompilerMetadataKind, TokenType } from "./types";
 import { DataType } from "./DataType";
 import { ChordError, ErrorLevel } from "../errors/ChordError";

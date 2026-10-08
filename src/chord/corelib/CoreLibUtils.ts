@@ -1,3 +1,5 @@
+// if this file exceeds 500 lines of code, it will be refactored
+
 import { corelib } from "./corelib.data";
 import { isIdentificatorNode } from "../ast.guards";
 import { AnyDataType, ClassDataType, DataType, PrimitiveDataType, UnionDataType, UserClassDataType } from "../DataType";
