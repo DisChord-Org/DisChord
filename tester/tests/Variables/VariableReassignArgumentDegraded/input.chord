@@ -1,0 +1,7 @@
+funcion f(x tipo texto) -> texto {
+    devolver x
+}
+
+var a es 5
+a es "x"
+consola.imprimir(f(a))

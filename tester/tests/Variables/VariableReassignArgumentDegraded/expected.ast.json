@@ -1,0 +1,147 @@
+[
+  {
+    "type": "importar",
+    "identificators": [],
+    "path": "./lib/consoleRuntime.js",
+    "isDestructured": false,
+    "location": {
+      "line": 0,
+      "column": 0
+    }
+  },
+  {
+    "type": "funcion",
+    "id": "f",
+    "metadata": {
+      "isConstructor": false,
+      "isMethod": false,
+      "isStatic": false,
+      "isAsync": false
+    },
+    "params": [
+      "x"
+    ],
+    "paramTypes": [
+      {
+        "kind": "primitive",
+        "name": "texto"
+      }
+    ],
+    "returnType": {
+      "kind": "primitive",
+      "name": "texto"
+    },
+    "body": [
+      {
+        "type": "devolver",
+        "object": {
+          "type": "IDENTIFICADOR",
+          "value": "x",
+          "location": {
+            "line": 2,
+            "column": 14
+          }
+        },
+        "location": {
+          "line": 2,
+          "column": 14
+        }
+      }
+    ],
+    "location": {
+      "line": 3,
+      "column": 1
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "a",
+    "value": {
+      "type": "Literal",
+      "value": 5,
+      "raw": "5",
+      "location": {
+        "line": 5,
+        "column": 10
+      }
+    },
+    "location": {
+      "line": 5,
+      "column": 10
+    }
+  },
+  {
+    "type": "Asignacion",
+    "left": {
+      "type": "IDENTIFICADOR",
+      "value": "a",
+      "location": {
+        "line": 6,
+        "column": 1
+      }
+    },
+    "assignment": {
+      "type": "Literal",
+      "value": "x",
+      "raw": "x",
+      "location": {
+        "line": 6,
+        "column": 6
+      }
+    },
+    "location": {
+      "line": 6,
+      "column": 6
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 7,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 7,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "Llamada",
+        "object": {
+          "type": "IDENTIFICADOR",
+          "value": "f",
+          "location": {
+            "line": 7,
+            "column": 18
+          }
+        },
+        "params": [
+          {
+            "type": "IDENTIFICADOR",
+            "value": "a",
+            "location": {
+              "line": 7,
+              "column": 20
+            }
+          }
+        ],
+        "location": {
+          "line": 7,
+          "column": 21
+        }
+      }
+    ],
+    "location": {
+      "line": 7,
+      "column": 22
+    }
+  }
+]

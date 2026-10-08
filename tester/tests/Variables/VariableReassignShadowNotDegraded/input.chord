@@ -1,0 +1,9 @@
+var s es 1
+
+funcion f() {
+    var s es "x"
+    s es "y"
+    devolver s
+}
+
+var k tipo texto es s

@@ -1,0 +1,3 @@
+var x
+x es 5
+consola.imprimir(x)

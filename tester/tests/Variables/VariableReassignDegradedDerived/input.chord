@@ -1,0 +1,5 @@
+var a es 5
+a es "x"
+var b es a mas 1
+var c tipo texto es b
+consola.imprimir(c)

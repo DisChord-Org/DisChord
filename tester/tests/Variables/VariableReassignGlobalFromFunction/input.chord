@@ -1,0 +1,9 @@
+var g es 1
+
+funcion f() {
+    g es "x"
+}
+
+var h tipo texto es g
+f()
+consola.imprimir(h)

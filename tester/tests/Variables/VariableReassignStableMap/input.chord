@@ -1,0 +1,3 @@
+var m es nuevo Mapa()
+m es nuevo Mapa()
+consola.imprimir(m.tiene("a"))

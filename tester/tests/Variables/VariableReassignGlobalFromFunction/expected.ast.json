@@ -1,0 +1,139 @@
+[
+  {
+    "type": "importar",
+    "identificators": [],
+    "path": "./lib/consoleRuntime.js",
+    "isDestructured": false,
+    "location": {
+      "line": 0,
+      "column": 0
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "g",
+    "value": {
+      "type": "Literal",
+      "value": 1,
+      "raw": "1",
+      "location": {
+        "line": 1,
+        "column": 10
+      }
+    },
+    "location": {
+      "line": 1,
+      "column": 10
+    }
+  },
+  {
+    "type": "funcion",
+    "id": "f",
+    "metadata": {
+      "isConstructor": false,
+      "isMethod": false,
+      "isStatic": false,
+      "isAsync": false
+    },
+    "params": [],
+    "body": [
+      {
+        "type": "Asignacion",
+        "left": {
+          "type": "IDENTIFICADOR",
+          "value": "g",
+          "location": {
+            "line": 4,
+            "column": 5
+          }
+        },
+        "assignment": {
+          "type": "Literal",
+          "value": "x",
+          "raw": "x",
+          "location": {
+            "line": 4,
+            "column": 10
+          }
+        },
+        "location": {
+          "line": 4,
+          "column": 10
+        }
+      }
+    ],
+    "location": {
+      "line": 5,
+      "column": 1
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "h",
+    "value": {
+      "type": "IDENTIFICADOR",
+      "value": "g",
+      "location": {
+        "line": 7,
+        "column": 21
+      }
+    },
+    "dataType": {
+      "kind": "primitive",
+      "name": "texto"
+    },
+    "location": {
+      "line": 7,
+      "column": 21
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "IDENTIFICADOR",
+      "value": "f",
+      "location": {
+        "line": 8,
+        "column": 1
+      }
+    },
+    "params": [],
+    "location": {
+      "line": 8,
+      "column": 3
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 9,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 9,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "IDENTIFICADOR",
+        "value": "h",
+        "location": {
+          "line": 9,
+          "column": 18
+        }
+      }
+    ],
+    "location": {
+      "line": 9,
+      "column": 19
+    }
+  }
+]

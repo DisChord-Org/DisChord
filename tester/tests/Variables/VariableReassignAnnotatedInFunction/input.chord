@@ -1,0 +1,5 @@
+var q tipo numero es 1
+
+funcion g() {
+    q es "x"
+}
