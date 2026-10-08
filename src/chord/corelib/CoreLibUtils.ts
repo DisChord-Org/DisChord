@@ -1,7 +1,7 @@
 import { corelib } from "./corelib.data";
 import { isIdentificatorNode } from "../ast.guards";
-import { AnyDataType, ClassDataType, DataType, UnionDataType, UserClassDataType } from "../DataType";
-import { AccessNode, ASTNode, BaseNode, CallNode, TokenType } from "../types";
+import { AnyDataType, ClassDataType, DataType, PrimitiveDataType, UnionDataType, UserClassDataType } from "../DataType";
+import { AccessNode, ASTNode, BaseNode, CallNode, PrimitiveType, TokenType } from "../types";
 import { CoreLib, CoreLibClass, ResolvedMember } from "./corelib.types";
 import { runtimeHelperNames } from "./runtimeHelpers";
 
@@ -200,6 +200,23 @@ export class CoreLibUtils<C extends string = string> {
      */
     resolveClassReceiver(name: string): DataType | undefined {
         return this.hasOwn(this.corelib.classes, name) ? this.corelib.classes[name as C].receiver : undefined;
+    }
+
+    /**
+     * The names that can be written after `tipo` (or `->`) without declaring anything: the primitives,
+     * `cualquiera`, and the core library classes that are a type of their own (`Mapa`, `Lista`...). A
+     * class that is just another spelling of a primitive (`Texto`, `Numero`, `BDO`) and one with only
+     * static members (`Mates`, `JSON`, `consola`) are not in it. Derived from the real tables, so a
+     * message listing them can't drift from what is accepted.
+     * @returns {string} The names, separated by commas.
+     */
+    annotableTypeNames(): string {
+        const classes = (Object.keys(this.corelib.classes) as C[]).filter(name => {
+            const receiver = this.resolveClassReceiver(name);
+            return receiver !== undefined && !(receiver instanceof PrimitiveDataType);
+        });
+
+        return [ ...Object.values(PrimitiveType), AnyDataType.Any.format(), ...classes ].join(', ');
     }
 
     /**

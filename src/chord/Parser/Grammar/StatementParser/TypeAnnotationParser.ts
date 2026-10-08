@@ -172,7 +172,7 @@ export class TypeAnnotationParser<T extends string, N extends BaseNode<T>> {
 
         const token = this.parser.consume(
             [ TokenType.IDENTIFICADOR, TokenType.Indefinido ],
-            `Se esperaba un tipo válido después de 'tipo' (${this.primitiveTypeNames.join(', ')})`
+            `Se esperaba un tipo válido después de 'tipo' (${coreLibUtils.annotableTypeNames()})`
         );
 
         const lowered = token.value.toLowerCase();
