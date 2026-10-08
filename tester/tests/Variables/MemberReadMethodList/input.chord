@@ -1,0 +1,2 @@
+var l es [1, 2]
+var m es l.agregar

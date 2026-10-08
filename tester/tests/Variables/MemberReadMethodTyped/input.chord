@@ -1,0 +1,2 @@
+var f tipo Fecha es nuevo Fecha()
+var d es f.dia

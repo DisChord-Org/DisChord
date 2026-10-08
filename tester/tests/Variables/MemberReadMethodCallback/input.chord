@@ -1,0 +1,3 @@
+var t es " a "
+var l es [" b "]
+l.mapear(t.limpiar)
