@@ -1,0 +1,4 @@
+var t es "hola"
+consola.imprimir(t.mayusculas())
+consola.imprimir(t.longitud)
+consola.imprimir(t.tiene("o"))

@@ -1,0 +1,150 @@
+[
+  {
+    "type": "importar",
+    "identificators": [
+      "chordTiene"
+    ],
+    "isDestructured": true,
+    "path": "./lib/runtimeHelpers.js",
+    "location": {
+      "line": 0,
+      "column": 0
+    }
+  },
+  {
+    "type": "importar",
+    "identificators": [],
+    "path": "./lib/consoleRuntime.js",
+    "isDestructured": false,
+    "location": {
+      "line": 0,
+      "column": 0
+    }
+  },
+  {
+    "type": "funcion",
+    "id": "hayEn",
+    "metadata": {
+      "isConstructor": false,
+      "isMethod": false,
+      "isStatic": false,
+      "isAsync": false
+    },
+    "params": [
+      "c"
+    ],
+    "paramTypes": [
+      {
+        "kind": "union",
+        "members": [
+          {
+            "kind": "class",
+            "name": "Mapa"
+          },
+          {
+            "kind": "primitive",
+            "name": "texto"
+          }
+        ]
+      }
+    ],
+    "body": [
+      {
+        "type": "devolver",
+        "object": {
+          "type": "Llamada",
+          "object": {
+            "type": "Acceso",
+            "object": {
+              "type": "IDENTIFICADOR",
+              "value": "c",
+              "location": {
+                "line": 2,
+                "column": 14
+              }
+            },
+            "property": "tiene",
+            "location": {
+              "line": 2,
+              "column": 16
+            }
+          },
+          "params": [
+            {
+              "type": "Literal",
+              "value": "a",
+              "raw": "a",
+              "location": {
+                "line": 2,
+                "column": 22
+              }
+            }
+          ],
+          "location": {
+            "line": 2,
+            "column": 25
+          }
+        },
+        "location": {
+          "line": 2,
+          "column": 25
+        }
+      }
+    ],
+    "location": {
+      "line": 3,
+      "column": 1
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 5,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 5,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "Llamada",
+        "object": {
+          "type": "IDENTIFICADOR",
+          "value": "hayEn",
+          "location": {
+            "line": 5,
+            "column": 18
+          }
+        },
+        "params": [
+          {
+            "type": "Literal",
+            "value": "abc",
+            "raw": "abc",
+            "location": {
+              "line": 5,
+              "column": 24
+            }
+          }
+        ],
+        "location": {
+          "line": 5,
+          "column": 29
+        }
+      }
+    ],
+    "location": {
+      "line": 5,
+      "column": 30
+    }
+  }
+]

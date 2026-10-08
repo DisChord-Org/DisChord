@@ -1,0 +1,12 @@
+@asincrono
+funcion nombre() {
+    devolver " ab "
+}
+
+@asincrono
+funcion principal() {
+    consola.imprimir(nombre().tiene("a"))
+    consola.imprimir(nombre().limpiar())
+}
+
+principal()

@@ -1,0 +1,130 @@
+[
+  {
+    "type": "importar",
+    "identificators": [],
+    "path": "./lib/consoleRuntime.js",
+    "isDestructured": false,
+    "location": {
+      "line": 0,
+      "column": 0
+    }
+  },
+  {
+    "type": "funcion",
+    "id": "crear",
+    "metadata": {
+      "isConstructor": false,
+      "isMethod": false,
+      "isStatic": false,
+      "isAsync": false
+    },
+    "params": [],
+    "returnType": {
+      "kind": "class",
+      "name": "Mapa"
+    },
+    "body": [
+      {
+        "type": "devolver",
+        "object": {
+          "type": "nuevo",
+          "object": {
+            "type": "Llamada",
+            "object": {
+              "type": "IDENTIFICADOR",
+              "value": "Mapa",
+              "location": {
+                "line": 2,
+                "column": 20
+              }
+            },
+            "params": [],
+            "location": {
+              "line": 2,
+              "column": 25
+            }
+          },
+          "location": {
+            "line": 2,
+            "column": 25
+          }
+        },
+        "location": {
+          "line": 2,
+          "column": 25
+        }
+      }
+    ],
+    "location": {
+      "line": 3,
+      "column": 1
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 5,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 5,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "Llamada",
+        "object": {
+          "type": "Acceso",
+          "object": {
+            "type": "Llamada",
+            "object": {
+              "type": "IDENTIFICADOR",
+              "value": "crear",
+              "location": {
+                "line": 5,
+                "column": 18
+              }
+            },
+            "params": [],
+            "location": {
+              "line": 5,
+              "column": 24
+            }
+          },
+          "property": "tiene",
+          "location": {
+            "line": 5,
+            "column": 26
+          }
+        },
+        "params": [
+          {
+            "type": "Literal",
+            "value": "a",
+            "raw": "a",
+            "location": {
+              "line": 5,
+              "column": 32
+            }
+          }
+        ],
+        "location": {
+          "line": 5,
+          "column": 35
+        }
+      }
+    ],
+    "location": {
+      "line": 5,
+      "column": 36
+    }
+  }
+]

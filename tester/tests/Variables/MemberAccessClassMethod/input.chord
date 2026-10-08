@@ -1,0 +1,9 @@
+clase Caja {
+    prop x es "a"
+
+    funcion f() {
+        devolver esta.x.mayusculas()
+    }
+}
+
+consola.imprimir(nuevo Caja().f())

@@ -1,0 +1,5 @@
+var m tipo Mapa es nuevo Mapa()
+m.poner("a", 1)
+consola.imprimir(m.tiene("a"))
+consola.imprimir(m.tamano)
+m.limpiar()

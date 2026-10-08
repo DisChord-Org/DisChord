@@ -1,0 +1,11 @@
+funcion leer(a) {
+    consola.imprimir(a.dia.mes)
+    devolver a.b.c()
+}
+
+var u es {
+    dia {
+        mes 1
+    }
+}
+consola.imprimir(leer(u))

@@ -1,0 +1,13 @@
+clase Caja {
+    funcion partir(x) {
+        devolver x
+    }
+}
+
+funcion g(p) {
+    devolver p.partir(",")
+}
+
+var c es nuevo Caja()
+consola.imprimir(c.partir("a"))
+consola.imprimir(g(c))

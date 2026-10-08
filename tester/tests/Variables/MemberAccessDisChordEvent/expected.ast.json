@@ -1,0 +1,69 @@
+[
+  {
+    "type": "Evento",
+    "name": "encendido",
+    "body": [
+      {
+        "type": "Llamada",
+        "object": {
+          "type": "IDENTIFICADOR",
+          "value": "imprimir",
+          "location": {
+            "line": 2,
+            "column": 5
+          }
+        },
+        "params": [
+          {
+            "type": "ExpresionBinaria",
+            "left": {
+              "type": "Acceso",
+              "object": {
+                "type": "IDENTIFICADOR",
+                "value": "cliente",
+                "location": {
+                  "line": 2,
+                  "column": 14
+                }
+              },
+              "property": "nombre",
+              "location": {
+                "line": 2,
+                "column": 22
+              }
+            },
+            "operator": "mas",
+            "right": {
+              "type": "Acceso",
+              "object": {
+                "type": "IDENTIFICADOR",
+                "value": "cliente",
+                "location": {
+                  "line": 2,
+                  "column": 33
+                }
+              },
+              "property": "id",
+              "location": {
+                "line": 2,
+                "column": 41
+              }
+            },
+            "location": {
+              "line": 2,
+              "column": 41
+            }
+          }
+        ],
+        "location": {
+          "line": 2,
+          "column": 43
+        }
+      }
+    ],
+    "location": {
+      "line": 3,
+      "column": 1
+    }
+  }
+]

@@ -1,0 +1,5 @@
+var l es [1, 2]
+consola.imprimir(l.longitud)
+consola.imprimir(l.tiene(1))
+l.agregar(3)
+consola.imprimir(l)

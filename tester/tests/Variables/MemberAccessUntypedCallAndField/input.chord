@@ -1,0 +1,6 @@
+funcion f(p) {
+    consola.imprimir(p.dia)
+    devolver p.mayusculas()
+}
+
+consola.imprimir(f("a"))

@@ -1,0 +1,112 @@
+[
+  {
+    "type": "importar",
+    "identificators": [],
+    "path": "./lib/consoleRuntime.js",
+    "isDestructured": false,
+    "location": {
+      "line": 0,
+      "column": 0
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 1,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 1,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "Acceso",
+        "object": {
+          "type": "IDENTIFICADOR",
+          "value": "Mates",
+          "location": {
+            "line": 1,
+            "column": 18
+          }
+        },
+        "property": "PI",
+        "location": {
+          "line": 1,
+          "column": 24
+        }
+      }
+    ],
+    "location": {
+      "line": 1,
+      "column": 26
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 2,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 2,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "Llamada",
+        "object": {
+          "type": "Acceso",
+          "object": {
+            "type": "IDENTIFICADOR",
+            "value": "Mates",
+            "location": {
+              "line": 2,
+              "column": 18
+            }
+          },
+          "property": "redondear",
+          "location": {
+            "line": 2,
+            "column": 24
+          }
+        },
+        "params": [
+          {
+            "type": "Literal",
+            "value": 1.5,
+            "raw": "1.5",
+            "location": {
+              "line": 2,
+              "column": 34
+            }
+          }
+        ],
+        "location": {
+          "line": 2,
+          "column": 37
+        }
+      }
+    ],
+    "location": {
+      "line": 2,
+      "column": 38
+    }
+  }
+]

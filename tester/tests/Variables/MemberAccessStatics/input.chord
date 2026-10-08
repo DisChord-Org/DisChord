@@ -1,0 +1,2 @@
+consola.imprimir(Mates.PI)
+consola.imprimir(Mates.redondear(1.5))

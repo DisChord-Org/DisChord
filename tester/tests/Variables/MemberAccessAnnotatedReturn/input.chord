@@ -1,0 +1,5 @@
+funcion crear() -> Mapa {
+    devolver nuevo Mapa()
+}
+
+consola.imprimir(crear().tiene("a"))

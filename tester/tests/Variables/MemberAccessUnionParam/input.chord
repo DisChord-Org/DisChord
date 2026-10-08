@@ -1,0 +1,5 @@
+funcion hayEn(c tipo Mapa|texto) {
+    devolver c.tiene("a")
+}
+
+consola.imprimir(hayEn("abc"))
