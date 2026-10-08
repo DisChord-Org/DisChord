@@ -1,0 +1,183 @@
+[
+  {
+    "type": "clase",
+    "id": "A",
+    "body": [],
+    "location": {
+      "line": 2,
+      "column": 1
+    }
+  },
+  {
+    "type": "clase",
+    "id": "B",
+    "superClass": "A",
+    "body": [],
+    "location": {
+      "line": 5,
+      "column": 1
+    }
+  },
+  {
+    "type": "clase",
+    "id": "E",
+    "superClass": "Z",
+    "body": [],
+    "location": {
+      "line": 8,
+      "column": 1
+    }
+  },
+  {
+    "type": "clase",
+    "id": "F",
+    "superClass": "G",
+    "body": [],
+    "location": {
+      "line": 11,
+      "column": 1
+    }
+  },
+  {
+    "type": "clase",
+    "id": "G",
+    "superClass": "F",
+    "body": [],
+    "location": {
+      "line": 14,
+      "column": 1
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "b",
+    "value": {
+      "type": "nuevo",
+      "object": {
+        "type": "Llamada",
+        "object": {
+          "type": "IDENTIFICADOR",
+          "value": "B",
+          "location": {
+            "line": 16,
+            "column": 16
+          }
+        },
+        "params": [
+          {
+            "type": "Literal",
+            "value": 1,
+            "raw": "1",
+            "location": {
+              "line": 16,
+              "column": 18
+            }
+          },
+          {
+            "type": "Literal",
+            "value": 2,
+            "raw": "2",
+            "location": {
+              "line": 16,
+              "column": 21
+            }
+          }
+        ],
+        "location": {
+          "line": 16,
+          "column": 22
+        }
+      },
+      "location": {
+        "line": 16,
+        "column": 22
+      }
+    },
+    "location": {
+      "line": 16,
+      "column": 22
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "e",
+    "value": {
+      "type": "nuevo",
+      "object": {
+        "type": "Llamada",
+        "object": {
+          "type": "IDENTIFICADOR",
+          "value": "E",
+          "location": {
+            "line": 17,
+            "column": 16
+          }
+        },
+        "params": [
+          {
+            "type": "Literal",
+            "value": 1,
+            "raw": "1",
+            "location": {
+              "line": 17,
+              "column": 18
+            }
+          }
+        ],
+        "location": {
+          "line": 17,
+          "column": 19
+        }
+      },
+      "location": {
+        "line": 17,
+        "column": 19
+      }
+    },
+    "location": {
+      "line": 17,
+      "column": 19
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "f",
+    "value": {
+      "type": "nuevo",
+      "object": {
+        "type": "Llamada",
+        "object": {
+          "type": "IDENTIFICADOR",
+          "value": "F",
+          "location": {
+            "line": 18,
+            "column": 16
+          }
+        },
+        "params": [
+          {
+            "type": "Literal",
+            "value": 1,
+            "raw": "1",
+            "location": {
+              "line": 18,
+              "column": 18
+            }
+          }
+        ],
+        "location": {
+          "line": 18,
+          "column": 19
+        }
+      },
+      "location": {
+        "line": 18,
+        "column": 19
+      }
+    },
+    "location": {
+      "line": 18,
+      "column": 19
+    }
+  }
+]

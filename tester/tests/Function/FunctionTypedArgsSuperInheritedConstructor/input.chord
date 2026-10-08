@@ -1,0 +1,18 @@
+clase A {
+    A(x tipo numero) {
+        esta.x es x
+    }
+
+    funcion dato() {
+        devolver esta.x
+    }
+}
+
+clase B extiende A {
+}
+
+clase C extiende B {
+    C() {
+        super("x")
+    }
+}

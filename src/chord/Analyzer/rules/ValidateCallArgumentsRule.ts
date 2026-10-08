@@ -1,7 +1,7 @@
 import { AnalysisRule } from "../AnalysisRule";
 import { TypeInferrer } from "../TypeInferrer";
 import { UserMemberResolver } from "../UserMemberResolver";
-import { ASTNode, BaseNode, CallNode, Symbol, SymbolKind, TokenType } from "../../types";
+import { ASTNode, BaseNode, CallNode, CompilerMetadataKind, Symbol, SymbolKind, TokenType } from "../../types";
 import { isAccessNode, isIdentificatorNode } from "../../ast.guards";
 import { PrimitiveDataType } from "../../DataType";
 import { PrimitiveType } from "../../types";
@@ -17,7 +17,8 @@ import { ChordError, ErrorLevel } from "../../../errors/ChordError";
  * argument of unknown type or `cualquiera`, are never rejected. The argument count must match the
  * parameter count, except that a missing argument is fine for a parameter without a type or whose
  * type admits `indefinido`. A call to a class (`nuevo Caja(...)`) is checked against its
- * constructor.
+ * constructor, or the nearest one it inherits, and `super(...)` against the constructor of the
+ * parent class (also inherited if needed).
  *
  * Walks the tree with the same scopes as the earlier passes, so the types of the locals passed as
  * arguments are resolved.
@@ -83,14 +84,46 @@ export class ValidateCallArgumentsRule<T extends string, N extends BaseNode<T>> 
 
             if (symbol?.kind === SymbolKind.Function) return { symbol, name: callee.value };
 
-            const constructor = symbol?.kind === SymbolKind.Class ? symbolTable.findMember(callee.value, callee.value) : undefined;
+            const constructor = symbol?.kind === SymbolKind.Class ? this.constructorOf(callee.value) : undefined;
             return constructor ? { symbol: constructor, name: callee.value } : undefined;
+        }
+
+        if (callee.type === TokenType.Super) {
+            const currentClass = symbolTable.getMetadata<string>(CompilerMetadataKind.CurrentClass);
+            const parent = currentClass === undefined ? undefined : symbolTable.superClassOf(currentClass);
+            const constructor = parent === undefined ? undefined : this.constructorOf(parent);
+
+            return constructor && parent !== undefined ? { symbol: constructor, name: parent } : undefined;
         }
 
         if (!isAccessNode(callee)) return undefined;
 
         const symbol = this.members.resolve(callee, this.typeInferrer.infer(callee.object));
         return symbol?.kind === SymbolKind.Function ? { symbol, name: callee.property } : undefined;
+    }
+
+    /**
+     * The constructor `nuevo` runs for a class: its own, or else the nearest one up its chain of
+     * parents. A parent that isn't a class of the file ends the search, and a cycle in the chain
+     * is cut, so a broken hierarchy leaves the call unchecked instead of hanging.
+     * @param {string} className - A class of the file.
+     * @returns {Symbol | undefined} The constructor, or `undefined` if no class of the chain declares one.
+     */
+    private constructorOf (className: string): Symbol | undefined {
+        const symbolTable = this.context.symbolTable;
+        const seen = new Set<string>();
+        let current: string | undefined = className;
+
+        while (current !== undefined && !seen.has(current) && symbolTable.isUserClass(current)) {
+            seen.add(current);
+
+            const own = symbolTable.findMember(current, current);
+            if (own?.kind === SymbolKind.Function) return own;
+
+            current = symbolTable.superClassOf(current);
+        }
+
+        return undefined;
     }
 
     private fail (message: string, node: ASTNode<T, N>): never {

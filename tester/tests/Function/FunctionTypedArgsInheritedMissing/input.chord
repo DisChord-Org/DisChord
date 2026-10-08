@@ -1,0 +1,14 @@
+clase A {
+    A(x tipo numero) {
+        esta.x es x
+    }
+
+    funcion dato() {
+        devolver esta.x
+    }
+}
+
+clase B extiende A {
+}
+
+var b es nuevo B()

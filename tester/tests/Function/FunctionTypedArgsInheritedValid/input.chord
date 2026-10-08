@@ -1,0 +1,25 @@
+clase A {
+    A(x tipo numero) {
+        esta.x es x
+    }
+
+    funcion dato() {
+        devolver esta.x
+    }
+}
+
+clase B extiende A {
+}
+
+clase C extiende B {
+}
+
+clase D extiende A {
+    D() {
+        super(7)
+    }
+}
+
+var c es nuevo C(5)
+consola.imprimir(c.dato())
+consola.imprimir(nuevo D().dato())
