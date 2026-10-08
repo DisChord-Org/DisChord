@@ -100,7 +100,8 @@ export interface Symbol {
      * The symbol's resolved type, if any. Unlike `VariableNode.dataType` — which only ever holds
      * what the user literally wrote after `tipo` — this is the *final* answer: an explicit
      * annotation, or the type inferred from a literal (or homogeneous array literal) initializer
-     * when no annotation was written. Left `undefined` at registration time (Analyzer Pass 2,
+     * when no annotation was written — `cualquiera` if a reassignment of such a variable has
+     * another type or one that can't be inferred. Left `undefined` at registration time (Analyzer Pass 2,
      * `BindDeclarationsRule`) and filled in afterwards by Pass 3 (`ResolveVariableTypesRule`, via
      * `SymbolTable.setDataType`), once the whole file's declarations are visible.
      */

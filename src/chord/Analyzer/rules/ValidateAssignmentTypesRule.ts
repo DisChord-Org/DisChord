@@ -14,6 +14,10 @@ import { ChordError, ErrorLevel } from "../../../errors/ChordError";
  * so it can't rely on "declared earlier in the same walk" the way Pass 3 itself can), not just a
  * lowering step independent of the binding model.
  *
+ * A variable without an annotation whose reassignments change its type is already `cualquiera`
+ * by then (see `ResolveVariableTypesRule`), so only the ones that keep it, and the annotated
+ * ones, can be rejected here.
+ *
  * Only checks a simple `identificador es <expr>` target — a property or index assignment
  * (`objeto.propiedad es x`, `lista[0] es x`) has no tracked `dataType` to check against, so it's
  * silently left alone, same as any other currently-untyped target.

@@ -1,6 +1,7 @@
 import { AnalysisRule } from "../AnalysisRule";
-import { ASTNode, BaseNode, ListNode, TokenType, VariableNode } from "../../types";
-import { DataType, TupleDataType, VoidDataType } from "../../DataType";
+import { ASTNode, AssignmentNode, BaseNode, ListNode, Symbol, TokenType, VariableNode } from "../../types";
+import { isIdentificatorNode } from "../../ast.guards";
+import { AnyDataType, DataType, TupleDataType, VoidDataType } from "../../DataType";
 import { TypeInferrer } from "../TypeInferrer";
 import { ChordError, ErrorLevel } from "../../../errors/ChordError";
 
@@ -24,6 +25,13 @@ import { ChordError, ErrorLevel } from "../../../errors/ChordError";
  *    all — a call to a user function, an index access, a component declaration (embed, comando,
  *    ...), or a function's return value (functions have no declared return type yet).
  *
+ * A variable declared without an annotation keeps its inferred type only while every reassignment
+ * has an inferrable type assignable to it; if one is of another type, or can't be inferred, the
+ * variable becomes `cualquiera` everywhere (`var a es 5` then `a es "cinco"`; `var x` then
+ * `x es 5`, since its implicit value is `indefinido`). That can change what is derived from the
+ * variable, so the types are resolved again until no variable is degraded anymore. An annotated
+ * variable never changes: its reassignments are checked by `ValidateAssignmentTypesRule`.
+ *
  * Mirrors `BindDeclarationsRule`'s own traversal: classes and functions get their own lexical
  * scope for their body, kept entered by `walkScoped` while it is visited, so a variable's resolved type
  * lands on the same `SymbolTable` scope entry `BindDeclarationsRule` created for it.
@@ -37,10 +45,75 @@ export class ResolveVariableTypesRule<T extends string, N extends BaseNode<T>> e
     private readonly typeInferrer: TypeInferrer<T, N> = new TypeInferrer(this.context);
 
     /**
+     * The variables declared without an annotation, and those among them that a reassignment
+     * made `cualquiera`. Symbols are compared by identity, so a variable that shadows another one
+     * is its own.
+     * @private
+     */
+    private readonly unannotated: Set<Symbol> = new Set();
+    private readonly degraded: Set<Symbol> = new Set();
+
+    /**
      * @override
      */
     check (nodes: ASTNode<T, N>[]): void {
+        let changed: boolean;
+
+        do {
+            this.walkScoped(nodes, current => this.declare(current));
+
+            changed = false;
+            this.walkScoped(nodes, current => {
+                if (this.degradeIfReassignedToOtherType(current)) changed = true;
+            });
+        } while (changed);
+
         this.walkScoped(nodes, current => this.enter(current));
+    }
+
+    /**
+     * Gives each variable its type without validating anything: an annotated one its annotation,
+     * the others what their initializer infers, or `cualquiera` if already degraded.
+     * @private
+     */
+    private declare (node: ASTNode<T, N>): void {
+        if (node.type !== TokenType.VARIABLE) return;
+
+        const variableNode = node as VariableNode<T, N>;
+        const symbolTable = this.context.symbolTable;
+
+        if (variableNode.dataType) {
+            symbolTable.setDataType(variableNode.id, variableNode.dataType);
+            return;
+        }
+
+        const symbol = symbolTable.lookup(variableNode.id);
+        if (symbol) this.unannotated.add(symbol);
+
+        symbolTable.setDataType(variableNode.id, symbol && this.degraded.has(symbol) ? AnyDataType.Any : this.typeInferrer.infer(variableNode.value));
+    }
+
+    /**
+     * Degrades the target of a reassignment to `cualquiera` when it is a variable declared without
+     * an annotation, has a type, and the assigned value has none that can be inferred or one the
+     * type doesn't accept.
+     * @returns {boolean} Whether a variable was degraded now.
+     * @private
+     */
+    private degradeIfReassignedToOtherType (node: ASTNode<T, N>): boolean {
+        if (node.type !== TokenType.ASIGNACION) return false;
+
+        const target = (node as AssignmentNode<T, N>).left;
+        if (!isIdentificatorNode(target)) return false;
+
+        const symbol = this.context.symbolTable.lookup(target.value);
+        if (!symbol || !this.unannotated.has(symbol) || this.degraded.has(symbol) || !symbol.dataType) return false;
+
+        const assignedType = this.typeInferrer.infer((node as AssignmentNode<T, N>).assignment);
+        if (assignedType && symbol.dataType.isAssignableFrom(assignedType)) return false;
+
+        this.degraded.add(symbol);
+        return true;
     }
 
     /**
@@ -69,7 +142,8 @@ export class ResolveVariableTypesRule<T extends string, N extends BaseNode<T>> e
      * is assignable to it.
      * @param {VariableNode<T, N>} variableNode - The variable declaration to resolve.
      * @returns {DataType | undefined} The resolved type, or `undefined` if neither an annotation
-     * nor an inferrable initializer is present.
+     * nor an inferrable initializer is present. `cualquiera` for a variable without an annotation
+     * that a reassignment degraded.
      * @throws {ChordError} If the explicit `tipo` annotation isn't assignable from the inferred
      * type (or, for a tuple, if the list literal's shape doesn't match it).
      * @private
@@ -94,7 +168,10 @@ export class ResolveVariableTypesRule<T extends string, N extends BaseNode<T>> e
             location: variableNode.location
         }).format();
 
-        return variableNode.dataType ?? inferredType;
+        if (variableNode.dataType) return variableNode.dataType;
+
+        const symbol = this.context.symbolTable.lookup(variableNode.id);
+        return symbol && this.degraded.has(symbol) ? AnyDataType.Any : inferredType;
     }
 
     /**
