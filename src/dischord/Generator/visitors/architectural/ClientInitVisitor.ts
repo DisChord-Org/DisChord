@@ -30,14 +30,14 @@ export default class ClietInitVisitor extends SubGenerator<DisChordNodeType, Dis
         const prefixNode = (blocks['prefijo'] || blocks['prefijos'])!;
 
         const prefix = this.parent.visit(prefixNode);
-        const isArray = prefixNode.type === 'Lista';
+        const isArray = prefixNode.type === TokenType.LISTA;
 
         let includeSlash = false;
         if (isArray) {
             includeSlash = prefixNode.body.some(
-                (p) => p.type === 'Literal' && p.value === '/'
+                (p) => p.type === TokenType.LITERAL && p.value === '/'
             );
-        } else if (prefixNode.type === 'Literal') {
+        } else if (prefixNode.type === TokenType.LITERAL) {
             includeSlash = prefixNode.value === '/';
         }
 
@@ -85,7 +85,7 @@ export default class ClietInitVisitor extends SubGenerator<DisChordNodeType, Dis
         const forwardedImports = this.forwardReferencedImports(node);
         let intents = "[]";
 
-        if (intentsNode && intentsNode.type === 'Lista') {
+        if (intentsNode && intentsNode.type === TokenType.LISTA) {
             const list = intentsNode.body.map((item: any) => {
                 const val = item.value?.toString().replace(/"/g, '');
                 const mapped = intentsMap[val];
