@@ -67,6 +67,11 @@ export class SymbolTable {
     private readonly awaitedCalls: WeakSet<object> = new WeakSet();
 
     /**
+     * The name each member access is emitted with (see {@link markMember}).
+     */
+    private readonly memberNames: WeakMap<object, string> = new WeakMap();
+
+    /**
      * Member accesses that are the callee of a call (see {@link markCallee}).
      */
     private readonly calleeAccesses: WeakSet<object> = new WeakSet();
@@ -222,6 +227,25 @@ export class SymbolTable {
     public roleOf(access: object): AccessRole {
         if (this.calleeAccesses.has(access)) return 'callee';
         return this.assignmentTargets.has(access) ? 'assignment' : 'read';
+    }
+
+    /**
+     * Records the name a member access is emitted with: the JavaScript name of the core library
+     * member it stands for, or the name as written when it doesn't (a field, a member of the user).
+     *
+     * @param {object} access - The access node.
+     * @param {string} name - The final property name.
+     */
+    public markMember(access: object, name: string): void {
+        this.memberNames.set(access, name);
+    }
+
+    /**
+     * @param {object} access - The access node.
+     * @returns {string | undefined} The name the analyzer decided to emit the access with, if it did.
+     */
+    public memberOf(access: object): string | undefined {
+        return this.memberNames.get(access);
     }
 
     /**
