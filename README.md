@@ -117,8 +117,23 @@ There is no `null`: the absence of a value is always `indefinido`.
 
 ### Types
 
-Types are optional. A variable, parameter or return value without an annotation is still inferred
-from what it holds; one with an annotation is checked, and a mismatch stops the compilation.
+Types are optional. A variable, parameter or return value without an annotation has its type
+inferred from what it holds, and keeps it as long as every reassignment agrees. If a reassignment
+changes the type, or its type can't be inferred, the variable becomes `cualquiera` for its whole
+scope (and so does anything derived from it, such as `var b es a mas 1`). One with an annotation is
+checked, and a mismatch stops the compilation.
+
+```js
+var a es 5
+a es "cinco"            // fine: `a` is now `cualquiera`
+
+var x                   // declared without a value
+x es 5                  // fine
+
+var b tipo numero es 5
+b es "cinco"
+// La variable 'b' es de tipo 'numero' pero se le asignó un valor de tipo 'texto'
+```
 
 | Type | Meaning | Example |
 | :--- | :--- | :--- |
