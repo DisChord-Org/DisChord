@@ -1,0 +1,8 @@
+clase Caja {
+    prop Mapa es 1
+
+    funcion Conjunto() { devolver 2 }
+}
+
+var c es nuevo Caja()
+consola.imprimir(c.Conjunto())

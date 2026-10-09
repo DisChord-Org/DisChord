@@ -1,6 +1,7 @@
 import { ASTNode, BaseNode, TokenType } from "../types";
 import { CompilationContext } from "../../cli/commands/CompileCommand";
 import { AnalysisRule, AnalysisRuleClass } from "./AnalysisRule";
+import { ValidateDeclarationNamesRule } from "./rules/ValidateDeclarationNamesRule";
 import { BindImportsRule } from "./rules/BindImportsRule";
 import { ValidateImportTargetsRule } from "./rules/ValidateImportTargetsRule";
 import { BindDeclarationsRule } from "./rules/BindDeclarationsRule";
@@ -48,6 +49,10 @@ export class Analyzer<T extends string, N extends BaseNode<T>> {
      * @static
      */
     private static readonly Rules: AnalysisRuleClass<TokenType, BaseNode<TokenType>>[] = [
+        // A declared name can't be one of a class of the core library. First, so this is the error
+        // given instead of a duplicate declaration.
+        ValidateDeclarationNamesRule,
+
         // Pass 1 ("Imports"): bind every imported name before anything else needs to see it.
         BindImportsRule,
 

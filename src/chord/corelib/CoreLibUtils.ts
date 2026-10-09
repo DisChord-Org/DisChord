@@ -216,6 +216,22 @@ export class CoreLibUtils<C extends string = string> {
     }
 
     /**
+     * @param {string} name - A name as written in source code.
+     * @returns {boolean} Whether it is the name of a class of the table.
+     */
+    isClassName(name: string): boolean {
+        return this.hasOwn(this.corelib.classes, name);
+    }
+
+    /**
+     * @param {string} name - A name as written in source code.
+     * @returns {boolean} Whether it is the name of a class the compiler puts in scope itself (`cliente`, `canal`), which a program can't declare, except as a parameter.
+     */
+    isInjectedName(name: string): boolean {
+        return this.isClassName(name) && this.corelib.classes[name as C].injected === true;
+    }
+
+    /**
      * @param {string} name - Class name as written in a `tipo` annotation.
      * @returns {DataType | undefined} What a value of that class is typed as (`Lista` is `cualquiera[]`), or `undefined` if it isn't a core library class with a receiver.
      */

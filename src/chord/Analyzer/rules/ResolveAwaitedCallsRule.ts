@@ -4,7 +4,7 @@ import { UserMemberResolver } from "../UserMemberResolver";
 import { ASTNode, AccessNode, BaseNode, CallNode, ClassNode, FunctionNode, TokenType } from "../../types";
 import { isAccessNode, isIdentificatorNode } from "../../ast.guards";
 import { AnyDataType, UnionDataType, UserClassDataType } from "../../model/DataType";
-import { asyncRuntimeHelperNames, corelib } from "../../corelib";
+import { asyncRuntimeHelperNames } from "../../corelib";
 import { ChordError, ErrorLevel } from "../../../errors/ChordError";
 
 /**
@@ -141,7 +141,7 @@ export class ResolveAwaitedCallsRule<T extends string, N extends BaseNode<T>> ex
         }
 
         if (isIdentificatorNode(receiver)) {
-            if (Object.prototype.hasOwnProperty.call(corelib.classes, receiver.value) && !symbolTable.lookup(receiver.value)) {
+            if (this.context.coreLib.isClassName(receiver.value) && !symbolTable.lookup(receiver.value)) {
                 return !!this.context.coreLib.resolveStatic(access)?.member.async;
             }
         }

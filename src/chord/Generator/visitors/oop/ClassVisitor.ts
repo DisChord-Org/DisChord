@@ -18,12 +18,10 @@ export class ClassVisitor<T extends string, N extends BaseNode<T>> extends SubGe
 
     /**
      * The JavaScript name of a parent class: the constructor of the core library class it names
-     * (`Mapa` → `Map`), unless the file declares a class of that name, or the name itself otherwise.
+     * (`Mapa` → `Map`), or the name itself for a class of the file (it can't be named like one of the library).
      * @private
      */
     private parentName(name: string): string {
-        if (this.parent.context.symbolTable.classes.isUserClass(name)) return name;
-
         return this.parent.context.coreLib.resolveConstructorOf(name) ?? name;
     }
 

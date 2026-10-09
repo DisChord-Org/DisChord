@@ -27,6 +27,7 @@ export const corelib: DisChordCoreLib = {
     classes: {
         ...chordCorelib.classes,
         [DisChordClassesEnum.cliente]: {
+            injected: true,
             methods: {
                 emitir: {
                     transpile: 'cliente.events.runEvent',
@@ -63,6 +64,7 @@ export const corelib: DisChordCoreLib = {
             }
         },
         [DisChordClassesEnum.canal]: {
+            injected: true,
             methods: {},
             properties: {
                 topico: {
