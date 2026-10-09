@@ -92,10 +92,6 @@ nuevo comando Ping {
         contenido "¡Pong!"
     }
 }
-
-evento entradaMiembro {
-    consola.imprimir("¡Un nuevo usuario ha entrado!")
-}
 ```
 
 ---
@@ -121,7 +117,10 @@ Types are optional. A variable, parameter or return value without an annotation 
 inferred from what it holds, and keeps it as long as every reassignment agrees. If a reassignment
 changes the type, or its type can't be inferred, the variable becomes `cualquiera` for its whole
 scope (and so does anything derived from it, such as `var b es a mas 1`). One with an annotation is
-checked, and a mismatch stops the compilation.
+checked, and a mismatch stops the compilation. Indexing a typed list or tuple gives the type of the
+element (`l[0]` of a `Mapa[]` is a `Mapa`; a tuple needs a literal index). A list literal of class
+instances is typed by them (`[ nuevo B(), nuevo A() ]` is a list of `A|B`), and one that mixes them with
+primitives is a list of the union.
 
 ```js
 var a es 5
@@ -144,20 +143,18 @@ b es "cinco"
 | `A\|B` | A union | `var id tipo texto\|numero es 7` |
 | `cualquiera` | Any value, unchecked | `var x tipo cualquiera es 1` |
 | `Mapa`, `Conjunto`, `Fecha`, ... | A core library class | `var m tipo Mapa es nuevo Mapa()` |
-| `MiClase` | A class declared in the file | `var c tipo Caja es nuevo Caja()` |
+| `MiClase` | A class declared in the file; accepts its subclasses | `var c tipo Caja es nuevo Caja()` |
 
 Functions annotate their parameters with `tipo` and their return value with `->`. `nada` is the
 return type of a function that returns no value, and is only valid there.
 
 ```js
 funcion saludar(quien tipo texto, veces tipo numero) -> texto {
-    para (_ en rango(veces)) {
-        devolver "Hola " mas quien
-    }
+    devolver "Hola " mas quien
 }
 
-funcion avisar(mensaje tipo texto) -> nada {
-    consola.imprimir(mensaje)
+funcion avisar(aviso tipo texto) -> nada {
+    consola.imprimir(aviso)
 }
 
 @asincrono
@@ -181,9 +178,87 @@ doble("tres")
 // El argumento 1 de 'doble' es de tipo 'texto', se esperaba 'numero'
 ```
 
-The checks are structural for core library classes (a `Mapa` is not a `Conjunto`) and permissive for
-the classes you declare (any class instance is accepted where another is expected). Generic types
+The checks are structural for core library classes (a `Mapa` is not a `Conjunto`) and nominal for
+the classes you declare: an instance is accepted where its own class or a class it extends is expected,
+not the other way round and not between unrelated classes (a class is identified by its name, so two
+classes of the same name in different scopes are the same type). Generic types
 (`Mapa<texto, numero>`) are not supported yet.
+
+A type name the compiler doesn't know stops the compilation and lists the valid ones: the primitives,
+`cualquiera`, `Lista`, `Mapa`, `Conjunto`, `Promesa`, `Expresion` and `Fecha`, a class declared in the
+file, and the shapes `T[]`, `[A, B]` and `A|B`. `Mates`, `JSON`, `Aleatorio` and `consola` are not types.
+
+```js
+var x tipo Mates es 1
+// Tipo desconocido 'Mates'. Tipos válidos: texto, numero, booleano, bdo, indefinido, cualquiera, Lista, Mapa, Conjunto, Promesa, Expresion, Fecha o una clase declarada en el archivo; también T[], [A, B] y A|B
+```
+
+Where the receiver's class is known, a core library method must be called and a property must not be;
+anything else would compile to JavaScript that doesn't do what was written.
+
+```js
+var f tipo Fecha es nuevo Fecha()
+f.dia
+// 'dia' es un método de Fecha: llámalo con paréntesis, dia()
+
+var t es "hola"
+t.longitud()
+// 'longitud' es una propiedad de Texto, no un método
+```
+
+Classes are checked too. A subclass must be declared after its base, inheriting in a cycle is an error,
+and a base that isn't declared in the file is taken as external (a class dischord generates, or a
+JavaScript global such as `Error`). A class that extends a core library class (`nuevo Mapa MiMapa {}`)
+extends the native `Map`, although the compiler doesn't know it inherits its methods. A method that
+overrides another can't change whether it is `@asincrono`, because a call is awaited by what the base
+class declares.
+
+```js
+clase B extiende A {
+}
+clase A {
+}
+// La clase 'B' extiende de 'A', que se declara más abajo; declara 'A' antes de 'B'
+
+clase A extiende B {
+}
+clase B extiende A {
+}
+// La clase 'A' hereda de sí misma (A → B → A)
+
+clase A {
+    funcion m() { devolver 1 }
+}
+clase B extiende A {
+    @asincrono
+    funcion m() { devolver 2 }
+}
+// El método 'm' de 'B' es asíncrono pero el de 'A' no
+```
+
+Reading `longitud` or `tamano` from a value whose type is not known (a parameter without
+`tipo`, or a `cualquiera` value) is resolved when the program runs: a text, a list, a `Mapa`
+or a `Conjunto` gives its length or size, and a `bdo` with a field of that name gives the
+field. Writing to it (`p.longitud es 3`) is always a field.
+
+```js
+funcion largo(valor) {          // `valor` has no type
+    devolver valor.longitud
+}
+
+consola.imprimir(largo("abc"))             // 3
+consola.imprimir(largo([ 1, 2 ]))          // 2
+consola.imprimir(largo({ longitud 5 }))    // 5
+```
+
+### Known limitations
+
+- A class is identified by its name, so two classes of the same name in different scopes are the same type.
+- A class that extends a core library class isn't assignable to it, and its inherited members aren't
+  resolved through it by the compiler.
+- There are no generic types, type aliases or interfaces, and `si` doesn't narrow a type.
+- The variable of a `para` loop, a function's return value without a `->` annotation and the implicit
+  parameters of dischord constructs are not typed.
 
 ### Natural Operators
 
