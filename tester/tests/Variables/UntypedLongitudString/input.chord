@@ -1,0 +1,5 @@
+funcion largo(p) {
+    devolver p.longitud
+}
+
+consola.imprimir(largo("abc"))

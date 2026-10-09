@@ -35,11 +35,12 @@ export class RequiresRuntimeHelpersRule<T extends string, N extends BaseNode<T>>
      */
     private helperOf (node: ASTNode<T, N>): string | undefined {
         const dispatch = isCallNode(node) ? this.context.symbolTable.marks.dispatchOf(node) : undefined;
-        const transpiled = dispatch
+        const memberHelper = isAccessNode(node) ? this.context.symbolTable.marks.memberHelperOf(node) : undefined;
+        const transpiled = memberHelper ?? (dispatch
             ? ('helper' in dispatch ? dispatch.helper : undefined)
             : isAccessNode(node)
                 ? this.context.coreLib.resolveStatic(node)?.member.transpile
-                : isCallNode(node) ? this.context.coreLib.resolveFunction(node.object, this.isDeclared(node.object)) : undefined;
+                : isCallNode(node) ? this.context.coreLib.resolveFunction(node.object, this.isDeclared(node.object)) : undefined);
 
         return transpiled !== undefined && runtimeHelperNames.has(transpiled) ? transpiled : undefined;
     }

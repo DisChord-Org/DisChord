@@ -2,7 +2,7 @@
   {
     "type": "importar",
     "identificators": [
-      "chordLongitud"
+      "chordTamano"
     ],
     "isDestructured": true,
     "path": "./lib/runtimeHelpers.js",
@@ -23,7 +23,7 @@
   },
   {
     "type": "funcion",
-    "id": "largo",
+    "id": "tam",
     "metadata": {
       "isConstructor": false,
       "isMethod": false,
@@ -31,7 +31,7 @@
       "isAsync": false
     },
     "params": [
-      "t"
+      "p"
     ],
     "body": [
       {
@@ -40,13 +40,13 @@
           "type": "Acceso",
           "object": {
             "type": "IDENTIFICADOR",
-            "value": "t",
+            "value": "p",
             "location": {
               "line": 2,
               "column": 14
             }
           },
-          "property": "longitud",
+          "property": "tamano",
           "location": {
             "line": 2,
             "column": 16
@@ -64,6 +64,34 @@
     }
   },
   {
+    "type": "Variable",
+    "id": "obj",
+    "value": {
+      "type": "BDO",
+      "mode": 0,
+      "blocks": {
+        "tamano": {
+          "type": "Literal",
+          "value": 7,
+          "raw": "7",
+          "location": {
+            "line": 6,
+            "column": 12
+          }
+        }
+      },
+      "body": [],
+      "location": {
+        "line": 7,
+        "column": 1
+      }
+    },
+    "location": {
+      "line": 7,
+      "column": 1
+    }
+  },
+  {
     "type": "Llamada",
     "object": {
       "type": "Acceso",
@@ -71,13 +99,13 @@
         "type": "IDENTIFICADOR",
         "value": "consola",
         "location": {
-          "line": 5,
+          "line": 8,
           "column": 1
         }
       },
       "property": "imprimir",
       "location": {
-        "line": 5,
+        "line": 8,
         "column": 9
       }
     },
@@ -86,32 +114,31 @@
         "type": "Llamada",
         "object": {
           "type": "IDENTIFICADOR",
-          "value": "largo",
+          "value": "tam",
           "location": {
-            "line": 5,
+            "line": 8,
             "column": 18
           }
         },
         "params": [
           {
-            "type": "Literal",
-            "value": "hola",
-            "raw": "hola",
+            "type": "IDENTIFICADOR",
+            "value": "obj",
             "location": {
-              "line": 5,
-              "column": 24
+              "line": 8,
+              "column": 22
             }
           }
         ],
         "location": {
-          "line": 5,
-          "column": 30
+          "line": 8,
+          "column": 25
         }
       }
     ],
     "location": {
-      "line": 5,
-      "column": 31
+      "line": 8,
+      "column": 26
     }
   }
 ]

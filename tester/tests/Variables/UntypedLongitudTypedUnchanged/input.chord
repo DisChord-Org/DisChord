@@ -1,0 +1,5 @@
+funcion largo(t tipo texto) {
+    devolver t.longitud
+}
+
+consola.imprimir(largo("abc"))

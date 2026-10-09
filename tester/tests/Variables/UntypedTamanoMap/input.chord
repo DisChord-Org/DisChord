@@ -1,0 +1,7 @@
+funcion tam(p) {
+    devolver p.tamano
+}
+
+var m es nuevo Mapa()
+m.poner("a", 1)
+consola.imprimir(tam(m))

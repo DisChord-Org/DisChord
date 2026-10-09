@@ -1,6 +1,6 @@
 import { chordLongitud } from './lib/runtimeHelpers.js';
 import './lib/consoleRuntime.js';
-function largo(t) {
-    return chordLongitud(t);
+function largo(p) {
+    return chordLongitud(p);
 }
-console.log(largo('hola'));
+console.log(largo('abc'));

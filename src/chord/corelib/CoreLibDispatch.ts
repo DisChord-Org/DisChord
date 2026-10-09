@@ -79,6 +79,21 @@ export class CoreLibDispatch<C extends string = string> {
         return this.dispatchHelper(access.property);
     }
 
+    /**
+     * Decides how a property read on a receiver of unknown type is emitted when the name means a
+     * core library property (`longitud`, `tamano`): through the runtime helper that picks at run time,
+     * since an object can hold a field of that name (a `bdo` read from anywhere) and the receiver's type
+     * can't say. Only names whose every member in the table is a property, and that have a helper.
+     * @param {AccessNode<T, N>} access - The property read.
+     * @returns {UnionDispatch | undefined} The helper, or `undefined` if the name is no property of the core library or has no helper.
+     */
+    resolveUnknownPropertyDispatch<T extends string, N extends BaseNode<T>> (access: AccessNode<T, N>): UnionDispatch | undefined {
+        const members = this.utils.resolveInstanceMembers(access);
+        if (members.length === 0 || members.some(found => !found.isProperty)) return undefined;
+
+        return this.dispatchHelper(access.property);
+    }
+
     private dispatchHelper (property: string): UnionDispatch | undefined {
         const helper = `chord${property.charAt(0).toUpperCase()}${property.slice(1)}`;
         return runtimeHelperNames.has(helper) ? { helper } : undefined;

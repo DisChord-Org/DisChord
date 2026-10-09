@@ -1,0 +1,8 @@
+funcion largo(p) {
+    devolver p.longitud
+}
+
+var obj es {
+    longitud 5
+}
+consola.imprimir(largo(obj))

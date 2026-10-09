@@ -1,18 +1,6 @@
 [
   {
     "type": "importar",
-    "identificators": [
-      "chordLongitud"
-    ],
-    "isDestructured": true,
-    "path": "./lib/runtimeHelpers.js",
-    "location": {
-      "line": 0,
-      "column": 0
-    }
-  },
-  {
-    "type": "importar",
     "identificators": [],
     "path": "./lib/consoleRuntime.js",
     "isDestructured": false,
@@ -32,6 +20,12 @@
     },
     "params": [
       "t"
+    ],
+    "paramTypes": [
+      {
+        "kind": "primitive",
+        "name": "texto"
+      }
     ],
     "body": [
       {
@@ -95,8 +89,8 @@
         "params": [
           {
             "type": "Literal",
-            "value": "hola",
-            "raw": "hola",
+            "value": "abc",
+            "raw": "abc",
             "location": {
               "line": 5,
               "column": 24
@@ -105,13 +99,13 @@
         ],
         "location": {
           "line": 5,
-          "column": 30
+          "column": 29
         }
       }
     ],
     "location": {
       "line": 5,
-      "column": 31
+      "column": 30
     }
   }
 ]

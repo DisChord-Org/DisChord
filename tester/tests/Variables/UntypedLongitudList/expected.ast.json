@@ -31,7 +31,7 @@
       "isAsync": false
     },
     "params": [
-      "t"
+      "p"
     ],
     "body": [
       {
@@ -40,7 +40,7 @@
           "type": "Acceso",
           "object": {
             "type": "IDENTIFICADOR",
-            "value": "t",
+            "value": "p",
             "location": {
               "line": 2,
               "column": 14
@@ -94,24 +94,42 @@
         },
         "params": [
           {
-            "type": "Literal",
-            "value": "hola",
-            "raw": "hola",
+            "type": "Lista",
+            "body": [
+              {
+                "type": "Literal",
+                "value": 1,
+                "raw": "1",
+                "location": {
+                  "line": 5,
+                  "column": 26
+                }
+              },
+              {
+                "type": "Literal",
+                "value": 2,
+                "raw": "2",
+                "location": {
+                  "line": 5,
+                  "column": 29
+                }
+              }
+            ],
             "location": {
               "line": 5,
-              "column": 24
+              "column": 31
             }
           }
         ],
         "location": {
           "line": 5,
-          "column": 30
+          "column": 32
         }
       }
     ],
     "location": {
       "line": 5,
-      "column": 31
+      "column": 33
     }
   }
 ]

@@ -4,7 +4,7 @@ import { runtimeHelperNames } from "../../../../src/chord/corelib/runtimeHelpers
 
 /**
  * @class CoreLibHelpersConsistencyTest
- * @description Validates that every instance method name the core library maps to different JavaScript members in different classes has a runtime helper (`chord<Name>`) to pick between them when the receiver's class isn't known. Without it the call would silently go to the first class by name.
+ * @description Validates that every instance property, and every instance method name the core library maps to different JavaScript members in different classes has a runtime helper (`chord<Name>`) to pick between them when the receiver's class isn't known. Without it the call would silently go to the first class by name.
  */
 export class CoreLibHelpersConsistencyTest extends Test {
     /**
@@ -38,6 +38,15 @@ export class CoreLibHelpersConsistencyTest extends Test {
             .filter(([ , transpiles ]) => transpiles.size > 1)
             .map(([ name ]) => `${name} -> chord${name.charAt(0).toUpperCase()}${name.slice(1)}`)
             .filter(entry => !runtimeHelperNames.has(entry.split(' -> ')[1]));
+
+        const missingProperties = Object.values(corelib.classes)
+            .flatMap(entry => Object.entries(entry.properties ?? {}).filter(([ , member ]) => !member.static && !member.runtime).map(([ name ]) => name))
+            .map(name => `chord${name.charAt(0).toUpperCase()}${name.slice(1)}`)
+            .filter(helper => !runtimeHelperNames.has(helper));
+
+        if (missingProperties.length > 0) {
+            throw new Error(`Instance properties need a runtime helper in runtimeHelperNames, to read them on a receiver of unknown type: ${missingProperties.join(', ')}`);
+        }
 
         if (missing.length > 0) {
             throw new Error(`Instance methods with different members across classes need a runtime helper in runtimeHelperNames: ${missing.join(', ')}`);

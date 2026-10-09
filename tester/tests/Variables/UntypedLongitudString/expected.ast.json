@@ -31,7 +31,7 @@
       "isAsync": false
     },
     "params": [
-      "t"
+      "p"
     ],
     "body": [
       {
@@ -40,7 +40,7 @@
           "type": "Acceso",
           "object": {
             "type": "IDENTIFICADOR",
-            "value": "t",
+            "value": "p",
             "location": {
               "line": 2,
               "column": 14
@@ -95,8 +95,8 @@
         "params": [
           {
             "type": "Literal",
-            "value": "hola",
-            "raw": "hola",
+            "value": "abc",
+            "raw": "abc",
             "location": {
               "line": 5,
               "column": 24
@@ -105,13 +105,13 @@
         ],
         "location": {
           "line": 5,
-          "column": 30
+          "column": 29
         }
       }
     ],
     "location": {
       "line": 5,
-      "column": 31
+      "column": 30
     }
   }
 ]

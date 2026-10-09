@@ -2,7 +2,7 @@
   {
     "type": "importar",
     "identificators": [
-      "chordLongitud"
+      "chordTamano"
     ],
     "isDestructured": true,
     "path": "./lib/runtimeHelpers.js",
@@ -23,7 +23,7 @@
   },
   {
     "type": "funcion",
-    "id": "largo",
+    "id": "tam",
     "metadata": {
       "isConstructor": false,
       "isMethod": false,
@@ -31,7 +31,7 @@
       "isAsync": false
     },
     "params": [
-      "t"
+      "p"
     ],
     "body": [
       {
@@ -40,13 +40,13 @@
           "type": "Acceso",
           "object": {
             "type": "IDENTIFICADOR",
-            "value": "t",
+            "value": "p",
             "location": {
               "line": 2,
               "column": 14
             }
           },
-          "property": "longitud",
+          "property": "tamano",
           "location": {
             "line": 2,
             "column": 16
@@ -64,6 +64,71 @@
     }
   },
   {
+    "type": "Variable",
+    "id": "c",
+    "value": {
+      "type": "nuevo",
+      "object": {
+        "type": "Llamada",
+        "object": {
+          "type": "IDENTIFICADOR",
+          "value": "Conjunto",
+          "location": {
+            "line": 5,
+            "column": 16
+          }
+        },
+        "params": [],
+        "location": {
+          "line": 5,
+          "column": 25
+        }
+      },
+      "location": {
+        "line": 5,
+        "column": 25
+      }
+    },
+    "location": {
+      "line": 5,
+      "column": 25
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "c",
+        "location": {
+          "line": 6,
+          "column": 1
+        }
+      },
+      "property": "agregar",
+      "location": {
+        "line": 6,
+        "column": 3
+      }
+    },
+    "params": [
+      {
+        "type": "Literal",
+        "value": 1,
+        "raw": "1",
+        "location": {
+          "line": 6,
+          "column": 11
+        }
+      }
+    ],
+    "location": {
+      "line": 6,
+      "column": 12
+    }
+  },
+  {
     "type": "Llamada",
     "object": {
       "type": "Acceso",
@@ -71,13 +136,13 @@
         "type": "IDENTIFICADOR",
         "value": "consola",
         "location": {
-          "line": 5,
+          "line": 7,
           "column": 1
         }
       },
       "property": "imprimir",
       "location": {
-        "line": 5,
+        "line": 7,
         "column": 9
       }
     },
@@ -86,32 +151,31 @@
         "type": "Llamada",
         "object": {
           "type": "IDENTIFICADOR",
-          "value": "largo",
+          "value": "tam",
           "location": {
-            "line": 5,
+            "line": 7,
             "column": 18
           }
         },
         "params": [
           {
-            "type": "Literal",
-            "value": "hola",
-            "raw": "hola",
+            "type": "IDENTIFICADOR",
+            "value": "c",
             "location": {
-              "line": 5,
-              "column": 24
+              "line": 7,
+              "column": 22
             }
           }
         ],
         "location": {
-          "line": 5,
-          "column": 30
+          "line": 7,
+          "column": 23
         }
       }
     ],
     "location": {
-      "line": 5,
-      "column": 31
+      "line": 7,
+      "column": 24
     }
   }
 ]

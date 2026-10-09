@@ -1,6 +1,18 @@
 [
   {
     "type": "importar",
+    "identificators": [
+      "chordLongitud"
+    ],
+    "isDestructured": true,
+    "path": "./lib/runtimeHelpers.js",
+    "location": {
+      "line": 0,
+      "column": 0
+    }
+  },
+  {
+    "type": "importar",
     "identificators": [],
     "path": "./lib/consoleRuntime.js",
     "isDestructured": false,

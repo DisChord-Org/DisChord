@@ -21,6 +21,11 @@ export class CompilationMarks {
     private readonly memberNames: WeakMap<object, string> = new WeakMap();
 
     /**
+     * The runtime helper a property read is emitted through (see {@link markMemberHelper}).
+     */
+    private readonly memberHelpers: WeakMap<object, string> = new WeakMap();
+
+    /**
      * Calls on a receiver of union type that the analyzer decided to emit differently (see
      * {@link markDispatched}).
      */
@@ -61,6 +66,25 @@ export class CompilationMarks {
      */
     public memberOf(access: object): string | undefined {
         return this.memberNames.get(access);
+    }
+
+    /**
+     * Records that a property read is emitted as a call to a runtime helper taking the receiver
+     * (`chordLongitud(p)`), which picks at run time, instead of as `receiver.name`.
+     *
+     * @param {object} access - The access node.
+     * @param {string} helper - The helper's name.
+     */
+    public markMemberHelper(access: object, helper: string): void {
+        this.memberHelpers.set(access, helper);
+    }
+
+    /**
+     * @param {object} access - The access node.
+     * @returns {string | undefined} The helper the analyzer decided to emit the read through, if it did.
+     */
+    public memberHelperOf(access: object): string | undefined {
+        return this.memberHelpers.get(access);
     }
 
     /**

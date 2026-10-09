@@ -1,6 +1,4 @@
 import { chordLongitud } from './lib/runtimeHelpers.js';
 import './lib/consoleRuntime.js';
-function largo(t) {
-    return chordLongitud(t);
-}
-console.log(largo('hola'));
+let x = JSON.parse('[1, 2]');
+console.log(chordLongitud(x));

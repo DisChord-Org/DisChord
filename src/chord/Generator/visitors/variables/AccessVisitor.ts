@@ -19,7 +19,7 @@ export class AccessVisitor<T extends string, N extends BaseNode<T>> extends SubG
     /**
      * Emits a member access with the name the Analyzer decided for it (see
      * `ResolveMemberAccessesRule`): the JavaScript name of the core library member it stands for,
-     * or the name as written. A static core library access is emitted as its own translation.
+     * or the name as written, or a call to the runtime helper it decided to read the member through. A static core library access is emitted as its own translation.
      * @param {AccessNode<T>} node - The target field access syntax tree node.
      * @returns {string} The fully resolved and chained member dot-notation string.
      * @public
@@ -28,7 +28,12 @@ export class AccessVisitor<T extends string, N extends BaseNode<T>> extends SubG
         const staticMember = this.parent.context.coreLib.resolveStatic(node);
         if (staticMember) return staticMember.member.transpile;
 
-        const property = this.parent.context.symbolTable.marks.memberOf(node) ?? node.property;
+        const marks = this.parent.context.symbolTable.marks;
+
+        const helper = marks.memberHelperOf(node);
+        if (helper) return `${helper}(${this.parent.visit(node.object)})`;
+
+        const property = marks.memberOf(node) ?? node.property;
 
         const receiver = this.parent.visit(node.object);
         return `${receiver.startsWith('await ') ? `(${receiver})` : receiver}.${property}`;

@@ -1,0 +1,53 @@
+[
+  {
+    "type": "funcion",
+    "id": "fijar",
+    "metadata": {
+      "isConstructor": false,
+      "isMethod": false,
+      "isStatic": false,
+      "isAsync": false
+    },
+    "params": [
+      "p"
+    ],
+    "body": [
+      {
+        "type": "Asignacion",
+        "left": {
+          "type": "Acceso",
+          "object": {
+            "type": "IDENTIFICADOR",
+            "value": "p",
+            "location": {
+              "line": 2,
+              "column": 5
+            }
+          },
+          "property": "longitud",
+          "location": {
+            "line": 2,
+            "column": 7
+          }
+        },
+        "assignment": {
+          "type": "Literal",
+          "value": 3,
+          "raw": "3",
+          "location": {
+            "line": 2,
+            "column": 19
+          }
+        },
+        "location": {
+          "line": 2,
+          "column": 19
+        }
+      }
+    ],
+    "location": {
+      "line": 3,
+      "column": 1
+    }
+  }
+]

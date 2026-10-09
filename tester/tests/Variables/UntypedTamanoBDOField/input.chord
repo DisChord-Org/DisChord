@@ -1,0 +1,8 @@
+funcion tam(p) {
+    devolver p.tamano
+}
+
+var obj es {
+    tamano 7
+}
+consola.imprimir(tam(obj))

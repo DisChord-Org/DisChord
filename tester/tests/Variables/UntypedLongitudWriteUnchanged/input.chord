@@ -1,0 +1,3 @@
+funcion fijar(p) {
+    p.longitud es 3
+}

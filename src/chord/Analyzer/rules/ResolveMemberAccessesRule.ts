@@ -68,6 +68,11 @@ export class ResolveMemberAccessesRule<T extends string, N extends BaseNode<T>> 
         const isFieldUse = resolved && isUnknownReceiver && (resolved.isProperty ? role !== 'read' : role !== 'callee');
 
         symbolTable.marks.markMember(node, resolved && !isFieldUse ? resolved.member.transpile : node.property);
+
+        if (resolved?.isProperty && isUnknownReceiver && role === 'read') {
+            const dispatch = this.context.coreLibDispatch.resolveUnknownPropertyDispatch(node);
+            if (dispatch && 'helper' in dispatch) symbolTable.marks.markMemberHelper(node, dispatch.helper);
+        }
     }
 
     /**

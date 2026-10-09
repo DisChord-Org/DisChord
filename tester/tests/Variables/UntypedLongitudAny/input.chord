@@ -1,0 +1,2 @@
+var x es JSON.leer("[1, 2]")
+consola.imprimir(x.longitud)

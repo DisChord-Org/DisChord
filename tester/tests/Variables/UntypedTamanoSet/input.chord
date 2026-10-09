@@ -1,0 +1,7 @@
+funcion tam(p) {
+    devolver p.tamano
+}
+
+var c es nuevo Conjunto()
+c.agregar(1)
+consola.imprimir(tam(c))
