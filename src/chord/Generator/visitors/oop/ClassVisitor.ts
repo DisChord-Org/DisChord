@@ -17,13 +17,24 @@ export class ClassVisitor<T extends string, N extends BaseNode<T>> extends SubGe
     public static triggerToken: TokenTypeUnion<TokenType> | undefined = TokenType.Clase;
 
     /**
+     * The JavaScript name of a parent class: the constructor of the core library class it names
+     * (`Mapa` → `Map`), unless the file declares a class of that name, or the name itself otherwise.
+     * @private
+     */
+    private parentName(name: string): string {
+        if (this.parent.context.symbolTable.classes.isUserClass(name)) return name;
+
+        return this.parent.context.coreLib.resolveConstructorOf(name) ?? name;
+    }
+
+    /**
      * Transpiles a Class definition syntax node matching legacy indent structures.
      * @param {ClassNode<T, N>} node - The target class analytical syntax tree node.
      * @returns {string} The fully compiled native JavaScript class code block representation.
      * @public
      */
     public visit(node: ClassNode<T, N>): string {
-        const inheritance = node.superClass ? ` extends ${node.superClass}` : '';
+        const inheritance = node.superClass ? ` extends ${this.parentName(node.superClass)}` : '';
 
         // Reopening the scope the analyzer bound to this node lets lookups see the class's members.
         this.parent.context.symbolTable.enterScope(node);

@@ -1,0 +1,6 @@
+nuevo Mapa MiMapa {
+}
+
+var m es nuevo MiMapa()
+m.set("a", 1)
+consola.imprimir(m.size)

@@ -184,7 +184,15 @@ export class CoreLibUtils<C extends string = string> {
      */
     resolveConstructor<T extends string, N extends BaseNode<T>> (target: ASTNode<T, N>): string | undefined {
         const name = this.instantiatedName(target);
-        return name !== undefined && this.hasOwn(this.corelib.classes, name) ? this.corelib.classes[name as C].constructs : undefined;
+        return name === undefined ? undefined : this.resolveConstructorOf(name);
+    }
+
+    /**
+     * @param {string} name - A class name as written in source code.
+     * @returns {string | undefined} The JavaScript constructor of the core library class of that name (`Mapa` → `Map`), or `undefined` if there is none or it can't be instantiated.
+     */
+    resolveConstructorOf(name: string): string | undefined {
+        return this.hasOwn(this.corelib.classes, name) ? this.corelib.classes[name as C].constructs : undefined;
     }
 
     /**

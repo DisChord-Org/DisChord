@@ -1,0 +1,137 @@
+[
+  {
+    "type": "importar",
+    "identificators": [],
+    "path": "./lib/consoleRuntime.js",
+    "isDestructured": false,
+    "location": {
+      "line": 0,
+      "column": 0
+    }
+  },
+  {
+    "type": "clase",
+    "id": "MiMapa",
+    "superClass": "Mapa",
+    "body": [],
+    "location": {
+      "line": 2,
+      "column": 1
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "m",
+    "value": {
+      "type": "nuevo",
+      "object": {
+        "type": "Llamada",
+        "object": {
+          "type": "IDENTIFICADOR",
+          "value": "MiMapa",
+          "location": {
+            "line": 4,
+            "column": 16
+          }
+        },
+        "params": [],
+        "location": {
+          "line": 4,
+          "column": 23
+        }
+      },
+      "location": {
+        "line": 4,
+        "column": 23
+      }
+    },
+    "location": {
+      "line": 4,
+      "column": 23
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "m",
+        "location": {
+          "line": 5,
+          "column": 1
+        }
+      },
+      "property": "set",
+      "location": {
+        "line": 5,
+        "column": 3
+      }
+    },
+    "params": [
+      {
+        "type": "Literal",
+        "value": "a",
+        "raw": "a",
+        "location": {
+          "line": 5,
+          "column": 7
+        }
+      },
+      {
+        "type": "Literal",
+        "value": 1,
+        "raw": "1",
+        "location": {
+          "line": 5,
+          "column": 12
+        }
+      }
+    ],
+    "location": {
+      "line": 5,
+      "column": 13
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 6,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 6,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "Acceso",
+        "object": {
+          "type": "IDENTIFICADOR",
+          "value": "m",
+          "location": {
+            "line": 6,
+            "column": 18
+          }
+        },
+        "property": "size",
+        "location": {
+          "line": 6,
+          "column": 20
+        }
+      }
+    ],
+    "location": {
+      "line": 6,
+      "column": 24
+    }
+  }
+]
