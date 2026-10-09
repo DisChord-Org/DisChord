@@ -1,0 +1,8 @@
+clase A extiende B {
+}
+
+clase B extiende C {
+}
+
+clase C extiende A {
+}

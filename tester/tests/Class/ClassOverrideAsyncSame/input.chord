@@ -1,0 +1,35 @@
+clase A {
+    funcion s() {
+        devolver 1
+    }
+
+    @asincrono
+    funcion a() {
+        devolver 2
+    }
+}
+
+clase B extiende A {
+    funcion s() {
+        devolver 10
+    }
+
+    @asincrono
+    funcion a() {
+        devolver 20
+    }
+
+    @asincrono
+    funcion nuevo2() {
+        devolver 30
+    }
+}
+
+@asincrono
+funcion principal() {
+    var x tipo A es nuevo B()
+    consola.imprimir(x.s())
+    consola.imprimir(x.a())
+}
+
+principal()

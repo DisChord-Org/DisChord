@@ -1,0 +1,15 @@
+clase A {
+    funcion m() {
+        devolver 1
+    }
+}
+
+clase B extiende A {
+}
+
+clase C extiende B {
+    @asincrono
+    funcion m() {
+        devolver 3
+    }
+}

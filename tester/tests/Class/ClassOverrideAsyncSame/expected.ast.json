@@ -1,0 +1,364 @@
+[
+  {
+    "type": "importar",
+    "identificators": [],
+    "path": "./lib/consoleRuntime.js",
+    "isDestructured": false,
+    "location": {
+      "line": 0,
+      "column": 0
+    }
+  },
+  {
+    "type": "clase",
+    "id": "A",
+    "body": [
+      {
+        "type": "funcion",
+        "id": "s",
+        "metadata": {
+          "isConstructor": false,
+          "isMethod": true,
+          "isStatic": false,
+          "isAsync": false
+        },
+        "params": [],
+        "body": [
+          {
+            "type": "devolver",
+            "object": {
+              "type": "Literal",
+              "value": 1,
+              "raw": "1",
+              "location": {
+                "line": 3,
+                "column": 18
+              }
+            },
+            "location": {
+              "line": 3,
+              "column": 18
+            }
+          }
+        ],
+        "location": {
+          "line": 4,
+          "column": 5
+        }
+      },
+      {
+        "type": "funcion",
+        "id": "a",
+        "metadata": {
+          "isConstructor": false,
+          "isMethod": true,
+          "isStatic": false,
+          "isAsync": true
+        },
+        "params": [],
+        "body": [
+          {
+            "type": "devolver",
+            "object": {
+              "type": "Literal",
+              "value": 2,
+              "raw": "2",
+              "location": {
+                "line": 8,
+                "column": 18
+              }
+            },
+            "location": {
+              "line": 8,
+              "column": 18
+            }
+          }
+        ],
+        "location": {
+          "line": 9,
+          "column": 5
+        }
+      }
+    ],
+    "location": {
+      "line": 10,
+      "column": 1
+    }
+  },
+  {
+    "type": "clase",
+    "id": "B",
+    "superClass": "A",
+    "body": [
+      {
+        "type": "funcion",
+        "id": "s",
+        "metadata": {
+          "isConstructor": false,
+          "isMethod": true,
+          "isStatic": false,
+          "isAsync": false
+        },
+        "params": [],
+        "body": [
+          {
+            "type": "devolver",
+            "object": {
+              "type": "Literal",
+              "value": 10,
+              "raw": "10",
+              "location": {
+                "line": 14,
+                "column": 18
+              }
+            },
+            "location": {
+              "line": 14,
+              "column": 18
+            }
+          }
+        ],
+        "location": {
+          "line": 15,
+          "column": 5
+        }
+      },
+      {
+        "type": "funcion",
+        "id": "a",
+        "metadata": {
+          "isConstructor": false,
+          "isMethod": true,
+          "isStatic": false,
+          "isAsync": true
+        },
+        "params": [],
+        "body": [
+          {
+            "type": "devolver",
+            "object": {
+              "type": "Literal",
+              "value": 20,
+              "raw": "20",
+              "location": {
+                "line": 19,
+                "column": 18
+              }
+            },
+            "location": {
+              "line": 19,
+              "column": 18
+            }
+          }
+        ],
+        "location": {
+          "line": 20,
+          "column": 5
+        }
+      },
+      {
+        "type": "funcion",
+        "id": "nuevo2",
+        "metadata": {
+          "isConstructor": false,
+          "isMethod": true,
+          "isStatic": false,
+          "isAsync": true
+        },
+        "params": [],
+        "body": [
+          {
+            "type": "devolver",
+            "object": {
+              "type": "Literal",
+              "value": 30,
+              "raw": "30",
+              "location": {
+                "line": 24,
+                "column": 18
+              }
+            },
+            "location": {
+              "line": 24,
+              "column": 18
+            }
+          }
+        ],
+        "location": {
+          "line": 25,
+          "column": 5
+        }
+      }
+    ],
+    "location": {
+      "line": 26,
+      "column": 1
+    }
+  },
+  {
+    "type": "funcion",
+    "id": "principal",
+    "metadata": {
+      "isConstructor": false,
+      "isMethod": false,
+      "isStatic": false,
+      "isAsync": true
+    },
+    "params": [],
+    "body": [
+      {
+        "type": "Variable",
+        "id": "x",
+        "value": {
+          "type": "nuevo",
+          "object": {
+            "type": "Llamada",
+            "object": {
+              "type": "IDENTIFICADOR",
+              "value": "B",
+              "location": {
+                "line": 30,
+                "column": 27
+              }
+            },
+            "params": [],
+            "location": {
+              "line": 30,
+              "column": 29
+            }
+          },
+          "location": {
+            "line": 30,
+            "column": 29
+          }
+        },
+        "dataType": {
+          "kind": "userClass",
+          "name": "A"
+        },
+        "location": {
+          "line": 30,
+          "column": 29
+        }
+      },
+      {
+        "type": "Llamada",
+        "object": {
+          "type": "Acceso",
+          "object": {
+            "type": "IDENTIFICADOR",
+            "value": "consola",
+            "location": {
+              "line": 31,
+              "column": 5
+            }
+          },
+          "property": "imprimir",
+          "location": {
+            "line": 31,
+            "column": 13
+          }
+        },
+        "params": [
+          {
+            "type": "Llamada",
+            "object": {
+              "type": "Acceso",
+              "object": {
+                "type": "IDENTIFICADOR",
+                "value": "x",
+                "location": {
+                  "line": 31,
+                  "column": 22
+                }
+              },
+              "property": "s",
+              "location": {
+                "line": 31,
+                "column": 24
+              }
+            },
+            "params": [],
+            "location": {
+              "line": 31,
+              "column": 26
+            }
+          }
+        ],
+        "location": {
+          "line": 31,
+          "column": 27
+        }
+      },
+      {
+        "type": "Llamada",
+        "object": {
+          "type": "Acceso",
+          "object": {
+            "type": "IDENTIFICADOR",
+            "value": "consola",
+            "location": {
+              "line": 32,
+              "column": 5
+            }
+          },
+          "property": "imprimir",
+          "location": {
+            "line": 32,
+            "column": 13
+          }
+        },
+        "params": [
+          {
+            "type": "Llamada",
+            "object": {
+              "type": "Acceso",
+              "object": {
+                "type": "IDENTIFICADOR",
+                "value": "x",
+                "location": {
+                  "line": 32,
+                  "column": 22
+                }
+              },
+              "property": "a",
+              "location": {
+                "line": 32,
+                "column": 24
+              }
+            },
+            "params": [],
+            "location": {
+              "line": 32,
+              "column": 26
+            }
+          }
+        ],
+        "location": {
+          "line": 32,
+          "column": 27
+        }
+      }
+    ],
+    "location": {
+      "line": 33,
+      "column": 1
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "IDENTIFICADOR",
+      "value": "principal",
+      "location": {
+        "line": 35,
+        "column": 1
+      }
+    },
+    "params": [],
+    "location": {
+      "line": 35,
+      "column": 11
+    }
+  }
+]

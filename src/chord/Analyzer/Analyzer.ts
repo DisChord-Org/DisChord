@@ -4,6 +4,7 @@ import { AnalysisRule, AnalysisRuleClass } from "./AnalysisRule";
 import { BindImportsRule } from "./rules/BindImportsRule";
 import { ValidateImportTargetsRule } from "./rules/ValidateImportTargetsRule";
 import { BindDeclarationsRule } from "./rules/BindDeclarationsRule";
+import { ValidateClassHierarchyRule } from "./rules/ValidateClassHierarchyRule";
 import { ValidateTypeAnnotationsRule } from "./rules/ValidateTypeAnnotationsRule";
 import { ResolveVariableTypesRule } from "./rules/ResolveVariableTypesRule";
 import { ValidateAssignmentTypesRule } from "./rules/ValidateAssignmentTypesRule";
@@ -58,6 +59,9 @@ export class Analyzer<T extends string, N extends BaseNode<T>> {
         // properties) across the whole file, so forward references resolve regardless of
         // source order.
         BindDeclarationsRule,
+
+        // The `extiende` chains between the classes of the file: no cycles, parents declared first.
+        ValidateClassHierarchyRule,
 
         // Pass 3 ("Tipos"): reference/type validation against the now-complete symbol table. The
         // names an annotation uses are checked first, so the rest can trust them.

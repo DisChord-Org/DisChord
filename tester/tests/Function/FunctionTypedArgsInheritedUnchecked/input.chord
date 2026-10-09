@@ -7,12 +7,5 @@ clase B extiende A {
 clase E extiende Z {
 }
 
-clase F extiende G {
-}
-
-clase G extiende F {
-}
-
 var b es nuevo B(1, 2)
 var e es nuevo E(1)
-var f es nuevo F(1)

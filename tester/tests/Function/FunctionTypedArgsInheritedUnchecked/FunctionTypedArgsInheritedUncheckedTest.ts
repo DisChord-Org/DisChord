@@ -2,7 +2,7 @@ import { Test } from "../../../Test";
 
 /**
  * @class FunctionTypedArgsInheritedUncheckedTest
- * @description Validates the cases left as they were: a hierarchy with no constructor, an unknown parent class and a cycle compile without being checked.
+ * @description Validates the cases left as they were: a hierarchy with no constructor and an unknown parent class compile without being checked.
  */
 export class FunctionTypedArgsInheritedUncheckedTest extends Test {
     /**
