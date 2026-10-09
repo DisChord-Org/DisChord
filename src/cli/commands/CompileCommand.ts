@@ -5,7 +5,7 @@ import { GlobalCLIOptions, DebugFlags } from '../Program';
 import { CompilerConfig, FileSystem } from '../../utils/FileSystem';
 import Prettifier from '../../utils/Prettifier';
 import { CodeProvider } from '../../chord/CodeProvider';
-import { SymbolTable } from '../../chord/SymbolsTable';
+import { SymbolTable } from '../../chord/model/SymbolsTable';
 import { KeyWords } from '../../chord/KeywordsManager';
 import { Lexer } from '../../chord/Lexer';
 import { DisChordParser } from '../../dischord/Parser/Parser';

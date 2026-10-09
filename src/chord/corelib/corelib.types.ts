@@ -1,4 +1,4 @@
-import { DataType } from "../DataType";
+import { DataType } from "../model/DataType";
 
 /**
  * A single member (method or property) of a core library class, keyed by its name in the

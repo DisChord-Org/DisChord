@@ -5,7 +5,7 @@ import { ChordError, ErrorLevel } from "../../errors/ChordError";
 import { CompilationContext } from "../../cli/commands/CompileCommand";
 import { ParserContext } from "./ParserContext";
 import { SubParser, SubParserClass } from "./SubParser";
-import { SymbolTable } from "../SymbolsTable";
+import { SymbolTable } from "../model/SymbolsTable";
 import { KeyWords } from "../KeywordsManager";
 
 import { BDOParser } from "./Grammar/BDOParser";

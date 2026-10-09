@@ -1,5 +1,5 @@
 import { ASTNode, AccessNode, BaseNode, TokenType, TokenTypeUnion } from "../../types";
-import { DataType } from "../../DataType";
+import { DataType } from "../../model/DataType";
 import { coreLibUtils } from "../../corelib";
 import { SubInferrer } from "../SubInferrer";
 

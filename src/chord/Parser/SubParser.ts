@@ -1,5 +1,5 @@
 import { ASTNode, BaseNode, PeekType, Token, TokenType, TokenTypeUnion } from "../types";
-import { SymbolTable } from "../SymbolsTable";
+import { SymbolTable } from "../model/SymbolsTable";
 import { Parser } from "./Parser";
 
 /**

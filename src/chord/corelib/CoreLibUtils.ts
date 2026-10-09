@@ -2,7 +2,7 @@
 
 import { corelib } from "./corelib.data";
 import { isIdentificatorNode } from "../ast.guards";
-import { AnyDataType, ClassDataType, DataType, PrimitiveDataType, UnionDataType, UserClassDataType } from "../DataType";
+import { AnyDataType, ClassDataType, DataType, PrimitiveDataType, UnionDataType, UserClassDataType } from "../model/DataType";
 import { AccessNode, ASTNode, BaseNode, CallNode, PrimitiveType, TokenType } from "../types";
 import { CoreLib, CoreLibClass, ResolvedMember } from "./corelib.types";
 import { runtimeHelperNames } from "./runtimeHelpers";

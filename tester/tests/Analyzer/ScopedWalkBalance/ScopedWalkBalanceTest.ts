@@ -1,6 +1,6 @@
 import { Test } from "../../../Test";
 import { AnalysisRule } from "../../../../src/chord/Analyzer/AnalysisRule";
-import { SymbolTable } from "../../../../src/chord/SymbolsTable";
+import { SymbolTable } from "../../../../src/chord/model/SymbolsTable";
 import { ASTNode, BaseNode, Location, TokenType } from "../../../../src/chord/types";
 import { CompilationContext } from "../../../../src/cli/commands/CompileCommand";
 

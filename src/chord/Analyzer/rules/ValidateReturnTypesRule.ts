@@ -2,7 +2,7 @@ import { AnalysisRule } from "../AnalysisRule";
 import { TypeInferrer } from "../TypeInferrer";
 import { ASTNode, BaseNode, FunctionNode, ReturnNode, TokenType } from "../../types";
 import { isFunctionNode } from "../../ast.guards";
-import { DataType, VoidDataType } from "../../DataType";
+import { DataType, VoidDataType } from "../../model/DataType";
 import { ChordError, ErrorLevel } from "../../../errors/ChordError";
 
 /**

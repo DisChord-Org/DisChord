@@ -3,7 +3,7 @@ import { BaseNode, FunctionNode, TokenType, TokenTypeUnion } from "../../../type
 import { BlockParser } from "../BlockParser";
 import { Parser } from "../../Parser";
 import { DecoratorProcessor } from "../../../DecoratorProcessor";
-import { DataType } from "../../../DataType";
+import { DataType } from "../../../model/DataType";
 import { TypeAnnotationParser } from "./TypeAnnotationParser";
 import { ChordError, ErrorLevel } from "../../../../errors/ChordError";
 

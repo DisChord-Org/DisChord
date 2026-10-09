@@ -1,7 +1,7 @@
 import { AnalysisRule } from "../AnalysisRule";
 import { walkAST } from "../../walkAST";
 import { ASTNode, BaseNode, FunctionNode, TokenType, VariableNode } from "../../types";
-import { ArrayDataType, DataType, TupleDataType, UnionDataType, UserClassDataType, VoidDataType } from "../../DataType";
+import { ArrayDataType, DataType, TupleDataType, UnionDataType, UserClassDataType, VoidDataType } from "../../model/DataType";
 import { coreLibUtils } from "../../corelib";
 import { ChordError, ErrorLevel } from "../../../errors/ChordError";
 

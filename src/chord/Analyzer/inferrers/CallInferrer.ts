@@ -1,6 +1,6 @@
 import { ASTNode, BaseNode, CallNode, TokenType, TokenTypeUnion } from "../../types";
 import { isAccessNode, isIdentificatorNode } from "../../ast.guards";
-import { DataType } from "../../DataType";
+import { DataType } from "../../model/DataType";
 import { coreLibUtils } from "../../corelib";
 import { SubInferrer } from "../SubInferrer";
 import { UserMemberResolver } from "../UserMemberResolver";

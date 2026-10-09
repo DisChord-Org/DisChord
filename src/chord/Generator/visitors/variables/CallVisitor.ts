@@ -1,5 +1,5 @@
 import { AccessNode, CallNode, BaseNode, TokenType, TokenTypeUnion } from "../../../types";
-import { CallDispatch } from "../../../SymbolsTable";
+import { CallDispatch } from "../../../model/SymbolsTable";
 import { isAccessNode, isIdentificatorNode } from "../../../ast.guards";
 import { SubGenerator } from "../../SubGenerator";
 import { asyncRuntimeHelperNames, coreLibUtils } from "../../../corelib";

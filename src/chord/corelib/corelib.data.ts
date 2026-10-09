@@ -1,4 +1,4 @@
-import { AnyDataType, ArrayDataType, ClassDataType, PrimitiveDataType, UnionDataType, VoidDataType } from "../DataType";
+import { AnyDataType, ArrayDataType, ClassDataType, PrimitiveDataType, UnionDataType, VoidDataType } from "../model/DataType";
 import { PrimitiveType } from "../types";
 import { CoreLib } from "./corelib.types";
 

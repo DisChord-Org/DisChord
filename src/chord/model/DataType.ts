@@ -1,4 +1,4 @@
-import { PrimitiveType, PrimitiveTypeName } from "./types";
+import { PrimitiveType, PrimitiveTypeName } from "../types";
 
 /**
  * @file DataType.ts

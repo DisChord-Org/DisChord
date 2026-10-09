@@ -1,5 +1,5 @@
 import { ASTNode, BaseNode, ListNode, PrimitiveTypeName, TokenType, TokenTypeUnion } from "../../types";
-import { ArrayDataType, DataType, PrimitiveDataType, UnionDataType } from "../../DataType";
+import { ArrayDataType, DataType, PrimitiveDataType, UnionDataType } from "../../model/DataType";
 import { SubInferrer } from "../SubInferrer";
 
 /**

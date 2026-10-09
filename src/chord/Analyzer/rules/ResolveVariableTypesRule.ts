@@ -1,7 +1,7 @@
 import { AnalysisRule } from "../AnalysisRule";
 import { ASTNode, AssignmentNode, BaseNode, ListNode, Symbol, TokenType, VariableNode } from "../../types";
 import { isIdentificatorNode } from "../../ast.guards";
-import { AnyDataType, DataType, TupleDataType, VoidDataType } from "../../DataType";
+import { AnyDataType, DataType, TupleDataType, VoidDataType } from "../../model/DataType";
 import { TypeInferrer } from "../TypeInferrer";
 import { ChordError, ErrorLevel } from "../../../errors/ChordError";
 

@@ -1,6 +1,6 @@
 import { AccessNode, BaseNode, CompilerMetadataKind, Symbol, TokenType } from "../types";
 import { isIdentificatorNode } from "../ast.guards";
-import { DataType, UserClassDataType } from "../DataType";
+import { DataType, UserClassDataType } from "../model/DataType";
 import { CompilationContext } from "../../cli/commands/CompileCommand";
 
 /**

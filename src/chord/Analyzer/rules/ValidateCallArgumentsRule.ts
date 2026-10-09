@@ -3,7 +3,7 @@ import { TypeInferrer } from "../TypeInferrer";
 import { UserMemberResolver } from "../UserMemberResolver";
 import { ASTNode, BaseNode, CallNode, CompilerMetadataKind, Symbol, SymbolKind, TokenType } from "../../types";
 import { isAccessNode, isIdentificatorNode } from "../../ast.guards";
-import { PrimitiveDataType } from "../../DataType";
+import { PrimitiveDataType } from "../../model/DataType";
 import { PrimitiveType } from "../../types";
 import { ChordError, ErrorLevel } from "../../../errors/ChordError";
 

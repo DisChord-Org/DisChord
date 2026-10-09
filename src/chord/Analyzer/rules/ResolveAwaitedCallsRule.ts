@@ -3,7 +3,7 @@ import { TypeInferrer } from "../TypeInferrer";
 import { UserMemberResolver } from "../UserMemberResolver";
 import { ASTNode, AccessNode, BaseNode, CallNode, ClassNode, FunctionNode, TokenType } from "../../types";
 import { isAccessNode, isIdentificatorNode } from "../../ast.guards";
-import { AnyDataType, UnionDataType, UserClassDataType } from "../../DataType";
+import { AnyDataType, UnionDataType, UserClassDataType } from "../../model/DataType";
 import { asyncRuntimeHelperNames, corelib, coreLibUtils } from "../../corelib";
 import { ChordError, ErrorLevel } from "../../../errors/ChordError";
 

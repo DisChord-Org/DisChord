@@ -1,5 +1,5 @@
 import { ASTNode, BaseNode, TokenTypeUnion } from "../types";
-import { DataType } from "../DataType";
+import { DataType } from "../model/DataType";
 import { TypeInferrer } from "./TypeInferrer";
 
 /**

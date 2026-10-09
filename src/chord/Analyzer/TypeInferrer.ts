@@ -1,5 +1,5 @@
 import { ASTNode, BaseNode, TokenType } from "../types";
-import { DataType } from "../DataType";
+import { DataType } from "../model/DataType";
 import { CompilationContext } from "../../cli/commands/CompileCommand";
 import { SubInferrerClass } from "./SubInferrer";
 import { LiteralInferrer } from "./inferrers/LiteralInferrer";

@@ -1,5 +1,5 @@
 import { UnaryNode, BaseNode, PrimitiveType, TokenType, TokenTypeUnion } from "../../../types";
-import { PrimitiveDataType } from "../../../DataType";
+import { PrimitiveDataType } from "../../../model/DataType";
 import { SubGenerator } from "../../SubGenerator";
 
 /**

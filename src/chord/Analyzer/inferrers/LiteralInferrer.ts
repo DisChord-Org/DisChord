@@ -1,5 +1,5 @@
 import { ASTNode, BaseNode, LiteralNode, TokenType, TokenTypeUnion } from "../../types";
-import { DataType, PrimitiveDataType } from "../../DataType";
+import { DataType, PrimitiveDataType } from "../../model/DataType";
 import { SubInferrer } from "../SubInferrer";
 
 /** Infers a literal's `DataType` directly from its native JS value via `PrimitiveDataType.fromJSValue`. */

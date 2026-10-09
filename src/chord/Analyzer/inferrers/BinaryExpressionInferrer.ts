@@ -1,5 +1,5 @@
 import { ASTNode, BaseNode, BinaryExpressionNode, ComparisonOperators, NumericOperators, PrimitiveType, TokenType, TokenTypeUnion } from "../../types";
-import { AnyDataType, DataType, PrimitiveDataType } from "../../DataType";
+import { AnyDataType, DataType, PrimitiveDataType } from "../../model/DataType";
 import { SubInferrer } from "../SubInferrer";
 
 /**

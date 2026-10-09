@@ -2,7 +2,7 @@ import { AnalysisRule } from "../AnalysisRule";
 import { TypeInferrer } from "../TypeInferrer";
 import { ASTNode, AccessNode, AssignmentNode, BaseNode, CallNode, TokenType } from "../../types";
 import { isAccessNode, isIdentificatorNode } from "../../ast.guards";
-import { AnyDataType, DataType, UnionDataType } from "../../DataType";
+import { AnyDataType, DataType, UnionDataType } from "../../model/DataType";
 import { coreLibUtils, ResolvedMember } from "../../corelib";
 import { ChordError, ErrorLevel } from "../../../errors/ChordError";
 

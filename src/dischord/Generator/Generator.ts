@@ -3,9 +3,9 @@ import { DisChordASTNode, DisChordNode, DisChordNodeType } from "../types";
 import { Generator } from "../../chord/Generator/Generator";
 import { SubGeneratorClass } from "../../chord/Generator/SubGenerator";
 
-import ClientInitVisitor from '../Generator/visitors/architectural/ClientInitVisitor';
-import CommandVisitor from '../Generator/visitors/architectural/CommandVisitor';
-import EventVisitor from '../Generator/visitors/architectural/EventVisitor';
+import ClientInitVisitor from './visitors/architectural/ClientInitVisitor';
+import CommandVisitor from './visitors/architectural/CommandVisitor';
+import EventVisitor from './visitors/architectural/EventVisitor';
 import { CompilationContext } from "../../cli/commands/CompileCommand";
 import ButtonVisitor from "./visitors/components/ButtonVisitor";
 import ButtonDeclarationVisitor from "./visitors/components/ButtonDeclarationVisitor";

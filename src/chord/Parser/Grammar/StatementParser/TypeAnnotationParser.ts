@@ -1,5 +1,5 @@
 import { BaseNode, PrimitiveType, PrimitiveTypeName, TokenType } from "../../../types";
-import { AnyDataType, ArrayDataType, DataType, PrimitiveDataType, TupleDataType, UnionDataType, UserClassDataType, VoidDataType } from "../../../DataType";
+import { AnyDataType, ArrayDataType, DataType, PrimitiveDataType, TupleDataType, UnionDataType, UserClassDataType, VoidDataType } from "../../../model/DataType";
 import { coreLibUtils } from "../../../corelib";
 import { Parser } from "../../Parser";
 import { ChordError, ErrorLevel } from "../../../../errors/ChordError";

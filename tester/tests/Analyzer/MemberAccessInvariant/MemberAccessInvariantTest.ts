@@ -3,7 +3,7 @@ import path from "node:path";
 import { Test } from "../../../Test";
 import { KeyWords } from "../../../../src/chord/KeywordsManager";
 import { Lexer } from "../../../../src/chord/Lexer";
-import { SymbolTable } from "../../../../src/chord/SymbolsTable";
+import { SymbolTable } from "../../../../src/chord/model/SymbolsTable";
 import { CodeProvider } from "../../../../src/chord/CodeProvider";
 import { walkAST } from "../../../../src/chord/walkAST";
 import { isAccessNode } from "../../../../src/chord/ast.guards";

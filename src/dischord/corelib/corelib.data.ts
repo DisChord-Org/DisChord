@@ -1,5 +1,5 @@
 import { corelib as chordCorelib } from "../../chord/corelib/corelib.data";
-import { PrimitiveDataType, UnionDataType, VoidDataType } from "../../chord/DataType";
+import { PrimitiveDataType, UnionDataType, VoidDataType } from "../../chord/model/DataType";
 import { PrimitiveType } from "../../chord/types";
 import { DisChordCoreLib } from "./corelib.types";
 
