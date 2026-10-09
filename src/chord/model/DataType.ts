@@ -1,4 +1,5 @@
 import { PrimitiveType, PrimitiveTypeName } from "../types";
+import type { ClassRegistry } from "./ClassRegistry";
 
 /**
  * @file DataType.ts
@@ -241,27 +242,38 @@ export class ClassDataType extends DataType {
 
 /**
  * An instance of a class declared in the source file (`nuevo Caja()`, or `esta` inside one). It
- * carries only the class name — what the instance holds is not tracked — and any user class
- * instance is assignable to any other, since the class hierarchy is not modelled here. A `tipo`
- * annotation writes it by name; the parser can't tell whether the class exists (it may be declared further
- * down), so `ValidateTypeAnnotationsRule` checks that.
+ * carries only the class name — what the instance holds is not tracked. Classes are nominal: an
+ * instance is assignable to its own class and to the classes it extends, directly or through others,
+ * but not to the ones it is unrelated to, nor a base instance to a subclass. A `tipo` annotation writes
+ * it by name; the parser can't tell whether the class exists (it may be declared further down), so
+ * `ValidateTypeAnnotationsRule` checks that. The identity is the name, so two classes of the same name
+ * in different scopes are the same type.
+ *
+ * It holds the compilation's `ClassRegistry` (not enumerable, so it isn't part of a serialized type)
+ * to know who extends whom; the registry is filled after annotations are parsed, but it is the same
+ * live object. A type built without one accepts any other class instance.
  */
 export class UserClassDataType extends DataType {
     public readonly kind = DataTypeKind.UserClass;
     public readonly name: string;
+    declare public readonly registry?: ClassRegistry;
 
-    private constructor (name: string) {
+    private constructor (name: string, registry?: ClassRegistry) {
         super();
         this.name = name;
+        Object.defineProperty(this, 'registry', { value: registry, enumerable: false });
     }
 
-    /** Builds the `DataType` of an instance of the user class called `name`. */
-    public static of (name: string): UserClassDataType {
-        return new UserClassDataType(name);
+    /** Builds the `DataType` of an instance of the user class called `name`, in the compilation `registry` belongs to. */
+    public static of (name: string, registry?: ClassRegistry): UserClassDataType {
+        return new UserClassDataType(name, registry);
     }
 
     protected acceptsNonUnionSource (source: DataType): boolean {
-        return source instanceof UserClassDataType;
+        if (!(source instanceof UserClassDataType)) return false;
+
+        const registry = this.registry ?? source.registry;
+        return registry === undefined || registry.isSubclassOf(source.name, this.name);
     }
 
     public format (): string {

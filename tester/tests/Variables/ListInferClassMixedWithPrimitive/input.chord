@@ -1,0 +1,9 @@
+clase A {
+    funcion dato() {
+        devolver 1
+    }
+}
+
+var m es [1, nuevo A()]
+var t tipo (numero|A)[] es m
+consola.imprimir(t[0])

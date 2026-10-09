@@ -16,7 +16,7 @@ export class NewInferrer<T extends string, N extends BaseNode<T>> extends SubInf
         const callee = target.type === TokenType.LLAMADA ? (target as CallNode<T, N>).object : target;
 
         if (isIdentificatorNode(callee) && this.parent.context.symbolTable.classes.isUserClass(callee.value)) {
-            return UserClassDataType.of(callee.value);
+            return UserClassDataType.of(callee.value, this.parent.context.symbolTable.classes);
         }
 
         return this.parent.context.coreLib.resolveConstructedType(target);

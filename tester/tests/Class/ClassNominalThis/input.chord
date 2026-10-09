@@ -1,0 +1,17 @@
+clase A {
+    funcion dato() {
+        devolver 1
+    }
+}
+
+funcion usar(x tipo A) {
+    devolver x.dato()
+}
+
+clase B extiende A {
+    funcion probar() {
+        devolver usar(esta)
+    }
+}
+
+consola.imprimir(nuevo B().probar())

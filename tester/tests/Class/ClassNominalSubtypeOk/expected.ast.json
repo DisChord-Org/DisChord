@@ -1,0 +1,270 @@
+[
+  {
+    "type": "importar",
+    "identificators": [],
+    "path": "./lib/consoleRuntime.js",
+    "isDestructured": false,
+    "location": {
+      "line": 0,
+      "column": 0
+    }
+  },
+  {
+    "type": "clase",
+    "id": "A",
+    "body": [
+      {
+        "type": "funcion",
+        "id": "dato",
+        "metadata": {
+          "isConstructor": false,
+          "isMethod": true,
+          "isStatic": false,
+          "isAsync": false
+        },
+        "params": [],
+        "body": [
+          {
+            "type": "devolver",
+            "object": {
+              "type": "Literal",
+              "value": 1,
+              "raw": "1",
+              "location": {
+                "line": 3,
+                "column": 18
+              }
+            },
+            "location": {
+              "line": 3,
+              "column": 18
+            }
+          }
+        ],
+        "location": {
+          "line": 4,
+          "column": 5
+        }
+      }
+    ],
+    "location": {
+      "line": 5,
+      "column": 1
+    }
+  },
+  {
+    "type": "clase",
+    "id": "B",
+    "superClass": "A",
+    "body": [],
+    "location": {
+      "line": 8,
+      "column": 1
+    }
+  },
+  {
+    "type": "funcion",
+    "id": "f",
+    "metadata": {
+      "isConstructor": false,
+      "isMethod": false,
+      "isStatic": false,
+      "isAsync": false
+    },
+    "params": [
+      "x"
+    ],
+    "paramTypes": [
+      {
+        "kind": "userClass",
+        "name": "A"
+      }
+    ],
+    "body": [
+      {
+        "type": "devolver",
+        "object": {
+          "type": "Llamada",
+          "object": {
+            "type": "Acceso",
+            "object": {
+              "type": "IDENTIFICADOR",
+              "value": "x",
+              "location": {
+                "line": 11,
+                "column": 14
+              }
+            },
+            "property": "dato",
+            "location": {
+              "line": 11,
+              "column": 16
+            }
+          },
+          "params": [],
+          "location": {
+            "line": 11,
+            "column": 21
+          }
+        },
+        "location": {
+          "line": 11,
+          "column": 21
+        }
+      }
+    ],
+    "location": {
+      "line": 12,
+      "column": 1
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "a",
+    "value": {
+      "type": "nuevo",
+      "object": {
+        "type": "Llamada",
+        "object": {
+          "type": "IDENTIFICADOR",
+          "value": "B",
+          "location": {
+            "line": 14,
+            "column": 23
+          }
+        },
+        "params": [],
+        "location": {
+          "line": 14,
+          "column": 25
+        }
+      },
+      "location": {
+        "line": 14,
+        "column": 25
+      }
+    },
+    "dataType": {
+      "kind": "userClass",
+      "name": "A"
+    },
+    "location": {
+      "line": 14,
+      "column": 25
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 15,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 15,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "Llamada",
+        "object": {
+          "type": "IDENTIFICADOR",
+          "value": "f",
+          "location": {
+            "line": 15,
+            "column": 18
+          }
+        },
+        "params": [
+          {
+            "type": "nuevo",
+            "object": {
+              "type": "Llamada",
+              "object": {
+                "type": "IDENTIFICADOR",
+                "value": "B",
+                "location": {
+                  "line": 15,
+                  "column": 26
+                }
+              },
+              "params": [],
+              "location": {
+                "line": 15,
+                "column": 28
+              }
+            },
+            "location": {
+              "line": 15,
+              "column": 28
+            }
+          }
+        ],
+        "location": {
+          "line": 15,
+          "column": 29
+        }
+      }
+    ],
+    "location": {
+      "line": 15,
+      "column": 30
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 16,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 16,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "Llamada",
+        "object": {
+          "type": "Acceso",
+          "object": {
+            "type": "IDENTIFICADOR",
+            "value": "a",
+            "location": {
+              "line": 16,
+              "column": 18
+            }
+          },
+          "property": "dato",
+          "location": {
+            "line": 16,
+            "column": 20
+          }
+        },
+        "params": [],
+        "location": {
+          "line": 16,
+          "column": 25
+        }
+      }
+    ],
+    "location": {
+      "line": 16,
+      "column": 26
+    }
+  }
+]

@@ -1,0 +1,12 @@
+clase A {
+    funcion dato() {
+        devolver 1
+    }
+}
+
+clase B {
+}
+
+var a es nuevo A()
+a es nuevo B()
+var t tipo texto es a

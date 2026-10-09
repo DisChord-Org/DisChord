@@ -1,0 +1,143 @@
+[
+  {
+    "type": "clase",
+    "id": "A",
+    "body": [
+      {
+        "type": "funcion",
+        "id": "dato",
+        "metadata": {
+          "isConstructor": false,
+          "isMethod": true,
+          "isStatic": false,
+          "isAsync": false
+        },
+        "params": [],
+        "body": [
+          {
+            "type": "devolver",
+            "object": {
+              "type": "Literal",
+              "value": 1,
+              "raw": "1",
+              "location": {
+                "line": 3,
+                "column": 18
+              }
+            },
+            "location": {
+              "line": 3,
+              "column": 18
+            }
+          }
+        ],
+        "location": {
+          "line": 4,
+          "column": 5
+        }
+      }
+    ],
+    "location": {
+      "line": 5,
+      "column": 1
+    }
+  },
+  {
+    "type": "clase",
+    "id": "B",
+    "body": [],
+    "location": {
+      "line": 8,
+      "column": 1
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "a",
+    "value": {
+      "type": "nuevo",
+      "object": {
+        "type": "Llamada",
+        "object": {
+          "type": "IDENTIFICADOR",
+          "value": "A",
+          "location": {
+            "line": 10,
+            "column": 16
+          }
+        },
+        "params": [],
+        "location": {
+          "line": 10,
+          "column": 18
+        }
+      },
+      "location": {
+        "line": 10,
+        "column": 18
+      }
+    },
+    "location": {
+      "line": 10,
+      "column": 18
+    }
+  },
+  {
+    "type": "Asignacion",
+    "left": {
+      "type": "IDENTIFICADOR",
+      "value": "a",
+      "location": {
+        "line": 11,
+        "column": 1
+      }
+    },
+    "assignment": {
+      "type": "nuevo",
+      "object": {
+        "type": "Llamada",
+        "object": {
+          "type": "IDENTIFICADOR",
+          "value": "B",
+          "location": {
+            "line": 11,
+            "column": 12
+          }
+        },
+        "params": [],
+        "location": {
+          "line": 11,
+          "column": 14
+        }
+      },
+      "location": {
+        "line": 11,
+        "column": 14
+      }
+    },
+    "location": {
+      "line": 11,
+      "column": 14
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "t",
+    "value": {
+      "type": "IDENTIFICADOR",
+      "value": "a",
+      "location": {
+        "line": 12,
+        "column": 21
+      }
+    },
+    "dataType": {
+      "kind": "primitive",
+      "name": "texto"
+    },
+    "location": {
+      "line": 12,
+      "column": 21
+    }
+  }
+]

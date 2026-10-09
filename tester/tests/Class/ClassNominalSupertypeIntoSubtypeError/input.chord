@@ -1,0 +1,10 @@
+clase A {
+    funcion dato() {
+        devolver 1
+    }
+}
+
+clase B extiende A {
+}
+
+var b tipo B es nuevo A()

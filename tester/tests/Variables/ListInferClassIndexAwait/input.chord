@@ -1,0 +1,15 @@
+clase A {
+    @asincrono
+    funcion dato() {
+        devolver 1
+    }
+}
+
+clase B {
+    funcion dato() {
+        devolver 2
+    }
+}
+
+var l es [nuevo A()]
+consola.imprimir(l[0].dato())

@@ -1,0 +1,11 @@
+clase A {
+    funcion dato() {
+        devolver 1
+    }
+}
+
+clase B extiende A {
+}
+
+var x tipo A[] es [nuevo B(), nuevo A()]
+consola.imprimir(x[1].dato())

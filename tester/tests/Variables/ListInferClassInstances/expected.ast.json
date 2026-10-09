@@ -1,0 +1,206 @@
+[
+  {
+    "type": "importar",
+    "identificators": [],
+    "path": "./lib/consoleRuntime.js",
+    "isDestructured": false,
+    "location": {
+      "line": 0,
+      "column": 0
+    }
+  },
+  {
+    "type": "clase",
+    "id": "A",
+    "body": [
+      {
+        "type": "funcion",
+        "id": "dato",
+        "metadata": {
+          "isConstructor": false,
+          "isMethod": true,
+          "isStatic": false,
+          "isAsync": false
+        },
+        "params": [],
+        "body": [
+          {
+            "type": "devolver",
+            "object": {
+              "type": "Literal",
+              "value": 1,
+              "raw": "1",
+              "location": {
+                "line": 3,
+                "column": 18
+              }
+            },
+            "location": {
+              "line": 3,
+              "column": 18
+            }
+          }
+        ],
+        "location": {
+          "line": 4,
+          "column": 5
+        }
+      }
+    ],
+    "location": {
+      "line": 5,
+      "column": 1
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "l",
+    "value": {
+      "type": "Lista",
+      "body": [
+        {
+          "type": "nuevo",
+          "object": {
+            "type": "Llamada",
+            "object": {
+              "type": "IDENTIFICADOR",
+              "value": "A",
+              "location": {
+                "line": 7,
+                "column": 17
+              }
+            },
+            "params": [],
+            "location": {
+              "line": 7,
+              "column": 19
+            }
+          },
+          "location": {
+            "line": 7,
+            "column": 19
+          }
+        },
+        {
+          "type": "nuevo",
+          "object": {
+            "type": "Llamada",
+            "object": {
+              "type": "IDENTIFICADOR",
+              "value": "A",
+              "location": {
+                "line": 7,
+                "column": 28
+              }
+            },
+            "params": [],
+            "location": {
+              "line": 7,
+              "column": 30
+            }
+          },
+          "location": {
+            "line": 7,
+            "column": 30
+          }
+        }
+      ],
+      "location": {
+        "line": 7,
+        "column": 31
+      }
+    },
+    "location": {
+      "line": 7,
+      "column": 31
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "x",
+    "value": {
+      "type": "IDENTIFICADOR",
+      "value": "l",
+      "location": {
+        "line": 8,
+        "column": 19
+      }
+    },
+    "dataType": {
+      "kind": "array",
+      "element": {
+        "kind": "userClass",
+        "name": "A"
+      }
+    },
+    "location": {
+      "line": 8,
+      "column": 19
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 9,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 9,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "Llamada",
+        "object": {
+          "type": "Acceso",
+          "object": {
+            "type": "AccesoPorIndice",
+            "object": {
+              "type": "IDENTIFICADOR",
+              "value": "x",
+              "location": {
+                "line": 9,
+                "column": 18
+              }
+            },
+            "index": {
+              "type": "Literal",
+              "value": 0,
+              "raw": "0",
+              "location": {
+                "line": 9,
+                "column": 20
+              }
+            },
+            "location": {
+              "line": 9,
+              "column": 21
+            }
+          },
+          "property": "dato",
+          "location": {
+            "line": 9,
+            "column": 23
+          }
+        },
+        "params": [],
+        "location": {
+          "line": 9,
+          "column": 28
+        }
+      }
+    ],
+    "location": {
+      "line": 9,
+      "column": 29
+    }
+  }
+]

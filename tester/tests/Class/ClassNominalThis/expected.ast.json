@@ -1,0 +1,235 @@
+[
+  {
+    "type": "importar",
+    "identificators": [],
+    "path": "./lib/consoleRuntime.js",
+    "isDestructured": false,
+    "location": {
+      "line": 0,
+      "column": 0
+    }
+  },
+  {
+    "type": "clase",
+    "id": "A",
+    "body": [
+      {
+        "type": "funcion",
+        "id": "dato",
+        "metadata": {
+          "isConstructor": false,
+          "isMethod": true,
+          "isStatic": false,
+          "isAsync": false
+        },
+        "params": [],
+        "body": [
+          {
+            "type": "devolver",
+            "object": {
+              "type": "Literal",
+              "value": 1,
+              "raw": "1",
+              "location": {
+                "line": 3,
+                "column": 18
+              }
+            },
+            "location": {
+              "line": 3,
+              "column": 18
+            }
+          }
+        ],
+        "location": {
+          "line": 4,
+          "column": 5
+        }
+      }
+    ],
+    "location": {
+      "line": 5,
+      "column": 1
+    }
+  },
+  {
+    "type": "funcion",
+    "id": "usar",
+    "metadata": {
+      "isConstructor": false,
+      "isMethod": false,
+      "isStatic": false,
+      "isAsync": false
+    },
+    "params": [
+      "x"
+    ],
+    "paramTypes": [
+      {
+        "kind": "userClass",
+        "name": "A"
+      }
+    ],
+    "body": [
+      {
+        "type": "devolver",
+        "object": {
+          "type": "Llamada",
+          "object": {
+            "type": "Acceso",
+            "object": {
+              "type": "IDENTIFICADOR",
+              "value": "x",
+              "location": {
+                "line": 8,
+                "column": 14
+              }
+            },
+            "property": "dato",
+            "location": {
+              "line": 8,
+              "column": 16
+            }
+          },
+          "params": [],
+          "location": {
+            "line": 8,
+            "column": 21
+          }
+        },
+        "location": {
+          "line": 8,
+          "column": 21
+        }
+      }
+    ],
+    "location": {
+      "line": 9,
+      "column": 1
+    }
+  },
+  {
+    "type": "clase",
+    "id": "B",
+    "superClass": "A",
+    "body": [
+      {
+        "type": "funcion",
+        "id": "probar",
+        "metadata": {
+          "isConstructor": false,
+          "isMethod": true,
+          "isStatic": false,
+          "isAsync": false
+        },
+        "params": [],
+        "body": [
+          {
+            "type": "devolver",
+            "object": {
+              "type": "Llamada",
+              "object": {
+                "type": "IDENTIFICADOR",
+                "value": "usar",
+                "location": {
+                  "line": 13,
+                  "column": 18
+                }
+              },
+              "params": [
+                {
+                  "type": "esta",
+                  "value": "",
+                  "location": {
+                    "line": 13,
+                    "column": 23
+                  }
+                }
+              ],
+              "location": {
+                "line": 13,
+                "column": 27
+              }
+            },
+            "location": {
+              "line": 13,
+              "column": 27
+            }
+          }
+        ],
+        "location": {
+          "line": 14,
+          "column": 5
+        }
+      }
+    ],
+    "location": {
+      "line": 15,
+      "column": 1
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 17,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 17,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "nuevo",
+        "object": {
+          "type": "Llamada",
+          "object": {
+            "type": "Acceso",
+            "object": {
+              "type": "Llamada",
+              "object": {
+                "type": "IDENTIFICADOR",
+                "value": "B",
+                "location": {
+                  "line": 17,
+                  "column": 24
+                }
+              },
+              "params": [],
+              "location": {
+                "line": 17,
+                "column": 26
+              }
+            },
+            "property": "probar",
+            "location": {
+              "line": 17,
+              "column": 28
+            }
+          },
+          "params": [],
+          "location": {
+            "line": 17,
+            "column": 35
+          }
+        },
+        "location": {
+          "line": 17,
+          "column": 35
+        }
+      }
+    ],
+    "location": {
+      "line": 17,
+      "column": 36
+    }
+  }
+]

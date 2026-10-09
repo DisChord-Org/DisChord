@@ -11,6 +11,6 @@ export class ThisInferrer<T extends string, N extends BaseNode<T>> extends SubIn
 
     public infer (_node: ASTNode<T, N>): DataType | undefined {
         const className = this.parent.context.symbolTable.getMetadata<string>(CompilerMetadataKind.CurrentClass);
-        return className === undefined ? undefined : UserClassDataType.of(className);
+        return className === undefined ? undefined : UserClassDataType.of(className, this.parent.context.symbolTable.classes);
     }
 }

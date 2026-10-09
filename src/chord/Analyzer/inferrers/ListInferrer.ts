@@ -1,17 +1,17 @@
-import { ASTNode, BaseNode, ListNode, PrimitiveTypeName, TokenType, TokenTypeUnion } from "../../types";
-import { ArrayDataType, DataType, PrimitiveDataType, UnionDataType } from "../../model/DataType";
+import { ASTNode, BaseNode, ListNode, TokenType, TokenTypeUnion } from "../../types";
+import { ArrayDataType, ClassDataType, DataType, PrimitiveDataType, UnionDataType, UserClassDataType } from "../../model/DataType";
 import { SubInferrer } from "../SubInferrer";
 
 /**
  * Infers a list literal's array type: every element is inferred recursively via
  * `this.parent.infer` (an element can itself be an identifier, a binary expression, ...), and
- * their primitive kinds are unioned together (`[1, "dos"]` -> `numero|texto[]`, not just
- * `numero[]` or a refusal to infer at all). Infers `undefined` for an empty list, one with any
- * non-inferrable element, or one with a nested list/tuple element (an array's inferred type is
- * always a flat union of primitives — a tuple type is only ever produced by an explicit
- * `tipo [...]` annotation, never inferred, matching how TypeScript itself never infers a tuple
- * type from a plain array literal either). The same goes for an element of any other type (an
- * instance of a class, `cualquiera`, `nada`, a union with such members): only primitives are unioned.
+ * their types are unioned together (`[1, "dos"]` -> `(numero|texto)[]`, not just `numero[]` or a
+ * refusal to infer at all; `[nuevo B(), nuevo A()]` -> `(A|B)[]`). Only primitives and instances of
+ * classes (of the file or of the core library), or unions of them, are unioned. Infers `undefined`
+ * for an empty list, one with any non-inferrable element, or one with a nested list/tuple element (an
+ * array's inferred type is always a flat union — a tuple type is only ever produced by an explicit
+ * `tipo [...]` annotation, never inferred, matching how TypeScript itself never infers a tuple type
+ * from a plain array literal either). The same goes for an element that is `cualquiera` or `nada`.
  */
 export class ListInferrer<T extends string, N extends BaseNode<T>> extends SubInferrer<T, N> {
     public static triggerToken: TokenTypeUnion<TokenType> | undefined = TokenType.LISTA;
@@ -23,21 +23,11 @@ export class ListInferrer<T extends string, N extends BaseNode<T>> extends SubIn
         const elementTypes = listNode.body.map(element => this.parent.infer(element));
         if (elementTypes.some(elementType => elementType === undefined)) return undefined;
 
-        const kinds = new Set<PrimitiveTypeName>();
-        const addKind = (type: DataType): boolean => {
-            if (!(type instanceof PrimitiveDataType)) return false;
-            kinds.add(type.name);
-            return true;
-        };
+        const isUnionable = (type: DataType): boolean => type instanceof PrimitiveDataType || type instanceof UserClassDataType || type instanceof ClassDataType;
 
-        for (const elementType of elementTypes as DataType[]) {
-            const isPrimitiveOrUnionOfPrimitives = elementType instanceof UnionDataType
-                ? elementType.members.every(addKind)
-                : addKind(elementType);
+        const unionable = (elementTypes as DataType[]).every(type => type instanceof UnionDataType ? type.members.every(isUnionable) : isUnionable(type));
+        if (!unionable) return undefined;
 
-            if (!isPrimitiveOrUnionOfPrimitives) return undefined;
-        }
-
-        return ArrayDataType.of(UnionDataType.of([ ...kinds ]));
+        return ArrayDataType.of(UnionDataType.ofTypes(elementTypes as DataType[]));
     }
 }

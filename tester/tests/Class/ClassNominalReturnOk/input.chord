@@ -1,0 +1,14 @@
+clase A {
+    funcion dato() {
+        devolver 1
+    }
+}
+
+clase B extiende A {
+}
+
+funcion crear() -> A {
+    devolver nuevo B()
+}
+
+consola.imprimir(crear().dato())

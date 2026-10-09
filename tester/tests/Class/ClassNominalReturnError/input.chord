@@ -1,0 +1,12 @@
+clase A {
+    funcion dato() {
+        devolver 1
+    }
+}
+
+clase B {
+}
+
+funcion crear() -> A {
+    devolver nuevo B()
+}

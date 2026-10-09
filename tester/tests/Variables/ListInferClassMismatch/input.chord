@@ -1,0 +1,7 @@
+clase A {
+    funcion dato() {
+        devolver 1
+    }
+}
+
+var x tipo texto[] es [nuevo A()]

@@ -184,7 +184,7 @@ export class TypeAnnotationParser<T extends string, N extends BaseNode<T>> {
         if (lowered === 'cualquiera') return AnyDataType.Any;
         if (lowered === 'nada') return VoidDataType.Void;
 
-        return UserClassDataType.of(token.value);
+        return UserClassDataType.of(token.value, this.parser.SymbolTable.classes);
     }
 
     /** Whether the upcoming tokens are an empty `[]` array-suffix, without consuming them. */

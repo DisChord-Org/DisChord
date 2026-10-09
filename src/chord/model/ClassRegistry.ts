@@ -61,6 +61,25 @@ export class ClassRegistry {
     }
 
     /**
+     * @param {string} sub - A class name.
+     * @param {string} base - A class name.
+     * @returns {boolean} Whether `sub` is `base` or extends it, directly or through other classes. A cycle in the chain is cut.
+     */
+    public isSubclassOf(sub: string, base: string): boolean {
+        const seen = new Set<string>();
+        let current: string | undefined = sub;
+
+        while (current !== undefined && !seen.has(current)) {
+            if (current === base) return true;
+
+            seen.add(current);
+            current = this.classes.get(current)?.superClass;
+        }
+
+        return false;
+    }
+
+    /**
      * @param {string} member - A member name.
      * @returns {Symbol[]} The member as declared by each class of the file that declares it itself.
      */

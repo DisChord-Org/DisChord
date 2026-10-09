@@ -1,0 +1,203 @@
+[
+  {
+    "type": "importar",
+    "identificators": [],
+    "path": "./lib/consoleRuntime.js",
+    "isDestructured": false,
+    "location": {
+      "line": 0,
+      "column": 0
+    }
+  },
+  {
+    "type": "clase",
+    "id": "A",
+    "body": [
+      {
+        "type": "funcion",
+        "id": "dato",
+        "metadata": {
+          "isConstructor": false,
+          "isMethod": true,
+          "isStatic": false,
+          "isAsync": true
+        },
+        "params": [],
+        "body": [
+          {
+            "type": "devolver",
+            "object": {
+              "type": "Literal",
+              "value": 1,
+              "raw": "1",
+              "location": {
+                "line": 4,
+                "column": 18
+              }
+            },
+            "location": {
+              "line": 4,
+              "column": 18
+            }
+          }
+        ],
+        "location": {
+          "line": 5,
+          "column": 5
+        }
+      }
+    ],
+    "location": {
+      "line": 6,
+      "column": 1
+    }
+  },
+  {
+    "type": "clase",
+    "id": "B",
+    "body": [
+      {
+        "type": "funcion",
+        "id": "dato",
+        "metadata": {
+          "isConstructor": false,
+          "isMethod": true,
+          "isStatic": false,
+          "isAsync": false
+        },
+        "params": [],
+        "body": [
+          {
+            "type": "devolver",
+            "object": {
+              "type": "Literal",
+              "value": 2,
+              "raw": "2",
+              "location": {
+                "line": 10,
+                "column": 18
+              }
+            },
+            "location": {
+              "line": 10,
+              "column": 18
+            }
+          }
+        ],
+        "location": {
+          "line": 11,
+          "column": 5
+        }
+      }
+    ],
+    "location": {
+      "line": 12,
+      "column": 1
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "l",
+    "value": {
+      "type": "Lista",
+      "body": [
+        {
+          "type": "nuevo",
+          "object": {
+            "type": "Llamada",
+            "object": {
+              "type": "IDENTIFICADOR",
+              "value": "A",
+              "location": {
+                "line": 14,
+                "column": 17
+              }
+            },
+            "params": [],
+            "location": {
+              "line": 14,
+              "column": 19
+            }
+          },
+          "location": {
+            "line": 14,
+            "column": 19
+          }
+        }
+      ],
+      "location": {
+        "line": 14,
+        "column": 20
+      }
+    },
+    "location": {
+      "line": 14,
+      "column": 20
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 15,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 15,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "Llamada",
+        "object": {
+          "type": "Acceso",
+          "object": {
+            "type": "AccesoPorIndice",
+            "object": {
+              "type": "IDENTIFICADOR",
+              "value": "l",
+              "location": {
+                "line": 15,
+                "column": 18
+              }
+            },
+            "index": {
+              "type": "Literal",
+              "value": 0,
+              "raw": "0",
+              "location": {
+                "line": 15,
+                "column": 20
+              }
+            },
+            "location": {
+              "line": 15,
+              "column": 21
+            }
+          },
+          "property": "dato",
+          "location": {
+            "line": 15,
+            "column": 23
+          }
+        },
+        "params": [],
+        "location": {
+          "line": 15,
+          "column": 28
+        }
+      }
+    ],
+    "location": {
+      "line": 15,
+      "column": 29
+    }
+  }
+]

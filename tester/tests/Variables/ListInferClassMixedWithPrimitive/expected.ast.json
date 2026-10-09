@@ -1,0 +1,185 @@
+[
+  {
+    "type": "importar",
+    "identificators": [],
+    "path": "./lib/consoleRuntime.js",
+    "isDestructured": false,
+    "location": {
+      "line": 0,
+      "column": 0
+    }
+  },
+  {
+    "type": "clase",
+    "id": "A",
+    "body": [
+      {
+        "type": "funcion",
+        "id": "dato",
+        "metadata": {
+          "isConstructor": false,
+          "isMethod": true,
+          "isStatic": false,
+          "isAsync": false
+        },
+        "params": [],
+        "body": [
+          {
+            "type": "devolver",
+            "object": {
+              "type": "Literal",
+              "value": 1,
+              "raw": "1",
+              "location": {
+                "line": 3,
+                "column": 18
+              }
+            },
+            "location": {
+              "line": 3,
+              "column": 18
+            }
+          }
+        ],
+        "location": {
+          "line": 4,
+          "column": 5
+        }
+      }
+    ],
+    "location": {
+      "line": 5,
+      "column": 1
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "m",
+    "value": {
+      "type": "Lista",
+      "body": [
+        {
+          "type": "Literal",
+          "value": 1,
+          "raw": "1",
+          "location": {
+            "line": 7,
+            "column": 11
+          }
+        },
+        {
+          "type": "nuevo",
+          "object": {
+            "type": "Llamada",
+            "object": {
+              "type": "IDENTIFICADOR",
+              "value": "A",
+              "location": {
+                "line": 7,
+                "column": 20
+              }
+            },
+            "params": [],
+            "location": {
+              "line": 7,
+              "column": 22
+            }
+          },
+          "location": {
+            "line": 7,
+            "column": 22
+          }
+        }
+      ],
+      "location": {
+        "line": 7,
+        "column": 23
+      }
+    },
+    "location": {
+      "line": 7,
+      "column": 23
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "t",
+    "value": {
+      "type": "IDENTIFICADOR",
+      "value": "m",
+      "location": {
+        "line": 8,
+        "column": 28
+      }
+    },
+    "dataType": {
+      "kind": "array",
+      "element": {
+        "kind": "union",
+        "members": [
+          {
+            "kind": "primitive",
+            "name": "numero"
+          },
+          {
+            "kind": "userClass",
+            "name": "A"
+          }
+        ]
+      }
+    },
+    "location": {
+      "line": 8,
+      "column": 28
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 9,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 9,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "AccesoPorIndice",
+        "object": {
+          "type": "IDENTIFICADOR",
+          "value": "t",
+          "location": {
+            "line": 9,
+            "column": 18
+          }
+        },
+        "index": {
+          "type": "Literal",
+          "value": 0,
+          "raw": "0",
+          "location": {
+            "line": 9,
+            "column": 20
+          }
+        },
+        "location": {
+          "line": 9,
+          "column": 21
+        }
+      }
+    ],
+    "location": {
+      "line": 9,
+      "column": 22
+    }
+  }
+]

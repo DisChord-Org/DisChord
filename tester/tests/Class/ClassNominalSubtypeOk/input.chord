@@ -1,0 +1,16 @@
+clase A {
+    funcion dato() {
+        devolver 1
+    }
+}
+
+clase B extiende A {
+}
+
+funcion f(x tipo A) {
+    devolver x.dato()
+}
+
+var a tipo A es nuevo B()
+consola.imprimir(f(nuevo B()))
+consola.imprimir(a.dato())
