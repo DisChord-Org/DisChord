@@ -6,14 +6,9 @@
 
 import { Location, Symbol, SymbolKind, CompilerMetadataKind, TokenType } from "../types";
 import { DataType } from "./DataType";
+import { ClassRegistry } from "./ClassRegistry";
+import { CompilationMarks } from "./CompilationMarks";
 import { ChordError, ErrorLevel } from "../../errors/ChordError";
-
-/**
- * How a method call on a receiver of union type is emitted, when it isn't by the member's name:
- * as a call to `member` on the receiver, or as a call to the runtime helper `helper` with the
- * receiver as its first argument.
- */
-export type CallDispatch = { readonly member: string } | { readonly helper: string };
 
 /**
  * One lexical scope: the symbols declared in it plus its contextual compilation metadata.
@@ -56,26 +51,14 @@ export class SymbolTable {
     private readonly asyncBodyTypes: Set<string> = new Set();
 
     /**
-     * Every class declared in the file by name, with its parent class and the scope holding its
-     * members, so a method can be found from a class name and through inheritance.
+     * The classes declared in the file, so a member can be found from a class name and through inheritance.
      */
-    private readonly classes: Map<string, { superClass?: string; scope: Scope }> = new Map();
+    public readonly classes: ClassRegistry = new ClassRegistry();
 
     /**
-     * Calls the analyzer decided must be awaited (see {@link markAwaited}).
+     * What the analyzer decided about how to emit the nodes of the tree, for the generator to read.
      */
-    private readonly awaitedCalls: WeakSet<object> = new WeakSet();
-
-    /**
-     * The name each member access is emitted with (see {@link markMember}).
-     */
-    private readonly memberNames: WeakMap<object, string> = new WeakMap();
-
-    /**
-     * Calls on a receiver of union type that the analyzer decided to emit differently (see
-     * {@link markDispatched}).
-     */
-    private readonly dispatchedCalls: WeakMap<object, CallDispatch> = new WeakMap();
+    public readonly marks: CompilationMarks = new CompilationMarks();
 
     private static createScope(): Scope {
         return { symbols: new Map(), metadata: new Map() };
@@ -103,130 +86,11 @@ export class SymbolTable {
     }
 
     /**
-     * Records the class being declared, whose scope must be the current one, so its members can be
-     * found by class name later.
-     *
-     * @param {string} name - The class name.
-     * @param {string} [superClass] - The name of the class it extends, if any.
+     * @returns {ReadonlyMap<string, Symbol>} The symbols declared in the current scope, which a
+     * class being declared hands to {@link ClassRegistry.register} as its members.
      */
-    public registerClass(name: string, superClass?: string): void {
-        this.classes.set(name, { superClass, scope: this.scopes[this.scopes.length - 1] });
-    }
-
-    /**
-     * @param {string} name - A class name.
-     * @returns {boolean} Whether a class with that name is declared in the file.
-     */
-    public isUserClass(name: string): boolean {
-        return this.classes.has(name);
-    }
-
-    /**
-     * @param {string} name - A user class name.
-     * @returns {string | undefined} The class it extends, if any.
-     */
-    public superClassOf(name: string): string | undefined {
-        return this.classes.get(name)?.superClass;
-    }
-
-    /**
-     * Finds a member in a user class, searching its parent classes in turn. A parent that isn't a
-     * class of this file ends the search, since what it holds is unknown.
-     *
-     * @param {string} className - A user class name.
-     * @param {string} member - The member name.
-     * @returns {Symbol | undefined} The member, or `undefined` if it isn't found in the chain.
-     */
-    public findMember(className: string, member: string): Symbol | undefined {
-        const seen = new Set<string>();
-        let current: string | undefined = className;
-
-        while (current !== undefined && !seen.has(current)) {
-            seen.add(current);
-            const entry = this.classes.get(current);
-            if (!entry) return undefined;
-
-            const symbol = entry.scope.symbols.get(member);
-            if (symbol) return symbol;
-
-            current = entry.superClass;
-        }
-
-        return undefined;
-    }
-
-    /**
-     * @param {string} member - A member name.
-     * @returns {Symbol[]} The member as declared by each class of the file that declares it itself.
-     */
-    public membersNamed(member: string): Symbol[] {
-        return [...this.classes.values()]
-            .map(entry => entry.scope.symbols.get(member))
-            .filter((symbol): symbol is Symbol => symbol !== undefined);
-    }
-
-    /**
-     * @param {string} member - A member name.
-     * @returns {boolean} Whether any class of the file declares a member with that name itself.
-     */
-    public hasMemberNamed(member: string): boolean {
-        return this.membersNamed(member).length > 0;
-    }
-
-    /**
-     * Records that the analyzer decided this call must be awaited, so the generator only has to
-     * read the decision.
-     *
-     * @param {object} call - The call node.
-     */
-    public markAwaited(call: object): void {
-        this.awaitedCalls.add(call);
-    }
-
-    /**
-     * @param {object} call - The call node.
-     * @returns {boolean} Whether the analyzer decided this call must be awaited.
-     */
-    public isAwaited(call: object): boolean {
-        return this.awaitedCalls.has(call);
-    }
-
-    /**
-     * Records the name a member access is emitted with: the JavaScript name of the core library
-     * member it stands for, or the name as written when it doesn't (a field, a member of the user).
-     *
-     * @param {object} access - The access node.
-     * @param {string} name - The final property name.
-     */
-    public markMember(access: object, name: string): void {
-        this.memberNames.set(access, name);
-    }
-
-    /**
-     * @param {object} access - The access node.
-     * @returns {string | undefined} The name the analyzer decided to emit the access with, if it did.
-     */
-    public memberOf(access: object): string | undefined {
-        return this.memberNames.get(access);
-    }
-
-    /**
-     * Records how the analyzer decided to emit a method call on a receiver of union type, so the
-     * generator only has to read the decision.
-     *
-     * @param {object} call - The call node.
-     * @param {CallDispatch} dispatch - What it is emitted as.
-     */
-    public markDispatched(call: object, dispatch: CallDispatch): void {
-        this.dispatchedCalls.set(call, dispatch);
-    }
-
-    /**
-     * @param {object} call - The call node.
-     * @returns {CallDispatch | undefined} How the analyzer decided to emit this call, if it did.
-     */
-    public dispatchOf(call: object): CallDispatch | undefined {
-        return this.dispatchedCalls.get(call);
+    public get currentMembers(): ReadonlyMap<string, Symbol> {
+        return this.scopes[this.scopes.length - 1].symbols;
     }
 
     /**

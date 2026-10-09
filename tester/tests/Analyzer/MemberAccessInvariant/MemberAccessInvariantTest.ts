@@ -7,7 +7,7 @@ import { SymbolTable } from "../../../../src/chord/model/SymbolsTable";
 import { CodeProvider } from "../../../../src/chord/CodeProvider";
 import { walkAST } from "../../../../src/chord/walkAST";
 import { isAccessNode } from "../../../../src/chord/ast.guards";
-import { coreLibUtils } from "../../../../src/chord/corelib";
+import { disChordCoreLibUtils, disChordCoreLibDispatch } from "../../../../src/dischord/corelib";
 import { DisChordParser } from "../../../../src/dischord/Parser/Parser";
 import { DisChordAnalyzer } from "../../../../src/dischord/Analyzer/Analyzer";
 import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType } from "../../../../src/dischord/types";
@@ -36,7 +36,7 @@ const programs: string[] = [
 
 /**
  * @class MemberAccessInvariantTest
- * @description Validates that the analyzer decides the name of every non-static member access (`SymbolTable.memberOf` is set for it) and leaves every static core library access unmarked, over programs that use all kinds of access. A table the analyzer never ran on must fail the same check, so the check can't pass by looking at nothing.
+ * @description Validates that the analyzer decides the name of every non-static member access (`CompilationMarks.memberOf` is set for it) and leaves every static core library access unmarked, over programs that use all kinds of access. A table the analyzer never ran on must fail the same check, so the check can't pass by looking at nothing.
  */
 export class MemberAccessInvariantTest extends Test {
     /**
@@ -82,7 +82,9 @@ export class MemberAccessInvariantTest extends Test {
             keywordsManager: new KeyWords(),
             codeProvider: new CodeProvider(),
             projectRoot: FileSystem.configure(this.fixturePath).projectRoot,
-            extraFiles: new Map()
+            extraFiles: new Map(),
+            coreLib: disChordCoreLibUtils,
+            coreLibDispatch: disChordCoreLibDispatch
         };
 
         DisChordParser.registerGrammar(context);
@@ -107,8 +109,8 @@ export class MemberAccessInvariantTest extends Test {
         ast.forEach(node => walkAST<DisChordNodeType, DisChordNode>(node, current => {
             if (!isAccessNode(current)) return;
 
-            const isStatic = coreLibUtils.resolveStatic(current) !== undefined;
-            const decided = symbolTable.memberOf(current) !== undefined;
+            const isStatic = disChordCoreLibUtils.resolveStatic(current) !== undefined;
+            const decided = symbolTable.marks.memberOf(current) !== undefined;
 
             if (isStatic) staticCount++;
             else memberCount++;

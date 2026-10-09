@@ -1,6 +1,5 @@
 import { AccessNode, BaseNode, TokenType, TokenTypeUnion } from "../../../types";
 import { SubGenerator } from "../../SubGenerator";
-import { coreLibUtils } from "../../../corelib";
 
 /**
  * Atomic SubGenerator mapping properties, fields, and core native dictionary methods.
@@ -26,10 +25,10 @@ export class AccessVisitor<T extends string, N extends BaseNode<T>> extends SubG
      * @public
      */
     public visit(node: AccessNode<T, N>): string {
-        const staticMember = coreLibUtils.resolveStatic(node);
+        const staticMember = this.parent.context.coreLib.resolveStatic(node);
         if (staticMember) return staticMember.member.transpile;
 
-        const property = this.parent.context.symbolTable.memberOf(node) ?? node.property;
+        const property = this.parent.context.symbolTable.marks.memberOf(node) ?? node.property;
 
         const receiver = this.parent.visit(node.object);
         return `${receiver.startsWith('await ') ? `(${receiver})` : receiver}.${property}`;

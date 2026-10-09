@@ -1,7 +1,7 @@
 import path from "node:path";
 import { AnalysisRule } from "../AnalysisRule";
 import { ASTNode, BaseNode, ImportNode, TokenType } from "../../types";
-import { coreLibUtils, runtimeHelperNames, runtimeHelpersModuleContent, runtimeHelpersModulePath } from "../../corelib";
+import { runtimeHelperNames, runtimeHelpersModuleContent, runtimeHelpersModulePath } from "../../corelib";
 import { isAccessNode, isCallNode, isIdentificatorNode } from "../../ast.guards";
 import { buildSharedModuleImportSpecifier } from "../sharedModulePath";
 
@@ -34,12 +34,12 @@ export class RequiresRuntimeHelpersRule<T extends string, N extends BaseNode<T>>
      * @private
      */
     private helperOf (node: ASTNode<T, N>): string | undefined {
-        const dispatch = isCallNode(node) ? this.context.symbolTable.dispatchOf(node) : undefined;
+        const dispatch = isCallNode(node) ? this.context.symbolTable.marks.dispatchOf(node) : undefined;
         const transpiled = dispatch
             ? ('helper' in dispatch ? dispatch.helper : undefined)
             : isAccessNode(node)
-                ? coreLibUtils.resolveStatic(node)?.member.transpile
-                : isCallNode(node) ? coreLibUtils.resolveFunction(node.object, this.isDeclared(node.object)) : undefined;
+                ? this.context.coreLib.resolveStatic(node)?.member.transpile
+                : isCallNode(node) ? this.context.coreLib.resolveFunction(node.object, this.isDeclared(node.object)) : undefined;
 
         return transpiled !== undefined && runtimeHelperNames.has(transpiled) ? transpiled : undefined;
     }

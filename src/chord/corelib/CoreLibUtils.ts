@@ -1,17 +1,9 @@
 // if this file exceeds 500 lines of code, it will be refactored
 
-import { corelib } from "./corelib.data";
 import { isIdentificatorNode } from "../ast.guards";
-import { AnyDataType, ClassDataType, DataType, PrimitiveDataType, UnionDataType, UserClassDataType } from "../model/DataType";
+import { AnyDataType, ClassDataType, DataType, PrimitiveDataType, UnionDataType } from "../model/DataType";
 import { AccessNode, ASTNode, BaseNode, CallNode, PrimitiveType, TokenType } from "../types";
 import { CoreLib, CoreLibClass, ResolvedMember } from "./corelib.types";
-import { runtimeHelperNames } from "./runtimeHelpers";
-
-/**
- * What a method call on a receiver of union type is emitted as: a call to `member`, or to the runtime
- * helper `helper` with the receiver as its first argument.
- */
-export type UnionDispatch = { readonly member: string } | { readonly helper: string };
 
 /**
  * Read-only lookups over a `CoreLib`, so callers pass the raw names they have from the AST and
@@ -70,40 +62,59 @@ export class CoreLibUtils<C extends string = string> {
     }
 
     /**
-     * The type an access evaluates to: a static member's own `returns`, or an instance member's.
+     * The type a call to a member evaluates to: a method's `returns`. A property yields no type
+     * as a call (`texto.longitud()` is not a thing). See {@link findForReturnType} for how the member
+     * is found.
+     * @param {AccessNode<T, N>} access - The callee of the call.
+     * @param {DataType} [receiverType] - The inferred type of `access.object`, if known.
+     * @param {boolean} [declaredByUser=false] - Whether a class of the file declares a member named like `access.property`.
+     * @returns {DataType | undefined} The type, or `undefined` if there is no such method, its name is ambiguous or the user's declaration wins.
+     */
+    resolveCallReturnType<T extends string, N extends BaseNode<T>> (access: AccessNode<T, N>, receiverType?: DataType, declaredByUser: boolean = false): DataType | undefined {
+        const found = this.findForReturnType(access, receiverType, declaredByUser);
+        return found && !found.isProperty ? found.member.returns : undefined;
+    }
+
+    /**
+     * The type reading a member evaluates to: a property's `returns`. A method yields no type as a
+     * plain read (`fecha.dia` without calling it). See {@link findForReturnType} for how the member
+     * is found.
+     * @param {AccessNode<T, N>} access - The access node, not the callee of a call.
+     * @param {DataType} [receiverType] - The inferred type of `access.object`, if known.
+     * @param {boolean} [declaredByUser=false] - Whether a class of the file declares a member named like `access.property`.
+     * @returns {DataType | undefined} The type, or `undefined` if there is no such property, its name is ambiguous or the user's declaration wins.
+     */
+    resolvePropertyType<T extends string, N extends BaseNode<T>> (access: AccessNode<T, N>, receiverType?: DataType, declaredByUser: boolean = false): DataType | undefined {
+        const found = this.findForReturnType(access, receiverType, declaredByUser);
+        return found?.isProperty ? found.member.returns : undefined;
+    }
+
+    /**
+     * The member an access stands for, when it has a type: a static member, or an instance one.
      * When the receiver's type is known the member is looked up only in the class that type belongs
-     * to (`texto.cortar` is `Texto.cortar`, never `Lista.cortar`), and it has no type if that class
+     * to (`texto.cortar` is `Texto.cortar`, never `Lista.cortar`), and there is none if that class
      * has no such member or the type belongs to no class (a `bdo`'s own fields, a `booleano`):
      * guessing there would type a user's field after a core library one that happens to share its
      * name. With no receiver type (or `cualquiera`), falls back to looking the name up in every
-     * class and only resolves if they all agree on its type instance. A method yields its type only
-     * as a call, and a property only as a plain access. A member the file itself declares in a
+     * class and only resolves if they all agree on its type instance. A member the file itself declares in a
      * class (`declaredByUser`) wins over the core library one of the same name when the receiver's
      * type is unknown, so the name is left to the user's declaration. A known receiver type or a
      * static access is unaffected: the receiver decides once it is known. Classes imported from
      * another file aren't seen by the caller, so a member they declare is still resolved by name.
-     * @param {AccessNode<T, N>} access - The access node.
-     * @param {boolean} isCall - Whether the access is the callee of a call.
-     * @param {DataType} [receiverType] - The inferred type of `access.object`, if known.
-     * @param {boolean} [declaredByUser=false] - Whether a class of the file declares a member named like `access.property`.
-     * @returns {DataType | undefined} The type, or `undefined` if the core library has no such
-     * member, its name is ambiguous, the user's declaration wins, or it is used the wrong way (a method read without calling it).
+     * @private
      */
-    resolveReturnType<T extends string, N extends BaseNode<T>> (access: AccessNode<T, N>, isCall: boolean, receiverType?: DataType, declaredByUser: boolean = false): DataType | undefined {
+    private findForReturnType<T extends string, N extends BaseNode<T>> (access: AccessNode<T, N>, receiverType: DataType | undefined, declaredByUser: boolean): ResolvedMember | undefined {
         const staticMember = this.resolveStatic(access);
-        if (staticMember) return this.returnTypeOf(staticMember, isCall);
+        if (staticMember) return staticMember;
 
-        if (receiverType && !this.isUnknownReceiver(receiverType)) {
-            const found = this.resolveInstanceOf(access, receiverType);
-            return found ? this.returnTypeOf(found, isCall) : undefined;
-        }
+        if (receiverType && !this.isUnknownReceiver(receiverType)) return this.resolveInstanceOf(access, receiverType);
 
         if (declaredByUser) return undefined;
 
         const [first, ...rest] = this.resolveInstanceMembers(access);
         if (!first || rest.some(other => other.isProperty !== first.isProperty || other.member.returns !== first.member.returns)) return undefined;
 
-        return this.returnTypeOf(first, isCall);
+        return first;
     }
 
     /**
@@ -123,7 +134,7 @@ export class CoreLibUtils<C extends string = string> {
      * @param {string} propName - Member name as written in source code.
      * @returns {ResolvedMember | undefined} The member, or `undefined` if the class has no such member.
      */
-    private findInClass(className: C, propName: string): ResolvedMember | undefined {
+    findInClass(className: C, propName: string): ResolvedMember | undefined {
         const classEntry: CoreLibClass = this.corelib.classes[className];
         const qualifiedName = `${className}.${propName}`;
 
@@ -243,72 +254,6 @@ export class CoreLibUtils<C extends string = string> {
         return type instanceof AnyDataType || type instanceof UnionDataType;
     }
 
-    /**
-     * Decides how a method called on a receiver of union type is emitted, by resolving the class of
-     * every member of the union. If they all map the name to the same JavaScript member, that member
-     * is called directly (`Mapa|Conjunto` and `tiene` give `has`). If they differ, the name is
-     * ambiguous at compile time and the choice is made at run time by the runtime helper named
-     * `chord<Name>` (`chordTiene`), which exists only for the names that need one. A member of the
-     * union that is a class of the file counts as one that maps the name to itself, so the helper
-     * delegates to its own method.
-     *
-     * Anything else yields `undefined`, leaving the call as if the receiver were of unknown type: a
-     * member that isn't a class (`indefinido`) or lacks the method, a property, a name with no helper,
-     * or a union with no core library class at all. Only calls are decided: reading `c.tiene` without
-     * calling it is never rewritten.
-     * @param {AccessNode<T, N>} access - The callee of the call.
-     * @param {UnionDataType} union - The inferred type of its receiver.
-     * @param {(className: string) => boolean} declaresMethod - Whether a class of the file declares the method.
-     * @returns {UnionDispatch | undefined} What the call is emitted as, or `undefined` to leave it alone.
-     */
-    resolveUnionDispatch<T extends string, N extends BaseNode<T>> (access: AccessNode<T, N>, union: UnionDataType, declaresMethod: (className: string) => boolean): UnionDispatch | undefined {
-        const transpiles = new Set<string>();
-        let hasUserClass = false;
-
-        for (const member of union.members) {
-            if (member instanceof UserClassDataType) {
-                if (!declaresMethod(member.name)) return undefined;
-                hasUserClass = true;
-                continue;
-            }
-
-            const className = this.classOf(member);
-            const found = className && this.findInClass(className, access.property);
-            if (!found || found.member.static || found.isProperty) return undefined;
-
-            transpiles.add(found.member.transpile);
-        }
-
-        if (transpiles.size === 0) return undefined;
-
-        if (hasUserClass) transpiles.add(access.property);
-        if (transpiles.size === 1) return hasUserClass ? undefined : { member: [ ...transpiles ][0] };
-
-        return this.dispatchHelper(access.property);
-    }
-
-    /**
-     * Decides how a method called on a receiver of unknown type (no type, or `cualquiera`) is emitted
-     * when the name means different members in different classes (`tiene` is `includes` in `Texto` and
-     * `Lista` but `has` in `Mapa` and `Conjunto`): through the runtime helper that picks at run time.
-     * The ambiguity is computed over the table. A member a class of the file declares under that name
-     * doesn't prevent it, since the helper calls the receiver's own method when it has one.
-     * @param {AccessNode<T, N>} access - The callee of the call.
-     * @returns {UnionDispatch | undefined} The helper, or `undefined` if the name is not ambiguous, is a property, or has no helper.
-     */
-    resolveUnknownDispatch<T extends string, N extends BaseNode<T>> (access: AccessNode<T, N>): UnionDispatch | undefined {
-        const members = this.resolveInstanceMembers(access);
-        if (members.some(found => found.isProperty)) return undefined;
-        if (new Set(members.map(found => found.member.transpile)).size < 2) return undefined;
-
-        return this.dispatchHelper(access.property);
-    }
-
-    private dispatchHelper (property: string): UnionDispatch | undefined {
-        const helper = `chord${property.charAt(0).toUpperCase()}${property.slice(1)}`;
-        return runtimeHelperNames.has(helper) ? { helper } : undefined;
-    }
-
     private resolveInstanceOf<T extends string, N extends BaseNode<T>> (access: AccessNode<T, N>, receiverType: DataType): ResolvedMember | undefined {
         const className = this.classOf(receiverType);
         const found = className && this.findInClass(className, access.property);
@@ -321,10 +266,6 @@ export class CoreLibUtils<C extends string = string> {
         return isIdentificatorNode(callee) ? callee.value : undefined;
     }
 
-    private returnTypeOf(resolved: ResolvedMember, isCall: boolean): DataType | undefined {
-        return resolved.isProperty === isCall ? undefined : resolved.member.returns;
-    }
-
     /**
      * @param {object} target - Object to inspect.
      * @param {string} key - Key to look for.
@@ -334,9 +275,3 @@ export class CoreLibUtils<C extends string = string> {
         return Object.prototype.hasOwnProperty.call(target, key);
     }
 }
-
-/**
- * Lookups over chord's own `corelib`; the default used by the shared visitors and rules.
- * @type {CoreLibUtils}
- */
-export const coreLibUtils = new CoreLibUtils(corelib);

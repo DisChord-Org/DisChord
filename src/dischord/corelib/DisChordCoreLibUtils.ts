@@ -1,5 +1,6 @@
 import { ClassesEnum } from "../../chord/corelib/corelib.data";
 import { CoreLibUtils } from "../../chord/corelib/CoreLibUtils";
+import { CoreLibDispatch } from "../../chord/corelib/CoreLibDispatch";
 import { corelib, DisChordClassesEnum } from "./corelib.data";
 
 /**
@@ -17,3 +18,9 @@ export class DisChordCoreLibUtils extends CoreLibUtils<ClassesEnum | DisChordCla
  * @type {DisChordCoreLibUtils}
  */
 export const disChordCoreLibUtils = new DisChordCoreLibUtils();
+
+/**
+ * Dispatch policy over DisChord's `corelib`; the one the compilation context carries.
+ * @type {CoreLibDispatch}
+ */
+export const disChordCoreLibDispatch = new CoreLibDispatch(disChordCoreLibUtils);

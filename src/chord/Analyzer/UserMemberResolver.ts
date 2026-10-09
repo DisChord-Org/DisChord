@@ -25,9 +25,9 @@ export class UserMemberResolver<T extends string> {
 
         let className: string | undefined;
         if (receiver.type === TokenType.Esta) className = currentClass;
-        else if (receiver.type === TokenType.Super) className = currentClass === undefined ? undefined : symbolTable.superClassOf(currentClass);
+        else if (receiver.type === TokenType.Super) className = currentClass === undefined ? undefined : symbolTable.classes.superClassOf(currentClass);
         else if (receiverType instanceof UserClassDataType) className = receiverType.name;
-        else if (isIdentificatorNode(receiver) && symbolTable.isUserClass(receiver.value)) className = receiver.value;
+        else if (isIdentificatorNode(receiver) && symbolTable.classes.isUserClass(receiver.value)) className = receiver.value;
 
         return className;
     }
@@ -40,6 +40,6 @@ export class UserMemberResolver<T extends string> {
      */
     public resolve<N extends BaseNode<T>> (access: AccessNode<T, N>, receiverType?: DataType): Symbol | undefined {
         const className = this.className(access, receiverType);
-        return className === undefined ? undefined : this.context.symbolTable.findMember(className, access.property);
+        return className === undefined ? undefined : this.context.symbolTable.classes.findMember(className, access.property);
     }
 }

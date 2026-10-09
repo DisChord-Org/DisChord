@@ -1,7 +1,7 @@
 import { ASTNode, BaseNode, CallNode, NewNode, TokenType, TokenTypeUnion } from "../../types";
 import { isIdentificatorNode } from "../../ast.guards";
 import { DataType, UserClassDataType } from "../../model/DataType";
-import { coreLibUtils } from "../../corelib";
+
 import { SubInferrer } from "../SubInferrer";
 
 /**
@@ -15,10 +15,10 @@ export class NewInferrer<T extends string, N extends BaseNode<T>> extends SubInf
         const target = (node as NewNode<T, N>).object;
         const callee = target.type === TokenType.LLAMADA ? (target as CallNode<T, N>).object : target;
 
-        if (isIdentificatorNode(callee) && this.parent.context.symbolTable.isUserClass(callee.value)) {
+        if (isIdentificatorNode(callee) && this.parent.context.symbolTable.classes.isUserClass(callee.value)) {
             return UserClassDataType.of(callee.value);
         }
 
-        return coreLibUtils.resolveConstructedType(target);
+        return this.parent.context.coreLib.resolveConstructedType(target);
     }
 }

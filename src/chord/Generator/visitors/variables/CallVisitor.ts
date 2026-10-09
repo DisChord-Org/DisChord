@@ -1,8 +1,8 @@
 import { AccessNode, CallNode, BaseNode, TokenType, TokenTypeUnion } from "../../../types";
-import { CallDispatch } from "../../../model/SymbolsTable";
+import { CallDispatch } from "../../../model/CompilationMarks";
 import { isAccessNode, isIdentificatorNode } from "../../../ast.guards";
 import { SubGenerator } from "../../SubGenerator";
-import { asyncRuntimeHelperNames, coreLibUtils } from "../../../corelib";
+import { asyncRuntimeHelperNames } from "../../../corelib";
 
 /**
  * Atomic SubGenerator that handles function and method execution structures.
@@ -35,18 +35,18 @@ export class CallVisitor<T extends string, N extends BaseNode<T>> extends SubGen
         let isAsyncCall = false;
 
         if (isAccessNode(node.object)) {
-            isAsyncCall = this.parent.context.symbolTable.isAwaited(node);
+            isAsyncCall = this.parent.context.symbolTable.marks.isAwaited(node);
 
-            const dispatch = this.parent.context.symbolTable.dispatchOf(node);
+            const dispatch = this.parent.context.symbolTable.marks.dispatchOf(node);
             if (dispatch) return this.visitDispatched(node, node.object, dispatch, args, isAsyncCall);
 
             translation = this.parent.visit(node.object);
         } else if (isIdentificatorNode(node.object)) {
             const name = node.object.value;
-            translation = coreLibUtils.resolveFunction(node.object, !!this.parent.context.symbolTable.lookup(name)) ?? name;
+            translation = this.parent.context.coreLib.resolveFunction(node.object, !!this.parent.context.symbolTable.lookup(name)) ?? name;
             isAsyncCall = asyncRuntimeHelperNames.has(translation);
 
-            if (this.parent.context.symbolTable.isAwaited(node)) {
+            if (this.parent.context.symbolTable.marks.isAwaited(node)) {
                 isAsyncCall = true;
             }
         } else {

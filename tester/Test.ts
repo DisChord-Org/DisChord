@@ -8,6 +8,7 @@ import { DisChordParser } from "../src/dischord/Parser/Parser";
 import { DisChordAnalyzer } from "../src/dischord/Analyzer/Analyzer";
 import { SymbolTable } from "../src/chord/model/SymbolsTable";
 import { CodeProvider } from "../src/chord/CodeProvider";
+import { disChordCoreLibUtils, disChordCoreLibDispatch } from "../src/dischord/corelib";
 import { DisChordASTNode, DisChordNodeType, DisChordTokenType } from "../src/dischord/types";
 import { FileSystem } from "../src/utils/FileSystem";
 import { CompilationContext } from "../src/cli/commands/CompileCommand";
@@ -142,7 +143,9 @@ export abstract class Test {
             keywordsManager: new KeyWords(),
             codeProvider: new CodeProvider(),
             projectRoot: FileSystem.configure(this.fixturePath).projectRoot,
-            extraFiles: new Map()
+            extraFiles: new Map(),
+            coreLib: disChordCoreLibUtils,
+            coreLibDispatch: disChordCoreLibDispatch
         };
 
         const fileName = path.basename(this.fixturePath);

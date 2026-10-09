@@ -36,7 +36,7 @@ export class BindDeclarationsRule<T extends string, N extends BaseNode<T>> exten
             }, node.location);
 
             this.context.symbolTable.enterScope(node);
-            this.context.symbolTable.registerClass(node.id, node.superClass);
+            this.context.symbolTable.classes.register(node.id, this.context.symbolTable.currentMembers, node.superClass);
             this.context.symbolTable.setMetadata(CompilerMetadataKind.CurrentClass, node.id);
 
         } else if (isFunctionNode(node)) {

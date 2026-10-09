@@ -1,7 +1,7 @@
 import { ASTNode, BaseNode, CallNode, TokenType, TokenTypeUnion } from "../../types";
 import { isAccessNode, isIdentificatorNode } from "../../ast.guards";
 import { DataType } from "../../model/DataType";
-import { coreLibUtils } from "../../corelib";
+
 import { SubInferrer } from "../SubInferrer";
 import { UserMemberResolver } from "../UserMemberResolver";
 
@@ -12,7 +12,7 @@ import { UserMemberResolver } from "../UserMemberResolver";
  * of its receiver: an instance of a class of the file, `esta` or `super`. Any other call to a
  * method gives the `returns` of the core library member (`Mates.raizCuadrada(4)`,
  * `texto.partir(",")`), except a method a class of the file declares itself on a receiver of
- * unknown type (see `CoreLibUtils.resolveReturnType`). A free function that is not declared in
+ * unknown type (see `CoreLibUtils.resolveCallReturnType`). A free function that is not declared in
  * the file infers `undefined`.
  */
 export class CallInferrer<T extends string, N extends BaseNode<T>> extends SubInferrer<T, N> {
@@ -27,8 +27,8 @@ export class CallInferrer<T extends string, N extends BaseNode<T>> extends SubIn
 
         const receiverType = this.parent.infer(callee.object);
         const className = new UserMemberResolver(this.parent.context).className(callee, receiverType);
-        if (className !== undefined) return symbolTable.findMember(className, callee.property)?.signature?.returns;
+        if (className !== undefined) return symbolTable.classes.findMember(className, callee.property)?.signature?.returns;
 
-        return coreLibUtils.resolveReturnType(callee, true, receiverType, symbolTable.hasMemberNamed(callee.property));
+        return this.parent.context.coreLib.resolveCallReturnType(callee, receiverType, symbolTable.classes.hasMemberNamed(callee.property));
     }
 }

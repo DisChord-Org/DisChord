@@ -1,6 +1,6 @@
 import { BaseNode, PrimitiveType, PrimitiveTypeName, TokenType } from "../../../types";
 import { AnyDataType, ArrayDataType, DataType, PrimitiveDataType, TupleDataType, UnionDataType, UserClassDataType, VoidDataType } from "../../../model/DataType";
-import { coreLibUtils } from "../../../corelib";
+
 import { Parser } from "../../Parser";
 import { ChordError, ErrorLevel } from "../../../../errors/ChordError";
 
@@ -172,13 +172,13 @@ export class TypeAnnotationParser<T extends string, N extends BaseNode<T>> {
 
         const token = this.parser.consume(
             [ TokenType.IDENTIFICADOR, TokenType.Indefinido ],
-            `Se esperaba un tipo válido después de 'tipo' (${coreLibUtils.annotableTypeNames()})`
+            `Se esperaba un tipo válido después de 'tipo' (${this.parser.CoreLib.annotableTypeNames()})`
         );
 
         const lowered = token.value.toLowerCase();
         if ((this.primitiveTypeNames as readonly string[]).includes(lowered)) return PrimitiveDataType.of(lowered as PrimitiveTypeName);
 
-        const classType = coreLibUtils.resolveClassType(token.value) ?? coreLibUtils.resolveClassReceiver(token.value);
+        const classType = this.parser.CoreLib.resolveClassType(token.value) ?? this.parser.CoreLib.resolveClassReceiver(token.value);
         if (classType) return classType;
 
         if (lowered === 'cualquiera') return AnyDataType.Any;

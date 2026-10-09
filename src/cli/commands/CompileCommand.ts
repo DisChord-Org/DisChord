@@ -6,6 +6,9 @@ import { CompilerConfig, FileSystem } from '../../utils/FileSystem';
 import Prettifier from '../../utils/Prettifier';
 import { CodeProvider } from '../../chord/CodeProvider';
 import { SymbolTable } from '../../chord/model/SymbolsTable';
+import { CoreLibUtils } from '../../chord/corelib/CoreLibUtils';
+import { CoreLibDispatch } from '../../chord/corelib/CoreLibDispatch';
+import { disChordCoreLibUtils, disChordCoreLibDispatch } from '../../dischord/corelib';
 import { KeyWords } from '../../chord/KeywordsManager';
 import { Lexer } from '../../chord/Lexer';
 import { DisChordParser } from '../../dischord/Parser/Parser';
@@ -27,6 +30,10 @@ export interface CompilationContext<T extends string = string> {
     projectRoot: string;
     outputDir?: string;
     extraFiles: Map<string, string>;
+    /** Lookups over the core library of the dialect being compiled. */
+    coreLib: CoreLibUtils<string>;
+    /** How a call on a receiver of ambiguous type is emitted, over the same table as `coreLib`. */
+    coreLibDispatch: CoreLibDispatch<string>;
 }
 
 /**
@@ -98,7 +105,9 @@ export class CompileCommand {
             codeProvider: new CodeProvider(),
             projectRoot: this.config.projectRoot,
             outputDir: targetDir,
-            extraFiles: new Map()
+            extraFiles: new Map(),
+            coreLib: disChordCoreLibUtils,
+            coreLibDispatch: disChordCoreLibDispatch
         };
 
         DisChordParser.registerGrammar(context);

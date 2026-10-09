@@ -90,7 +90,7 @@ export class ValidateCallArgumentsRule<T extends string, N extends BaseNode<T>> 
 
         if (callee.type === TokenType.Super) {
             const currentClass = symbolTable.getMetadata<string>(CompilerMetadataKind.CurrentClass);
-            const parent = currentClass === undefined ? undefined : symbolTable.superClassOf(currentClass);
+            const parent = currentClass === undefined ? undefined : symbolTable.classes.superClassOf(currentClass);
             const constructor = parent === undefined ? undefined : this.constructorOf(parent);
 
             return constructor && parent !== undefined ? { symbol: constructor, name: parent } : undefined;
@@ -114,13 +114,13 @@ export class ValidateCallArgumentsRule<T extends string, N extends BaseNode<T>> 
         const seen = new Set<string>();
         let current: string | undefined = className;
 
-        while (current !== undefined && !seen.has(current) && symbolTable.isUserClass(current)) {
+        while (current !== undefined && !seen.has(current) && symbolTable.classes.isUserClass(current)) {
             seen.add(current);
 
-            const own = symbolTable.findMember(current, current);
+            const own = symbolTable.classes.findMember(current, current);
             if (own?.kind === SymbolKind.Function) return own;
 
-            current = symbolTable.superClassOf(current);
+            current = symbolTable.classes.superClassOf(current);
         }
 
         return undefined;

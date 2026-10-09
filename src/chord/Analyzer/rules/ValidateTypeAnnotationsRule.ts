@@ -2,7 +2,7 @@ import { AnalysisRule } from "../AnalysisRule";
 import { walkAST } from "../../walkAST";
 import { ASTNode, BaseNode, FunctionNode, TokenType, VariableNode } from "../../types";
 import { ArrayDataType, DataType, TupleDataType, UnionDataType, UserClassDataType, VoidDataType } from "../../model/DataType";
-import { coreLibUtils } from "../../corelib";
+
 import { ChordError, ErrorLevel } from "../../../errors/ChordError";
 
 /**
@@ -46,9 +46,9 @@ export class ValidateTypeAnnotationsRule<T extends string, N extends BaseNode<T>
      * @private
      */
     private validate (type: DataType, location: BaseNode<T>['location'], allowsVoid: boolean, inContainer = false): void {
-        if (type instanceof UserClassDataType && !this.context.symbolTable.isUserClass(type.name)) throw new ChordError({
+        if (type instanceof UserClassDataType && !this.context.symbolTable.classes.isUserClass(type.name)) throw new ChordError({
             phase: ErrorLevel.Analysis,
-            message: `Tipo desconocido '${type.name}'. Tipos válidos: ${coreLibUtils.annotableTypeNames()} o una clase declarada en el archivo; también T[], [A, B] y A|B`,
+            message: `Tipo desconocido '${type.name}'. Tipos válidos: ${this.context.coreLib.annotableTypeNames()} o una clase declarada en el archivo; también T[], [A, B] y A|B`,
             location
         }).format();
 

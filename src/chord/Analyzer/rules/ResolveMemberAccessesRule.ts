@@ -3,7 +3,7 @@ import { TypeInferrer } from "../TypeInferrer";
 import { ASTNode, AccessNode, AssignmentNode, BaseNode, CallNode, TokenType } from "../../types";
 import { isAccessNode, isIdentificatorNode } from "../../ast.guards";
 import { AnyDataType, DataType, UnionDataType } from "../../model/DataType";
-import { coreLibUtils, ResolvedMember } from "../../corelib";
+import { ResolvedMember } from "../../corelib";
 import { ChordError, ErrorLevel } from "../../../errors/ChordError";
 
 /**
@@ -51,7 +51,7 @@ export class ResolveMemberAccessesRule<T extends string, N extends BaseNode<T>> 
         if (!isAccessNode(node)) return;
 
         const symbolTable = this.context.symbolTable;
-        const staticMember = coreLibUtils.resolveStatic(node);
+        const staticMember = this.context.coreLib.resolveStatic(node);
 
         if (staticMember) {
             this.checkInstanceMemberOnClass(node, staticMember);
@@ -59,15 +59,15 @@ export class ResolveMemberAccessesRule<T extends string, N extends BaseNode<T>> 
         }
 
         const receiverType = this.typeInferrer.infer(node.object);
-        const declaredByUser = symbolTable.hasMemberNamed(node.property);
-        const resolved = coreLibUtils.resolveInstanceMember(node, receiverType, declaredByUser);
+        const declaredByUser = symbolTable.classes.hasMemberNamed(node.property);
+        const resolved = this.context.coreLib.resolveInstanceMember(node, receiverType, declaredByUser);
 
         const role = this.callees.has(node) ? 'callee' : this.targets.has(node) ? 'assignment' : 'read';
         if (resolved && receiverType && !declaredByUser) this.checkUse(node, resolved, receiverType, role);
         const isUnknownReceiver = !receiverType || receiverType instanceof AnyDataType;
         const isFieldUse = resolved && isUnknownReceiver && (resolved.isProperty ? role !== 'read' : role !== 'callee');
 
-        symbolTable.markMember(node, resolved && !isFieldUse ? resolved.member.transpile : node.property);
+        symbolTable.marks.markMember(node, resolved && !isFieldUse ? resolved.member.transpile : node.property);
     }
 
     /**

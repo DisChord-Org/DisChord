@@ -33,7 +33,7 @@ export const asyncRuntimeHelperNames: ReadonlySet<string> = new Set([ 'chordEspe
 /**
  * Raw JavaScript string content for the shared helpers that have no one-to-one JavaScript
  * equivalent (`esperar`, `Aleatorio.*`, `Mates.limitar`) and the three that dispatch on the receiver at
- * run time (`chordTiene`, `chordLimpiar`, `chordAgregar`, see `CoreLibUtils.resolveUnionDispatch`), each
+ * run time (`chordTiene`, `chordLimpiar`, `chordAgregar`, see `CoreLibDispatch.resolveUnionDispatch`), each
  * falling back, when the receiver is neither a core library value nor a list/string, to its own method
  * of the original name if it has one, and else to the native JavaScript member the name has always
  * been emitted as (`includes`, `trim`, `push`). Written once to

@@ -7,6 +7,7 @@ import { ParserContext } from "./ParserContext";
 import { SubParser, SubParserClass } from "./SubParser";
 import { SymbolTable } from "../model/SymbolsTable";
 import { KeyWords } from "../KeywordsManager";
+import { CoreLibUtils } from "../corelib/CoreLibUtils";
 
 import { BDOParser } from "./Grammar/BDOParser";
 import { AccessParser } from "./Grammar/Expressions/AccessParser";
@@ -171,6 +172,16 @@ export class Parser<T extends string, N extends BaseNode<T>> extends ParserConte
      */
     public get KeywordsManager (): KeyWords<T> {
         return this.context.keywordsManager;
+    }
+
+    /**
+     * Accessor to retrieve the core library lookups of the dialect being compiled.
+     * @public
+     * @readonly
+     * @type {CoreLibUtils}
+     */
+    public get CoreLib (): CoreLibUtils {
+        return this.context.coreLib;
     }
 
     /**

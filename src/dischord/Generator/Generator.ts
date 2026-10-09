@@ -15,8 +15,6 @@ import EmbedVisitor from "./visitors/components/EmbedVisitor";
 import EmbedDeclarationVisitor from "./visitors/components/EmbedDeclarationVisitor";
 import CollectorVisitor from "./visitors/features/CollectorVisitor";
 import MessageVisitor from "./visitors/features/MessageVisitor";
-import { DisChordAccessVisitor } from "./visitors/variables/DisChordAccessVisitor";
-import { DisChordCallVisitor } from "./visitors/variables/DisChordCallVisitor";
 
 /**
  * Main generator class for DisChord.
@@ -30,8 +28,7 @@ export class DisChordGenerator extends Generator<DisChordNodeType, DisChordNode>
     private static readonly DisChordSubGenerators: SubGeneratorClass<DisChordNodeType, DisChordNode>[] = [
         ClientInitVisitor, CommandVisitor, EventVisitor,
         ButtonVisitor, ButtonDeclarationVisitor, ActionRowVisitor, CommandOptionVisitor, EmbedVisitor, EmbedDeclarationVisitor,
-        CollectorVisitor, MessageVisitor,
-        DisChordAccessVisitor, DisChordCallVisitor
+        CollectorVisitor, MessageVisitor
     ];
 
     /**

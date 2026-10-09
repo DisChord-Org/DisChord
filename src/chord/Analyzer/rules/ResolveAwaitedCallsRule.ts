@@ -4,7 +4,7 @@ import { UserMemberResolver } from "../UserMemberResolver";
 import { ASTNode, AccessNode, BaseNode, CallNode, ClassNode, FunctionNode, TokenType } from "../../types";
 import { isAccessNode, isIdentificatorNode } from "../../ast.guards";
 import { AnyDataType, UnionDataType, UserClassDataType } from "../../model/DataType";
-import { asyncRuntimeHelperNames, corelib, coreLibUtils } from "../../corelib";
+import { asyncRuntimeHelperNames, corelib } from "../../corelib";
 import { ChordError, ErrorLevel } from "../../../errors/ChordError";
 
 /**
@@ -100,7 +100,7 @@ export class ResolveAwaitedCallsRule<T extends string, N extends BaseNode<T>> ex
             awaited = this.isAsyncMethod(callee);
         } else if (isIdentificatorNode(callee)) {
             name = callee.value;
-            const helper = coreLibUtils.resolveFunction(callee, !!this.context.symbolTable.lookup(name));
+            const helper = this.context.coreLib.resolveFunction(callee, !!this.context.symbolTable.lookup(name));
             awaited = helper !== undefined
                 ? asyncRuntimeHelperNames.has(helper)
                 : !!this.context.symbolTable.lookup(name)?.metadata.isAsync;
@@ -110,7 +110,7 @@ export class ResolveAwaitedCallsRule<T extends string, N extends BaseNode<T>> ex
 
         this.assertMayAwait(`Se llama a la función asíncrona '${name}' desde una función que no es asíncrona; márcala con @asincrono`, call.location);
 
-        this.context.symbolTable.markAwaited(call);
+        this.context.symbolTable.marks.markAwaited(call);
     }
 
     /**
@@ -121,7 +121,7 @@ export class ResolveAwaitedCallsRule<T extends string, N extends BaseNode<T>> ex
     private isAsyncOnUnion (union: UnionDataType, method: string): boolean {
         const declared = union.members
             .filter((member): member is UserClassDataType => member instanceof UserClassDataType)
-            .map(member => this.context.symbolTable.findMember(member.name, method))
+            .map(member => this.context.symbolTable.classes.findMember(member.name, method))
             .filter(symbol => symbol !== undefined);
 
         return declared.length > 0 && declared.every(symbol => symbol.metadata.isAsync);
@@ -136,13 +136,13 @@ export class ResolveAwaitedCallsRule<T extends string, N extends BaseNode<T>> ex
 
         // `esta`, `super` and a class of the file named directly are resolved without the receiver's type, and
         // never fall back to the checks below, even when the class or its parent is unknown.
-        if (receiver.type === TokenType.Esta || receiver.type === TokenType.Super || (isIdentificatorNode(receiver) && symbolTable.isUserClass(receiver.value))) {
+        if (receiver.type === TokenType.Esta || receiver.type === TokenType.Super || (isIdentificatorNode(receiver) && symbolTable.classes.isUserClass(receiver.value))) {
             return !!this.members.resolve(access)?.metadata.isAsync;
         }
 
         if (isIdentificatorNode(receiver)) {
             if (Object.prototype.hasOwnProperty.call(corelib.classes, receiver.value) && !symbolTable.lookup(receiver.value)) {
-                return !!coreLibUtils.resolveStatic(access)?.member.async;
+                return !!this.context.coreLib.resolveStatic(access)?.member.async;
             }
         }
 
@@ -151,7 +151,7 @@ export class ResolveAwaitedCallsRule<T extends string, N extends BaseNode<T>> ex
         if (type instanceof UnionDataType) return this.isAsyncOnUnion(type, access.property);
         if (type && !(type instanceof AnyDataType)) return false;
 
-        const candidates = symbolTable.membersNamed(access.property);
+        const candidates = symbolTable.classes.membersNamed(access.property);
         return candidates.length > 0 && candidates.every(symbol => symbol.metadata.isAsync);
     }
 }

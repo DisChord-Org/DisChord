@@ -3,7 +3,6 @@ import { TypeInferrer } from "../TypeInferrer";
 import { ASTNode, AccessNode, BaseNode, CallNode, TokenType } from "../../types";
 import { isCallNode, isAccessNode } from "../../ast.guards";
 import { AnyDataType, DataType, UnionDataType } from "../../model/DataType";
-import { coreLibUtils } from "../../corelib";
 
 /**
  * Decides how a method called on a receiver of union type is emitted, and records the decision in
@@ -11,9 +10,9 @@ import { coreLibUtils } from "../../corelib";
  * `c tipo texto|Mapa` doesn't say which class `c.tiene(x)` is a member of, so the call is either
  * emitted as the member every class of the union agrees on (`has`), or, when they differ, as a call
  * to a runtime helper that picks by what `c` really is when it runs (`chordTiene(c, x)`); see
- * `CoreLibUtils.resolveUnionDispatch` for the cases it leaves alone. A receiver of unknown type gets the
+ * `CoreLibDispatch.resolveUnionDispatch` for the cases it leaves alone. A receiver of unknown type gets the
  * same helper for the names that mean different members in different classes
- * (`CoreLibUtils.resolveUnknownDispatch`). Receivers of any other type are not touched.
+ * (`CoreLibDispatch.resolveUnknownDispatch`). Receivers of any other type are not touched.
  *
  * Runs after every variable's type is resolved, walking the tree with the same scopes as the
  * earlier passes, and before `RequiresRuntimeHelpersRule`, which imports the helpers it picks.
@@ -38,7 +37,7 @@ export class ResolveDispatchedCallsRule<T extends string, N extends BaseNode<T>>
      */
     private isUnknown (callee: AccessNode<T, N>, type: DataType | undefined): boolean {
         if (callee.object.type === TokenType.Esta || callee.object.type === TokenType.Super) return false;
-        if (coreLibUtils.resolveStatic(callee)) return false;
+        if (this.context.coreLib.resolveStatic(callee)) return false;
 
         return type === undefined || type instanceof AnyDataType;
     }
@@ -52,11 +51,11 @@ export class ResolveDispatchedCallsRule<T extends string, N extends BaseNode<T>>
         let dispatch;
 
         if (receiverType instanceof UnionDataType) {
-            dispatch = coreLibUtils.resolveUnionDispatch(callee, receiverType, className => !!symbolTable.findMember(className, callee.property));
+            dispatch = this.context.coreLibDispatch.resolveUnionDispatch(callee, receiverType, className => !!symbolTable.classes.findMember(className, callee.property));
         } else if (this.isUnknown(callee, receiverType)) {
-            dispatch = coreLibUtils.resolveUnknownDispatch(callee);
+            dispatch = this.context.coreLibDispatch.resolveUnknownDispatch(callee);
         }
 
-        if (dispatch) symbolTable.markDispatched(call, dispatch);
+        if (dispatch) symbolTable.marks.markDispatched(call, dispatch);
     }
 }

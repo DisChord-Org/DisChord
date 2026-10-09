@@ -1,6 +1,5 @@
 import { BaseNode, CallNode, TokenType, TokenTypeUnion, NewNode } from "../../../types";
 import { SubGenerator } from "../../SubGenerator";
-import { coreLibUtils } from "../../../corelib";
 
 /**
  * Sub-generator responsible for compiling instantiation nodes ('Nuevo') into native JavaScript.
@@ -26,7 +25,7 @@ export class NewVisitor<T extends string, N extends BaseNode<T>> extends SubGene
      * @public
      */
     public visit(node: NewNode<T, N>): string {
-        const constructor = coreLibUtils.resolveConstructor(node.object);
+        const constructor = this.parent.context.coreLib.resolveConstructor(node.object);
 
         if (constructor) {
             const params = node.object.type === TokenType.LLAMADA ? (node.object as CallNode<T, N>).params : [];
