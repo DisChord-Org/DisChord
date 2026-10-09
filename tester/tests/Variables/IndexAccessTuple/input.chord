@@ -1,0 +1,3 @@
+var tp tipo [Mapa, texto] es [nuevo Mapa(), "abc"]
+consola.imprimir(tp[0].tiene(1))
+consola.imprimir(tp[1].tiene("b"))

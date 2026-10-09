@@ -1,0 +1,177 @@
+[
+  {
+    "type": "importar",
+    "identificators": [
+      "chordTiene"
+    ],
+    "isDestructured": true,
+    "path": "./lib/runtimeHelpers.js",
+    "location": {
+      "line": 0,
+      "column": 0
+    }
+  },
+  {
+    "type": "importar",
+    "identificators": [],
+    "path": "./lib/consoleRuntime.js",
+    "isDestructured": false,
+    "location": {
+      "line": 0,
+      "column": 0
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "tp",
+    "value": {
+      "type": "Lista",
+      "body": [
+        {
+          "type": "nuevo",
+          "object": {
+            "type": "Llamada",
+            "object": {
+              "type": "IDENTIFICADOR",
+              "value": "Mapa",
+              "location": {
+                "line": 1,
+                "column": 37
+              }
+            },
+            "params": [],
+            "location": {
+              "line": 1,
+              "column": 42
+            }
+          },
+          "location": {
+            "line": 1,
+            "column": 42
+          }
+        },
+        {
+          "type": "Literal",
+          "value": "abc",
+          "raw": "abc",
+          "location": {
+            "line": 1,
+            "column": 45
+          }
+        }
+      ],
+      "location": {
+        "line": 1,
+        "column": 50
+      }
+    },
+    "dataType": {
+      "kind": "tuple",
+      "elements": [
+        {
+          "kind": "class",
+          "name": "Mapa"
+        },
+        {
+          "kind": "primitive",
+          "name": "texto"
+        }
+      ]
+    },
+    "location": {
+      "line": 1,
+      "column": 50
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "i",
+    "value": {
+      "type": "Literal",
+      "value": 1,
+      "raw": "1",
+      "location": {
+        "line": 2,
+        "column": 10
+      }
+    },
+    "location": {
+      "line": 2,
+      "column": 10
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 3,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 3,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "Llamada",
+        "object": {
+          "type": "Acceso",
+          "object": {
+            "type": "AccesoPorIndice",
+            "object": {
+              "type": "IDENTIFICADOR",
+              "value": "tp",
+              "location": {
+                "line": 3,
+                "column": 18
+              }
+            },
+            "index": {
+              "type": "IDENTIFICADOR",
+              "value": "i",
+              "location": {
+                "line": 3,
+                "column": 21
+              }
+            },
+            "location": {
+              "line": 3,
+              "column": 22
+            }
+          },
+          "property": "tiene",
+          "location": {
+            "line": 3,
+            "column": 24
+          }
+        },
+        "params": [
+          {
+            "type": "Literal",
+            "value": "b",
+            "raw": "b",
+            "location": {
+              "line": 3,
+              "column": 30
+            }
+          }
+        ],
+        "location": {
+          "line": 3,
+          "column": 33
+        }
+      }
+    ],
+    "location": {
+      "line": 3,
+      "column": 34
+    }
+  }
+]

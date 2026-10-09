@@ -11,6 +11,7 @@ import { AccessInferrer } from "./inferrers/AccessInferrer";
 import { NewInferrer } from "./inferrers/NewInferrer";
 import { BDOInferrer } from "./inferrers/BDOInferrer";
 import { ThisInferrer } from "./inferrers/ThisInferrer";
+import { IndexInferrer } from "./inferrers/IndexInferrer";
 
 /**
  * Dispatches a `DataType` inference request to the `SubInferrer` registered for the node's shape —
@@ -42,7 +43,7 @@ export class TypeInferrer<T extends string, N extends BaseNode<T>> {
     private static readonly SubInferrers: SubInferrerClass<TokenType, BaseNode<TokenType>>[] = [
         LiteralInferrer, IdentifierInferrer, BinaryExpressionInferrer,
         ListInferrer, CallInferrer, AccessInferrer,
-        NewInferrer, BDOInferrer, ThisInferrer
+        NewInferrer, BDOInferrer, ThisInferrer, IndexInferrer
     ];
 
     /**

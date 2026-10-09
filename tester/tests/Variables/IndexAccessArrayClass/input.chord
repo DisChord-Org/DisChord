@@ -1,0 +1,4 @@
+var l tipo Mapa[] es [nuevo Mapa()]
+consola.imprimir(l[0].tiene("a"))
+l[0].poner("a", 1)
+consola.imprimir(l[0].tamano)

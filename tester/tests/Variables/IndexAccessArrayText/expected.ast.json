@@ -1,0 +1,194 @@
+[
+  {
+    "type": "importar",
+    "identificators": [],
+    "path": "./lib/consoleRuntime.js",
+    "isDestructured": false,
+    "location": {
+      "line": 0,
+      "column": 0
+    }
+  },
+  {
+    "type": "Variable",
+    "id": "l",
+    "value": {
+      "type": "Lista",
+      "body": [
+        {
+          "type": "Literal",
+          "value": "hola",
+          "raw": "hola",
+          "location": {
+            "line": 1,
+            "column": 24
+          }
+        },
+        {
+          "type": "Literal",
+          "value": "mundo",
+          "raw": "mundo",
+          "location": {
+            "line": 1,
+            "column": 32
+          }
+        }
+      ],
+      "location": {
+        "line": 1,
+        "column": 39
+      }
+    },
+    "dataType": {
+      "kind": "array",
+      "element": {
+        "kind": "primitive",
+        "name": "texto"
+      }
+    },
+    "location": {
+      "line": 1,
+      "column": 39
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 2,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 2,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "Llamada",
+        "object": {
+          "type": "Acceso",
+          "object": {
+            "type": "AccesoPorIndice",
+            "object": {
+              "type": "IDENTIFICADOR",
+              "value": "l",
+              "location": {
+                "line": 2,
+                "column": 18
+              }
+            },
+            "index": {
+              "type": "Literal",
+              "value": 0,
+              "raw": "0",
+              "location": {
+                "line": 2,
+                "column": 20
+              }
+            },
+            "location": {
+              "line": 2,
+              "column": 21
+            }
+          },
+          "property": "tiene",
+          "location": {
+            "line": 2,
+            "column": 23
+          }
+        },
+        "params": [
+          {
+            "type": "Literal",
+            "value": "o",
+            "raw": "o",
+            "location": {
+              "line": 2,
+              "column": 29
+            }
+          }
+        ],
+        "location": {
+          "line": 2,
+          "column": 32
+        }
+      }
+    ],
+    "location": {
+      "line": 2,
+      "column": 33
+    }
+  },
+  {
+    "type": "Llamada",
+    "object": {
+      "type": "Acceso",
+      "object": {
+        "type": "IDENTIFICADOR",
+        "value": "consola",
+        "location": {
+          "line": 3,
+          "column": 1
+        }
+      },
+      "property": "imprimir",
+      "location": {
+        "line": 3,
+        "column": 9
+      }
+    },
+    "params": [
+      {
+        "type": "Llamada",
+        "object": {
+          "type": "Acceso",
+          "object": {
+            "type": "AccesoPorIndice",
+            "object": {
+              "type": "IDENTIFICADOR",
+              "value": "l",
+              "location": {
+                "line": 3,
+                "column": 18
+              }
+            },
+            "index": {
+              "type": "Literal",
+              "value": 1,
+              "raw": "1",
+              "location": {
+                "line": 3,
+                "column": 20
+              }
+            },
+            "location": {
+              "line": 3,
+              "column": 21
+            }
+          },
+          "property": "mayusculas",
+          "location": {
+            "line": 3,
+            "column": 23
+          }
+        },
+        "params": [],
+        "location": {
+          "line": 3,
+          "column": 34
+        }
+      }
+    ],
+    "location": {
+      "line": 3,
+      "column": 35
+    }
+  }
+]

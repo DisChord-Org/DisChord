@@ -1,0 +1,5 @@
+funcion f(c) {
+    devolver c[0].tiene(1)
+}
+
+consola.imprimir(f([[1]]))
