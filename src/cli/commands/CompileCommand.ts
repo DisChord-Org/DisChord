@@ -71,6 +71,8 @@ export class CompileCommand {
             fileExtraFiles.forEach((content, absolutePath) => extraFiles.set(absolutePath, content));
         }
 
+        if (options.check) return;
+
         await this.writeExtraFiles(extraFiles);
 
         this.removeStaleOutputs(options);
@@ -128,6 +130,8 @@ export class CompileCommand {
         const generator = new DisChordGenerator(context, ast);
         const output = generator.generate();
         this.logDebug(DebugFlags.Generator, options, output);
+
+        if (options.check) return context.extraFiles;
 
         if (!fs.existsSync(targetDir)) {
             fs.mkdirSync(targetDir, { recursive: true });

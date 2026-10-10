@@ -24,6 +24,8 @@ export enum DebugFlags {
 export interface GlobalCLIOptions {
     /** Disables automatic execution after compilation */
     run: boolean;
+    /** Runs every phase but writes nothing and never executes the bot */
+    check?: boolean;
     /** Output directory override for compiled files */
     outDir?: string;
     /** Enables detailed logging for specific compiler phases */
@@ -63,6 +65,7 @@ export class Program {
         this.program
             .argument('[entry]', 'Ruta al archivo .chord o directorio del proyecto', '.')
             .option('--no-run', 'Compila el proyecto sin ejecutar el bot resultante')
+            .option('--check', 'Comprueba el proyecto (análisis y generación) sin escribir archivos ni ejecutar')
             .option('-o, --out-dir <directorio>', 'Directorio de salida para los archivos compilados')
             .option(
                 '-d, --debug <fase>',
