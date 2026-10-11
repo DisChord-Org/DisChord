@@ -5,6 +5,7 @@ import { CompilerConfig, FileSystem } from '../../utils/FileSystem';
 import Prettifier from '../../utils/Prettifier';
 import { BaseChordError, Diagnostic } from '../../errors/ChordError';
 import { File } from '../../utils/File';
+import { Stdin } from '../../utils/Stdin';
 import { Directory } from '../../utils/Directory';
 import { FileCompiler, FileCompilation } from './FileCompiler';
 import { RunCommand } from './RunCommand';
@@ -53,11 +54,15 @@ export class CompileCommand {
      * @returns {Promise<void>}
      */
     private async compile(rawPath: string, options: GlobalCLIOptions): Promise<void> {
-        this.config = FileSystem.configure(rawPath);
+        const stdinFile = options.stdin ? await this.readStdinFile(options) : undefined;
+
+        if (stdinFile) options = { ...options, check: true };
+
+        this.config = stdinFile ? FileSystem.layoutOf(stdinFile) : FileSystem.configure(rawPath);
         this.emitted.clear();
         FileSystem.assertEsmProject(this.config.projectRoot);
 
-        const files = FileSystem.getChordFiles(this.config.input);
+        const files = stdinFile ? [stdinFile] : FileSystem.getChordFiles(this.config.input);
 
         this.log(options, `Compilando proyecto: ${this.config.projectRoot}`);
 
@@ -119,6 +124,28 @@ export class CompileCommand {
         this.emitted.add(written.absolutePath);
 
         return compiled;
+    }
+
+    /**
+     * The file a `--stdin` check is about: the path `--stdin-filepath` names, with the content
+     * read from standard input. The path need not exist yet (a buffer that was never saved), but
+     * the directory it lives in must, so imports and the project can be resolved from it.
+     *
+     * @private
+     * @param {GlobalCLIOptions} options - Parsed Commander options.
+     * @returns {Promise<File>}
+     * @throws {Error} If `--stdin-filepath` is missing or does not name a `.chord` file.
+     */
+    private async readStdinFile(options: GlobalCLIOptions): Promise<File> {
+        if (!options.stdinFilepath) throw new Error('--stdin necesita --stdin-filepath <ruta> con el archivo al que corresponde el código');
+
+        const file = File.withContent(options.stdinFilepath, await Stdin.read());
+
+        if (!file.hasExtension('.chord')) {
+            throw new Error(`--stdin-filepath debe ser un archivo .chord: ${file}`);
+        }
+
+        return file;
     }
 
     /**

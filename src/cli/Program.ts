@@ -28,6 +28,10 @@ export interface GlobalCLIOptions {
     check?: boolean;
     /** Prints the result as a JSON document and suppresses progress messages */
     json?: boolean;
+    /** Takes the source of one file from standard input instead of the disk; implies `check` */
+    stdin?: boolean;
+    /** The `.chord` file the standard input stands for; it may not exist on disk yet */
+    stdinFilepath?: string;
     /** Output directory override for compiled files */
     outDir?: string;
     /** Enables detailed logging for specific compiler phases */
@@ -68,6 +72,8 @@ export class Program {
             .argument('[entry]', 'Ruta al archivo .chord o directorio del proyecto', '.')
             .option('--no-run', 'Compila el proyecto sin ejecutar el bot resultante')
             .option('--check', 'Comprueba el proyecto (análisis y generación) sin escribir archivos ni ejecutar')
+            .option('--stdin', 'Lee el código de un archivo desde la entrada estándar, en lugar del disco (solo comprueba, no escribe)')
+            .option('--stdin-filepath <ruta>', 'Archivo .chord al que corresponde el código de --stdin (puede no existir aún, pero su directorio sí)')
             .option('--json', 'Imprime el resultado como JSON (diagnósticos) y omite los mensajes de progreso')
             .option('-o, --out-dir <directorio>', 'Directorio de salida para los archivos compilados')
             .option(

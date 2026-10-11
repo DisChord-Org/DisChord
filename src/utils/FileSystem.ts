@@ -25,8 +25,17 @@ export class FileSystem {
      */
     static configure(rawInput: string): CompilerConfig {
         const resolved = path.resolve(rawInput);
-        const input = fs.statSync(resolved).isDirectory() ? Directory.of(resolved) : File.of(resolved);
 
+        return FileSystem.layoutOf(fs.statSync(resolved).isDirectory() ? Directory.of(resolved) : File.of(resolved));
+    }
+
+    /**
+     * The compiler configuration for an entry that is already a `File` or a `Directory` — the
+     * way to configure for a file whose content lives in memory (see `File.withContent`).
+     * @param input - The entry: a single script or a whole project.
+     * @returns The project layout the entry belongs to.
+     */
+    static layoutOf(input: File | Directory): CompilerConfig {
         const baseDir = input instanceof Directory ? input : Directory.of(input.directory);
         const projectRoot = baseDir.name === 'src' ? baseDir.parent : baseDir;
 
