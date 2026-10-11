@@ -63,6 +63,9 @@ export class Program {
      * @private
      */
     private configure(): void {
+        // usage errors, `--help` and `--version` reach the bootstrapper as errors, which maps them to exit codes
+        this.program.exitOverride();
+
         this.program
             .name('dischord')
             .description('Compilador para el entorno DisChord')

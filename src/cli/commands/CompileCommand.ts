@@ -7,6 +7,7 @@ import { BaseChordError, Diagnostic } from '../../errors/ChordError';
 import { File } from '../../utils/File';
 import { Stdin } from '../../utils/Stdin';
 import { Directory } from '../../utils/Directory';
+import { ExitCode } from '../ExitCode';
 import { FileCompiler, FileCompilation } from './FileCompiler';
 import { RunCommand } from './RunCommand';
 
@@ -39,7 +40,7 @@ export class CompileCommand {
             await this.compile(rawPath, options);
         } catch (error) {
             diagnostics.push(this.toDiagnostic(error));
-            process.exitCode = 1;
+            process.exitCode = ExitCode.of(error);
         }
 
         console.log(JSON.stringify({ ok: diagnostics.length === 0, diagnostics }));
