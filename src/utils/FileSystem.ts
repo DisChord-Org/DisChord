@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import { File } from './File';
 
 /**
  * Global configuration contract for the compiler's environment.
@@ -76,13 +77,20 @@ export class FileSystem {
      * single-file behavior.
      * @param dir - The starting directory or file path.
      * @param isDirectory - Boolean flag to determine search mode.
-     * @returns An array of absolute paths to all discovered .chord files.
+     * @returns Every discovered .chord file.
+     * @throws {Error} If a single input path is not an existing `.chord` file.
      */
-    static getChordFiles(dir: string, isDirectory: boolean): string[] {
+    static getChordFiles(dir: string, isDirectory: boolean): File[] {
         if (!isDirectory) {
             if (FileSystem.isProjectCompile(dir, false)) return FileSystem.getChordFiles(path.dirname(dir), true);
 
-            return [dir];
+            const file = File.of(dir);
+
+            if (!file.hasExtension('.chord')) {
+                throw new Error(`Se esperaba un archivo .chord: ${file.absolutePath}`);
+            }
+
+            return [file];
         }
 
         return FileSystem.walkChordFiles(dir);
@@ -107,16 +115,16 @@ export class FileSystem {
      * non-recursive scan).
      * @private
      * @param dir - The directory to walk.
-     * @returns An array of absolute paths to every `.chord` file found under `dir`.
+     * @returns Every `.chord` file found under `dir`.
      */
-    private static walkChordFiles (dir: string): string[] {
+    private static walkChordFiles (dir: string): File[] {
         const entries = fs.readdirSync(dir, { withFileTypes: true });
 
         return entries.flatMap(entry => {
             const entryPath = path.join(dir, entry.name);
 
             if (entry.isDirectory()) return FileSystem.walkChordFiles(entryPath);
-            if (entry.isFile() && entry.name.endsWith('.chord')) return [entryPath];
+            if (entry.isFile() && entry.name.endsWith('.chord')) return [File.of(entryPath)];
 
             return [];
         });

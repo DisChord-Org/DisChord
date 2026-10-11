@@ -5,6 +5,7 @@ import { GlobalCLIOptions } from '../Program';
 import { CompilerConfig, FileSystem } from '../../utils/FileSystem';
 import Prettifier from '../../utils/Prettifier';
 import { BaseChordError, Diagnostic } from '../../errors/ChordError';
+import { File } from '../../utils/File';
 import { FileCompiler } from './FileCompiler';
 import { RunCommand } from './RunCommand';
 
@@ -81,19 +82,19 @@ export class CompileCommand {
      * A compiler error leaves the method tagged with the file it belongs to.
      *
      * @private
-     * @param {string} file - Absolute path to the .chord file.
+     * @param {File} file - The .chord file.
      * @param {GlobalCLIOptions} options - CLI flags for debugging and output control.
      * @returns {Promise<Map<string, string>>} Extra files (shared runtime modules, project-level
      * config files, ...) any phase determined this file's compilation needs written, keyed by
      * absolute path — see `CompilationContext.extraFiles`.
      */
-    private async compileFile(file: string, options: GlobalCLIOptions): Promise<Map<string, string>> {
+    private async compileFile(file: File, options: GlobalCLIOptions): Promise<Map<string, string>> {
         if (!this.config) return new Map();
 
-        const relativeFile = path.relative(this.config.projectRoot, file);
+        const relativeFile = file.relativeTo(this.config.projectRoot);
         this.log(options, `Compilando: ${relativeFile}`);
 
-        const relativePath = path.relative(path.join(this.config.projectRoot, 'src'), file);
+        const relativePath = path.relative(path.join(this.config.projectRoot, 'src'), file.absolutePath);
         const targetDir = options.outDir
             ? path.resolve(options.outDir)
             : path.join(this.config.distDir, path.dirname(relativePath));
@@ -103,7 +104,7 @@ export class CompileCommand {
         try {
             compiled = new FileCompiler(options).compile(file, this.config.projectRoot, targetDir);
         } catch (error) {
-            if (error instanceof BaseChordError) error.file = relativeFile.split(path.sep).join('/');
+            if (error instanceof BaseChordError) error.file = file;
             throw error;
         }
 
@@ -113,7 +114,7 @@ export class CompileCommand {
             fs.mkdirSync(targetDir, { recursive: true });
         }
 
-        const outputPath = path.join(targetDir, `${path.basename(file, '.chord')}.js`);
+        const outputPath = path.join(targetDir, `${file.baseName}.js`);
         await Prettifier.savePrettified(outputPath, compiled.output);
         this.emitted.add(outputPath);
 

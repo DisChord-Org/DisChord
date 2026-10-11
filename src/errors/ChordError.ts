@@ -1,4 +1,5 @@
 import { Location } from "../chord/types";
+import { File } from "../utils/File";
 
 /** Life cycle phase where the failure originated. */
 export enum ErrorLevel {
@@ -24,7 +25,7 @@ export interface ErrorPayload<P> {
     message: string;
     location?: Location;
     rawLine?: string;
-    file?: string;
+    file?: File;
 }
 
 /** Machine-readable form of a failure, as printed by `--json`. */
@@ -43,7 +44,7 @@ export abstract class BaseChordError extends Error {
     public type: ErrorType;
     public location?: Location;
     /** Source file the error belongs to, set by whoever knows which file was being compiled. */
-    public file?: string;
+    public file?: File;
 
     /**
      * @param phase Lifecycle phase where the error occurred.
@@ -62,7 +63,7 @@ export abstract class BaseChordError extends Error {
     /** Converts the error into its `--json` representation. */
     public toDiagnostic(): Diagnostic {
         return {
-            file: this.file,
+            file: this.file?.absolutePath,
             phase: this.phase,
             severity: 'error',
             message: this.message,

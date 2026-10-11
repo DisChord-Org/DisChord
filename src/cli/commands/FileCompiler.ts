@@ -1,7 +1,6 @@
-import * as fs from 'fs';
-
 import { GlobalCLIOptions, DebugFlags } from '../Program';
 import { CompilationContext } from '../../chord/model/CompilationContext';
+import { File } from '../../utils/File';
 import { SymbolTable } from '../../chord/model/SymbolsTable';
 import { CodeProvider } from '../../chord/CodeProvider';
 import { KeyWords } from '../../chord/KeywordsManager';
@@ -36,12 +35,12 @@ export class FileCompiler {
     /**
      * Compiles a single source file.
      *
-     * @param {string} file - Absolute path to the .chord file.
+     * @param {File} file - The .chord file.
      * @param {string} projectRoot - Root of the project the file belongs to.
      * @param {string} outputDir - Directory its output will be written to.
      * @returns {FileCompilation} The generated code and the extra files it needs.
      */
-    public compile(file: string, projectRoot: string, outputDir: string): FileCompilation {
+    public compile(file: File, projectRoot: string, outputDir: string): FileCompilation {
         const context: CompilationContext<DisChordNodeType> = {
             symbolTable: new SymbolTable(),
             keywordsManager: new KeyWords(),
@@ -55,8 +54,7 @@ export class FileCompiler {
 
         DisChordParser.registerGrammar(context);
 
-        const code = fs.readFileSync(file, 'utf-8');
-        context.codeProvider.currentCode = { name: file, content: code };
+        context.codeProvider.currentCode = { name: file.absolutePath, content: file.read() };
 
         const lexer = new Lexer<DisChordTokenType>(context);
         const tokens = lexer.tokenize();
