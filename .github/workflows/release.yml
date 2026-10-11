@@ -80,3 +80,8 @@ jobs:
           prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  notify-server:
+    needs: publish-release
+    uses: DisChord-Org/.github/.github/workflows/notify_server.yml@v1.1
+    secrets: inherit
