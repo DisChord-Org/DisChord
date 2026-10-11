@@ -22,7 +22,7 @@ export class ValidateEventRule extends AnalysisRule<DisChordNodeType, DisChordNo
                 phase: ErrorLevel.Analysis,
                 message: `El evento '${eventNode.name}' no existe`,
                 location: eventNode.location
-            }).format();
+            });
         }));
     }
 }

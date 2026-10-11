@@ -110,7 +110,7 @@ export class Generator<T extends string, N extends BaseNode<T>> extends Generato
             phase: ErrorLevel.Compiler,
             message: `Generador: Error al procesar el tipo de nodo '${node.type}'. Asegúrate de que su visitor esté correctamente registrado.`,
             location: node.location
-        }).format();
+        });
 
         return this.get(VisitorClass as unknown as SubGeneratorClass<T, N>).visit(node);
     }

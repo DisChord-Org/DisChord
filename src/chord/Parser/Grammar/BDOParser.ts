@@ -73,14 +73,11 @@ export class BDOParser<T extends string, N extends BaseNode<T>> extends SubParse
                     if (mode === ODBMode.Simple) mode = ODBMode.Intelligent;
                     this.consume(TokenType.SEPARADOR, 'En un BDOI, las definiciones deben terminar con ";"');
                 } else if (mode === ODBMode.Intelligent && value.type !== TokenType.BDO) {
-                    // A BDO-valued property (`opciones { ... }`) is self-delimited by its own
-                    // matching brace — exempt from the mandatory ';', same as `checkPropertyPattern`
-                    // already treats it as unambiguously a property regardless of mode.
                     throw new ChordError({
                         phase: ErrorLevel.Parser,
                         message: `En un BDO inteligente, la propiedad '${key}' debe terminar en ';'`,
                         location: this.peek().location
-                    }).format();
+                    });
                 }
 
                 blocks[key] = value;
@@ -91,7 +88,7 @@ export class BDOParser<T extends string, N extends BaseNode<T>> extends SubParse
                             phase: ErrorLevel.Parser,
                             message: `Conflicto de estilo: Si el BDO contiene código ejecutable, todas las propiedades superiores deben terminar en ";"`,
                             location: this.peek().location
-                        }).format();
+                        });
                     }
                     mode = ODBMode.Intelligent;
                 }

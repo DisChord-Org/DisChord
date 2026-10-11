@@ -212,7 +212,7 @@ export class Lexer<T extends string> {
                     line: this.line,
                     column: this.column
                 }
-            }).format();
+            });
         }
 
         return tokens;

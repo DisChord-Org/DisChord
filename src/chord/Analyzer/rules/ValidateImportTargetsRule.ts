@@ -34,7 +34,7 @@ export class ValidateImportTargetsRule<T extends string, N extends BaseNode<T>> 
                 phase: ErrorLevel.Analysis,
                 message: `No se encontró el módulo '${current.path}' (se buscó en: ${candidates.map(candidate => path.relative(this.context.projectRoot, candidate)).join(', ')}).`,
                 location: current.location
-            }).format();
+            });
         }));
     }
 

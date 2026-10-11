@@ -27,7 +27,7 @@ export interface ErrorPayload<P> {
 }
 
 /** Abstract base class for error handling with location support and source code snippets. */
-abstract class BaseChordError extends Error {
+export abstract class BaseChordError extends Error {
     public phase: ErrorLevel;
     public type: ErrorType;
     public location?: Location;

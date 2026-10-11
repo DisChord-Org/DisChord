@@ -27,6 +27,6 @@ export class ValidateStartBotRule extends AnalysisRule<DisChordNodeType, DisChor
      * @private
      */
     private fail (message: string, location: DisChordASTNode['location']): never {
-        throw new DisChordError({ phase: ErrorLevel.Analysis, message, location }).format();
+        throw new DisChordError({ phase: ErrorLevel.Analysis, message, location });
     }
 }

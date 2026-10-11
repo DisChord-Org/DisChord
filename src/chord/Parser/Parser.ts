@@ -279,7 +279,7 @@ export class Parser<T extends string, N extends BaseNode<T>> extends ParserConte
             phase: ErrorLevel.Parser,
             message: `${customMessage}. (En su lugar se encontró '${token.value}')`,
             location: token.location
-        }).format();
+        });
     }
 
     /**

@@ -44,6 +44,6 @@ export class ValidateCollectorRule extends AnalysisRule<DisChordNodeType, DisCho
      * @private
      */
     private fail (message: string, location: DisChordASTNode['location']): never {
-        throw new DisChordError({ phase: ErrorLevel.Analysis, message, location }).format();
+        throw new DisChordError({ phase: ErrorLevel.Analysis, message, location });
     }
 }

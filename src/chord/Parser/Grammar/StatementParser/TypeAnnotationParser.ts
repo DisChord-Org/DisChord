@@ -95,7 +95,7 @@ export class TypeAnnotationParser<T extends string, N extends BaseNode<T>> {
             phase: ErrorLevel.Parser,
             message: `Una tupla necesita al menos un tipo: 'tipo [<tipo>, ...]'`,
             location: this.parser.peek().location
-        }).format();
+        });
 
         const elements: DataType[] = [ this.parseUnion(false) ];
         while (this.parser.match(TokenType.COMA)) elements.push(this.parseUnion(false));
@@ -127,7 +127,7 @@ export class TypeAnnotationParser<T extends string, N extends BaseNode<T>> {
             phase: ErrorLevel.Parser,
             message: `Una unión de tipos usada como array debe ir entre paréntesis: (${union.format()})[]`,
             location: this.parser.peek().location
-        }).format();
+        });
 
         const array = this.consumeArraySuffixes(union);
 
@@ -140,7 +140,7 @@ export class TypeAnnotationParser<T extends string, N extends BaseNode<T>> {
                 phase: ErrorLevel.Parser,
                 message: `Un tipo con '[]' dentro de una unión debe ir entre paréntesis: ${UnionDataType.ofTypes([ array, ...rest ]).format()}`,
                 location
-            }).format();
+            });
         }
 
         return array;

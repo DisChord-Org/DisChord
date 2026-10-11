@@ -160,13 +160,13 @@ export class ResolveVariableTypesRule<T extends string, N extends BaseNode<T>> e
             phase: ErrorLevel.Analysis,
             message: `La variable '${variableNode.id}' se inicializó con una llamada que no devuelve ningún valor`,
             location: variableNode.location
-        }).format();
+        });
 
         if (variableNode.dataType && inferredType && !variableNode.dataType.isAssignableFrom(inferredType)) throw new ChordError({
             phase: ErrorLevel.Analysis,
             message: `La variable '${variableNode.id}' se declaró con tipo '${variableNode.dataType.format()}' pero se le asignó un valor de tipo '${inferredType.format()}'`,
             location: variableNode.location
-        }).format();
+        });
 
         if (variableNode.dataType) return variableNode.dataType;
 
@@ -194,7 +194,7 @@ export class ResolveVariableTypesRule<T extends string, N extends BaseNode<T>> e
             phase: ErrorLevel.Analysis,
             message: `La variable '${id}' se declaró como tupla de ${tupleType.elements.length} elemento(s) pero se le asignó una lista de ${listNode.body.length}`,
             location: listNode.location
-        }).format();
+        });
 
         listNode.body.forEach((element, index) => {
             const elementType = this.typeInferrer.infer(element);
@@ -204,7 +204,7 @@ export class ResolveVariableTypesRule<T extends string, N extends BaseNode<T>> e
                 phase: ErrorLevel.Analysis,
                 message: `La variable '${id}' se declaró con tipo '${tupleType.format()}', pero el elemento ${index} es de tipo '${elementType.format()}', se esperaba '${expectedType.format()}'`,
                 location: element.location
-            }).format();
+            });
         });
     }
 }

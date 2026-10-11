@@ -1,19 +1,19 @@
 import { Program } from './cli/Program';
-import { DisChordError } from './errors/ChordError';
+import { BaseChordError } from './errors/ChordError';
 
 /**
  * Execution Bootstrapper
  * 
  * 1. Instantiates the main CLI Program orchestrator.
  * 2. Parses command-line arguments and delegates to appropriate Command handlers.
- * 3. Global Catch: Intercepts handled DisChordError exceptions or unhandled runtime 
+ * 3. Global Catch: Intercepts handled compiler errors or unhandled runtime 
  *    errors, logging formatted diagnostics and exiting the process with code 1.
  */
 new Program()
     .parse(process.argv)
     .catch((error: unknown) => {
 
-        if (error instanceof DisChordError) {
+        if (error instanceof BaseChordError) {
             console.error(error.format());
         
         } else if (error instanceof Error) {

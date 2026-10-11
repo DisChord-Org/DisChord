@@ -80,7 +80,7 @@ export class FunctionParser<T extends string, N extends BaseNode<T>> extends Sub
                 phase: ErrorLevel.Parser,
                 message: "Un constructor no puede declarar un tipo de retorno",
                 location: this.peek().location
-            }).format();
+            });
 
             this.consume(TokenType.Flecha);
             returnType = typeParser.parseType();

@@ -32,7 +32,7 @@ export class BindDisChordDeclarationsRule extends AnalysisRule<DisChordNodeType,
                         phase: ErrorLevel.Analysis,
                         message: `Ya existe una declaración 'encender bot' en este archivo. Solo se permite una por archivo.`,
                         location: startBotNode.location
-                    }).format();
+                    });
                 }
             }
         }));

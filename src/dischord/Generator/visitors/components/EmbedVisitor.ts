@@ -89,7 +89,7 @@ export default class EmbedVisitor extends SubGenerator<DisChordNodeType, DisChor
             phase: ErrorLevel.Parser,
             message: `Se esperaba un BDO, se recibió '${node.type}'`,
             location: node.location
-        }).format();
+        });
 
         const resolver = new BDOResolver<DisChordNodeType, DisChordNode>(expression => this.parent.visit(expression));
         const fields = resolver.resolve(node, EmbedSchema);

@@ -74,6 +74,6 @@ export class ValidateAssignmentTypesRule<T extends string, N extends BaseNode<T>
             phase: ErrorLevel.Analysis,
             message: `La variable '${node.left.value}' es de tipo '${declaredType.format()}' pero se le asignó un valor de tipo '${assignedType.format()}'`,
             location: node.location
-        }).format();
+        });
     }
 }

@@ -126,6 +126,6 @@ export class PrimaryParser<T extends string, N extends BaseNode<T>> extends SubP
             phase: ErrorLevel.Parser,
             message: `Token inesperado en expresión: ${token.type} en la posición ${this.parent.cursor}`,
             location: token.location
-        }).format();
+        });
     }
 }

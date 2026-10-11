@@ -79,7 +79,7 @@ export class ResolveAwaitedCallsRule<T extends string, N extends BaseNode<T>> ex
             phase: ErrorLevel.Analysis,
             message,
             location
-        }).format();
+        });
     }
 
     private exit (node: ASTNode<T, N>): void {

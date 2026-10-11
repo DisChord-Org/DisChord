@@ -149,7 +149,7 @@ export class SymbolTable {
                 phase: ErrorLevel.Analysis,
                 message: `Identificador duplicado: '${name}' ya ha sido declarado en este ámbito.`,
                 location
-            }).format();
+            });
         }
 
         currentScope.set(name, {

@@ -39,6 +39,6 @@ export class ValidateCallTargetsRule<T extends string, N extends BaseNode<T>> ex
             phase: ErrorLevel.Analysis,
             message: "Se esperaba un identificador o un acceso de propiedad válido para ejecutar la llamada.",
             location: callNode.location
-        }).format();
+        });
     }
 }

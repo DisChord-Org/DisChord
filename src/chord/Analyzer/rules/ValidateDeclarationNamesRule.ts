@@ -71,6 +71,6 @@ export class ValidateDeclarationNamesRule<T extends string, N extends BaseNode<T
     }
 
     private fail (message: string, node: ASTNode<T, N>): never {
-        throw new ChordError({ phase: ErrorLevel.Analysis, message, location: node.location }).format();
+        throw new ChordError({ phase: ErrorLevel.Analysis, message, location: node.location });
     }
 }

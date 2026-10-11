@@ -41,7 +41,7 @@ export default class ClientParser extends SubParser<DisChordNodeType, DisChordNo
             phase: ErrorLevel.Parser,
             message: `Se esperaba 'bot' después de 'encender', se encontró '${id.value}'`,
             location: this.peek().location
-        }).format();
+        });
 
         const configBody = this.parent.get(BDOParser).setMode(ODBMode.Simple).parse() as DisChordODBNode;
     

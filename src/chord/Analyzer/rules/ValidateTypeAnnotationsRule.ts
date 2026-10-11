@@ -50,13 +50,13 @@ export class ValidateTypeAnnotationsRule<T extends string, N extends BaseNode<T>
             phase: ErrorLevel.Analysis,
             message: `Tipo desconocido '${type.name}'. Tipos válidos: ${this.context.coreLib.annotableTypeNames()} o una clase declarada en el archivo; también T[], [A, B] y A|B`,
             location
-        }).format();
+        });
 
         if (type instanceof VoidDataType && !allowsVoid) throw new ChordError({
             phase: ErrorLevel.Analysis,
             message: inContainer ? `'nada' no puede ser el tipo de los elementos de una lista ni de una tupla` : `'nada' solo puede usarse como tipo de retorno`,
             location
-        }).format();
+        });
 
         if (type instanceof UnionDataType) type.members.forEach(member => this.validate(member, location, allowsVoid));
         if (type instanceof ArrayDataType) this.validate(type.element, location, false, true);

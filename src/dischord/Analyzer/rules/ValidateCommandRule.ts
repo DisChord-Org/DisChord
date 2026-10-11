@@ -61,6 +61,6 @@ export class ValidateCommandRule extends AnalysisRule<DisChordNodeType, DisChord
      * @private
      */
     private fail (message: string, location: DisChordASTNode['location']): never {
-        throw new DisChordError({ phase: ErrorLevel.Analysis, message, location }).format();
+        throw new DisChordError({ phase: ErrorLevel.Analysis, message, location });
     }
 }

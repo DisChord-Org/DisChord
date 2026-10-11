@@ -57,7 +57,7 @@ export default class ButtonVisitor extends SubGenerator<DisChordNodeType, DisCho
             phase: ErrorLevel.Compiler,
             message: `Se esperaba un BDO, se recibió '${node.type}'`,
             location: node.location
-        }).format();
+        });
 
         const resolver = new BDOResolver<DisChordNodeType, DisChordNode>(expression => this.parent.visit(expression));
         const button = resolver.resolve(node, ButtonSchema);

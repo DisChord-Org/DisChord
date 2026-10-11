@@ -35,6 +35,6 @@ export class SingleWholeFileDeclarationRule extends AnalysisRule<DisChordNodeTyp
             phase: ErrorLevel.Analysis,
             message: `Solo se permite un 'comando' o 'evento' por archivo. Este archivo declara ${wholeFileNodes.length}: separalos en un archivo por cada uno.`,
             location: wholeFileNodes[1].location
-        }).format();
+        });
     }
 }
