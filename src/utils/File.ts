@@ -10,14 +10,23 @@ import path from 'path';
  * The check is a snapshot, as it is in any language: the file can still vanish afterwards, and
  * `read()` reports that as the I/O error it is.
  *
+ * A file can also carry its content in memory (`withContent`): what an editor holds for a buffer
+ * that has unsaved changes, or that was never saved. There the guarantee is about the location —
+ * the directory exists and nothing but a file can sit at that path — and `read()` answers the
+ * content it carries instead of whatever the disk holds.
+ *
  * @class File
  */
 export class File {
     /** Absolute path, with the platform's separators. */
     public readonly absolutePath: string;
 
-    private constructor(absolutePath: string) {
+    /** Content held in memory in place of the disk's, when there is one. */
+    private readonly content?: string;
+
+    private constructor(absolutePath: string, content?: string) {
         this.absolutePath = absolutePath;
+        this.content = content;
     }
 
     /**
@@ -39,6 +48,31 @@ export class File {
         }
 
         return new File(absolutePath);
+    }
+
+    /**
+     * Builds a `File` whose content lives in memory, at a path that may not exist on disk yet.
+     * If the path does exist, the in-memory content shadows what the disk holds.
+     *
+     * @param {string} rawPath - Absolute path, or relative to the working directory.
+     * @param {string} content - The file's content.
+     * @returns {File}
+     * @throws {Error} If a directory sits at the path, or the directory it would live in is missing.
+     */
+    public static withContent(rawPath: string, content: string): File {
+        const absolutePath = path.resolve(rawPath);
+
+        if (fs.existsSync(absolutePath) && !fs.statSync(absolutePath).isFile()) {
+            throw new Error(`La ruta no es un archivo: ${absolutePath}`);
+        }
+
+        const directory = path.dirname(absolutePath);
+
+        if (!fs.existsSync(directory) || !fs.statSync(directory).isDirectory()) {
+            throw new Error(`El directorio no existe: ${directory}`);
+        }
+
+        return new File(absolutePath, content);
     }
 
     /**
@@ -94,13 +128,13 @@ export class File {
     }
 
     /**
-     * Reads the file as UTF-8 text.
+     * Reads the file as UTF-8 text, or answers the content it carries in memory.
      *
      * @returns {string}
      * @throws {Error} The underlying I/O error if the file can no longer be read.
      */
     public read(): string {
-        return fs.readFileSync(this.absolutePath, 'utf-8');
+        return this.content ?? fs.readFileSync(this.absolutePath, 'utf-8');
     }
 
     public toString(): string {
