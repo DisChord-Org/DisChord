@@ -24,6 +24,17 @@ export interface ErrorPayload<P> {
     message: string;
     location?: Location;
     rawLine?: string;
+    file?: string;
+}
+
+/** Machine-readable form of a failure, as printed by `--json`. */
+export interface Diagnostic {
+    file?: string;
+    phase: string;
+    severity: 'error';
+    message: string;
+    line?: number;
+    column?: number;
 }
 
 /** Abstract base class for error handling with location support and source code snippets. */
@@ -31,6 +42,8 @@ export abstract class BaseChordError extends Error {
     public phase: ErrorLevel;
     public type: ErrorType;
     public location?: Location;
+    /** Source file the error belongs to, set by whoever knows which file was being compiled. */
+    public file?: string;
 
     /**
      * @param phase Lifecycle phase where the error occurred.
@@ -43,6 +56,19 @@ export abstract class BaseChordError extends Error {
         this.type = type;
         this.phase = payload.phase;
         this.location = payload.location;
+        this.file = payload.file;
+    }
+
+    /** Converts the error into its `--json` representation. */
+    public toDiagnostic(): Diagnostic {
+        return {
+            file: this.file,
+            phase: this.phase,
+            severity: 'error',
+            message: this.message,
+            line: this.location?.line,
+            column: this.location?.column
+        };
     }
 
     /**

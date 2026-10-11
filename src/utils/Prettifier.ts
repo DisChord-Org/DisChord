@@ -22,7 +22,7 @@ export default class Prettifier {
                 printWidth: 120
             });
         } catch (error) {
-            console.log("Aviso: No se pudo formatear el código, se guardará en bruto.");
+            console.warn("Aviso: No se pudo formatear el código, se guardará en bruto.");
         }
     
         return code;

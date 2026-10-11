@@ -4,6 +4,7 @@ import path from 'path';
 import { GlobalCLIOptions } from '../Program';
 import { CompilerConfig, FileSystem } from '../../utils/FileSystem';
 import Prettifier from '../../utils/Prettifier';
+import { BaseChordError, Diagnostic } from '../../errors/ChordError';
 import { FileCompiler } from './FileCompiler';
 import { RunCommand } from './RunCommand';
 
@@ -20,20 +21,44 @@ export class CompileCommand {
     private emitted = new Set<string>();
 
     /**
-     * Executes the main compilation process and optionally runs the generated code.
+     * Executes the main compilation process and optionally runs the generated code. With `--json`
+     * nothing is printed but a single document holding the diagnostics.
      *
      * @param {string} rawPath - Raw path string passed from CLI arguments.
      * @param {GlobalCLIOptions} options - Parsed Commander options.
      * @returns {Promise<void>}
      */
     public async execute(rawPath: string, options: GlobalCLIOptions): Promise<void> {
+        if (!options.json) return this.compile(rawPath, options);
+
+        const diagnostics: Diagnostic[] = [];
+
+        try {
+            await this.compile(rawPath, options);
+        } catch (error) {
+            diagnostics.push(this.toDiagnostic(error));
+            process.exitCode = 1;
+        }
+
+        console.log(JSON.stringify({ ok: diagnostics.length === 0, diagnostics }));
+    }
+
+    /**
+     * Runs the compilation pipeline over every file of the project.
+     *
+     * @private
+     * @param {string} rawPath - Raw path string passed from CLI arguments.
+     * @param {GlobalCLIOptions} options - Parsed Commander options.
+     * @returns {Promise<void>}
+     */
+    private async compile(rawPath: string, options: GlobalCLIOptions): Promise<void> {
         this.config = FileSystem.configure(rawPath);
         this.emitted.clear();
         FileSystem.assertEsmProject(this.config.projectRoot);
 
         const files = FileSystem.getChordFiles(this.config.inputPath, this.config.isDirectory);
 
-        console.log(`Compilando proyecto: ${this.config.projectRoot}`);
+        this.log(options, `Compilando proyecto: ${this.config.projectRoot}`);
 
         const extraFiles = new Map<string, string>();
 
@@ -53,6 +78,7 @@ export class CompileCommand {
 
     /**
      * Compiles a single .chord source file into Javascript and writes it, unless only checking.
+     * A compiler error leaves the method tagged with the file it belongs to.
      *
      * @private
      * @param {string} file - Absolute path to the .chord file.
@@ -65,14 +91,21 @@ export class CompileCommand {
         if (!this.config) return new Map();
 
         const relativeFile = path.relative(this.config.projectRoot, file);
-        console.log(`Compilando: ${relativeFile}`);
+        this.log(options, `Compilando: ${relativeFile}`);
 
         const relativePath = path.relative(path.join(this.config.projectRoot, 'src'), file);
         const targetDir = options.outDir
             ? path.resolve(options.outDir)
             : path.join(this.config.distDir, path.dirname(relativePath));
 
-        const compiled = new FileCompiler(options).compile(file, this.config.projectRoot, targetDir);
+        let compiled;
+
+        try {
+            compiled = new FileCompiler(options).compile(file, this.config.projectRoot, targetDir);
+        } catch (error) {
+            if (error instanceof BaseChordError) error.file = relativeFile.split(path.sep).join('/');
+            throw error;
+        }
 
         if (options.check) return compiled.extraFiles;
 
@@ -125,7 +158,7 @@ export class CompileCommand {
         const { projectRoot, distDir } = this.config;
         const removed = FileSystem.removeStaleOutput(distDir, this.emitted);
 
-        removed.forEach(file => console.log(`Eliminado (sin fuente): ${path.relative(projectRoot, file)}`));
+        removed.forEach(file => this.log(options, `Eliminado (sin fuente): ${path.relative(projectRoot, file)}`));
     }
 
     /**
@@ -143,5 +176,34 @@ export class CompileCommand {
 
         const runner = new RunCommand();
         await runner.execute(runTarget, { projectRoot: this.config.projectRoot });
+    }
+
+    /**
+     * Converts whatever a failed compilation threw into a diagnostic. A compiler error carries its
+     * own; anything else is a failure of the tool itself (missing project, unreadable file, ...).
+     *
+     * @private
+     * @param {unknown} error - The thrown value.
+     * @returns {Diagnostic}
+     */
+    private toDiagnostic(error: unknown): Diagnostic {
+        if (error instanceof BaseChordError) return error.toDiagnostic();
+
+        return {
+            phase: 'Interno',
+            severity: 'error',
+            message: error instanceof Error ? error.message : String(error)
+        };
+    }
+
+    /**
+     * Prints a progress message unless the output is machine-readable (`--json`).
+     *
+     * @private
+     * @param {GlobalCLIOptions} options - Active CLI options.
+     * @param {string} message - Message to print.
+     */
+    private log(options: GlobalCLIOptions, message: string): void {
+        if (!options.json) console.log(message);
     }
 }
