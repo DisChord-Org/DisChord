@@ -18,6 +18,8 @@ export interface FileCompilation {
     output: string;
     /** Extra files (shared runtime modules, project-level config files, ...) the file's compilation needs written. */
     extraFiles: Map<string, string>;
+    /** Directories (absolute paths) the compiled project needs to exist. */
+    extraDirectories: Set<string>;
 }
 
 /**
@@ -50,6 +52,7 @@ export class FileCompiler {
             distDir: config.distDir,
             outputDir,
             extraFiles: new Map(),
+            extraDirectories: new Set(),
             coreLib: disChordCoreLibUtils,
             coreLibDispatch: disChordCoreLibDispatch
         };
@@ -71,7 +74,7 @@ export class FileCompiler {
         const output = new DisChordGenerator(context, ast).generate();
         this.logDebug(DebugFlags.Generator, output);
 
-        return { output, extraFiles: context.extraFiles };
+        return { output, extraFiles: context.extraFiles, extraDirectories: context.extraDirectories };
     }
 
     /**

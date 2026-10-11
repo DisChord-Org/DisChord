@@ -62,10 +62,12 @@ export class CompileCommand {
         this.log(options, `Compilando proyecto: ${this.config.projectRoot}`);
 
         const extraFiles = new Map<string, string>();
+        const extraDirectories = new Set<string>();
 
         for (const file of files) {
             const compiled = await this.compileFile(file, options);
             compiled.extraFiles.forEach((content, absolutePath) => extraFiles.set(absolutePath, content));
+            compiled.extraDirectories.forEach(directory => extraDirectories.add(directory));
         }
 
         if (options.check) return;
@@ -73,6 +75,9 @@ export class CompileCommand {
         await this.writeExtraFiles(extraFiles);
 
         this.removeStaleOutputs(options);
+
+        // after the cleanup, which also drops directories left empty
+        extraDirectories.forEach(directory => Directory.create(directory));
 
         if (options.run) await this.executeTarget();
     }
@@ -85,10 +90,11 @@ export class CompileCommand {
      * @param {File} file - The .chord file.
      * @param {GlobalCLIOptions} options - CLI flags for debugging and output control.
      * @returns {Promise<FileCompilation>} What the compilation produced, including the extra files
-     * (shared runtime modules, project-level config files, ...) any phase determined it needs — see `CompilationContext.extraFiles`.
+     * and directories (shared runtime modules, project-level config files, ...) any phase
+     * determined it needs — see `CompilationContext.extraFiles`.
      */
     private async compileFile(file: File, options: GlobalCLIOptions): Promise<FileCompilation> {
-        if (!this.config) return { output: '', extraFiles: new Map() };
+        if (!this.config) return { output: '', extraFiles: new Map(), extraDirectories: new Set() };
 
         const relativeFile = file.relativeTo(this.config.projectRoot.absolutePath);
         this.log(options, `Compilando: ${relativeFile}`);

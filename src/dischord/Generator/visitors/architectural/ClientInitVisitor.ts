@@ -1,5 +1,4 @@
-import path, { join } from "node:path";
-import fs from "fs";
+import path from "node:path";
 
 import { DisChordNode, DisChordNodeType, DisChordTokenType, StartBotNode } from "../../../types";
 import { intentsMap } from "../../constants/mappings";
@@ -44,7 +43,7 @@ export default class ClietInitVisitor extends SubGenerator<DisChordNodeType, Dis
         const seyfertConfig = this.generateSeyfertConfig(node);
         this.parent.context.extraFiles.set(this.parent.context.projectRoot.resolve('seyfert.config.mjs'), seyfertConfig);
 
-        this.ensureDirectories();
+        this.requireOutputDirectories();
 
         return `
             import { Client } from "seyfert";
@@ -172,13 +171,13 @@ export default class ClietInitVisitor extends SubGenerator<DisChordNodeType, Dis
     }
 
     /**
-     * Helper to ensure the output directories exist.
+     * Asks for the directories Seyfert's loader scans to exist in the output, even if the project
+     * has nothing to put in them. Only asks: creating them is the compile command's job, once it
+     * knows the compile succeeded and isn't just a check.
      */
-    private ensureDirectories() {
-        const dirs = ['comandos', 'eventos', 'componentes'];
-        dirs.forEach(dir => {
-            const targetPath = join(this.parent.context.distDir, dir);
-            if (!fs.existsSync(targetPath)) fs.mkdirSync(targetPath, { recursive: true });
+    private requireOutputDirectories() {
+        [ 'comandos', 'eventos', 'componentes' ].forEach(dir => {
+            this.parent.context.extraDirectories.add(path.join(this.parent.context.distDir, dir));
         });
     }
 }

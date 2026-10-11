@@ -87,6 +87,7 @@ export class MemberAccessInvariantTest extends Test {
             distDir: config.distDir,
             outputDir: config.distDir,
             extraFiles: new Map(),
+            extraDirectories: new Set(),
             coreLib: disChordCoreLibUtils,
             coreLibDispatch: disChordCoreLibDispatch
         };

@@ -22,6 +22,8 @@ export interface CompilationContext<T extends string = string> {
     /** Where the file being compiled is written: `distDir`, or what `--out-dir` says. */
     outputDir: string;
     extraFiles: Map<string, string>;
+    /** Directories (absolute paths) the compiled project needs to exist, empty or not. */
+    extraDirectories: Set<string>;
     /** Lookups over the core library of the dialect being compiled. */
     coreLib: CoreLibUtils<string>;
     /** How a call on a receiver of ambiguous type is emitted, over the same table as `coreLib`. */
