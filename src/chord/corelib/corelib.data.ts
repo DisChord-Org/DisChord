@@ -59,117 +59,172 @@ export const corelib = {
             methods: {
                 limpiar: {
                     transpile: 'trim',
-                    returns: PrimitiveDataType.Texto
+                    returns: PrimitiveDataType.Texto,
+                    params: [],
+                    doc: 'Quita los espacios del principio y del final.'
                 },
                 partir: {
                     transpile: 'split',
-                    returns: ArrayDataType.of(PrimitiveDataType.Texto)
+                    returns: ArrayDataType.of(PrimitiveDataType.Texto),
+                    params: [{ name: 'separador', type: PrimitiveDataType.Texto }, { name: 'limite', type: PrimitiveDataType.Numero, optional: true }],
+                    doc: 'Divide el texto en una lista por cada aparición del separador.'
                 },
                 reemplazar: {
                     transpile: 'replace',
-                    returns: PrimitiveDataType.Texto
+                    returns: PrimitiveDataType.Texto,
+                    params: [{ name: 'buscado', type: PrimitiveDataType.Texto }, { name: 'reemplazo', type: PrimitiveDataType.Texto }],
+                    doc: 'Reemplaza la primera aparición de lo buscado.'
                 },
                 reemplazarTodo: {
                     transpile: 'replaceAll',
-                    returns: PrimitiveDataType.Texto
+                    returns: PrimitiveDataType.Texto,
+                    params: [{ name: 'buscado', type: PrimitiveDataType.Texto }, { name: 'reemplazo', type: PrimitiveDataType.Texto }],
+                    doc: 'Reemplaza todas las apariciones de lo buscado.'
                 },
                 terminaCon: {
                     transpile: 'endsWith',
-                    returns: PrimitiveDataType.Booleano
+                    returns: PrimitiveDataType.Booleano,
+                    params: [{ name: 'final', type: PrimitiveDataType.Texto }],
+                    doc: 'Indica si el texto termina con el valor dado.'
                 },
                 empiezaCon: {
                     transpile: 'startsWith',
-                    returns: PrimitiveDataType.Booleano
+                    returns: PrimitiveDataType.Booleano,
+                    params: [{ name: 'inicio', type: PrimitiveDataType.Texto }],
+                    doc: 'Indica si el texto empieza con el valor dado.'
                 },
                 repetir: {
                     transpile: 'repeat',
-                    returns: PrimitiveDataType.Texto
+                    returns: PrimitiveDataType.Texto,
+                    params: [{ name: 'veces', type: PrimitiveDataType.Numero }],
+                    doc: 'Repite el texto el número de veces dado.'
                 },
                 cortar: {
                     transpile: 'slice',
-                    returns: PrimitiveDataType.Texto
+                    returns: PrimitiveDataType.Texto,
+                    params: [{ name: 'inicio', type: PrimitiveDataType.Numero }, { name: 'fin', type: PrimitiveDataType.Numero, optional: true }],
+                    doc: 'Devuelve la parte del texto entre dos posiciones.'
                 },
                 minusculas: {
                     transpile: 'toLowerCase',
-                    returns: PrimitiveDataType.Texto
+                    returns: PrimitiveDataType.Texto,
+                    params: [],
+                    doc: 'Convierte el texto a minúsculas.'
                 },
                 mayusculas: {
                     transpile: 'toUpperCase',
-                    returns: PrimitiveDataType.Texto
+                    returns: PrimitiveDataType.Texto,
+                    params: [],
+                    doc: 'Convierte el texto a mayúsculas.'
                 },
                 tiene: {
                     transpile: 'includes',
-                    returns: PrimitiveDataType.Booleano
+                    returns: PrimitiveDataType.Booleano,
+                    params: [{ name: 'buscado', type: PrimitiveDataType.Texto }, { name: 'desde', type: PrimitiveDataType.Numero, optional: true }],
+                    doc: 'Indica si el texto contiene lo buscado.'
                 },
                 indiceDe: {
                     transpile: 'indexOf',
-                    returns: PrimitiveDataType.Numero
+                    returns: PrimitiveDataType.Numero,
+                    params: [{ name: 'buscado', type: PrimitiveDataType.Texto }, { name: 'desde', type: PrimitiveDataType.Numero, optional: true }],
+                    doc: 'Posición de la primera aparición de lo buscado, o -1.'
                 },
                 ultimoIndiceDe: {
                     transpile: 'lastIndexOf',
-                    returns: PrimitiveDataType.Numero
+                    returns: PrimitiveDataType.Numero,
+                    params: [{ name: 'buscado', type: PrimitiveDataType.Texto }, { name: 'desde', type: PrimitiveDataType.Numero, optional: true }],
+                    doc: 'Posición de la última aparición de lo buscado, o -1.'
                 },
                 caracterEn: {
                     transpile: 'charAt',
-                    returns: PrimitiveDataType.Texto
+                    returns: PrimitiveDataType.Texto,
+                    params: [{ name: 'indice', type: PrimitiveDataType.Numero }],
+                    doc: 'Carácter en la posición dada.'
                 },
                 rellenarInicio: {
                     transpile: 'padStart',
-                    returns: PrimitiveDataType.Texto
+                    returns: PrimitiveDataType.Texto,
+                    params: [{ name: 'longitud', type: PrimitiveDataType.Numero }, { name: 'relleno', type: PrimitiveDataType.Texto, optional: true }],
+                    doc: 'Rellena el principio hasta alcanzar la longitud dada.'
                 },
                 rellenarFinal: {
                     transpile: 'padEnd',
-                    returns: PrimitiveDataType.Texto
+                    returns: PrimitiveDataType.Texto,
+                    params: [{ name: 'longitud', type: PrimitiveDataType.Numero }, { name: 'relleno', type: PrimitiveDataType.Texto, optional: true }],
+                    doc: 'Rellena el final hasta alcanzar la longitud dada.'
                 },
                 concatenar: {
                     transpile: 'concat',
-                    returns: PrimitiveDataType.Texto
+                    returns: PrimitiveDataType.Texto,
+                    params: [{ name: 'textos', type: PrimitiveDataType.Texto, rest: true }],
+                    doc: 'Une el texto con los que se le pasan.'
                 },
                 recortarInicio: {
                     transpile: 'trimStart',
-                    returns: PrimitiveDataType.Texto
+                    returns: PrimitiveDataType.Texto,
+                    params: [],
+                    doc: 'Quita los espacios del principio.'
                 },
                 recortarFinal: {
                     transpile: 'trimEnd',
-                    returns: PrimitiveDataType.Texto
+                    returns: PrimitiveDataType.Texto,
+                    params: [],
+                    doc: 'Quita los espacios del final.'
                 },
                 normalizar: {
                     transpile: 'normalize',
-                    returns: PrimitiveDataType.Texto
+                    returns: PrimitiveDataType.Texto,
+                    params: [{ name: 'forma', type: PrimitiveDataType.Texto, optional: true }],
+                    doc: 'Normaliza el texto Unicode.'
                 },
                 coincidir: {
                     transpile: 'match',
-                    returns: AnyDataType.Any
+                    returns: AnyDataType.Any,
+                    params: [{ name: 'patron', type: AnyDataType.Any }],
+                    doc: 'Busca coincidencias con una expresión.'
                 },
                 coincidirTodo: {
                     transpile: 'matchAll',
-                    returns: AnyDataType.Any
+                    returns: AnyDataType.Any,
+                    params: [{ name: 'patron', type: AnyDataType.Any }],
+                    doc: 'Busca todas las coincidencias con una expresión.'
                 },
                 buscar: {
                     transpile: 'search',
-                    returns: PrimitiveDataType.Numero
+                    returns: PrimitiveDataType.Numero,
+                    params: [{ name: 'patron', type: AnyDataType.Any }],
+                    doc: 'Posición de la primera coincidencia con una expresión, o -1.'
                 },
                 codigoEn: {
                     transpile: 'charCodeAt',
-                    returns: PrimitiveDataType.Numero
+                    returns: PrimitiveDataType.Numero,
+                    params: [{ name: 'indice', type: PrimitiveDataType.Numero }],
+                    doc: 'Código Unicode del carácter en la posición dada.'
                 },
                 subcadena: {
                     transpile: 'substring',
-                    returns: PrimitiveDataType.Texto
+                    returns: PrimitiveDataType.Texto,
+                    params: [{ name: 'inicio', type: PrimitiveDataType.Numero }, { name: 'fin', type: PrimitiveDataType.Numero, optional: true }],
+                    doc: 'Devuelve la parte del texto entre dos posiciones.'
                 },
                 comparar: {
                     transpile: 'localeCompare',
-                    returns: PrimitiveDataType.Numero
+                    returns: PrimitiveDataType.Numero,
+                    params: [{ name: 'otro', type: PrimitiveDataType.Texto }],
+                    doc: 'Compara con otro texto: negativo, 0 o positivo.'
                 },
                 en: {
                     transpile: 'at',
-                    returns: UnionDataType.of([PrimitiveType.Texto, PrimitiveType.Indefinido])
+                    returns: UnionDataType.of([PrimitiveType.Texto, PrimitiveType.Indefinido]),
+                    params: [{ name: 'indice', type: PrimitiveDataType.Numero }],
+                    doc: 'Carácter en la posición dada; admite negativos para contar desde el final.'
                 }
             },
             properties: {
                 longitud: {
                     transpile: 'length',
-                    returns: PrimitiveDataType.Numero
+                    returns: PrimitiveDataType.Numero,
+                    doc: 'Cantidad de caracteres del texto.'
                 }
             }
         },
@@ -325,219 +380,297 @@ export const corelib = {
                 absoluto: {
                     transpile: 'Math.abs',
                     returns: PrimitiveDataType.Numero,
-                    static: true
+                    static: true,
+                    params: [{ name: 'valor', type: PrimitiveDataType.Numero }],
+                    doc: 'Valor sin signo.'
                 },
                 redondearArriba: {
                     transpile: 'Math.ceil',
                     returns: PrimitiveDataType.Numero,
-                    static: true
+                    static: true,
+                    params: [{ name: 'valor', type: PrimitiveDataType.Numero }],
+                    doc: 'Entero más cercano hacia arriba.'
                 },
                 redondearAbajo: {
                     transpile: 'Math.floor',
                     returns: PrimitiveDataType.Numero,
-                    static: true
+                    static: true,
+                    params: [{ name: 'valor', type: PrimitiveDataType.Numero }],
+                    doc: 'Entero más cercano hacia abajo.'
                 },
                 redondear: {
                     transpile: 'Math.round',
                     returns: PrimitiveDataType.Numero,
-                    static: true
+                    static: true,
+                    params: [{ name: 'valor', type: PrimitiveDataType.Numero }],
+                    doc: 'Entero más cercano.'
                 },
                 truncar: {
                     transpile: 'Math.trunc',
                     returns: PrimitiveDataType.Numero,
-                    static: true
+                    static: true,
+                    params: [{ name: 'valor', type: PrimitiveDataType.Numero }],
+                    doc: 'Parte entera, sin decimales.'
                 },
                 potencia: {
                     transpile: 'Math.pow',
                     returns: PrimitiveDataType.Numero,
-                    static: true
+                    static: true,
+                    params: [{ name: 'base', type: PrimitiveDataType.Numero }, { name: 'exponente', type: PrimitiveDataType.Numero }],
+                    doc: 'Base elevada al exponente.'
                 },
                 raizCuadrada: {
                     transpile: 'Math.sqrt',
                     returns: PrimitiveDataType.Numero,
-                    static: true
+                    static: true,
+                    params: [{ name: 'valor', type: PrimitiveDataType.Numero }],
+                    doc: 'Raíz cuadrada.'
                 },
                 raizCubica: {
                     transpile: 'Math.cbrt',
                     returns: PrimitiveDataType.Numero,
-                    static: true
+                    static: true,
+                    params: [{ name: 'valor', type: PrimitiveDataType.Numero }],
+                    doc: 'Raíz cúbica.'
                 },
                 hipotenusa: {
                     transpile: 'Math.hypot',
                     returns: PrimitiveDataType.Numero,
-                    static: true
+                    static: true,
+                    params: [{ name: 'valores', type: PrimitiveDataType.Numero, rest: true }],
+                    doc: 'Raíz cuadrada de la suma de los cuadrados de los valores.'
                 },
                 exponente: {
                     transpile: 'Math.exp',
                     returns: PrimitiveDataType.Numero,
-                    static: true
+                    static: true,
+                    params: [{ name: 'valor', type: PrimitiveDataType.Numero }],
+                    doc: 'e elevado al valor.'
                 },
                 log: {
                     transpile: 'Math.log',
                     returns: PrimitiveDataType.Numero,
-                    static: true
+                    static: true,
+                    params: [{ name: 'valor', type: PrimitiveDataType.Numero }],
+                    doc: 'Logaritmo natural.'
                 },
                 log10: {
                     transpile: 'Math.log10',
                     returns: PrimitiveDataType.Numero,
-                    static: true
+                    static: true,
+                    params: [{ name: 'valor', type: PrimitiveDataType.Numero }],
+                    doc: 'Logaritmo en base 10.'
                 },
                 log2: {
                     transpile: 'Math.log2',
                     returns: PrimitiveDataType.Numero,
-                    static: true
+                    static: true,
+                    params: [{ name: 'valor', type: PrimitiveDataType.Numero }],
+                    doc: 'Logaritmo en base 2.'
                 },
                 seno: {
                     transpile: 'Math.sin',
                     returns: PrimitiveDataType.Numero,
-                    static: true
+                    static: true,
+                    params: [{ name: 'valor', type: PrimitiveDataType.Numero }],
+                    doc: 'Seno, con el ángulo en radianes.'
                 },
                 coseno: {
                     transpile: 'Math.cos',
                     returns: PrimitiveDataType.Numero,
-                    static: true
+                    static: true,
+                    params: [{ name: 'valor', type: PrimitiveDataType.Numero }],
+                    doc: 'Coseno, con el ángulo en radianes.'
                 },
                 tangente: {
                     transpile: 'Math.tan',
                     returns: PrimitiveDataType.Numero,
-                    static: true
+                    static: true,
+                    params: [{ name: 'valor', type: PrimitiveDataType.Numero }],
+                    doc: 'Tangente, con el ángulo en radianes.'
                 },
                 arcoseno: {
                     transpile: 'Math.asin',
                     returns: PrimitiveDataType.Numero,
-                    static: true
+                    static: true,
+                    params: [{ name: 'valor', type: PrimitiveDataType.Numero }],
+                    doc: 'Arcoseno, en radianes.'
                 },
                 arcocoseno: {
                     transpile: 'Math.acos',
                     returns: PrimitiveDataType.Numero,
-                    static: true
+                    static: true,
+                    params: [{ name: 'valor', type: PrimitiveDataType.Numero }],
+                    doc: 'Arcocoseno, en radianes.'
                 },
                 arcotangente: {
                     transpile: 'Math.atan',
                     returns: PrimitiveDataType.Numero,
-                    static: true
+                    static: true,
+                    params: [{ name: 'valor', type: PrimitiveDataType.Numero }],
+                    doc: 'Arcotangente, en radianes.'
                 },
                 arcotangente2: {
                     transpile: 'Math.atan2',
                     returns: PrimitiveDataType.Numero,
-                    static: true
+                    static: true,
+                    params: [{ name: 'y', type: PrimitiveDataType.Numero }, { name: 'x', type: PrimitiveDataType.Numero }],
+                    doc: 'Ángulo, en radianes, del punto (x, y).'
                 },
                 senoHiperbolico: {
                     transpile: 'Math.sinh',
                     returns: PrimitiveDataType.Numero,
-                    static: true
+                    static: true,
+                    params: [{ name: 'valor', type: PrimitiveDataType.Numero }],
+                    doc: 'Seno hiperbólico.'
                 },
                 cosenoHiperbolico: {
                     transpile: 'Math.cosh',
                     returns: PrimitiveDataType.Numero,
-                    static: true
+                    static: true,
+                    params: [{ name: 'valor', type: PrimitiveDataType.Numero }],
+                    doc: 'Coseno hiperbólico.'
                 },
                 tangenteHiperbolica: {
                     transpile: 'Math.tanh',
                     returns: PrimitiveDataType.Numero,
-                    static: true
+                    static: true,
+                    params: [{ name: 'valor', type: PrimitiveDataType.Numero }],
+                    doc: 'Tangente hiperbólica.'
                 },
                 maximo: {
                     transpile: 'Math.max',
                     returns: PrimitiveDataType.Numero,
-                    static: true
+                    static: true,
+                    params: [{ name: 'valores', type: PrimitiveDataType.Numero, rest: true }],
+                    doc: 'El mayor de los valores.'
                 },
                 minimo: {
                     transpile: 'Math.min',
                     returns: PrimitiveDataType.Numero,
-                    static: true
+                    static: true,
+                    params: [{ name: 'valores', type: PrimitiveDataType.Numero, rest: true }],
+                    doc: 'El menor de los valores.'
                 },
                 aleatorio: {
                     transpile: 'Math.random',
                     returns: PrimitiveDataType.Numero,
-                    static: true
+                    static: true,
+                    params: [],
+                    doc: 'Número aleatorio entre 0 (incluido) y 1 (excluido).'
                 },
                 signo: {
                     transpile: 'Math.sign',
                     returns: PrimitiveDataType.Numero,
-                    static: true
+                    static: true,
+                    params: [{ name: 'valor', type: PrimitiveDataType.Numero }],
+                    doc: 'Signo del valor'
                 },
                 arcosenoHiperbolico: {
                     transpile: 'Math.asinh',
                     returns: PrimitiveDataType.Numero,
-                    static: true
+                    static: true,
+                    params: [{ name: 'valor', type: PrimitiveDataType.Numero }],
+                    doc: 'Arcoseno hiperbólico.'
                 },
                 arcocosenoHiperbolico: {
                     transpile: 'Math.acosh',
                     returns: PrimitiveDataType.Numero,
-                    static: true
+                    static: true,
+                    params: [{ name: 'valor', type: PrimitiveDataType.Numero }],
+                    doc: 'Arcocoseno hiperbólico.'
                 },
                 arcotangenteHiperbolica: {
                     transpile: 'Math.atanh',
                     returns: PrimitiveDataType.Numero,
-                    static: true
+                    static: true,
+                    params: [{ name: 'valor', type: PrimitiveDataType.Numero }],
+                    doc: 'Arcotangente hiperbólica.'
                 },
                 redondearFlotante: {
                     transpile: 'Math.fround',
                     returns: PrimitiveDataType.Numero,
-                    static: true
+                    static: true,
+                    params: [{ name: 'valor', type: PrimitiveDataType.Numero }],
+                    doc: 'Valor como número de 32 bits.'
                 },
                 exponenteMenosUno: {
                     transpile: 'Math.expm1',
                     returns: PrimitiveDataType.Numero,
-                    static: true
+                    static: true,
+                    params: [{ name: 'valor', type: PrimitiveDataType.Numero }],
+                    doc: 'e elevado al valor, menos 1.'
                 },
                 logMasUno: {
                     transpile: 'Math.log1p',
                     returns: PrimitiveDataType.Numero,
-                    static: true
+                    static: true,
+                    params: [{ name: 'valor', type: PrimitiveDataType.Numero }],
+                    doc: 'Logaritmo natural de 1 más el valor.'
                 },
                 ceroInicial: {
                     transpile: 'Math.clz32',
                     returns: PrimitiveDataType.Numero,
-                    static: true
+                    static: true,
+                    params: [{ name: 'valor', type: PrimitiveDataType.Numero }],
+                    doc: 'Cantidad de ceros a la izquierda en 32 bits.'
                 },
                 limitar: {
                     transpile: 'chordLimitar',
                     returns: PrimitiveDataType.Numero,
-                    static: true
+                    static: true,
+                    params: [{ name: 'valor', type: PrimitiveDataType.Numero }, { name: 'minimo', type: PrimitiveDataType.Numero }, { name: 'maximo', type: PrimitiveDataType.Numero }],
+                    doc: 'Mantiene el valor dentro del rango dado.'
                 }
             },
             properties: {
                 PI: {
                     transpile: 'Math.PI',
                     returns: PrimitiveDataType.Numero,
-                    static: true
+                    static: true,
+                    doc: 'La constante π.'
                 },
                 E: {
                     transpile: 'Math.E',
                     returns: PrimitiveDataType.Numero,
-                    static: true
+                    static: true,
+                    doc: 'La constante e.'
                 },
                 LOGNEP2: {
                     transpile: 'Math.LN2',
                     returns: PrimitiveDataType.Numero,
-                    static: true
+                    static: true,
+                    doc: 'Logaritmo natural de 2.'
                 },
                 LOGNEP10: {
                     transpile: 'Math.LN10',
                     returns: PrimitiveDataType.Numero,
-                    static: true
+                    static: true,
+                    doc: 'Logaritmo natural de 10.'
                 },
                 LOG2E: {
                     transpile: 'Math.LOG2E',
                     returns: PrimitiveDataType.Numero,
-                    static: true
+                    static: true,
+                    doc: 'Logaritmo en base 2 de e.'
                 },
                 LOG10E: {
                     transpile: 'Math.LOG10E',
                     returns: PrimitiveDataType.Numero,
-                    static: true
+                    static: true,
+                    doc: 'Logaritmo en base 10 de e.'
                 },
                 RAIZCUADRADA1_2: {
                     transpile: 'Math.SQRT1_2',
                     returns: PrimitiveDataType.Numero,
-                    static: true
+                    static: true,
+                    doc: 'Raíz cuadrada de 1/2.'
                 },
                 RAIZCUADRADA2: {
                     transpile: 'Math.SQRT2',
                     returns: PrimitiveDataType.Numero,
-                    static: true
+                    static: true,
+                    doc: 'Raíz cuadrada de 2.'
                 }
             }
         },
@@ -547,75 +680,100 @@ export const corelib = {
                 esEntero: {
                     transpile: 'Number.isInteger',
                     returns: PrimitiveDataType.Booleano,
-                    static: true
+                    static: true,
+                    params: [{ name: 'valor', type: AnyDataType.Any }],
+                    doc: 'Indica si el valor es un número entero.'
                 },
                 esNumero: {
                     transpile: 'Number.isFinite',
                     returns: PrimitiveDataType.Booleano,
-                    static: true
+                    static: true,
+                    params: [{ name: 'valor', type: AnyDataType.Any }],
+                    doc: 'Indica si el valor es un número finito.'
                 },
                 esEnteroSeguro: {
                     transpile: 'Number.isSafeInteger',
                     returns: PrimitiveDataType.Booleano,
-                    static: true
+                    static: true,
+                    params: [{ name: 'valor', type: AnyDataType.Any }],
+                    doc: 'Indica si el valor es un entero que se representa sin pérdida.'
                 },
                 esNaN: {
                     transpile: 'Number.isNaN',
                     returns: PrimitiveDataType.Booleano,
-                    static: true
+                    static: true,
+                    params: [{ name: 'valor', type: AnyDataType.Any }],
+                    doc: 'Indica si el valor es NaN.'
                 },
                 aEntero: {
                     transpile: 'parseInt',
                     returns: PrimitiveDataType.Numero,
-                    static: true
+                    static: true,
+                    params: [{ name: 'texto', type: PrimitiveDataType.Texto }, { name: 'base', type: PrimitiveDataType.Numero, optional: true }],
+                    doc: 'Convierte un texto en un número entero.'
                 },
                 aDecimal: {
                     transpile: 'parseFloat',
                     returns: PrimitiveDataType.Numero,
-                    static: true
+                    static: true,
+                    params: [{ name: 'texto', type: PrimitiveDataType.Texto }],
+                    doc: 'Convierte un texto en un número decimal.'
                 },
                 aFijo: {
                     transpile: 'toFixed',
-                    returns: PrimitiveDataType.Texto
+                    returns: PrimitiveDataType.Texto,
+                    params: [{ name: 'decimales', type: PrimitiveDataType.Numero, optional: true }],
+                    doc: 'Texto con la cantidad de decimales dada.'
                 },
                 aPrecision: {
                     transpile: 'toPrecision',
-                    returns: PrimitiveDataType.Texto
+                    returns: PrimitiveDataType.Texto,
+                    params: [{ name: 'precision', type: PrimitiveDataType.Numero, optional: true }],
+                    doc: 'Texto con la cantidad de cifras significativas dada.'
                 },
                 aTexto: {
                     transpile: 'toString',
-                    returns: PrimitiveDataType.Texto
+                    returns: PrimitiveDataType.Texto,
+                    params: [{ name: 'base', type: PrimitiveDataType.Numero, optional: true }],
+                    doc: 'Texto del número, en la base dada.'
                 },
                 aLocal: {
                     transpile: 'toLocaleString',
-                    returns: PrimitiveDataType.Texto
+                    returns: PrimitiveDataType.Texto,
+                    params: [{ name: 'idioma', type: PrimitiveDataType.Texto, optional: true }],
+                    doc: 'Texto del número según el idioma.'
                 }
             },
             properties: {
                 MAXIMO_SEGURO: {
                     transpile: 'Number.MAX_SAFE_INTEGER',
                     returns: PrimitiveDataType.Numero,
-                    static: true
+                    static: true,
+                    doc: 'Mayor entero que se representa sin pérdida.'
                 },
                 MINIMO_SEGURO: {
                     transpile: 'Number.MIN_SAFE_INTEGER',
                     returns: PrimitiveDataType.Numero,
-                    static: true
+                    static: true,
+                    doc: 'Menor entero que se representa sin pérdida.'
                 },
                 MAXIMO: {
                     transpile: 'Number.MAX_VALUE',
                     returns: PrimitiveDataType.Numero,
-                    static: true
+                    static: true,
+                    doc: 'Mayor número representable.'
                 },
                 MINIMO: {
                     transpile: 'Number.MIN_VALUE',
                     returns: PrimitiveDataType.Numero,
-                    static: true
+                    static: true,
+                    doc: 'Menor número positivo representable.'
                 },
                 EPSILON: {
                     transpile: 'Number.EPSILON',
                     returns: PrimitiveDataType.Numero,
-                    static: true
+                    static: true,
+                    doc: 'Diferencia entre 1 y el siguiente número representable.'
                 }
             }
         },

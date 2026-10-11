@@ -1,6 +1,21 @@
 import { DataType } from "../model/DataType";
 
 /**
+ * A parameter of a core library method, as the language sees it (not as the JavaScript it is
+ * emitted as does: a member that is reordered or expanded when transpiled still lists the
+ * parameters the user writes).
+ */
+export interface CoreLibParameter {
+    /** Name that describes the parameter; it is documentation, arguments are passed by position. */
+    readonly name: string;
+    readonly type: DataType;
+    /** Whether the argument may be left out. Omitted means `false`. */
+    readonly optional?: boolean;
+    /** Whether it collects every remaining argument. Omitted means `false`. */
+    readonly rest?: boolean;
+}
+
+/**
  * A single member (method or property) of a core library class, keyed by its name in the
  * source language inside `CoreLibClass`.
  */
@@ -15,6 +30,13 @@ export interface CoreLibMember {
     readonly async?: boolean;
     /** Type of the value a call to this member produces, or of the member itself for a property. */
     readonly returns: DataType;
+    /**
+     * Parameters of a method, in order. An empty list means it takes none; omitted means they have
+     * not been written down yet, which says nothing about its arity: the compiler never reads it.
+     */
+    readonly params?: readonly CoreLibParameter[];
+    /** One sentence, in Spanish, of what the member does; shown by editors. */
+    readonly doc?: string;
 }
 
 /**
