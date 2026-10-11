@@ -6,7 +6,7 @@ import { SubGeneratorClass } from "../../chord/Generator/SubGenerator";
 import ClientInitVisitor from './visitors/architectural/ClientInitVisitor';
 import CommandVisitor from './visitors/architectural/CommandVisitor';
 import EventVisitor from './visitors/architectural/EventVisitor';
-import { CompilationContext } from "../../cli/commands/CompileCommand";
+import { CompilationContext } from "../../chord/model/CompilationContext";
 import ButtonVisitor from "./visitors/components/ButtonVisitor";
 import ButtonDeclarationVisitor from "./visitors/components/ButtonDeclarationVisitor";
 import ActionRowVisitor from "./visitors/components/ActionRowVisitor";

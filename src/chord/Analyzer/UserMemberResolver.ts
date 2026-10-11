@@ -1,7 +1,7 @@
 import { AccessNode, BaseNode, CompilerMetadataKind, Symbol, TokenType } from "../types";
 import { isIdentificatorNode } from "../ast.guards";
 import { DataType, UserClassDataType } from "../model/DataType";
-import { CompilationContext } from "../../cli/commands/CompileCommand";
+import { CompilationContext } from "../model/CompilationContext";
 
 /**
  * Finds the member of a class of the file that a member access names, from what its receiver is:

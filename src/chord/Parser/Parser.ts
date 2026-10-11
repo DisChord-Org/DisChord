@@ -2,7 +2,7 @@ import { SUGGESTIONS } from "./ParserErrorSuggestions";
 import { ASTNode, Token, SOF, EOF, TokenType, BaseNode, PeekType, Location, TokenTypeUnion } from "../types";
 
 import { ChordError, ErrorLevel } from "../../errors/ChordError";
-import { CompilationContext } from "../../cli/commands/CompileCommand";
+import { CompilationContext } from "../model/CompilationContext";
 import { ParserContext } from "./ParserContext";
 import { SubParser, SubParserClass } from "./SubParser";
 import { SymbolTable } from "../model/SymbolsTable";

@@ -1,5 +1,5 @@
 import { ASTNode, BaseNode, TokenType } from "../types";
-import { CompilationContext } from "../../cli/commands/CompileCommand";
+import { CompilationContext } from "../model/CompilationContext";
 import { AnalysisRule, AnalysisRuleClass } from "./AnalysisRule";
 import { ValidateDeclarationNamesRule } from "./rules/ValidateDeclarationNamesRule";
 import { BindImportsRule } from "./rules/BindImportsRule";

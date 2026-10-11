@@ -1,44 +1,15 @@
 import * as fs from 'fs';
 import path from 'path';
 
-import { GlobalCLIOptions, DebugFlags } from '../Program';
+import { GlobalCLIOptions } from '../Program';
 import { CompilerConfig, FileSystem } from '../../utils/FileSystem';
 import Prettifier from '../../utils/Prettifier';
-import { CodeProvider } from '../../chord/CodeProvider';
-import { SymbolTable } from '../../chord/model/SymbolsTable';
-import { CoreLibUtils } from '../../chord/corelib/CoreLibUtils';
-import { CoreLibDispatch } from '../../chord/corelib/CoreLibDispatch';
-import { disChordCoreLibUtils, disChordCoreLibDispatch } from '../../dischord/corelib';
-import { KeyWords } from '../../chord/KeywordsManager';
-import { Lexer } from '../../chord/Lexer';
-import { DisChordParser } from '../../dischord/Parser/Parser';
-import { DisChordAnalyzer } from '../../dischord/Analyzer/Analyzer';
-import { DisChordGenerator } from '../../dischord/Generator/Generator';
-import { DisChordASTNode, DisChordNodeType, DisChordTokenType } from '../../dischord/types';
+import { FileCompiler } from './FileCompiler';
 import { RunCommand } from './RunCommand';
 
 /**
- * Shared state context passed through compiler pipeline phases.
- * 
- * @interface CompilationContext
- * @template T
- */
-export interface CompilationContext<T extends string = string> {
-    symbolTable: SymbolTable;
-    keywordsManager: KeyWords<T>;
-    codeProvider: CodeProvider;
-    projectRoot: string;
-    outputDir?: string;
-    extraFiles: Map<string, string>;
-    /** Lookups over the core library of the dialect being compiled. */
-    coreLib: CoreLibUtils<string>;
-    /** How a call on a receiver of ambiguous type is emitted, over the same table as `coreLib`. */
-    coreLibDispatch: CoreLibDispatch<string>;
-}
-
-/**
  * Command handler responsible for orchestrating project compilation and execution.
- * 
+ *
  * @class CompileCommand
  */
 export class CompileCommand {
@@ -50,7 +21,7 @@ export class CompileCommand {
 
     /**
      * Executes the main compilation process and optionally runs the generated code.
-     * 
+     *
      * @param {string} rawPath - Raw path string passed from CLI arguments.
      * @param {GlobalCLIOptions} options - Parsed Commander options.
      * @returns {Promise<void>}
@@ -81,7 +52,7 @@ export class CompileCommand {
     }
 
     /**
-     * Compiles a single .chord source file into Javascript.
+     * Compiles a single .chord source file into Javascript and writes it, unless only checking.
      *
      * @private
      * @param {string} file - Absolute path to the .chord file.
@@ -93,55 +64,27 @@ export class CompileCommand {
     private async compileFile(file: string, options: GlobalCLIOptions): Promise<Map<string, string>> {
         if (!this.config) return new Map();
 
-        console.log(`Compilando: ${path.relative(this.config.projectRoot, file)}`);
+        const relativeFile = path.relative(this.config.projectRoot, file);
+        console.log(`Compilando: ${relativeFile}`);
 
         const relativePath = path.relative(path.join(this.config.projectRoot, 'src'), file);
-        const fileName = path.basename(file, '.chord');
         const targetDir = options.outDir
             ? path.resolve(options.outDir)
             : path.join(this.config.distDir, path.dirname(relativePath));
 
-        const context: CompilationContext<DisChordNodeType> = {
-            symbolTable: new SymbolTable(),
-            keywordsManager: new KeyWords(),
-            codeProvider: new CodeProvider(),
-            projectRoot: this.config.projectRoot,
-            outputDir: targetDir,
-            extraFiles: new Map(),
-            coreLib: disChordCoreLibUtils,
-            coreLibDispatch: disChordCoreLibDispatch
-        };
+        const compiled = new FileCompiler(options).compile(file, this.config.projectRoot, targetDir);
 
-        DisChordParser.registerGrammar(context);
-
-        const code = fs.readFileSync(file, 'utf-8');
-        context.codeProvider.currentCode = { name: file, content: code };
-
-        const lexer = new Lexer<DisChordTokenType>(context);
-        const tokens = lexer.tokenize();
-        this.logDebug(DebugFlags.Lexer, options, tokens);
-
-        const parser = new DisChordParser(tokens, context);
-        const ast: DisChordASTNode[] = parser.parse();
-        this.logDebug(DebugFlags.Parser, options, ast);
-
-        new DisChordAnalyzer(context).analyze(ast);
-
-        const generator = new DisChordGenerator(context, ast);
-        const output = generator.generate();
-        this.logDebug(DebugFlags.Generator, options, output);
-
-        if (options.check) return context.extraFiles;
+        if (options.check) return compiled.extraFiles;
 
         if (!fs.existsSync(targetDir)) {
             fs.mkdirSync(targetDir, { recursive: true });
         }
 
-        const outputPath = path.join(targetDir, `${fileName}.js`);
-        await Prettifier.savePrettified(outputPath, output);
+        const outputPath = path.join(targetDir, `${path.basename(file, '.chord')}.js`);
+        await Prettifier.savePrettified(outputPath, compiled.output);
         this.emitted.add(outputPath);
 
-        return context.extraFiles;
+        return compiled.extraFiles;
     }
 
     /**
@@ -187,7 +130,7 @@ export class CompileCommand {
 
     /**
      * Triggers the execution of the output bundle via Runner.
-     * 
+     *
      * @private
      * @returns {Promise<void>}
      */
@@ -200,21 +143,5 @@ export class CompileCommand {
 
         const runner = new RunCommand();
         await runner.execute(runTarget, { projectRoot: this.config.projectRoot });
-    }
-
-    /**
-     * Inspects and logs internal data structures according to the active debug flag and depth.
-     * 
-     * @private
-     * @param {DebugFlags} phase - The phase associated with the current data.
-     * @param {GlobalCLIOptions} options - Active CLI options.
-     * @param {unknown} data - Data structure to print.
-     */
-    private logDebug(phase: DebugFlags, options: GlobalCLIOptions, data: unknown): void {
-        if (options.debug === undefined) return;
-
-        if (options.debug === DebugFlags.All || options.debug === phase) {
-            console.dir(data, { depth: options.depth, colors: true });
-        }
     }
 }

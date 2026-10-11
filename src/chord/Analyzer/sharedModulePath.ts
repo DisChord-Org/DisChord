@@ -1,5 +1,5 @@
 import path from "path";
-import { CompilationContext } from "../../cli/commands/CompileCommand";
+import { CompilationContext } from "../model/CompilationContext";
 
 /**
  * Computes the import specifier for a shared module — one written once to

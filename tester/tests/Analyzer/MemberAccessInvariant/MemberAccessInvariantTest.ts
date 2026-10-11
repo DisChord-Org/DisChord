@@ -12,7 +12,7 @@ import { DisChordParser } from "../../../../src/dischord/Parser/Parser";
 import { DisChordAnalyzer } from "../../../../src/dischord/Analyzer/Analyzer";
 import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType } from "../../../../src/dischord/types";
 import { FileSystem } from "../../../../src/utils/FileSystem";
-import { CompilationContext } from "../../../../src/cli/commands/CompileCommand";
+import { CompilationContext } from "../../../../src/chord/model/CompilationContext";
 
 /**
  * Programs that between them use every kind of member access: on texts, lists, typed and untyped

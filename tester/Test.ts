@@ -11,7 +11,7 @@ import { CodeProvider } from "../src/chord/CodeProvider";
 import { disChordCoreLibUtils, disChordCoreLibDispatch } from "../src/dischord/corelib";
 import { DisChordASTNode, DisChordNodeType, DisChordTokenType } from "../src/dischord/types";
 import { FileSystem } from "../src/utils/FileSystem";
-import { CompilationContext } from "../src/cli/commands/CompileCommand";
+import { CompilationContext } from "../src/chord/model/CompilationContext";
 import Prettifier from "../src/utils/Prettifier";
 
 /**

@@ -9,7 +9,7 @@ import MessageParser from './Grammar/features/MessageParser';
 import CollectorParser from './Grammar/features/CollectorParser';
 import ClientParser from './Grammar/architectural/ClientParser';
 import EventParser from './Grammar/architectural/EventParser';
-import { CompilationContext } from '../../cli/commands/CompileCommand';
+import { CompilationContext } from '../../chord/model/CompilationContext';
 import DisChordStatementParser from './Grammar/DisChordStatementParser';
 import { UnreservedComponentDeclarations } from './Grammar/UnreservedComponentDeclarations';
 

@@ -1,5 +1,5 @@
 import { ASTNode, BaseNode } from "../types";
-import { CompilationContext } from "../../cli/commands/CompileCommand";
+import { CompilationContext } from "../model/CompilationContext";
 import { walkAST } from "../walkAST";
 
 /**
