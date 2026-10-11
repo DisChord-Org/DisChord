@@ -57,6 +57,10 @@ export class Lexer<T extends string> {
             location: {
                 line,
                 column
+            },
+            end: {
+                line: this.line,
+                column: this.column
             }
         }
     }

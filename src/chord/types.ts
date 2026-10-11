@@ -320,8 +320,10 @@ export type Token <T extends string> = {
     type: TokenTypeUnion<T>;
     /** The raw textual value string found in the code */
     value: string;
-    /** Code coordinates tracking for error generation */
+    /** Code coordinates tracking for error generation: where the token starts */
     location: Location;
+    /** Where the token ends: the position right after its last character */
+    end: Location;
 };
 
 /**

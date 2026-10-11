@@ -1,5 +1,5 @@
 import { SUGGESTIONS } from "./ParserErrorSuggestions";
-import { ASTNode, Token, SOF, EOF, TokenType, BaseNode, PeekType, Location, TokenTypeUnion } from "../types";
+import { ASTNode, Token, TokenType, BaseNode, PeekType, Location, TokenTypeUnion } from "../types";
 
 import { ChordError, ErrorLevel } from "../../errors/ChordError";
 import { CompilationContext } from "../model/CompilationContext";
@@ -217,16 +217,21 @@ export class Parser<T extends string, N extends BaseNode<T>> extends ParserConte
                 location: {
                     line: 1,
                     column: 1
+                },
+                end: {
+                    line: 1,
+                    column: 1
                 }
-            } as SOF<T>;
+            } as Token<T>;
         }
 
         if (targetIndex >= this.tokens.length) {
             return {
                 type: TokenType.EOF,
                 value: '',
-                location: this.tokens[this.tokens.length - 1]?.location || { line: 1, column: 1 }
-            } as EOF<T>;
+                location: this.tokens[this.tokens.length - 1]?.location || { line: 1, column: 1 },
+                end: this.tokens[this.tokens.length - 1]?.end || { line: 1, column: 1 }
+            } as Token<T>;
         }
 
         return this.tokens[targetIndex];
