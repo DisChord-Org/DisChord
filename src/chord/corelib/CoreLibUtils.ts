@@ -16,7 +16,7 @@ import { CoreLib, CoreLibClass, ResolvedMember } from "./corelib.types";
  * @template {string} C - Class names present in the table.
  */
 export class CoreLibUtils<C extends string = string> {
-    constructor(protected readonly corelib: CoreLib<C>) {}
+    constructor(public readonly corelib: CoreLib<C>) {}
 
     /**
      * Resolves an access whose object is itself a core library class.
@@ -248,12 +248,19 @@ export class CoreLibUtils<C extends string = string> {
      * @returns {string} The names, separated by commas.
      */
     annotableTypeNames(): string {
-        const classes = (Object.keys(this.corelib.classes) as C[]).filter(name => {
+        return [ ...Object.values(PrimitiveType), AnyDataType.Any.format(), ...this.annotableClassNames() ].join(', ');
+    }
+
+    /**
+     * The classes a `tipo` annotation can name: those whose values have a type of their own, so
+     * not `consola` (nothing is an instance of it) nor `Texto` (its values are the primitive `texto`).
+     * @returns {C[]} Class names, in declaration order.
+     */
+    annotableClassNames(): C[] {
+        return (Object.keys(this.corelib.classes) as C[]).filter(name => {
             const receiver = this.resolveClassReceiver(name);
             return receiver !== undefined && !(receiver instanceof PrimitiveDataType);
         });
-
-        return [ ...Object.values(PrimitiveType), AnyDataType.Any.format(), ...classes ].join(', ');
     }
 
     /**

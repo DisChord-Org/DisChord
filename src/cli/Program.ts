@@ -1,6 +1,7 @@
 import { Command } from 'commander';
 import pkg from '../../package.json';
 import { CompileCommand } from './commands/CompileCommand';
+import { CorelibCommand } from './commands/CorelibCommand';
 import { RunCommand } from './commands/RunCommand';
 import { TestCommand } from './commands/TestCommand';
 
@@ -66,6 +67,10 @@ export class Program {
         // usage errors, `--help` and `--version` reach the bootstrapper as errors, which maps them to exit codes
         this.program.exitOverride();
 
+        // Root options are only read before a subcommand, so the `--json` of `corelib` is its own and
+        // does not end up in the root's, where it means something else (diagnostics)
+        this.program.enablePositionalOptions();
+
         this.program
             .name('dischord')
             .description('Compilador para el entorno DisChord')
@@ -109,6 +114,14 @@ export class Program {
             .description('Ejecuta código previamente compilado')
             .action(async (file: string) => {
                 await new RunCommand().execute(file);
+            });
+
+        this.program
+            .command('corelib')
+            .description('Muestra las palabras reservadas y la librería base del lenguaje')
+            .option('--json', 'Imprime la información como un documento JSON')
+            .action((options: { json?: boolean }) => {
+                new CorelibCommand().execute(options);
             });
 
         this.program
