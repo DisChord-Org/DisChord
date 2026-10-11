@@ -6,6 +6,7 @@ import { SymbolTable } from '../../chord/model/SymbolsTable';
 import { CodeProvider } from '../../chord/CodeProvider';
 import { KeyWords } from '../../chord/KeywordsManager';
 import { Lexer } from '../../chord/Lexer';
+import { Token } from '../../chord/types';
 import { disChordCoreLibUtils, disChordCoreLibDispatch } from '../../dischord/corelib';
 import { DisChordParser } from '../../dischord/Parser/Parser';
 import { DisChordAnalyzer } from '../../dischord/Analyzer/Analyzer';
@@ -25,7 +26,8 @@ export interface FileCompilation {
 /**
  * Runs the compiler pipeline (lexer, parser, analyzer, generator) over a single `.chord` file.
  * It reads the source and returns the result; where that result is written, and whether the file
- * belongs to a project, is the caller's concern.
+ * belongs to a project, is the caller's concern. Each phase can also be run on its own, for the
+ * tools that only need its output.
  *
  * @class FileCompiler
  */
@@ -44,6 +46,55 @@ export class FileCompiler {
      * @returns {FileCompilation} The generated code and the extra files it needs.
      */
     public compile(file: File, config: CompilerConfig, outputDir: string): FileCompilation {
+        const context = this.createContext(file, config, outputDir);
+
+        const tokens = this.lex(context);
+        const ast = this.parse(context, tokens);
+
+        new DisChordAnalyzer(context).analyze(ast);
+
+        const output = new DisChordGenerator(context, ast).generate();
+        this.logDebug(DebugFlags.Generator, output);
+
+        return { output, extraFiles: context.extraFiles, extraDirectories: context.extraDirectories };
+    }
+
+    /**
+     * Runs the lexer alone over a source file.
+     *
+     * @param {File} file - The .chord file.
+     * @param {CompilerConfig} config - Layout of the project the file belongs to.
+     * @param {string} outputDir - Directory its output would be written to.
+     * @returns {Token<DisChordTokenType>[]} The tokens, each with where it starts and ends.
+     */
+    public tokenize(file: File, config: CompilerConfig, outputDir: string): Token<DisChordTokenType>[] {
+        return this.lex(this.createContext(file, config, outputDir));
+    }
+
+    /**
+     * Runs the lexer and the parser over a source file, without analyzing it.
+     *
+     * @param {File} file - The .chord file.
+     * @param {CompilerConfig} config - Layout of the project the file belongs to.
+     * @param {string} outputDir - Directory its output would be written to.
+     * @returns {DisChordASTNode[]} The syntax tree.
+     */
+    public parseTree(file: File, config: CompilerConfig, outputDir: string): DisChordASTNode[] {
+        const context = this.createContext(file, config, outputDir);
+
+        return this.parse(context, this.lex(context));
+    }
+
+    /**
+     * A compilation context for the file, with the grammar registered and its code loaded.
+     *
+     * @private
+     * @param {File} file - The .chord file.
+     * @param {CompilerConfig} config - Layout of the project the file belongs to.
+     * @param {string} outputDir - Directory its output will be written to.
+     * @returns {CompilationContext<DisChordNodeType>}
+     */
+    private createContext(file: File, config: CompilerConfig, outputDir: string): CompilationContext<DisChordNodeType> {
         const context: CompilationContext<DisChordNodeType> = {
             symbolTable: new SymbolTable(),
             keywordsManager: new KeyWords(),
@@ -61,20 +112,21 @@ export class FileCompiler {
 
         context.codeProvider.currentCode = { file, content: file.read() };
 
-        const lexer = new Lexer<DisChordTokenType>(context);
-        const tokens = lexer.tokenize();
+        return context;
+    }
+
+    private lex(context: CompilationContext<DisChordNodeType>): Token<DisChordTokenType>[] {
+        const tokens = new Lexer<DisChordTokenType>(context).tokenize();
         this.logDebug(DebugFlags.Lexer, tokens);
 
-        const parser = new DisChordParser(tokens, context);
-        const ast: DisChordASTNode[] = parser.parse();
+        return tokens;
+    }
+
+    private parse(context: CompilationContext<DisChordNodeType>, tokens: Token<DisChordTokenType>[]): DisChordASTNode[] {
+        const ast: DisChordASTNode[] = new DisChordParser(tokens, context).parse();
         this.logDebug(DebugFlags.Parser, ast);
 
-        new DisChordAnalyzer(context).analyze(ast);
-
-        const output = new DisChordGenerator(context, ast).generate();
-        this.logDebug(DebugFlags.Generator, output);
-
-        return { output, extraFiles: context.extraFiles, extraDirectories: context.extraDirectories };
+        return ast;
     }
 
     /**

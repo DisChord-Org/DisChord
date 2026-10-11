@@ -1,0 +1,8 @@
+var a tipo numero es 5
+// un comentario
+consola.imprimir("hola mundo")
+funcion doble(x tipo numero) -> numero {
+    devolver x por 2
+}
+
+consola.imprimir(doble(a))

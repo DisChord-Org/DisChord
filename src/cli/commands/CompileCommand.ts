@@ -1,6 +1,6 @@
 import path from 'path';
 
-import { GlobalCLIOptions } from '../Program';
+import { EmitKind, GlobalCLIOptions } from '../Program';
 import { CompilerConfig, FileSystem } from '../../utils/FileSystem';
 import Prettifier from '../../utils/Prettifier';
 import { BaseChordError, Diagnostic } from '../../errors/ChordError';
@@ -9,6 +9,7 @@ import { Stdin } from '../../utils/Stdin';
 import { Directory } from '../../utils/Directory';
 import { ExitCode } from '../ExitCode';
 import { FileCompiler, FileCompilation } from './FileCompiler';
+import { Location } from '../../chord/types';
 import { RunCommand } from './RunCommand';
 
 /**
@@ -24,26 +25,40 @@ export class CompileCommand {
     private emitted = new Set<string>();
 
     /**
+     * Version of the document `--emit` prints. Adding keys does not change it; renaming or
+     * removing one, or changing what it means, does. The shape of the nodes of an `ast` is the
+     * compiler's own and is not covered by it.
+     */
+    public static readonly emitSchema = 1;
+
+    /**
      * Executes the main compilation process and optionally runs the generated code. With `--json`
-     * nothing is printed but a single document holding the diagnostics.
+     * nothing is printed but a single document holding the diagnostics (and, with `--emit`, what
+     * was asked to be emitted).
      *
      * @param {string} rawPath - Raw path string passed from CLI arguments.
      * @param {GlobalCLIOptions} options - Parsed Commander options.
      * @returns {Promise<void>}
      */
     public async execute(rawPath: string, options: GlobalCLIOptions): Promise<void> {
-        if (!options.json) return this.compile(rawPath, options);
+        if (options.emit) options = { ...options, json: true, check: true };
+
+        if (!options.json) {
+            await this.compile(rawPath, options);
+            return;
+        }
 
         const diagnostics: Diagnostic[] = [];
+        let emitted: object | undefined;
 
         try {
-            await this.compile(rawPath, options);
+            emitted = await this.compile(rawPath, options);
         } catch (error) {
             diagnostics.push(this.toDiagnostic(error));
             process.exitCode = ExitCode.of(error);
         }
 
-        console.log(JSON.stringify({ ok: diagnostics.length === 0, diagnostics }));
+        console.log(JSON.stringify({ ok: diagnostics.length === 0, diagnostics, ...emitted }));
     }
 
     /**
@@ -52,15 +67,18 @@ export class CompileCommand {
      * @private
      * @param {string} rawPath - Raw path string passed from CLI arguments.
      * @param {GlobalCLIOptions} options - Parsed Commander options.
-     * @returns {Promise<void>}
+     * @returns {Promise<object | undefined>} What `--emit` asked for, if it did.
      */
-    private async compile(rawPath: string, options: GlobalCLIOptions): Promise<void> {
+    private async compile(rawPath: string, options: GlobalCLIOptions): Promise<object | undefined> {
         const stdinFile = options.stdin ? await this.readStdinFile(options) : undefined;
 
         if (stdinFile) options = { ...options, check: true };
 
         this.config = stdinFile ? FileSystem.layoutOf(stdinFile) : FileSystem.configure(rawPath);
         this.emitted.clear();
+
+        if (options.emit) return this.emit(stdinFile ?? this.singleFile(this.config), options.emit, options);
+
         FileSystem.assertEsmProject(this.config.projectRoot);
 
         const files = stdinFile ? [stdinFile] : FileSystem.getChordFiles(this.config.input);
@@ -76,7 +94,7 @@ export class CompileCommand {
             compiled.extraDirectories.forEach(directory => extraDirectories.add(directory));
         }
 
-        if (options.check) return;
+        if (options.check) return undefined;
 
         await this.writeExtraFiles(extraFiles);
 
@@ -86,6 +104,8 @@ export class CompileCommand {
         extraDirectories.forEach(directory => Directory.create(directory));
 
         if (options.run) await this.executeTarget();
+
+        return undefined;
     }
 
     /**
@@ -125,6 +145,55 @@ export class CompileCommand {
         this.emitted.add(written.absolutePath);
 
         return compiled;
+    }
+
+    /**
+     * The one file `--emit` is about when it does not come through `--stdin`.
+     *
+     * @private
+     * @param {CompilerConfig} config - The configuration for the entry.
+     * @returns {File}
+     * @throws {Error} If the entry is a directory.
+     */
+    private singleFile(config: CompilerConfig): File {
+        if (config.input instanceof Directory) {
+            throw new Error('--emit trabaja sobre un único archivo .chord, no sobre un directorio');
+        }
+
+        return config.input;
+    }
+
+    /**
+     * Runs only the phase `--emit` asks for over a file and describes what it produced. Nothing
+     * is analyzed, generated or written.
+     *
+     * @private
+     * @param {File} file - The file to emit.
+     * @param {EmitKind} kind - The phase to stop at.
+     * @param {GlobalCLIOptions} options - Parsed Commander options.
+     * @returns {object} The keys the document gains.
+     */
+    private emit(file: File, kind: EmitKind, options: GlobalCLIOptions): object {
+        const config = this.config!;
+        const compiler = new FileCompiler(options);
+
+        try {
+            if (kind === 'tokens') {
+                const tokens = compiler.tokenize(file, config, config.distDir).map(token => ({
+                    type: token.type,
+                    value: token.value,
+                    start: token.location as Location,
+                    end: token.end
+                }));
+
+                return { schema: CompileCommand.emitSchema, emit: kind, file: file.absolutePath, tokens };
+            }
+
+            return { schema: CompileCommand.emitSchema, emit: kind, file: file.absolutePath, ast: compiler.parseTree(file, config, config.distDir) };
+        } catch (error) {
+            if (error instanceof BaseChordError) error.file = file;
+            throw error;
+        }
     }
 
     /**

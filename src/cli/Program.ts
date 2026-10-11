@@ -22,11 +22,16 @@ export enum DebugFlags {
  *
  * @interface GlobalCLIOptions
  */
+/** What `--emit` prints in place of compiling. */
+export type EmitKind = 'tokens' | 'ast';
+
 export interface GlobalCLIOptions {
     /** Disables automatic execution after compilation */
     run: boolean;
     /** Runs every phase but writes nothing and never executes the bot */
     check?: boolean;
+    /** Prints the tokens or the syntax tree of one file as JSON instead of compiling it; implies `json` and `check` */
+    emit?: EmitKind;
     /** Prints the result as a JSON document and suppresses progress messages */
     json?: boolean;
     /** Takes the source of one file from standard input instead of the disk; implies `check` */
@@ -82,6 +87,17 @@ export class Program {
             .option('--check', 'Comprueba el proyecto (análisis y generación) sin escribir archivos ni ejecutar')
             .option('--stdin', 'Lee el código de un archivo desde la entrada estándar, en lugar del disco (solo comprueba, no escribe)')
             .option('--stdin-filepath <ruta>', 'Archivo .chord al que corresponde el código de --stdin (puede no existir aún, pero su directorio sí)')
+            .option(
+                '--emit <fase>',
+                'Imprime los tokens o el árbol sintáctico de un archivo como JSON, sin compilar (tokens | ast)',
+                (value: string): EmitKind => {
+                    if (value !== 'tokens' && value !== 'ast') {
+                        throw new Error(`Fase no válida para --emit: '${value}'. Opciones: tokens, ast`);
+                    }
+
+                    return value;
+                }
+            )
             .option('--json', 'Imprime el resultado como JSON (diagnósticos) y omite los mensajes de progreso')
             .option('-o, --out-dir <directorio>', 'Directorio de salida para los archivos compilados')
             .option(
@@ -119,6 +135,17 @@ export class Program {
         this.program
             .command('corelib')
             .description('Muestra las palabras reservadas y la librería base del lenguaje')
+            .option(
+                '--emit <fase>',
+                'Imprime los tokens o el árbol sintáctico de un archivo como JSON, sin compilar (tokens | ast)',
+                (value: string): EmitKind => {
+                    if (value !== 'tokens' && value !== 'ast') {
+                        throw new Error(`Fase no válida para --emit: '${value}'. Opciones: tokens, ast`);
+                    }
+
+                    return value;
+                }
+            )
             .option('--json', 'Imprime la información como un documento JSON')
             .action((options: { json?: boolean }) => {
                 new CorelibCommand().execute(options);
