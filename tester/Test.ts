@@ -123,7 +123,7 @@ export abstract class Test {
         const { ast, output } = await this.compile();
 
         const prettifiedOutput = await Prettifier.prettify(output);
-        const actualAstJson = JSON.stringify(ast, null, 2);
+        const actualAstJson = JSON.stringify(ast);
 
         await this.assertOrUpdateSnapshot(actualAstJson, 'ast');
         await this.assertOrUpdateSnapshot(prettifiedOutput, 'code');
@@ -220,7 +220,7 @@ export abstract class Test {
         if (this.forceUpdate || !fs.existsSync(targetPath)) {
             const formatted = snapshotType === 'code'
                 ? await Prettifier.prettify(actualContent.trim() + '\n')
-                : JSON.stringify(JSON.parse(actualContent), null, 2);
+                : JSON.stringify(JSON.parse(actualContent));
 
             if (this.writeSnapshotIfChanged(targetPath, formatted, snapshotType)) {
                 console.log(`[SNAPSHOT UPDATED] ${targetPath}`);
