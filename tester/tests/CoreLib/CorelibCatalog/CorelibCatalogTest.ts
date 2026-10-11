@@ -49,6 +49,7 @@ export class CorelibCatalogTest extends Test {
         this.assertSerializable(document);
         this.assertDisChordVocabulary(document);
         await this.assertSubcommand(document);
+        await this.assertTextListing();
     }
 
     private assertLayout (document: CorelibDocument): void {
@@ -272,6 +273,37 @@ export class CorelibCatalogTest extends Test {
         // What a command finds in scope: its parameter and every shortcut the generator declares
         const scope = document.scopes.find(entry => entry.construct === 'comando');
         if (scope?.identifiers.join() !== ['contexto', ...Object.keys(CommandScope)].join()) throw new Error('The scope of comando differs from CommandScope');
+    }
+
+    /**
+     * Without `--json` the command prints a readable listing, with the signatures when they are written.
+     */
+    private async assertTextListing (): Promise<void> {
+        const printed: string[] = [];
+        const original = console.log;
+
+        console.log = (...args: unknown[]) => { printed.push(args.join(' ')); };
+
+        try {
+            await new Program().parse(['node', 'dischord', 'corelib']);
+        } finally {
+            console.log = original;
+        }
+
+        const listing = printed.join('\n');
+
+        for (const expected of [
+            'Palabras reservadas: ',
+            'Texto (sobre texto)',
+            '.partir(separador: texto, limite?: numero) → texto[]',
+            '.imprimir(...valores: cualquiera) → nada',
+            'Funciones: esperar (asíncrona)',
+            'Decoradores: @asincrono'
+        ]) {
+            if (!listing.includes(expected)) throw new Error(`The listing lacks '${expected}'`);
+        }
+
+        if (listing.trimStart().startsWith('{')) throw new Error('The text listing printed JSON');
     }
 
     private assertSerializable (document: CorelibDocument): void {
