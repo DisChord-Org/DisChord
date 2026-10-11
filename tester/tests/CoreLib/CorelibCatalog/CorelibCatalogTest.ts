@@ -1,5 +1,8 @@
 import { Test } from "../../../Test";
 import { CorelibCommand, CorelibDocument } from "../../../../src/cli/commands/CorelibCommand";
+import { eventsMap, CommandScope } from "../../../../src/dischord/Generator/constants/mappings";
+import { CommandSchema, ButtonSchema, StartBotSchema } from "../../../../src/dischord/Generator/constants/schemas";
+import { UnreservedComponentDeclarations } from "../../../../src/dischord/Parser/Grammar/UnreservedComponentDeclarations";
 import { CoreLibCatalog } from "../../../../src/chord/corelib/CoreLibCatalog";
 import { CoreLibMember } from "../../../../src/chord/corelib/corelib.types";
 import { KeyWords } from "../../../../src/chord/KeywordsManager";
@@ -44,13 +47,14 @@ export class CorelibCatalogTest extends Test {
         this.assertKeywords(document);
         this.assertVocabulary(document);
         this.assertSerializable(document);
+        this.assertDisChordVocabulary(document);
         await this.assertSubcommand(document);
     }
 
     private assertLayout (document: CorelibDocument): void {
         if (document.schema !== CoreLibCatalog.schema) throw new Error(`schema is ${document.schema}`);
 
-        for (const key of ['schema', 'compilerVersion', 'keywords', 'classes', 'functions', 'types', 'literals', 'decorators']) {
+        for (const key of ['schema', 'compilerVersion', 'keywords', 'classes', 'functions', 'types', 'literals', 'decorators', 'declarations', 'events', 'blocks', 'scopes']) {
             if (!(key in document)) throw new Error(`The document lacks '${key}'`);
         }
 
@@ -71,6 +75,13 @@ export class CorelibCatalogTest extends Test {
         document.functions.forEach(entry => expect(`function ${entry.name}`, entry, ['name', 'kind', 'async']));
         document.types.forEach(entry => expect(`type ${entry.name}`, entry, ['name', 'kind']));
         document.literals.forEach(entry => expect(`literal ${entry.name}`, entry, ['name', 'value']));
+        document.declarations.forEach(entry => expect(`declaration ${entry.keyword}`, entry, ['keyword', 'block']));
+        document.events.forEach(entry => expect(`event ${entry.name}`, entry, ['name', 'params']));
+        document.scopes.forEach(entry => expect(`scope ${entry.construct}`, entry, ['construct', 'identifiers']));
+        document.blocks.forEach(block => {
+            expect(`block ${block.name}`, block, ['name', 'fields', 'nested']);
+            block.nested.forEach(nested => expect(`nested ${nested.key} of ${block.name}`, nested, ['key', 'block', 'shape']));
+        });
     }
 
     /**
@@ -220,6 +231,47 @@ export class CorelibCatalogTest extends Test {
 
         if (printed.length !== 1) throw new Error(`The subcommand printed ${printed.length} lines`);
         if (JSON.stringify(JSON.parse(printed[0])) !== JSON.stringify(document)) throw new Error('The subcommand prints a different document');
+    }
+
+    /**
+     * DisChord's own vocabulary is what the compiler's tables say, and every reference inside it points somewhere.
+     */
+    private assertDisChordVocabulary (document: CorelibDocument): void {
+        if (document.events.map(entry => entry.name).join() !== Object.keys(eventsMap).join()) throw new Error('The events differ from eventsMap');
+        if (document.declarations.map(entry => entry.keyword).join() !== UnreservedComponentDeclarations.map(entry => entry.keyword).join()) throw new Error('The declarations differ from the parser\'s');
+
+        const encendido = document.events.find(entry => entry.name === 'encendido');
+        if (encendido?.params.join() !== 'usuario,cliente') throw new Error('The ready event does not list its identifiers');
+
+        const block = (name: string) => document.blocks.find(candidate => candidate.name === name);
+        const field = (blockName: string, key: string) => block(blockName)?.fields.find(candidate => candidate.keys.includes(key));
+
+        // Fields come from the schemas, with their synonyms and requirements
+        if (block('comando')?.fields.map(entry => entry.keys[0]).join() !== CommandSchema.fields.map(entry => [entry.key].flat()[0]).join()) throw new Error('comando differs from CommandSchema');
+        if (block('boton')?.fields.map(entry => entry.keys[0]).join() !== ButtonSchema.fields.map(entry => [entry.key].flat()[0]).join()) throw new Error('boton differs from ButtonSchema');
+        if (field('encender bot', 'prefijos')?.keys.join() !== 'prefijo,prefijos') throw new Error('The prefix synonyms are lost');
+        if (field('encender bot', 'token')?.required !== true) throw new Error('token should be required');
+        if (StartBotSchema.fields.length !== block('encender bot')?.fields.length) throw new Error('encender bot lost a field');
+        if (field('boton', 'emoji')?.required !== false) throw new Error('emoji should be optional');
+        if (!field('boton', 'estilo')?.values?.length) throw new Error('estilo should list its values');
+
+        // Nested blocks exist, and are the ones the compiler validates with
+        const nested = (blockName: string, key: string) => block(blockName)?.nested.find(candidate => candidate.key === key);
+        if (nested('comando', 'opciones')?.block !== 'opcion' || nested('comando', 'opciones')?.shape !== 'entries') throw new Error('comando.opciones is not described');
+        if (nested('embed', 'campos')?.block !== 'campo' || nested('embed', 'campos')?.shape !== 'items') throw new Error('embed.campos is not described');
+        if (nested('embed', 'pie')?.block !== 'pie' || nested('embed', 'pie')?.shape !== 'single') throw new Error('embed.pie is not described');
+
+        const names = new Set(document.blocks.map(candidate => candidate.name));
+        document.blocks.forEach(candidate => candidate.nested.forEach(entry => {
+            if (!names.has(entry.block)) throw new Error(`${candidate.name}.${entry.key} points to the missing block '${entry.block}'`);
+        }));
+        document.declarations.forEach(entry => {
+            if (entry.block !== null && !names.has(entry.block)) throw new Error(`The declaration '${entry.keyword}' points to the missing block '${entry.block}'`);
+        });
+
+        // What a command finds in scope: its parameter and every shortcut the generator declares
+        const scope = document.scopes.find(entry => entry.construct === 'comando');
+        if (scope?.identifiers.join() !== ['contexto', ...Object.keys(CommandScope)].join()) throw new Error('The scope of comando differs from CommandScope');
     }
 
     private assertSerializable (document: CorelibDocument): void {

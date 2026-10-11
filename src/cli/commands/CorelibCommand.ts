@@ -3,13 +3,14 @@ import { KeyWords } from '../../chord/KeywordsManager';
 import { CoreLibCatalog, CoreLibClassDescription, CoreLibDescription, CoreLibFunctionDescription, CoreLibMemberDescription } from '../../chord/corelib/CoreLibCatalog';
 import { disChordCoreLibUtils } from '../../dischord/corelib/DisChordCoreLibUtils';
 import { DisChordParser } from '../../dischord/Parser/Parser';
+import { DisChordVocabulary, DisChordVocabularyDescription } from '../../dischord/corelib/DisChordVocabulary';
 
 /**
  * The document `corelib --json` prints: the language's vocabulary, for editor tooling.
  *
  * @interface CorelibDocument
  */
-export interface CorelibDocument extends CoreLibDescription {
+export interface CorelibDocument extends CoreLibDescription, DisChordVocabularyDescription {
     /** Version of this layout: an editor decides from it whether it understands the document. */
     readonly schema: number;
     /** Version of the compiler that produced it; informative, it changes with every release. */
@@ -47,6 +48,10 @@ export class CorelibCommand {
         console.log(`Tipos: ${document.types.map(entry => entry.name).join(', ')}`);
         console.log(`Literales: ${document.literals.map(entry => entry.name).join(', ')}`);
         console.log(`Decoradores: ${document.decorators.join(', ')}`);
+        console.log(`\nDeclaraciones: ${document.declarations.map(entry => entry.keyword).join(', ')}`);
+        console.log(`Eventos: ${document.events.map(entry => entry.name).join(', ')}`);
+        document.blocks.forEach(block => console.log(`Bloque ${block.name}: ${block.fields.map(field => field.keys.join('/') + (field.required ? '*' : '')).join(', ')}`));
+        document.scopes.forEach(scope => console.log(`En ${scope.construct}: ${scope.identifiers.join(', ')}`));
     }
 
     /**
@@ -62,7 +67,8 @@ export class CorelibCommand {
             schema: CoreLibCatalog.schema,
             compilerVersion: pkg.version,
             keywords: keywords.getKeywordsList(),
-            ...new CoreLibCatalog(disChordCoreLibUtils).describe()
+            ...new CoreLibCatalog(disChordCoreLibUtils).describe(),
+            ...new DisChordVocabulary().describe()
         };
     }
 

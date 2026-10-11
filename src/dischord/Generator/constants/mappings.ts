@@ -20,6 +20,26 @@ function dictionary<V> (entries: Record<string, V>): Record<string, V> {
 }
 
 /**
+ * Name of the parameter of a command's handler: the interaction context Seyfert hands it.
+ * @type {string}
+ */
+export const CommandContextParameter = 'contexto';
+
+/**
+ * What a command's body finds in scope besides its options and the handler's own parameter: each
+ * name with the JavaScript expression it is initialized with, in the order they are declared
+ * (later ones may use earlier ones). The generator emits these declarations and the vocabulary
+ * tools list them from this one table.
+ * @type {Readonly<Record<string, string>>}
+ */
+export const CommandScope: Readonly<Record<string, string>> = {
+    cliente: 'contexto.client',
+    usuario: 'contexto.author',
+    canal: 'contexto.interaction ? contexto.interaction.channel : cliente.channels.fetch(contexto.channelId)',
+    ctx: '{ cliente, contexto }'
+};
+
+/**
  * Map translating DisChord Spanish event identifiers to their corresponding internal Discord event structures.
  *
  * @type {Readonly<Record<string, EventType>>}

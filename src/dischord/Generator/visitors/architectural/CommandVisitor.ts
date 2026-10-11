@@ -4,6 +4,7 @@ import { BDOResolver } from '../../../../chord/Generator/BDOResolver';
 import { CompilerMetadataKind, TokenTypeUnion } from '../../../../chord/types';
 import CommandOptionVisitor from '../components/CommandOptionVisitor';
 import { CommandSchema } from '../../constants/schemas';
+import { CommandContextParameter, CommandScope } from '../../constants/mappings';
 import { slugifyCommandName } from '../../constants/commandNames';
 
 /**
@@ -37,6 +38,10 @@ export default class CommandVisitor extends SubGenerator<DisChordNodeType, DisCh
         const OptionsConstDeclaration: string = OptionsData.length > 0? 'options = options;' : '';
         const OptionsConstExtraction: string = CommandOptionVisitorData.variables;
 
+        const scopeDeclarations = Object.entries(CommandScope)
+            .map(([name, expression]) => `const ${name} = ${expression};`)
+            .join('\n');
+
         const body = node.body.body
             .map((n: DisChordASTNode): string => "    " + this.parent.visit(n) + ";")
             .join('\n');
@@ -51,11 +56,8 @@ export default class CommandVisitor extends SubGenerator<DisChordNodeType, DisCh
 
                 ${OptionsConstDeclaration}
 
-                async run(contexto) {
-                    const cliente = contexto.client;
-                    const usuario = contexto.author;
-                    const canal = contexto.interaction ? contexto.interaction.channel : cliente.channels.fetch(contexto.channelId);
-                    const ctx = { cliente, contexto };
+                async run(${CommandContextParameter}) {
+                    ${scopeDeclarations}
 
                     ${OptionsConstExtraction}
 
