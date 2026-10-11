@@ -141,7 +141,7 @@ export class CorelibCatalogTest extends Test {
         const partir = JSON.stringify(member('Texto', 'partir')?.params?.map(param => [param.name, param.type, param.optional, param.rest]));
         if (partir !== '[["separador","texto",false,false],["limite","numero",true,false]]') throw new Error(`Texto.partir has the parameters ${partir}`);
         if (member('Texto', 'limpiar')?.params?.length !== 0) throw new Error('Texto.limpiar should take no parameters');
-        if (member('consola', 'imprimir')?.params !== null) throw new Error('consola.imprimir should not have its parameters written yet');
+        if (member('consola', 'imprimir')?.params?.[0]?.rest !== true) throw new Error('consola.imprimir should take its values as a rest parameter');
 
         const functions = document.functions.filter(entry => entry.kind === 'function').map(entry => entry.name).join();
         if (functions !== Object.keys(corelib.functions).join()) throw new Error(`Functions differ: ${functions}`);
