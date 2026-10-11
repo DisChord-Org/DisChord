@@ -1,4 +1,5 @@
 import { GlobalCLIOptions, DebugFlags } from '../Program';
+import { CompilerConfig } from '../../utils/FileSystem';
 import { CompilationContext } from '../../chord/model/CompilationContext';
 import { File } from '../../utils/File';
 import { SymbolTable } from '../../chord/model/SymbolsTable';
@@ -36,16 +37,17 @@ export class FileCompiler {
      * Compiles a single source file.
      *
      * @param {File} file - The .chord file.
-     * @param {string} projectRoot - Root of the project the file belongs to.
+     * @param {CompilerConfig} config - Layout of the project the file belongs to.
      * @param {string} outputDir - Directory its output will be written to.
      * @returns {FileCompilation} The generated code and the extra files it needs.
      */
-    public compile(file: File, projectRoot: string, outputDir: string): FileCompilation {
+    public compile(file: File, config: CompilerConfig, outputDir: string): FileCompilation {
         const context: CompilationContext<DisChordNodeType> = {
             symbolTable: new SymbolTable(),
             keywordsManager: new KeyWords(),
             codeProvider: new CodeProvider(),
-            projectRoot,
+            projectRoot: config.projectRoot,
+            distDir: config.distDir,
             outputDir,
             extraFiles: new Map(),
             coreLib: disChordCoreLibUtils,
@@ -54,7 +56,7 @@ export class FileCompiler {
 
         DisChordParser.registerGrammar(context);
 
-        context.codeProvider.currentCode = { name: file.absolutePath, content: file.read() };
+        context.codeProvider.currentCode = { file, content: file.read() };
 
         const lexer = new Lexer<DisChordTokenType>(context);
         const tokens = lexer.tokenize();

@@ -62,6 +62,6 @@ export class RequiresUserExtensionsRule extends AnalysisRule<DisChordNodeType, D
 
         nodes.unshift(importNode);
 
-        this.context.extraFiles.set(path.join(this.context.projectRoot, 'dist', userExtensionsModulePath), userExtensionsModuleContent);
+        this.context.extraFiles.set(path.join(this.context.distDir, userExtensionsModulePath), userExtensionsModuleContent);
     }
 }

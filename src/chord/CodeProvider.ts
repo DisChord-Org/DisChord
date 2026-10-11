@@ -1,3 +1,5 @@
+import { File } from '../utils/File';
+
 /**
  * Represents a snapshot of a processed source file.
  */
@@ -14,7 +16,7 @@ interface CodeEntry {
  */
 export class CodeProvider {
     private _currentCode: string = "";
-    private _currentFileName: string = "";
+    private _currentFile?: File;
 
     /** Internal indexed storage for file history. */
     private history: Record<string, CodeEntry> = {};
@@ -23,14 +25,14 @@ export class CodeProvider {
 
     /**
      * Updates the current active code and archives it in the history record.
-     * @param entry Object containing the filename and the source content.
+     * @param entry Object containing the file and the source content.
      */
-    public set currentCode(entry: { name: string, content: string }) {
+    public set currentCode(entry: { file: File, content: string }) {
         this._currentCode = entry.content;
-        this._currentFileName = entry.name;
+        this._currentFile = entry.file;
 
-        this.history[entry.name] = {
-            fileName: entry.name,
+        this.history[entry.file.absolutePath] = {
+            fileName: entry.file.absolutePath,
             content: entry.content,
             timestamp: Date.now()
         };
@@ -41,9 +43,11 @@ export class CodeProvider {
         return this._currentCode;
     }
 
-    /** Returns the name of the file currently being processed. */
-    public get currentFileName(): string {
-        return this._currentFileName;
+    /** Returns the file currently being processed. */
+    public get currentFile(): File {
+        if (!this._currentFile) throw new Error('No hay ningún archivo en proceso');
+
+        return this._currentFile;
     }
 
     /**

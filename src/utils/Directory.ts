@@ -40,14 +40,16 @@ export class Directory {
     }
 
     /**
-     * Same as `of`, but answers `undefined` instead of throwing when nothing exists at the path.
+     * Same as `of`, but answers `undefined` instead of throwing when the path is not an
+     * existing directory (it is missing, or it is a file).
      *
      * @param {string} rawPath - Absolute path, or relative to the working directory.
      * @returns {Directory | undefined}
-     * @throws {Error} If something that is not a directory exists at the path.
      */
     public static tryOf(rawPath: string): Directory | undefined {
-        return fs.existsSync(path.resolve(rawPath)) ? Directory.of(rawPath) : undefined;
+        const absolutePath = path.resolve(rawPath);
+
+        return fs.existsSync(absolutePath) && fs.statSync(absolutePath).isDirectory() ? new Directory(absolutePath) : undefined;
     }
 
     /**

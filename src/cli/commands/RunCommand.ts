@@ -1,6 +1,7 @@
-import path from 'path';
 import { pathToFileURL } from 'url';
 import { DisChordError, ErrorLevel } from '../../errors/ChordError';
+import { File } from '../../utils/File';
+import { Directory } from '../../utils/Directory';
 
 /**
  * Options accepted by the RunCommand handler.
@@ -9,7 +10,7 @@ import { DisChordError, ErrorLevel } from '../../errors/ChordError';
  */
 export interface RunCommandOptions {
     /** Root directory of the project to set as working directory */
-    projectRoot?: string;
+    projectRoot?: Directory;
 }
 
 /**
@@ -27,14 +28,14 @@ export class RunCommand {
      * @throws {DisChordError} Wrapped execution error if module import or execution fails.
      */
     public async execute(targetPath: string, options: RunCommandOptions = {}): Promise<unknown> {
-        const absoluteTarget = path.resolve(targetPath);
-        const projectRoot = options.projectRoot || path.dirname(absoluteTarget);
-
-        console.log(`Ejecutando: ${path.relative(projectRoot, absoluteTarget)}\n`);
-
         try {
-            process.chdir(projectRoot);
-            const url = `${pathToFileURL(absoluteTarget).href}?u=${Date.now()}`;
+            const target = File.of(targetPath);
+            const projectRoot = options.projectRoot ?? Directory.of(target.directory);
+
+            console.log(`Ejecutando: ${target.relativeTo(projectRoot.absolutePath)}\n`);
+
+            process.chdir(projectRoot.absolutePath);
+            const url = `${pathToFileURL(target.absolutePath).href}?u=${Date.now()}`;
 
             return await import(url);
         } catch (error) {

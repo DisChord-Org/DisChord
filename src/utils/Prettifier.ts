@@ -1,4 +1,5 @@
 import fs from 'fs';
+import { File } from './File';
 import prettier from 'prettier';
 
 /**
@@ -30,11 +31,14 @@ export default class Prettifier {
     
     /**
      * Formats the code and writes it to the specified file path.
-     * @param path - The destination file path.
+     * @param target - The destination file path; its directory must already exist.
      * @param code - The source code to process and save.
+     * @returns The file that was written.
      */
-    static async savePrettified (path: string, code: string): Promise<void> {
+    static async savePrettified (target: string, code: string): Promise<File> {
         const prettified = await Prettifier.prettify(code);
-        fs.writeFileSync(path, prettified, 'utf-8');
+        fs.writeFileSync(target, prettified, 'utf-8');
+
+        return File.of(target);
     }
 }

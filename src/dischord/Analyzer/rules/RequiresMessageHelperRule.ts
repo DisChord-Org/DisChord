@@ -36,6 +36,6 @@ export class RequiresMessageHelperRule extends AnalysisRule<DisChordNodeType, Di
 
         nodes.unshift(importNode);
 
-        this.context.extraFiles.set(path.join(this.context.projectRoot, 'dist', createMessageModulePath), createMessageModuleContent);
+        this.context.extraFiles.set(path.join(this.context.distDir, createMessageModulePath), createMessageModuleContent);
     }
 }

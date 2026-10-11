@@ -12,6 +12,7 @@ import { DisChordParser } from "../../../../src/dischord/Parser/Parser";
 import { DisChordAnalyzer } from "../../../../src/dischord/Analyzer/Analyzer";
 import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType } from "../../../../src/dischord/types";
 import { FileSystem } from "../../../../src/utils/FileSystem";
+import { File } from "../../../../src/utils/File";
 import { CompilationContext } from "../../../../src/chord/model/CompilationContext";
 
 /**
@@ -77,18 +78,22 @@ export class MemberAccessInvariantTest extends Test {
      * Lexes, parses and analyzes `code` the way the compiler does, without generating.
      */
     private analyze (code: string): { ast: DisChordASTNode[]; symbolTable: SymbolTable } {
+        const config = FileSystem.configure(this.fixturePath);
         const context: CompilationContext<DisChordNodeType> = {
             symbolTable: new SymbolTable(),
             keywordsManager: new KeyWords(),
             codeProvider: new CodeProvider(),
-            projectRoot: FileSystem.configure(this.fixturePath).projectRoot.absolutePath,
+            projectRoot: config.projectRoot,
+            distDir: config.distDir,
+            outputDir: config.distDir,
             extraFiles: new Map(),
             coreLib: disChordCoreLibUtils,
             coreLibDispatch: disChordCoreLibDispatch
         };
 
         DisChordParser.registerGrammar(context);
-        context.codeProvider.currentCode = { name: path.join(this.fixturePath, 'input.chord'), content: code };
+        // The programs are generated, not read from disk: this file only gives them a directory to resolve imports from.
+        context.codeProvider.currentCode = { file: File.of(path.join(this.fixturePath, 'MemberAccessInvariantTest.ts')), content: code };
 
         const tokens = new Lexer<DisChordTokenType>(context).tokenize();
         const ast: DisChordASTNode[] = new DisChordParser(tokens, context).parse();

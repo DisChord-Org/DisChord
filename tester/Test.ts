@@ -11,6 +11,7 @@ import { CodeProvider } from "../src/chord/CodeProvider";
 import { disChordCoreLibUtils, disChordCoreLibDispatch } from "../src/dischord/corelib";
 import { DisChordASTNode, DisChordNodeType, DisChordTokenType } from "../src/dischord/types";
 import { FileSystem } from "../src/utils/FileSystem";
+import { File } from "../src/utils/File";
 import { CompilationContext } from "../src/chord/model/CompilationContext";
 import Prettifier from "../src/utils/Prettifier";
 
@@ -138,23 +139,26 @@ export abstract class Test {
      * @protected
      */
     protected async compile(): Promise<{ ast: DisChordASTNode[]; output: string }> {
+        const config = FileSystem.configure(this.fixturePath);
         const context: CompilationContext<DisChordNodeType> = {
             symbolTable: new SymbolTable(),
             keywordsManager: new KeyWords(),
             codeProvider: new CodeProvider(),
-            projectRoot: FileSystem.configure(this.fixturePath).projectRoot.absolutePath,
+            projectRoot: config.projectRoot,
+            distDir: config.distDir,
+            outputDir: config.distDir,
             extraFiles: new Map(),
             coreLib: disChordCoreLibUtils,
             coreLibDispatch: disChordCoreLibDispatch
         };
 
         const fileName = path.basename(this.fixturePath);
-        console.log(`Compilando: ${path.relative(context.projectRoot, fileName)}`);
+        console.log(`Compilando: ${path.relative(context.projectRoot.absolutePath, fileName)}`);
 
         DisChordParser.registerGrammar(context);
 
         const code = this.code;
-        context.codeProvider.currentCode = { name: path.join(this.fixturePath, 'input.chord'), content: code };
+        context.codeProvider.currentCode = { file: File.of(path.join(this.fixturePath, 'input.chord')), content: code };
 
         const lexer = new Lexer<DisChordTokenType>(context);
         const tokens = lexer.tokenize();

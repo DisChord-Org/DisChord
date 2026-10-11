@@ -78,7 +78,7 @@ export class RequiresRuntimeHelpersRule<T extends string, N extends BaseNode<T>>
 
         nodes.unshift(importNode);
 
-        this.context.extraFiles.set(path.join(this.context.projectRoot, 'dist', runtimeHelpersModulePath), runtimeHelpersModuleContent);
+        this.context.extraFiles.set(path.join(this.context.distDir, runtimeHelpersModulePath), runtimeHelpersModuleContent);
     }
 
     /**

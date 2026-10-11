@@ -6,7 +6,7 @@ import Prettifier from '../../utils/Prettifier';
 import { BaseChordError, Diagnostic } from '../../errors/ChordError';
 import { File } from '../../utils/File';
 import { Directory } from '../../utils/Directory';
-import { FileCompiler } from './FileCompiler';
+import { FileCompiler, FileCompilation } from './FileCompiler';
 import { RunCommand } from './RunCommand';
 
 /**
@@ -64,8 +64,8 @@ export class CompileCommand {
         const extraFiles = new Map<string, string>();
 
         for (const file of files) {
-            const fileExtraFiles = await this.compileFile(file, options);
-            fileExtraFiles.forEach((content, absolutePath) => extraFiles.set(absolutePath, content));
+            const compiled = await this.compileFile(file, options);
+            compiled.extraFiles.forEach((content, absolutePath) => extraFiles.set(absolutePath, content));
         }
 
         if (options.check) return;
@@ -84,12 +84,11 @@ export class CompileCommand {
      * @private
      * @param {File} file - The .chord file.
      * @param {GlobalCLIOptions} options - CLI flags for debugging and output control.
-     * @returns {Promise<Map<string, string>>} Extra files (shared runtime modules, project-level
-     * config files, ...) any phase determined this file's compilation needs written, keyed by
-     * absolute path — see `CompilationContext.extraFiles`.
+     * @returns {Promise<FileCompilation>} What the compilation produced, including the extra files
+     * (shared runtime modules, project-level config files, ...) any phase determined it needs — see `CompilationContext.extraFiles`.
      */
-    private async compileFile(file: File, options: GlobalCLIOptions): Promise<Map<string, string>> {
-        if (!this.config) return new Map();
+    private async compileFile(file: File, options: GlobalCLIOptions): Promise<FileCompilation> {
+        if (!this.config) return { output: '', extraFiles: new Map() };
 
         const relativeFile = file.relativeTo(this.config.projectRoot.absolutePath);
         this.log(options, `Compilando: ${relativeFile}`);
@@ -102,19 +101,18 @@ export class CompileCommand {
         let compiled;
 
         try {
-            compiled = new FileCompiler(options).compile(file, this.config.projectRoot.absolutePath, targetDir);
+            compiled = new FileCompiler(options).compile(file, this.config, targetDir);
         } catch (error) {
             if (error instanceof BaseChordError) error.file = file;
             throw error;
         }
 
-        if (options.check) return compiled.extraFiles;
+        if (options.check) return compiled;
 
-        const outputPath = Directory.create(targetDir).resolve(`${file.baseName}.js`);
-        await Prettifier.savePrettified(outputPath, compiled.output);
-        this.emitted.add(outputPath);
+        const written = await Prettifier.savePrettified(Directory.create(targetDir).resolve(`${file.baseName}.js`), compiled.output);
+        this.emitted.add(written.absolutePath);
 
-        return compiled.extraFiles;
+        return compiled;
     }
 
     /**
@@ -130,8 +128,8 @@ export class CompileCommand {
     private async writeExtraFiles(files: Map<string, string>): Promise<void> {
         for (const [absolutePath, content] of files) {
             Directory.create(path.dirname(absolutePath));
-            await Prettifier.savePrettified(absolutePath, content);
-            this.emitted.add(absolutePath);
+            const written = await Prettifier.savePrettified(absolutePath, content);
+            this.emitted.add(written.absolutePath);
         }
     }
 
@@ -168,7 +166,7 @@ export class CompileCommand {
         const runTarget = path.join(distDir, input instanceof Directory ? 'index.js' : `${input.baseName}.js`);
 
         const runner = new RunCommand();
-        await runner.execute(runTarget, { projectRoot: projectRoot.absolutePath });
+        await runner.execute(runTarget, { projectRoot });
     }
 
     /**

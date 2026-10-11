@@ -44,6 +44,6 @@ export class RequiresConsoleRuntimeRule<T extends string, N extends BaseNode<T>>
 
         nodes.unshift(importNode);
 
-        this.context.extraFiles.set(path.join(this.context.projectRoot, 'dist', consoleRuntimeModulePath), consoleRuntimeModuleContent);
+        this.context.extraFiles.set(path.join(this.context.distDir, consoleRuntimeModulePath), consoleRuntimeModuleContent);
     }
 }

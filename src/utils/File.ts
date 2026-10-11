@@ -41,6 +41,19 @@ export class File {
         return new File(absolutePath);
     }
 
+    /**
+     * Same as `of`, but answers `undefined` instead of throwing when the path is not an
+     * existing regular file (it is missing, or it is a directory).
+     *
+     * @param {string} rawPath - Absolute path, or relative to the working directory.
+     * @returns {File | undefined}
+     */
+    public static tryOf(rawPath: string): File | undefined {
+        const absolutePath = path.resolve(rawPath);
+
+        return fs.existsSync(absolutePath) && fs.statSync(absolutePath).isFile() ? new File(absolutePath) : undefined;
+    }
+
     /** File name with its extension, e.g. `index.chord`. */
     public get name(): string {
         return path.basename(this.absolutePath);

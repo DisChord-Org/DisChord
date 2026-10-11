@@ -16,10 +16,9 @@ import { CompilationContext } from "../model/CompilationContext";
  * @returns {string} A relative import specifier (always starting with `./` or `../`).
  */
 export function buildSharedModuleImportSpecifier<T extends string> (context: CompilationContext<T>, modulePathRelativeToDist: string): string {
-    const outputDir = context.outputDir ?? path.join(context.projectRoot, 'dist');
-    const absoluteModulePath = path.join(context.projectRoot, 'dist', modulePathRelativeToDist);
+    const absoluteModulePath = path.join(context.distDir, modulePathRelativeToDist);
 
-    let specifier = path.relative(outputDir, absoluteModulePath).split(path.sep).join('/');
+    let specifier = path.relative(context.outputDir, absoluteModulePath).split(path.sep).join('/');
     if (!specifier.startsWith('.')) specifier = `./${specifier}`;
 
     return specifier;

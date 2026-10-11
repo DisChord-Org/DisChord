@@ -1,10 +1,10 @@
-import fs from "node:fs";
 import path from "node:path";
 import { AnalysisRule } from "../AnalysisRule";
 import { walkAST } from "../../walkAST";
 import { isImportNode } from "../../ast.guards";
 import { ASTNode, BaseNode } from "../../types";
 import { ChordError, ErrorLevel } from "../../../errors/ChordError";
+import { File } from "../../../utils/File";
 
 /**
  * Validates that every `importar` points at a module that actually exists, at analysis time —
@@ -28,11 +28,11 @@ export class ValidateImportTargetsRule<T extends string, N extends BaseNode<T>> 
 
             const candidates = this.resolveCandidates(current.path);
 
-            if (candidates.some(candidate => fs.existsSync(candidate))) return;
+            if (candidates.some(candidate => File.tryOf(candidate))) return;
 
             throw new ChordError({
                 phase: ErrorLevel.Analysis,
-                message: `No se encontró el módulo '${current.path}' (se buscó en: ${candidates.map(candidate => path.relative(this.context.projectRoot, candidate)).join(', ')}).`,
+                message: `No se encontró el módulo '${current.path}' (se buscó en: ${candidates.map(candidate => path.relative(this.context.projectRoot.absolutePath, candidate)).join(', ')}).`,
                 location: current.location
             });
         }));
@@ -46,10 +46,10 @@ export class ValidateImportTargetsRule<T extends string, N extends BaseNode<T>> 
      */
     private resolveCandidates (specifier: string): string[] {
         if (specifier.startsWith('lib:')) {
-            return [ path.join(this.context.projectRoot, 'lib', specifier.slice('lib:'.length), 'src', 'index.js') ];
+            return [ this.context.projectRoot.resolve('lib', specifier.slice('lib:'.length), 'src', 'index.js') ];
         }
 
-        const sourceDir = path.dirname(this.context.codeProvider.currentFileName);
+        const sourceDir = this.context.codeProvider.currentFile.directory;
         const base = path.resolve(sourceDir, specifier.replace(/\.chord$/, ''));
 
         return [ `${base}.chord`, base ];

@@ -42,7 +42,7 @@ export default class ClietInitVisitor extends SubGenerator<DisChordNodeType, Dis
         }
 
         const seyfertConfig = this.generateSeyfertConfig(node);
-        this.parent.context.extraFiles.set(join(this.parent.context.projectRoot, 'seyfert.config.mjs'), seyfertConfig);
+        this.parent.context.extraFiles.set(this.parent.context.projectRoot.resolve('seyfert.config.mjs'), seyfertConfig);
 
         this.ensureDirectories();
 
@@ -159,14 +159,13 @@ export default class ClietInitVisitor extends SubGenerator<DisChordNodeType, Dis
 
         if (cleanPath.startsWith('lib:')) {
             const libName = cleanPath.split(':')[1];
-            absoluteTarget = path.join(projectRoot, 'lib', libName, 'src', 'index.js');
+            absoluteTarget = projectRoot.resolve('lib', libName, 'src', 'index.js');
         } else {
-            const originalDir = this.parent.context.outputDir ?? path.join(projectRoot, 'dist');
-            absoluteTarget = path.join(originalDir, cleanPath);
+            absoluteTarget = path.join(this.parent.context.outputDir, cleanPath);
             if (!absoluteTarget.endsWith('.js')) absoluteTarget += '.js';
         }
 
-        let specifier = path.relative(projectRoot, absoluteTarget).split(path.sep).join('/');
+        let specifier = path.relative(projectRoot.absolutePath, absoluteTarget).split(path.sep).join('/');
         if (!specifier.startsWith('.')) specifier = `./${specifier}`;
 
         return specifier;
@@ -178,7 +177,7 @@ export default class ClietInitVisitor extends SubGenerator<DisChordNodeType, Dis
     private ensureDirectories() {
         const dirs = ['comandos', 'eventos', 'componentes'];
         dirs.forEach(dir => {
-            const targetPath = join(this.parent.context.projectRoot, 'dist', dir);
+            const targetPath = join(this.parent.context.distDir, dir);
             if (!fs.existsSync(targetPath)) fs.mkdirSync(targetPath, { recursive: true });
         });
     }
