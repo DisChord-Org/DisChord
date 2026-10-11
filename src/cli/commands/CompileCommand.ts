@@ -1,4 +1,3 @@
-import * as fs from 'fs';
 import path from 'path';
 
 import { GlobalCLIOptions } from '../Program';
@@ -6,6 +5,7 @@ import { CompilerConfig, FileSystem } from '../../utils/FileSystem';
 import Prettifier from '../../utils/Prettifier';
 import { BaseChordError, Diagnostic } from '../../errors/ChordError';
 import { File } from '../../utils/File';
+import { Directory } from '../../utils/Directory';
 import { FileCompiler } from './FileCompiler';
 import { RunCommand } from './RunCommand';
 
@@ -57,7 +57,7 @@ export class CompileCommand {
         this.emitted.clear();
         FileSystem.assertEsmProject(this.config.projectRoot);
 
-        const files = FileSystem.getChordFiles(this.config.inputPath, this.config.isDirectory);
+        const files = FileSystem.getChordFiles(this.config.input);
 
         this.log(options, `Compilando proyecto: ${this.config.projectRoot}`);
 
@@ -91,10 +91,10 @@ export class CompileCommand {
     private async compileFile(file: File, options: GlobalCLIOptions): Promise<Map<string, string>> {
         if (!this.config) return new Map();
 
-        const relativeFile = file.relativeTo(this.config.projectRoot);
+        const relativeFile = file.relativeTo(this.config.projectRoot.absolutePath);
         this.log(options, `Compilando: ${relativeFile}`);
 
-        const relativePath = path.relative(path.join(this.config.projectRoot, 'src'), file.absolutePath);
+        const relativePath = path.relative(this.config.projectRoot.resolve('src'), file.absolutePath);
         const targetDir = options.outDir
             ? path.resolve(options.outDir)
             : path.join(this.config.distDir, path.dirname(relativePath));
@@ -102,7 +102,7 @@ export class CompileCommand {
         let compiled;
 
         try {
-            compiled = new FileCompiler(options).compile(file, this.config.projectRoot, targetDir);
+            compiled = new FileCompiler(options).compile(file, this.config.projectRoot.absolutePath, targetDir);
         } catch (error) {
             if (error instanceof BaseChordError) error.file = file;
             throw error;
@@ -110,11 +110,7 @@ export class CompileCommand {
 
         if (options.check) return compiled.extraFiles;
 
-        if (!fs.existsSync(targetDir)) {
-            fs.mkdirSync(targetDir, { recursive: true });
-        }
-
-        const outputPath = path.join(targetDir, `${file.baseName}.js`);
+        const outputPath = Directory.create(targetDir).resolve(`${file.baseName}.js`);
         await Prettifier.savePrettified(outputPath, compiled.output);
         this.emitted.add(outputPath);
 
@@ -133,10 +129,7 @@ export class CompileCommand {
      */
     private async writeExtraFiles(files: Map<string, string>): Promise<void> {
         for (const [absolutePath, content] of files) {
-            if (!fs.existsSync(path.dirname(absolutePath))) {
-                fs.mkdirSync(path.dirname(absolutePath), { recursive: true });
-            }
-
+            Directory.create(path.dirname(absolutePath));
             await Prettifier.savePrettified(absolutePath, content);
             this.emitted.add(absolutePath);
         }
@@ -154,12 +147,12 @@ export class CompileCommand {
      */
     private removeStaleOutputs(options: GlobalCLIOptions): void {
         if (!this.config || options.outDir) return;
-        if (!FileSystem.isProjectCompile(this.config.inputPath, this.config.isDirectory)) return;
+        if (!FileSystem.isProjectCompile(this.config.input)) return;
 
         const { projectRoot, distDir } = this.config;
-        const removed = FileSystem.removeStaleOutput(distDir, this.emitted);
+        const removed = Directory.tryOf(distDir)?.removeFilesExcept('.js', this.emitted) ?? [];
 
-        removed.forEach(file => this.log(options, `Eliminado (sin fuente): ${path.relative(projectRoot, file)}`));
+        removed.forEach(file => this.log(options, `Eliminado (sin fuente): ${path.relative(projectRoot.absolutePath, file)}`));
     }
 
     /**
@@ -171,12 +164,11 @@ export class CompileCommand {
     private async executeTarget(): Promise<void> {
         if (!this.config) return;
 
-        const runTarget = this.config.isDirectory
-            ? path.join(this.config.distDir, 'index.js')
-            : path.join(this.config.distDir, `${path.basename(this.config.inputPath, '.chord')}.js`);
+        const { input, distDir, projectRoot } = this.config;
+        const runTarget = path.join(distDir, input instanceof Directory ? 'index.js' : `${input.baseName}.js`);
 
         const runner = new RunCommand();
-        await runner.execute(runTarget, { projectRoot: this.config.projectRoot });
+        await runner.execute(runTarget, { projectRoot: projectRoot.absolutePath });
     }
 
     /**

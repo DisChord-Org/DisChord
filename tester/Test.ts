@@ -142,7 +142,7 @@ export abstract class Test {
             symbolTable: new SymbolTable(),
             keywordsManager: new KeyWords(),
             codeProvider: new CodeProvider(),
-            projectRoot: FileSystem.configure(this.fixturePath).projectRoot,
+            projectRoot: FileSystem.configure(this.fixturePath).projectRoot.absolutePath,
             extraFiles: new Map(),
             coreLib: disChordCoreLibUtils,
             coreLibDispatch: disChordCoreLibDispatch

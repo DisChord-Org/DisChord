@@ -1,39 +1,39 @@
 import fs from 'fs';
 import path from 'path';
 import { File } from './File';
+import { Directory } from './Directory';
 
 /**
  * Global configuration contract for the compiler's environment.
  */
 export interface CompilerConfig {
-    inputPath: string;      // The entry path
-    projectRoot: string;    // The project root (where the dist directory is located)
-    distDir: string;        // Output path for the compiled .js files
-    isDirectory: boolean;   // Are we compiling an entire project or a single script?
+    input: File | Directory;    // The entry: a single script or a whole project
+    projectRoot: Directory;     // The project root (where the dist directory is located)
+    distDir: string;            // Output path for the compiled .js files; may not exist yet
 }
 
 /**
- * Static utility class for filesystem operations and path resolution.
+ * Static utility class for the compiler's project layout: where the project starts, which files
+ * belong to it and where its output goes.
  */
 export class FileSystem {
     /**
      * Initializes the compiler configuration by analyzing the input path.
      * * @param rawInput - The raw string path received from the CLI.
-     * @returns A validated CompilerConfig object with normalized absolute paths.
+     * @returns A validated CompilerConfig object.
      * @throws Will throw an error if the path does not exist.
      */
     static configure(rawInput: string): CompilerConfig {
-        const inputPath = path.resolve(rawInput);
-        const isDirectory = fs.statSync(inputPath).isDirectory();
+        const resolved = path.resolve(rawInput);
+        const input = fs.statSync(resolved).isDirectory() ? Directory.of(resolved) : File.of(resolved);
 
-        const baseDir = isDirectory ? inputPath : path.dirname(inputPath);
-        const projectRoot = path.basename(baseDir) === 'src' ? path.join(baseDir, '..') : baseDir;
+        const baseDir = input instanceof Directory ? input : Directory.of(input.directory);
+        const projectRoot = baseDir.name === 'src' ? baseDir.parent : baseDir;
 
         return {
-            inputPath,
+            input,
             projectRoot,
-            distDir: path.join(projectRoot, 'dist'),
-            isDirectory
+            distDir: projectRoot.resolve('dist')
         };
     }
 
@@ -51,22 +51,20 @@ export class FileSystem {
      * @param projectRoot - The project's root directory (where `package.json` is expected).
      * @throws {Error} If `package.json` is missing, unreadable, or lacks `"type": "module"`.
      */
-    static assertEsmProject (projectRoot: string): void {
-        const packageJsonPath = path.join(projectRoot, 'package.json');
-
-        if (!fs.existsSync(packageJsonPath)) {
+    static assertEsmProject (projectRoot: Directory): void {
+        if (!projectRoot.hasFile('package.json')) {
             throw new Error(`No se encontró 'package.json' en '${projectRoot}'. DisChord necesita que el proyecto tenga uno con "type": "module".`);
         }
 
-        const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
+        const packageJson = projectRoot.file('package.json');
 
-        if (packageJson.type !== 'module') {
-            throw new Error(`El 'package.json' del proyecto necesita "type": "module" para poder ejecutar el código compilado (Seyfert carga los archivos de 'comandos'/'eventos' como .js, y Node solo los trata como ESM con esa opción activada). Añádela en '${packageJsonPath}'.`);
+        if (JSON.parse(packageJson.read()).type !== 'module') {
+            throw new Error(`El 'package.json' del proyecto necesita "type": "module" para poder ejecutar el código compilado (Seyfert carga los archivos de 'comandos'/'eventos' como .js, y Node solo los trata como ESM con esa opción activada). Añádela en '${packageJson}'.`);
         }
     }
 
     /**
-     * Recursively retrieves all .chord files from a directory or returns the single file path.
+     * Retrieves every .chord file of a project, or the single file that was asked for.
      *
      * A single file living directly inside a conventional `src/` folder (e.g. `src/index.chord`)
      * is treated as a project's entry point rather than a standalone script: pointing the CLI at
@@ -75,102 +73,30 @@ export class FileSystem {
      * events, ...), with no indication anything was left out. A file that *isn't* inside a `src/`
      * folder (e.g. one of the standalone scripts under `examples/`) keeps the original, literal
      * single-file behavior.
-     * @param dir - The starting directory or file path.
-     * @param isDirectory - Boolean flag to determine search mode.
+     * @param input - The entry: a directory, or a single file.
      * @returns Every discovered .chord file.
-     * @throws {Error} If a single input path is not an existing `.chord` file.
+     * @throws {Error} If a single input is not a `.chord` file.
      */
-    static getChordFiles(dir: string, isDirectory: boolean): File[] {
-        if (!isDirectory) {
-            if (FileSystem.isProjectCompile(dir, false)) return FileSystem.getChordFiles(path.dirname(dir), true);
+    static getChordFiles(input: File | Directory): File[] {
+        if (input instanceof Directory) return input.files('.chord');
 
-            const file = File.of(dir);
+        if (FileSystem.isProjectCompile(input)) return Directory.of(input.directory).files('.chord');
 
-            if (!file.hasExtension('.chord')) {
-                throw new Error(`Se esperaba un archivo .chord: ${file.absolutePath}`);
-            }
-
-            return [file];
+        if (!input.hasExtension('.chord')) {
+            throw new Error(`Se esperaba un archivo .chord: ${input}`);
         }
 
-        return FileSystem.walkChordFiles(dir);
+        return [input];
     }
 
     /**
-     * Whether compiling `inputPath` covers the project's whole `src/` — a directory, or a single
+     * Whether compiling `input` covers the project's whole `src/` — a directory, or a single
      * file directly inside `src/` (see `getChordFiles`) — as opposed to one standalone script.
      * Only a full project compile knows every file that belongs in `dist/`, so it is the only
      * kind that may delete stale output.
-     * @param inputPath - The entry path.
-     * @param isDirectory - Boolean flag of the input type.
+     * @param input - The entry.
      */
-    static isProjectCompile(inputPath: string, isDirectory: boolean): boolean {
-        return isDirectory || path.basename(path.dirname(inputPath)) === 'src';
-    }
-
-    /**
-     * Manually walks a directory tree collecting `.chord` files, rather than relying on
-     * `fs.readdirSync`'s `recursive` option (only available from Node 20.1 onward, and silently
-     * ignored — not an error — on older runtimes, which would quietly turn this into a shallow,
-     * non-recursive scan).
-     * @private
-     * @param dir - The directory to walk.
-     * @returns Every `.chord` file found under `dir`.
-     */
-    private static walkChordFiles (dir: string): File[] {
-        const entries = fs.readdirSync(dir, { withFileTypes: true });
-
-        return entries.flatMap(entry => {
-            const entryPath = path.join(dir, entry.name);
-
-            if (entry.isDirectory()) return FileSystem.walkChordFiles(entryPath);
-            if (entry.isFile() && entry.name.endsWith('.chord')) return [File.of(entryPath)];
-
-            return [];
-        });
-    }
-
-    /**
-     * Deletes every `.js` under `distDir` that isn't in `keep` (files a previous compile left
-     * behind whose `.chord` source has since been removed), then removes the directories that
-     * leaves empty. Only `.js` is considered, since that's the only thing the compiler emits.
-     * @param distDir - Absolute path of the output directory.
-     * @param keep - Absolute paths of every file written by the current compile.
-     * @returns Absolute paths of the files that were removed.
-     */
-    static removeStaleOutput(distDir: string, keep: Set<string>): string[] {
-        if (!fs.existsSync(distDir)) return [];
-
-        const removed: string[] = [];
-
-        const walk = (dir: string): void => {
-            for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-                const entryPath = path.join(dir, entry.name);
-
-                if (entry.isDirectory()) walk(entryPath);
-                else if (entry.name.endsWith('.js') && !keep.has(entryPath)) {
-                    fs.rmSync(entryPath);
-                    removed.push(entryPath);
-                }
-            }
-
-            if (dir !== distDir && fs.readdirSync(dir).length === 0) fs.rmdirSync(dir);
-        };
-
-        walk(distDir);
-
-        return removed;
-    }
-
-    /**
-     * Determines the root of the project based on the location of the source files.
-     * * @param inputPath - The current working path.
-     * @param isDirectory - Boolean flag of the input type.
-     * @returns The absolute path to the project's root directory.
-     * @deprecated
-     */
-    static resolveProjectRoot(inputPath: string, isDirectory: boolean): string {
-        const dir = isDirectory ? inputPath : path.dirname(inputPath);
-        return path.basename(dir) === 'src' ? path.join(dir, '..') : dir;
+    static isProjectCompile(input: File | Directory): boolean {
+        return input instanceof Directory || Directory.of(input.directory).name === 'src';
     }
 }
