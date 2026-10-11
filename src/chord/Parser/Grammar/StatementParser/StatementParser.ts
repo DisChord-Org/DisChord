@@ -1,5 +1,5 @@
 import { DecoratorProcessor } from "../../../DecoratorProcessor";
-import { ASTNode, BaseNode, TokenType, TokenTypeUnion } from "../../../types";
+import { ASTNode, BaseNode, Decorator, TokenType, TokenTypeUnion } from "../../../types";
 import { Parser } from "../../Parser";
 import { SubParser } from "../../SubParser";
 import { ExpressionParser } from "../Expressions/ExpressionParser";
@@ -39,9 +39,8 @@ export class StatementParser<T extends string, N extends BaseNode<T>> extends Su
             const decorator = token.value;
             this.consume(TokenType.Decorador);
         
-            if (decorator === '@asincrono') DecoratorProcessor.addDecorator('asincrono', true);
-            if (decorator === '@BDOI') DecoratorProcessor.addDecorator('BDOI', true);
-            if (decorator === '@fijar') DecoratorProcessor.addDecorator('fijar', true);
+            const known = (Object.keys(Decorator) as (keyof typeof Decorator)[]).find(name => Decorator[name] === decorator);
+            if (known) DecoratorProcessor.addDecorator(known, true);
 
             return (this.parent.get(StatementParser)).parse(classContext);
         }

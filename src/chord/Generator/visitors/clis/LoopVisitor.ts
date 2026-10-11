@@ -1,4 +1,4 @@
-import { LoopNode, BaseNode, TokenType, TokenTypeUnion, ASTNode, CallNode } from "../../../types";
+import { LoopNode, BaseNode, SyntaxFunction, TokenType, TokenTypeUnion, ASTNode, CallNode } from "../../../types";
 import { isIdentificatorNode } from "../../../ast.guards";
 import { SubGenerator } from "../../SubGenerator";
 import { walkAST } from "../../../walkAST";
@@ -38,7 +38,7 @@ export class LoopVisitor<T extends string, N extends BaseNode<T>> extends SubGen
         if (node.iterable.type === TokenType.LLAMADA) {
             const callNode = node.iterable as CallNode<T, N>;
 
-            if (isIdentificatorNode(callNode.object) && callNode.object.value === 'rango') {
+            if (isIdentificatorNode(callNode.object) && callNode.object.value === SyntaxFunction.Rango) {
                 const args = callNode.params;
                 let start = "0";
                 let end = this.parent.visit(args[0]);

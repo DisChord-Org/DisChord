@@ -53,6 +53,36 @@ export enum CompilerMetadataKind {
 };
 
 /**
+ * Decorators the language knows, by the name the `DecoratorProcessor` keeps them under. The
+ * lexer tokenizes any `@word`; only these have a meaning.
+ * @type {const}
+ */
+export const Decorator = {
+    asincrono: '@asincrono',
+    BDOI: '@BDOI',
+    fijar: '@fijar'
+} as const;
+
+/**
+ * Words that stand for a text the lexer produces itself (`espacio` is `" "`, `intro` is a line
+ * break), so they are literals and not identifiers or reserved words of the keyword registry.
+ * @type {const}
+ */
+export const NamedTextLiteral = {
+    espacio: ' ',
+    intro: '\n'
+} as const;
+
+/**
+ * Calls the compiler resolves by their shape instead of by a definition: they look like a call to
+ * a function but are syntax, so no table of functions has them.
+ * @type {const}
+ */
+export const SyntaxFunction = {
+    Rango: 'rango'
+} as const;
+
+/**
  * Registry of every primitive type name DisChord's compile-time type system currently recognizes,
  * in Spanish, for a `var` declaration's `dataType` — either written explicitly after `tipo`
  * (`TypeAnnotationParser`) or inferred from a literal initializer's native JS type
@@ -165,8 +195,6 @@ export const TokenType = {
     Decorador: 'decorador',
 
     // Operators
-    Intro: 'intro',
-    Espacio: 'espacio',
     Mas: 'mas',
     Menos: 'menos',
     Flecha: 'flecha',

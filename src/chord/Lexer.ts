@@ -1,4 +1,4 @@
-import { Token, TokenType } from './types';
+import { NamedTextLiteral, Token, TokenType } from './types';
 import { ChordError, ErrorLevel } from '../errors/ChordError';
 import { CompilationContext } from './model/CompilationContext';
 import { SymbolTranslationMap } from './Symbols';
@@ -176,10 +176,8 @@ export class Lexer<T extends string> {
                     tokens.push(this.createToken(TokenType.BOOLEANO, value, startLine, startCol));
                 } else if (value === TokenType.Indefinido) {
                     tokens.push(this.createToken(TokenType.Indefinido, value, startLine, startCol));
-                } else if (value === TokenType.Espacio) {
-                    tokens.push(this.createToken(TokenType.TEXTO, ' ', startLine, startCol));
-                } else if (value === TokenType.Intro) {
-                    tokens.push(this.createToken(TokenType.TEXTO, '\n', startLine, startCol));
+                } else if (Object.prototype.hasOwnProperty.call(NamedTextLiteral, value)) {
+                    tokens.push(this.createToken(TokenType.TEXTO, NamedTextLiteral[value as keyof typeof NamedTextLiteral], startLine, startCol));
                 } else if (Lexer.ASCII_ONLY.test(value) && this.context.keywordsManager.isKeyword(value)) {
                     tokens.push(this.createToken(this.context.keywordsManager.resolve(value.toLowerCase()) as TokenType, value, startLine, startCol));
                 } else {

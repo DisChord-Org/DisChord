@@ -1,3 +1,8 @@
+import { Decorator } from './types';
+
+/** Name a decorator is kept under: one of the keys of `Decorator`, so a rename cannot go unnoticed by its consumers. */
+type DecoratorName = keyof typeof Decorator;
+
 type PrimitiveBoxTypes = boolean | string | string[];
 type DecoratorBoxContent = PrimitiveBoxTypes | Record<string, PrimitiveBoxTypes>;
 type DecoratorBoxRecord = Record<string, DecoratorBoxContent>;
@@ -23,7 +28,7 @@ export class DecoratorProcessor {
      * @param decorator - The unique identifier of the decorator.
      * @param content - The metadata value to store.
      */
-    static addDecorator (decorator: string, content: DecoratorBoxContent): void {
+    static addDecorator (decorator: DecoratorName, content: DecoratorBoxContent): void {
         this.DecoratorBox[decorator] = content;
     }
 
@@ -31,7 +36,7 @@ export class DecoratorProcessor {
      * Removes a decorator from the buffer to prevent it from affecting subsequent nodes.
      * @param decorator - The identifier of the decorator to remove.
      */
-    static deleteDecorator (decorator: string): void {
+    static deleteDecorator (decorator: DecoratorName): void {
         delete this.DecoratorBox[decorator];
     }
 
@@ -42,7 +47,7 @@ export class DecoratorProcessor {
      * @param content - The value to compare against the stored one.
      * @returns True if the content matches (by value, not just reference).
      */
-    static match (decorator: string, content: DecoratorBoxContent): boolean {
+    static match (decorator: DecoratorName, content: DecoratorBoxContent): boolean {
         const stored = this.DecoratorBox[decorator];
 
         if (typeof stored !== typeof content) return false;
@@ -63,7 +68,7 @@ export class DecoratorProcessor {
      * @param content - The value to compare.
      * @returns True if the values matched before deletion.
      */
-    static matchAndDelete (decorator: string, content: DecoratorBoxContent): boolean {
+    static matchAndDelete (decorator: DecoratorName, content: DecoratorBoxContent): boolean {
         const isMatch = this.match(decorator, content);
 
         this.deleteDecorator(decorator);
