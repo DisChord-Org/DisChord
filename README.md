@@ -67,7 +67,7 @@ si (total mayor 10) {
 npm run dev hello.chord
 ```
 
-This will compile `hello.chord` to `dist/hello.mjs` and execute it automatically.
+This will compile `hello.chord` to `dist/hello.js` and execute it automatically.
 
 ### Command Line Options
 
@@ -412,7 +412,7 @@ consola.imprimir(largo({ longitud 5 }))    // 5
 - `src/dischord/`: Discord-specific Parser extension and Code Generator.
 - `src/chord/parser.ts`: The main recursive descent parser.
 - `examples/`: Code samples for both generic logic and Discord bots.
-- `dist/`: Output directory for transpiled `.mjs` files.
+- `dist/`: Output directory for transpiled `.js` files.
 
 ---
 
