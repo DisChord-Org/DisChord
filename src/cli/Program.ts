@@ -135,17 +135,6 @@ export class Program {
         this.program
             .command('corelib')
             .description('Muestra las palabras reservadas y la librería base del lenguaje')
-            .option(
-                '--emit <fase>',
-                'Imprime los tokens o el árbol sintáctico de un archivo como JSON, sin compilar (tokens | ast)',
-                (value: string): EmitKind => {
-                    if (value !== 'tokens' && value !== 'ast') {
-                        throw new Error(`Fase no válida para --emit: '${value}'. Opciones: tokens, ast`);
-                    }
-
-                    return value;
-                }
-            )
             .option('--json', 'Imprime la información como un documento JSON')
             .action((options: { json?: boolean }) => {
                 new CorelibCommand().execute(options);
