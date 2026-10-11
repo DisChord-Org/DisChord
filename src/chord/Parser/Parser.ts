@@ -106,8 +106,19 @@ export class Parser<T extends string, N extends BaseNode<T>> extends ParserConte
      * @returns {void}
      */
     protected static registerGrammar (context: CompilationContext<TokenTypeUnion<string>>): void {
+        Parser.registerKeywords(context.keywordsManager);
+    }
+
+    /**
+     * Registers the keywords the structural grammar components bring into a keywords registry.
+     * @protected
+     * @static
+     * @param {KeyWords<string>} keywordsManager - The registry to add the keywords to.
+     * @returns {void}
+     */
+    protected static registerKeywords (keywordsManager: KeyWords<string>): void {
         Parser.SubParsers.forEach(instance => {
-            context.keywordsManager.extend(
+            keywordsManager.extend(
                 instance.keywords.reduce<Record<string, TokenTypeUnion<string>>>((accumulator, keyword) => {
                     accumulator[keyword] = keyword;
 

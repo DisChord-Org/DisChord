@@ -3,6 +3,7 @@ import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType } fr
 
 import { Parser } from '../../chord/Parser/Parser';
 import { SubParserClass } from '../../chord/Parser/SubParser';
+import { KeyWords } from '../../chord/KeywordsManager';
 
 import CommandParser from './Grammar/architectural/CommandParser';
 import MessageParser from './Grammar/features/MessageParser';
@@ -57,8 +58,17 @@ export class DisChordParser extends Parser<DisChordNodeType, DisChordNode> {
      * @override
      */
     static override registerGrammar (context: CompilationContext<DisChordNodeType>): void {
+        DisChordParser.registerKeywords(context.keywordsManager);
+    }
+
+    /**
+     * Same as `registerGrammar`, for a keywords registry alone: it is how a tool that has no
+     * compilation (completion, highlighting) gets the language's reserved words.
+     * @override
+     */
+    static override registerKeywords (keywordsManager: KeyWords<string>): void {
         DisChordParser.DisChordSubParsers.forEach(instance => {
-            context.keywordsManager.extend(
+            keywordsManager.extend(
                 instance.keywords.reduce<Record<string, TokenTypeUnion<DisChordNodeType>>>((accumulator, keyword) => {
                     accumulator[keyword] = keyword as TokenTypeUnion<DisChordNodeType>;
 
@@ -67,7 +77,7 @@ export class DisChordParser extends Parser<DisChordNodeType, DisChordNode> {
             );
         });
 
-        super.registerGrammar(context);
+        super.registerKeywords(keywordsManager);
     }
 
     /**
