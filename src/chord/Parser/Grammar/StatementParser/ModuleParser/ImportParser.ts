@@ -1,5 +1,5 @@
 import { SubParser } from "../../../SubParser";
-import { BaseNode, ImportNode, TokenType, TokenTypeUnion } from "../../../../types";
+import { BaseNode, DeclarationKind, ImportNode, TokenType, TokenTypeUnion } from "../../../../types";
 import { Parser } from "../../../Parser";
 
 /*
@@ -35,12 +35,12 @@ export class ImportParser<T extends string, N extends BaseNode<T>> extends SubPa
 
         if (isDestructured) {
             while (this.peek().type !== TokenType.R_BRACE && !this.isAtEnd()) {
-                identificators.push(this.consume(TokenType.IDENTIFICADOR, "Se esperaba un nombre para importar").value);
+                identificators.push(this.declare(DeclarationKind.Import, this.consume(TokenType.IDENTIFICADOR, "Se esperaba un nombre para importar")));
                 this.match(TokenType.COMA);
             }
             this.consume(TokenType.R_BRACE);
         } else {
-            identificators.push(this.consume(TokenType.IDENTIFICADOR, "Se esperaba un nombre tras 'importar'").value);
+            identificators.push(this.declare(DeclarationKind.Import, this.consume(TokenType.IDENTIFICADOR, "Se esperaba un nombre tras 'importar'")));
         }
 
         let path: string;

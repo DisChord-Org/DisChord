@@ -1,0 +1,22 @@
+var global tipo numero es 1
+
+clase Caja {
+    prop ancho es 2
+
+    funcion area(factor tipo numero) -> numero {
+        var local tipo numero es factor
+        funcion interna(k tipo numero) -> numero {
+            devolver k
+        }
+        devolver interna(local)
+    }
+}
+
+funcion libre(x tipo numero) -> numero {
+    var otro tipo numero es x
+    devolver otro
+}
+
+nuevo evento encendido {
+    var enEvento es 1
+}

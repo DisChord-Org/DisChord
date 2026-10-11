@@ -1,4 +1,4 @@
-import { DisChordNode, DisChordNodeType, DisChordODBNode, DisChordTokenType, EmbedDeclarationNode } from "../../../types";
+import { DisChordDeclarationKind, DisChordNode, DisChordNodeType, DisChordODBNode, DisChordTokenType, EmbedDeclarationNode } from "../../../types";
 import { ODBMode, TokenType, TokenTypeUnion } from "../../../../chord/types";
 import { SubParser } from "../../../../chord/Parser/SubParser";
 import { BDOParser } from "../../../../chord/Parser/Grammar/BDOParser";
@@ -41,7 +41,7 @@ export default class EmbedDeclarationParser extends SubParser<DisChordNodeType, 
      * @returns {EmbedDeclarationNode} The AST node representing the embed value.
      */
     parse (): EmbedDeclarationNode {
-        const name = this.consume(TokenType.IDENTIFICADOR, "Se debe especificar el nombre del embed").value;
+        const name = this.declare(DisChordDeclarationKind.Embed, this.consume(TokenType.IDENTIFICADOR, "Se debe especificar el nombre del embed"));
         const body = this.parent.get(BDOParser).setMode(ODBMode.Simple).parse() as DisChordODBNode;
 
         return this.createNode<EmbedDeclarationNode>({

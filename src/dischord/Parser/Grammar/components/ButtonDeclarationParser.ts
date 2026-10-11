@@ -1,4 +1,4 @@
-import { DisChordNode, DisChordNodeType, DisChordODBNode, DisChordTokenType, ButtonDeclarationNode } from "../../../types";
+import { DisChordDeclarationKind, DisChordNode, DisChordNodeType, DisChordODBNode, DisChordTokenType, ButtonDeclarationNode } from "../../../types";
 import { ODBMode, TokenType, TokenTypeUnion } from "../../../../chord/types";
 import { SubParser } from "../../../../chord/Parser/SubParser";
 import { BDOParser } from "../../../../chord/Parser/Grammar/BDOParser";
@@ -41,7 +41,7 @@ export default class ButtonDeclarationParser extends SubParser<DisChordNodeType,
      * @returns {ButtonDeclarationNode} The AST node representing the button value.
      */
     parse (): ButtonDeclarationNode {
-        const name = this.consume(TokenType.IDENTIFICADOR, "Se debe especificar el nombre del botón").value;
+        const name = this.declare(DisChordDeclarationKind.Button, this.consume(TokenType.IDENTIFICADOR, "Se debe especificar el nombre del botón"));
         const body = this.parent.get(BDOParser).setMode(ODBMode.Simple).parse() as DisChordODBNode;
 
         return this.createNode<ButtonDeclarationNode>({

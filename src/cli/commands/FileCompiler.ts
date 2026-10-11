@@ -6,7 +6,7 @@ import { SymbolTable } from '../../chord/model/SymbolsTable';
 import { CodeProvider } from '../../chord/CodeProvider';
 import { KeyWords } from '../../chord/KeywordsManager';
 import { Lexer } from '../../chord/Lexer';
-import { Token } from '../../chord/types';
+import { DeclaredName, Token } from '../../chord/types';
 import { disChordCoreLibUtils, disChordCoreLibDispatch } from '../../dischord/corelib';
 import { DisChordParser } from '../../dischord/Parser/Parser';
 import { DisChordAnalyzer } from '../../dischord/Analyzer/Analyzer';
@@ -77,12 +77,17 @@ export class FileCompiler {
      * @param {File} file - The .chord file.
      * @param {CompilerConfig} config - Layout of the project the file belongs to.
      * @param {string} outputDir - Directory its output would be written to.
-     * @returns {DisChordASTNode[]} The syntax tree.
+     * @returns {{ ast: DisChordASTNode[]; declarations: readonly DeclaredName[] }} The syntax tree,
+     * and every name the source declares with where it is written.
      */
-    public parseTree(file: File, config: CompilerConfig, outputDir: string): DisChordASTNode[] {
+    public parseTree(file: File, config: CompilerConfig, outputDir: string): { ast: DisChordASTNode[]; declarations: readonly DeclaredName[] } {
         const context = this.createContext(file, config, outputDir);
+        const parser = new DisChordParser(this.lex(context), context);
+        const ast: DisChordASTNode[] = parser.parse();
 
-        return this.parse(context, this.lex(context));
+        this.logDebug(DebugFlags.Parser, ast);
+
+        return { ast, declarations: parser.declarations.entries() };
     }
 
     /**

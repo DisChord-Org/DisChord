@@ -1,5 +1,5 @@
 import { SubParser } from "../../SubParser";
-import { PropertyNode, LiteralNode, ASTNode, BaseNode, TokenType, TokenTypeUnion } from "../../../types";
+import { PropertyNode, LiteralNode, ASTNode, BaseNode, DeclarationKind, TokenType, TokenTypeUnion } from "../../../types";
 import { Parser } from "../../Parser";
 import { DecoratorProcessor } from "../../../DecoratorProcessor";
 
@@ -38,7 +38,7 @@ export class PropertyParser<T extends string, N extends BaseNode<T>> extends Sub
 
         const nextToken = this.peek();
         const nameType = isClassMember && this.isReservedMemberName(nextToken) ? nextToken.type : TokenType.IDENTIFICADOR;
-        const id = this.consume(nameType, "Se esperaba el nombre de la propiedad").value;
+        const id = this.declare(DeclarationKind.Property, this.consume(nameType, "Se esperaba el nombre de la propiedad"));
         
         let value: ASTNode<T, N> = this.createNode<LiteralNode<T>>({
             type: TokenType.LITERAL,

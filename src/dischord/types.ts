@@ -141,6 +141,17 @@ export interface ButtonDeclarationNode extends BaseNode<DisChordNodeType> {
  * Visual design configurations defining presentation properties for interactive message UI elements.
  * @enum {number}
  */
+/**
+ * Kinds of name DisChord's own constructs declare, besides the ones of `DeclarationKind`.
+ * @type {const}
+ */
+export const DisChordDeclarationKind = {
+    Command: 'command',
+    Event: 'event',
+    Button: 'button',
+    Embed: 'embed'
+} as const;
+
 export enum ButtonStyles {
     azul = 1,
     gris,

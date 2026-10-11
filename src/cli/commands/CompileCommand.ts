@@ -189,7 +189,11 @@ export class CompileCommand {
                 return { schema: CompileCommand.emitSchema, emit: kind, file: file.absolutePath, tokens };
             }
 
-            return { schema: CompileCommand.emitSchema, emit: kind, file: file.absolutePath, ast: compiler.parseTree(file, config, config.distDir) };
+            return {
+                schema: CompileCommand.emitSchema,
+                emit: kind, file: file.absolutePath,
+                ...compiler.parseTree(file, config, config.distDir)
+            };
         } catch (error) {
             if (error instanceof BaseChordError) error.file = file;
             throw error;

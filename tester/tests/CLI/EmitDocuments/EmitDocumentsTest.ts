@@ -14,6 +14,7 @@ interface Emitted {
     file?: string;
     tokens?: EmittedToken[];
     ast?: { type: string }[];
+    declarations?: { kind: string; name: string; container?: string; start: Position; end: Position }[];
 }
 
 /**
@@ -40,11 +41,17 @@ export class EmitDocumentsTest extends Test {
         const source = fs.readFileSync(input, 'utf-8');
 
         this.assertTokens(await this.emit(input, 'tokens'), source);
-        this.assertTree(await this.emit(input, 'ast'));
+        this.assertTree(await this.emit(input, 'ast'), source);
 
         // The tree is the parser's: a program that fails the analysis still has one
         const analysis = await this.emit(path.join(this.fixturePath, 'analysis.chord'), 'ast');
         if (!analysis.ok || !analysis.ast?.length) throw new Error('A program that fails the analysis has no syntax tree');
+
+        // What a name belongs to: the class or function (or event) whose body it is declared in
+        const scopes = await this.emit(path.join(this.fixturePath, 'scopes.chord'), 'ast');
+        const hierarchy = (scopes.declarations ?? []).map(entry => `${entry.kind}:${entry.container ?? ''}:${entry.name}`).join();
+        const expected = 'variable::global,class::Caja,property:Caja:ancho,method:Caja:area,parameter:area:factor,variable:area:local,function:area:interna,parameter:interna:k,function::libre,parameter:libre:x,variable:libre:otro,event::encendido,variable:encendido:enEvento';
+        if (hierarchy !== expected) throw new Error(`The declarations are ${hierarchy}`);
 
         // A failing phase gives the usual diagnostics document, with where and in which file
         const lexer = await this.emit(path.join(this.fixturePath, 'lexer.chord'), 'tokens');
@@ -112,10 +119,29 @@ export class EmitDocumentsTest extends Test {
         });
     }
 
-    private assertTree (document: Emitted): void {
+    /**
+     * The names the source declares come with the exact range they are written at, and with what they belong to.
+     */
+    private assertDeclarations (document: Emitted, source: string): void {
+        const lines = source.split('\n');
+        const declared = document.declarations ?? [];
+
+        declared.forEach(entry => {
+            const text = lines[entry.start.line - 1].slice(entry.start.column - 1, entry.end.column - 1);
+
+            if (entry.start.line !== entry.end.line || text !== entry.name) throw new Error(`${entry.kind} '${entry.name}' spans ${JSON.stringify(text)}`);
+        });
+
+        const summary = declared.map(entry => `${entry.kind}:${entry.container ?? ''}:${entry.name}`).join();
+        if (summary !== 'variable::a,function::doble,parameter:doble:x') throw new Error(`The declarations are ${summary}`);
+    }
+
+    private assertTree (document: Emitted, source: string): void {
         if (!document.ok || document.emit !== 'ast' || document.schema !== 1) throw new Error('The tree document is malformed');
 
         const types = (document.ast ?? []).map(node => node.type).join();
         if (types !== 'Variable,Llamada,funcion,Llamada') throw new Error(`The tree has the nodes ${types}`);
+
+        this.assertDeclarations(document, source);
     }
 }

@@ -1,5 +1,5 @@
 import { SubParser } from "../../SubParser";
-import { ClassNode, ASTNode, BaseNode, TokenType, TokenTypeUnion } from "../../../types";
+import { ClassNode, ASTNode, BaseNode, DeclarationKind, TokenType, TokenTypeUnion } from "../../../types";
 import { StatementParser } from "./StatementParser";
 import { Parser } from "../../Parser";
 
@@ -24,7 +24,7 @@ export class ClassParser<T extends string, N extends BaseNode<T>> extends SubPar
      */
     public parse(): ClassNode<T, N> {
         this.consume(TokenType.Clase);
-        const id = this.consume(TokenType.IDENTIFICADOR, 'Se debe especificar el nombre de la clase').value;
+        const id = this.declare(DeclarationKind.Class, this.consume(TokenType.IDENTIFICADOR, 'Se debe especificar el nombre de la clase'));
 
         let superClass: string | undefined = undefined;
         if (this.match(TokenType.Extiende)) {
@@ -41,7 +41,7 @@ export class ClassParser<T extends string, N extends BaseNode<T>> extends SubPar
      */
     public parseShorthand(): ClassNode<T, N> {
         const superClass = this.consume(TokenType.IDENTIFICADOR, "Se debe especificar el nombre de la clase base").value;
-        const id = this.consume(TokenType.IDENTIFICADOR, "Se debe especificar el nombre de la nueva clase").value;
+        const id = this.declare(DeclarationKind.Class, this.consume(TokenType.IDENTIFICADOR, "Se debe especificar el nombre de la nueva clase"));
 
         return this.buildClassNode(id, superClass);
     }
@@ -73,10 +73,12 @@ export class ClassParser<T extends string, N extends BaseNode<T>> extends SubPar
         const body: ASTNode<T, N>[] = [];
         const statementParser = this.parent.get(StatementParser) as StatementParser<T, N>;
 
-        while (this.peek().type !== TokenType.R_BRACE && !this.isAtEnd()) {
-            body.push(statementParser.parse(id));
-        }
+        return this.within(id, () => {
+            while (this.peek().type !== TokenType.R_BRACE && !this.isAtEnd()) {
+                body.push(statementParser.parse(id));
+            }
 
-        return body;
+            return body;
+        });
     }
 }

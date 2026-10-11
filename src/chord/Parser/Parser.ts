@@ -3,6 +3,7 @@ import { ASTNode, Token, TokenType, BaseNode, PeekType, Location, TokenTypeUnion
 
 import { ChordError, ErrorLevel } from "../../errors/ChordError";
 import { CompilationContext } from "../model/CompilationContext";
+import { DeclarationLog } from "../model/DeclarationLog";
 import { ParserContext } from "./ParserContext";
 import { SubParser, SubParserClass } from "./SubParser";
 import { SymbolTable } from "../model/SymbolsTable";
@@ -51,6 +52,14 @@ export class Parser<T extends string, N extends BaseNode<T>> extends ParserConte
      * @type {ASTNode<T, N>[]}
      */
     public nodes: ASTNode<T, N>[] = [];
+
+    /**
+     * Every name the parsed source declares, with where it is written and what it belongs to.
+     * @public
+     * @readonly
+     * @type {DeclarationLog<T>}
+     */
+    public readonly declarations: DeclarationLog<T> = new DeclarationLog<T>();
     
     /**
      * Creates an instance of the Parser orchestrator.

@@ -39,6 +39,26 @@ export abstract class SubParser<T extends string, N extends BaseNode<T>> {
     }
 
     /**
+     * Records the identifier token that names something the source declares, and answers the name.
+     * @param kind - What is declared (a `DeclarationKind`, or a kind of the dialect).
+     * @param token - The identifier token, as consumed.
+     * @returns The declared name.
+     */
+    protected declare(kind: string, token: Token<T>): string {
+        return this.parent.declarations.record(kind, token);
+    }
+
+    /**
+     * Makes the names declared while `body` parses belong to a class or function.
+     * @param container - Its name.
+     * @param body - What parses its body.
+     * @returns What `body` answers.
+     */
+    protected within<R>(container: string, body: () => R): R {
+        return this.parent.declarations.within(container, body);
+    }
+
+    /**
      * Looks ahead at tokens through the parent's token stream without consuming them.
      * @returns The current token without consuming it.
      */

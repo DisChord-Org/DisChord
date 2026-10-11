@@ -1,5 +1,5 @@
 import { SubParser } from "../../SubParser";
-import { BaseNode, FunctionNode, TokenType, TokenTypeUnion } from "../../../types";
+import { BaseNode, DeclarationKind, FunctionNode, TokenType, TokenTypeUnion } from "../../../types";
 import { BlockParser } from "../BlockParser";
 import { Parser } from "../../Parser";
 import { DecoratorProcessor } from "../../../DecoratorProcessor";
@@ -53,54 +53,56 @@ export class FunctionParser<T extends string, N extends BaseNode<T>> extends Sub
         const isStatic: boolean = DecoratorProcessor.matchAndDelete('fijar', true);
 
         if (flags.constructor) {
-            id = this.consume(TokenType.IDENTIFICADOR, "Se esperaba el nombre del constructor.").value;
+            id = this.declare(DeclarationKind.Constructor, this.consume(TokenType.IDENTIFICADOR, "Se esperaba el nombre del constructor."));
         } else {
             this.consume(TokenType.Funcion);
 
             // a method may be named after a reserved word (`funcion en() {}`); a free function may not.
             const nextToken = this.peek();
             const nameType = flags.method && this.isReservedMemberName(nextToken) ? nextToken.type : TokenType.IDENTIFICADOR;
-            id = this.consume(nameType, "Se esperaba el nombre de la función.").value;
+            id = this.declare(flags.method ? DeclarationKind.Method : DeclarationKind.Function, this.consume(nameType, "Se esperaba el nombre de la función."));
         }
 
-        this.consume(TokenType.L_PAREN, `Después del nombre de la función se debe abrir una expresión con '(' para especificar los parámetros.`);
-        const typeParser = new TypeAnnotationParser(this.parent);
-        const params: string[] = [];
-        const paramTypes: (DataType | undefined)[] = [];
-        while (!this.isAtEnd() && this.peek().type !== TokenType.R_PAREN) {
-            params.push(this.consume(TokenType.IDENTIFICADOR, "Se esperaba el nombre del parámetro.").value);
-            paramTypes.push(typeParser.parse());
-            if (this.peek().type === TokenType.COMA) this.consume(TokenType.COMA);
-        }
-        this.consume(TokenType.R_PAREN);
+        return this.within(id, () => {
+            this.consume(TokenType.L_PAREN, `Después del nombre de la función se debe abrir una expresión con '(' para especificar los parámetros.`);
+            const typeParser = new TypeAnnotationParser(this.parent);
+            const params: string[] = [];
+            const paramTypes: (DataType | undefined)[] = [];
+            while (!this.isAtEnd() && this.peek().type !== TokenType.R_PAREN) {
+                params.push(this.declare(DeclarationKind.Parameter, this.consume(TokenType.IDENTIFICADOR, "Se esperaba el nombre del parámetro.")));
+                paramTypes.push(typeParser.parse());
+                if (this.peek().type === TokenType.COMA) this.consume(TokenType.COMA);
+            }
+            this.consume(TokenType.R_PAREN);
 
-        let returnType: DataType | undefined;
-        if (this.peek().type === TokenType.Flecha) {
-            if (flags.constructor) throw new ChordError({
-                phase: ErrorLevel.Parser,
-                message: "Un constructor no puede declarar un tipo de retorno",
-                location: this.peek().location
+            let returnType: DataType | undefined;
+            if (this.peek().type === TokenType.Flecha) {
+                if (flags.constructor) throw new ChordError({
+                    phase: ErrorLevel.Parser,
+                    message: "Un constructor no puede declarar un tipo de retorno",
+                    location: this.peek().location
+                });
+
+                this.consume(TokenType.Flecha);
+                returnType = typeParser.parseType();
+            }
+
+            const body = (this.parent.get(BlockParser) as BlockParser<T, N>).parse().body;
+
+            return this.createNode<FunctionNode<T, N>>({
+                type: TokenType.Funcion,
+                id,
+                metadata: {
+                    isConstructor: flags.constructor,
+                    isMethod: flags.method,
+                    isStatic,
+                    isAsync
+                },
+                params,
+                ...(paramTypes.some(type => type !== undefined) && { paramTypes }),
+                ...(returnType && { returnType }),
+                body
             });
-
-            this.consume(TokenType.Flecha);
-            returnType = typeParser.parseType();
-        }
-
-        const body = (this.parent.get(BlockParser) as BlockParser<T, N>).parse().body;
-
-        return this.createNode<FunctionNode<T, N>>({
-            type: TokenType.Funcion,
-            id,
-            metadata: {
-                isConstructor: flags.constructor,
-                isMethod: flags.method,
-                isStatic,
-                isAsync
-            },
-            params,
-            ...(paramTypes.some(type => type !== undefined) && { paramTypes }),
-            ...(returnType && { returnType }),
-            body
         });
     }
 

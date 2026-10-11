@@ -1,4 +1,4 @@
-import { ASTNode, BaseNode, LiteralNode, TokenType, TokenTypeUnion, VariableNode } from "../../../types";
+import { ASTNode, BaseNode, DeclarationKind, LiteralNode, TokenType, TokenTypeUnion, VariableNode } from "../../../types";
 import { Parser } from "../../Parser";
 import { SubParser } from "../../SubParser";
 import { ExpressionParser } from "../Expressions/ExpressionParser";
@@ -42,7 +42,7 @@ export class VariableParser<T extends string, N extends BaseNode<T>> extends Sub
      */
     public parse(): VariableNode<T, N> {
         this.consume(TokenType.Var);
-        const id = this.consume(TokenType.IDENTIFICADOR, `Se debe especificar un nombre para la variable`).value;
+        const id = this.declare(DeclarationKind.Variable, this.consume(TokenType.IDENTIFICADOR, `Se debe especificar un nombre para la variable`));
 
         const dataType = new TypeAnnotationParser(this.parent).parse();
 

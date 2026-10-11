@@ -1,4 +1,4 @@
-import { CommandNode, DisChordNode, DisChordNodeType, DisChordODBNode, DisChordTokenType } from "../../../types";
+import { CommandNode, DisChordDeclarationKind, DisChordNode, DisChordNodeType, DisChordODBNode, DisChordTokenType } from "../../../types";
 import { ODBMode, TokenType, TokenTypeUnion } from "../../../../chord/types";
 import { SubParser } from "../../../../chord/Parser/SubParser";
 import { BDOParser } from "../../../../chord/Parser/Grammar/BDOParser";
@@ -31,9 +31,9 @@ export default class CommandParser extends SubParser<DisChordNodeType, DisChordN
      */
     parse (): CommandNode {
         this.consume(DisChordTokenType.Comando);
-        const commandName = this.consume(TokenType.IDENTIFICADOR).value;
+        const commandName = this.declare(DisChordDeclarationKind.Command, this.consume(TokenType.IDENTIFICADOR));
 
-        const body = this.parent.get(BDOParser).setMode(ODBMode.Intelligent).parse() as DisChordODBNode;
+        const body = this.within(commandName, () => this.parent.get(BDOParser).setMode(ODBMode.Intelligent).parse() as DisChordODBNode);
 
         return this.createNode<CommandNode>({
             type: DisChordTokenType.CREAR_COMANDO,
