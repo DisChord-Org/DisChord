@@ -1,5 +1,5 @@
 import { corelib as chordCorelib } from "../../chord/corelib/corelib.data";
-import { PrimitiveDataType, UnionDataType, VoidDataType } from "../../chord/model/DataType";
+import { AnyDataType, PrimitiveDataType, UnionDataType, VoidDataType } from "../../chord/model/DataType";
 import { PrimitiveType } from "../../chord/types";
 import { DisChordCoreLib } from "./corelib.types";
 
@@ -32,34 +32,40 @@ export const corelib: DisChordCoreLib = {
                 emitir: {
                     transpile: 'cliente.events.runEvent',
                     returns: VoidDataType.Void,
-                    static: true
+                    static: true,
+                    doc: 'Emite un evento del bot.'
                 }
             },
             properties: {
                 id: {
                     transpile: 'cliente.me.id',
                     returns: PrimitiveDataType.Texto,
-                    static: true
+                    static: true,
+                    doc: 'Identificador del bot.'
                 },
                 nombre: {
                     transpile: 'cliente.me.username',
                     returns: PrimitiveDataType.Texto,
-                    static: true
+                    static: true,
+                    doc: 'Nombre de usuario del bot.'
                 },
                 avatar: {
                     transpile: 'cliente.me.avatar',
                     returns: UnionDataType.of([PrimitiveType.Texto, PrimitiveType.Indefinido]),
-                    static: true
+                    static: true,
+                    doc: 'Hash del avatar del bot, si tiene.'
                 },
                 avatarUrl: {
                     transpile: 'cliente.me.avatarUrl',
                     returns: PrimitiveDataType.Texto,
-                    static: true
+                    static: true,
+                    doc: 'URL del avatar del bot.'
                 },
                 ping: {
                     transpile: 'cliente.gateway.latency',
                     returns: PrimitiveDataType.Numero,
-                    static: true
+                    static: true,
+                    doc: 'Latencia con la puerta de enlace, en milisegundos.'
                 }
             }
         },
@@ -70,32 +76,38 @@ export const corelib: DisChordCoreLib = {
                 topico: {
                     transpile: 'canal.topic',
                     returns: UnionDataType.of([PrimitiveType.Texto, PrimitiveType.Indefinido]),
-                    static: true
+                    static: true,
+                    doc: 'Tema del canal, si tiene.'
                 },
                 ratelimit: {
                     transpile: 'canal.rateLimitPerUser',
                     returns: UnionDataType.of([PrimitiveType.Numero, PrimitiveType.Indefinido]),
-                    static: true
+                    static: true,
+                    doc: 'Segundos que debe esperar un usuario entre mensajes.'
                 },
                 posicion: {
                     transpile: 'canal.position',
                     returns: PrimitiveDataType.Numero,
-                    static: true
+                    static: true,
+                    doc: 'Posición del canal en la lista de canales.'
                 },
                 categoria: {
                     transpile: 'canal.parentId',
                     returns: UnionDataType.of([PrimitiveType.Texto, PrimitiveType.Indefinido]),
-                    static: true
+                    static: true,
+                    doc: 'Identificador de la categoría que contiene el canal.'
                 },
                 nombre: {
                     transpile: 'canal.name',
                     returns: UnionDataType.of([PrimitiveType.Texto, PrimitiveType.Indefinido]),
-                    static: true
+                    static: true,
+                    doc: 'Nombre del canal.'
                 },
                 ultimoMensaje: {
                     transpile: 'canal.lastMessageId',
                     returns: UnionDataType.of([PrimitiveType.Texto, PrimitiveType.Indefinido]),
-                    static: true
+                    static: true,
+                    doc: 'Identificador del último mensaje del canal.'
                 }
             }
         },
@@ -120,57 +132,68 @@ export const corelib: DisChordCoreLib = {
                 nombre: {
                     transpile: 'username',
                     returns: PrimitiveDataType.Texto,
-                    runtime: true
+                    runtime: true,
+                    doc: 'Nombre de usuario.'
                 },
                 nombreGlobal: {
                     transpile: 'globalName',
                     returns: UnionDataType.of([PrimitiveType.Texto, PrimitiveType.Indefinido]),
-                    runtime: true
+                    runtime: true,
+                    doc: 'Nombre visible global del usuario, si lo tiene.'
                 },
                 etiqueta: {
                     transpile: 'tag',
                     returns: PrimitiveDataType.Texto,
-                    runtime: true
+                    runtime: true,
+                    doc: 'Etiqueta completa del usuario.'
                 },
                 discriminador: {
                     transpile: 'discriminator',
                     returns: PrimitiveDataType.Texto,
-                    runtime: true
+                    runtime: true,
+                    doc: 'Discriminador del usuario.'
                 },
                 insignias: {
                     transpile: 'publicFlags',
                     returns: UnionDataType.of([PrimitiveType.Numero, PrimitiveType.Indefinido]),
-                    runtime: true
+                    runtime: true,
+                    doc: 'Insignias públicas del usuario, como número de banderas.'
                 },
                 esBot: {
                     transpile: 'bot',
                     returns: UnionDataType.of([PrimitiveType.Booleano, PrimitiveType.Indefinido]),
-                    runtime: true
+                    runtime: true,
+                    doc: 'Indica si el usuario es un bot.'
                 },
                 esSistema: {
                     transpile: 'system',
                     returns: UnionDataType.of([PrimitiveType.Booleano, PrimitiveType.Indefinido]),
-                    runtime: true
+                    runtime: true,
+                    doc: 'Indica si el usuario es del sistema de Discord.'
                 },
                 avatarUrl: {
                     transpile: 'avatarURL()',
                     returns: PrimitiveDataType.Texto,
-                    runtime: true
+                    runtime: true,
+                    doc: 'URL del avatar del usuario.'
                 },
                 bannerUrl: {
                     transpile: 'bannerURL()',
                     returns: UnionDataType.of([PrimitiveType.Texto, PrimitiveType.Indefinido]),
-                    runtime: true
+                    runtime: true,
+                    doc: 'URL del banner del usuario, si tiene.'
                 },
                 colorPerfil: {
                     transpile: 'accentColor',
                     returns: UnionDataType.of([PrimitiveType.Numero, PrimitiveType.Indefinido]),
-                    runtime: true
+                    runtime: true,
+                    doc: 'Color del perfil del usuario, si lo tiene.'
                 },
                 tipoPremium: {
                     transpile: 'premiumType',
                     returns: UnionDataType.of([PrimitiveType.Numero, PrimitiveType.Indefinido]),
-                    runtime: true
+                    runtime: true,
+                    doc: 'Tipo de suscripción premium del usuario, si la tiene.'
                 }
             }
         }

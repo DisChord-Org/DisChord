@@ -120,19 +120,19 @@ export const corelib = {
                 tiene: {
                     transpile: 'includes',
                     returns: PrimitiveDataType.Booleano,
-                    params: [{ name: 'buscado', type: PrimitiveDataType.Texto }, { name: 'desde', type: PrimitiveDataType.Numero, optional: true }],
+                    params: [{ name: 'buscado', type: PrimitiveDataType.Texto }, { name: 'posicion', type: PrimitiveDataType.Numero, optional: true }],
                     doc: 'Indica si el texto contiene lo buscado.'
                 },
                 indiceDe: {
                     transpile: 'indexOf',
                     returns: PrimitiveDataType.Numero,
-                    params: [{ name: 'buscado', type: PrimitiveDataType.Texto }, { name: 'desde', type: PrimitiveDataType.Numero, optional: true }],
+                    params: [{ name: 'buscado', type: PrimitiveDataType.Texto }, { name: 'posicion', type: PrimitiveDataType.Numero, optional: true }],
                     doc: 'Posición de la primera aparición de lo buscado, o -1.'
                 },
                 ultimoIndiceDe: {
                     transpile: 'lastIndexOf',
                     returns: PrimitiveDataType.Numero,
-                    params: [{ name: 'buscado', type: PrimitiveDataType.Texto }, { name: 'desde', type: PrimitiveDataType.Numero, optional: true }],
+                    params: [{ name: 'buscado', type: PrimitiveDataType.Texto }, { name: 'posicion', type: PrimitiveDataType.Numero, optional: true }],
                     doc: 'Posición de la última aparición de lo buscado, o -1.'
                 },
                 caracterEn: {
@@ -233,145 +233,214 @@ export const corelib = {
             methods: {
                 agregar: {
                     transpile: 'push',
-                    returns: PrimitiveDataType.Numero
+                    returns: PrimitiveDataType.Numero,
+                    params: [{ name: 'elementos', type: AnyDataType.Any, rest: true }],
+                    doc: 'Agrega elementos al final y devuelve la nueva longitud.'
                 },
                 quitarUltimo: {
                     transpile: 'pop',
-                    returns: AnyDataType.Any
+                    returns: AnyDataType.Any,
+                    params: [],
+                    doc: 'Quita el último elemento y lo devuelve.'
                 },
                 quitarPrimero: {
                     transpile: 'shift',
-                    returns: AnyDataType.Any
+                    returns: AnyDataType.Any,
+                    params: [],
+                    doc: 'Quita el primer elemento y lo devuelve.'
                 },
                 agregarInicio: {
                     transpile: 'unshift',
-                    returns: PrimitiveDataType.Numero
+                    returns: PrimitiveDataType.Numero,
+                    params: [{ name: 'elementos', type: AnyDataType.Any, rest: true }],
+                    doc: 'Agrega elementos al inicio y devuelve la nueva longitud.'
                 },
                 unir: {
                     transpile: 'join',
-                    returns: PrimitiveDataType.Texto
+                    returns: PrimitiveDataType.Texto,
+                    params: [{ name: 'separador', type: PrimitiveDataType.Texto, optional: true }],
+                    doc: 'Une los elementos en un texto con el separador dado.'
                 },
                 mapear: {
                     transpile: 'map',
-                    returns: ArrayDataType.AnyList
+                    returns: ArrayDataType.AnyList,
+                    params: [{ name: 'accion', type: AnyDataType.Any }],
+                    doc: 'Crea una lista con el resultado de la función sobre cada elemento.'
                 },
                 llenar: {
                     transpile: 'fill',
-                    returns: ArrayDataType.AnyList
+                    returns: ArrayDataType.AnyList,
+                    params: [{ name: 'valor', type: AnyDataType.Any }, { name: 'inicio', type: PrimitiveDataType.Numero, optional: true }, { name: 'fin', type: PrimitiveDataType.Numero, optional: true }],
+                    doc: 'Rellena la lista con un valor entre dos posiciones.'
                 },
                 todos: {
                     transpile: 'every',
-                    returns: PrimitiveDataType.Booleano
+                    returns: PrimitiveDataType.Booleano,
+                    params: [{ name: 'condicion', type: AnyDataType.Any }],
+                    doc: 'Indica si todos los elementos cumplen la condición.'
                 },
                 algunos: {
                     transpile: 'some',
-                    returns: PrimitiveDataType.Booleano
+                    returns: PrimitiveDataType.Booleano,
+                    params: [{ name: 'condicion', type: AnyDataType.Any }],
+                    doc: 'Indica si algún elemento cumple la condición.'
                 },
                 filtrar: {
                     transpile: 'filter',
-                    returns: ArrayDataType.AnyList
+                    returns: ArrayDataType.AnyList,
+                    params: [{ name: 'condicion', type: AnyDataType.Any }],
+                    doc: 'Devuelve los elementos que cumplen la condición.'
                 },
                 encontrar: {
                     transpile: 'find',
-                    returns: AnyDataType.Any
+                    returns: AnyDataType.Any,
+                    params: [{ name: 'condicion', type: AnyDataType.Any }],
+                    doc: 'Devuelve el primer elemento que cumple la condición.'
                 },
                 tiene: {
                     transpile: 'includes',
-                    returns: PrimitiveDataType.Booleano
+                    returns: PrimitiveDataType.Booleano,
+                    params: [{ name: 'valor', type: AnyDataType.Any }],
+                    doc: 'Indica si la lista contiene el valor.'
                 },
                 cortar: {
                     transpile: 'slice',
-                    returns: ArrayDataType.AnyList
+                    returns: ArrayDataType.AnyList,
+                    params: [{ name: 'inicio', type: PrimitiveDataType.Numero, optional: true }, { name: 'fin', type: PrimitiveDataType.Numero, optional: true }],
+                    doc: 'Devuelve una copia de la parte de la lista entre dos posiciones.'
                 },
                 invertir: {
                     transpile: 'reverse',
-                    returns: ArrayDataType.AnyList
+                    returns: ArrayDataType.AnyList,
+                    params: [],
+                    doc: 'Invierte el orden de la lista en su lugar.'
                 },
                 ordenar: {
                     transpile: 'sort',
-                    returns: ArrayDataType.AnyList
+                    returns: ArrayDataType.AnyList,
+                    params: [{ name: 'comparador', type: AnyDataType.Any, optional: true }],
+                    doc: 'Ordena la lista en su lugar.'
                 },
                 reducir: {
                     transpile: 'reduce',
-                    returns: AnyDataType.Any
+                    returns: AnyDataType.Any,
+                    params: [{ name: 'accion', type: AnyDataType.Any }, { name: 'inicial', type: AnyDataType.Any, optional: true }],
+                    doc: 'Reduce la lista a un valor aplicando la función de izquierda a derecha.'
                 },
                 aplanar: {
                     transpile: 'flat',
-                    returns: ArrayDataType.AnyList
+                    returns: ArrayDataType.AnyList,
+                    params: [{ name: 'profundidad', type: PrimitiveDataType.Numero, optional: true }],
+                    doc: 'Aplana las listas anidadas hasta la profundidad dada.'
                 },
                 paraCada: {
                     transpile: 'forEach',
-                    returns: VoidDataType.Void
+                    returns: VoidDataType.Void,
+                    params: [{ name: 'accion', type: AnyDataType.Any }],
+                    doc: 'Ejecuta la función con cada elemento.'
                 },
                 indiceDe: {
                     transpile: 'indexOf',
-                    returns: PrimitiveDataType.Numero
+                    returns: PrimitiveDataType.Numero,
+                    params: [{ name: 'valor', type: AnyDataType.Any }, { name: 'inicio', type: PrimitiveDataType.Numero, optional: true }],
+                    doc: 'Posición de la primera aparición del valor, o -1.'
                 },
                 ultimoIndiceDe: {
                     transpile: 'lastIndexOf',
-                    returns: PrimitiveDataType.Numero
+                    returns: PrimitiveDataType.Numero,
+                    params: [{ name: 'valor', type: AnyDataType.Any }, { name: 'inicio', type: PrimitiveDataType.Numero, optional: true }],
+                    doc: 'Posición de la última aparición del valor, o -1.'
                 },
                 concatenar: {
                     transpile: 'concat',
-                    returns: ArrayDataType.AnyList
+                    returns: ArrayDataType.AnyList,
+                    params: [{ name: 'listas', type: AnyDataType.Any, rest: true }],
+                    doc: 'Une la lista con otras listas o valores en una nueva.'
                 },
                 buscarIndice: {
                     transpile: 'findIndex',
-                    returns: PrimitiveDataType.Numero
+                    returns: PrimitiveDataType.Numero,
+                    params: [{ name: 'condicion', type: AnyDataType.Any }],
+                    doc: 'Posición del primer elemento que cumple la condición, o -1.'
                 },
                 encontrarUltimo: {
                     transpile: 'findLast',
-                    returns: AnyDataType.Any
+                    returns: AnyDataType.Any,
+                    params: [{ name: 'condicion', type: AnyDataType.Any }],
+                    doc: 'Devuelve el último elemento que cumple la condición.'
                 },
                 aplanarMapear: {
                     transpile: 'flatMap',
-                    returns: ArrayDataType.AnyList
+                    returns: ArrayDataType.AnyList,
+                    params: [{ name: 'accion', type: AnyDataType.Any }],
+                    doc: 'Aplica la función a cada elemento y aplana el resultado un nivel.'
                 },
                 en: {
                     transpile: 'at',
-                    returns: AnyDataType.Any
+                    returns: AnyDataType.Any,
+                    params: [{ name: 'posicion', type: PrimitiveDataType.Numero }],
+                    doc: 'Elemento en la posición dada; admite posiciones negativas.'
                 },
                 insertar: {
                     transpile: 'splice',
-                    returns: ArrayDataType.AnyList
+                    returns: ArrayDataType.AnyList,
+                    params: [{ name: 'inicio', type: PrimitiveDataType.Numero }, { name: 'cantidad', type: PrimitiveDataType.Numero, optional: true }, { name: 'elementos', type: AnyDataType.Any, rest: true }],
+                    doc: 'Inserta elementos desde una posición, como splice: quita la cantidad indicada antes de insertar.'
                 },
                 eliminar: {
                     transpile: 'splice',
-                    returns: ArrayDataType.AnyList
+                    returns: ArrayDataType.AnyList,
+                    params: [{ name: 'inicio', type: PrimitiveDataType.Numero }, { name: 'cantidad', type: PrimitiveDataType.Numero, optional: true }],
+                    doc: 'Elimina elementos desde una posición y devuelve los eliminados.'
                 },
                 claves: {
                     transpile: 'keys',
-                    returns: AnyDataType.Any
+                    returns: AnyDataType.Any,
+                    params: [],
+                    doc: 'Iterador con las posiciones de la lista.'
                 },
                 valores: {
                     transpile: 'values',
-                    returns: AnyDataType.Any
+                    returns: AnyDataType.Any,
+                    params: [],
+                    doc: 'Iterador con los elementos de la lista.'
                 },
                 entradas: {
                     transpile: 'entries',
-                    returns: AnyDataType.Any
+                    returns: AnyDataType.Any,
+                    params: [],
+                    doc: 'Iterador de pares posición y elemento.'
                 },
                 reducirDerecha: {
                     transpile: 'reduceRight',
-                    returns: AnyDataType.Any
+                    returns: AnyDataType.Any,
+                    params: [{ name: 'accion', type: AnyDataType.Any }, { name: 'inicial', type: AnyDataType.Any, optional: true }],
+                    doc: 'Como reducir, pero de derecha a izquierda.'
                 },
                 copiarDentro: {
                     transpile: 'copyWithin',
-                    returns: ArrayDataType.AnyList
+                    returns: ArrayDataType.AnyList,
+                    params: [{ name: 'destino', type: PrimitiveDataType.Numero }, { name: 'inicio', type: PrimitiveDataType.Numero }, { name: 'fin', type: PrimitiveDataType.Numero, optional: true }],
+                    doc: 'Copia una parte de la lista a otra posición dentro de ella.'
                 },
                 ordenarCopia: {
                     transpile: 'toSorted',
-                    returns: ArrayDataType.AnyList
+                    returns: ArrayDataType.AnyList,
+                    params: [{ name: 'comparador', type: AnyDataType.Any, optional: true }],
+                    doc: 'Devuelve una copia ordenada sin modificar la original.'
                 },
                 invertirCopia: {
                     transpile: 'toReversed',
-                    returns: ArrayDataType.AnyList
+                    returns: ArrayDataType.AnyList,
+                    params: [],
+                    doc: 'Devuelve una copia invertida sin modificar la original.'
                 }
             },
             properties: {
                 longitud: {
                     transpile: 'length',
-                    returns: PrimitiveDataType.Numero
+                    returns: PrimitiveDataType.Numero,
+                    doc: 'Cantidad de elementos de la lista.'
                 }
             }
         },
@@ -514,7 +583,7 @@ export const corelib = {
                     transpile: 'Math.atan2',
                     returns: PrimitiveDataType.Numero,
                     static: true,
-                    params: [{ name: 'y', type: PrimitiveDataType.Numero }, { name: 'x', type: PrimitiveDataType.Numero }],
+                    params: [{ name: 'ordenada', type: PrimitiveDataType.Numero }, { name: 'abscisa', type: PrimitiveDataType.Numero }],
                     doc: 'Ángulo, en radianes, del punto (x, y).'
                 },
                 senoHiperbolico: {
@@ -782,12 +851,16 @@ export const corelib = {
                 leer: {
                     transpile: 'JSON.parse',
                     returns: AnyDataType.Any,
-                    static: true
+                    static: true,
+                    params: [{ name: 'texto', type: PrimitiveDataType.Texto }],
+                    doc: 'Convierte un texto JSON en un valor.'
                 },
                 escribir: {
                     transpile: 'JSON.stringify',
                     returns: PrimitiveDataType.Texto,
-                    static: true
+                    static: true,
+                    params: [{ name: 'valor', type: AnyDataType.Any }, { name: 'reemplazo', type: AnyDataType.Any, optional: true }, { name: 'espacios', type: PrimitiveDataType.Numero, optional: true }],
+                    doc: 'Convierte un valor en un texto JSON.'
                 }
             }
         },
@@ -797,37 +870,51 @@ export const corelib = {
                 claves: {
                     transpile: 'Object.keys',
                     returns: ArrayDataType.of(PrimitiveDataType.Texto),
-                    static: true
+                    static: true,
+                    params: [{ name: 'objeto', type: AnyDataType.Any }],
+                    doc: 'Lista con los nombres de los campos del objeto.'
                 },
                 valores: {
                     transpile: 'Object.values',
                     returns: ArrayDataType.AnyList,
-                    static: true
+                    static: true,
+                    params: [{ name: 'objeto', type: AnyDataType.Any }],
+                    doc: 'Lista con los valores de los campos del objeto.'
                 },
                 entradas: {
                     transpile: 'Object.entries',
                     returns: ArrayDataType.AnyList,
-                    static: true
+                    static: true,
+                    params: [{ name: 'objeto', type: AnyDataType.Any }],
+                    doc: 'Lista de pares nombre y valor de los campos del objeto.'
                 },
                 unir: {
                     transpile: 'Object.assign',
                     returns: PrimitiveDataType.BDO,
-                    static: true
+                    static: true,
+                    params: [{ name: 'destino', type: AnyDataType.Any }, { name: 'fuentes', type: AnyDataType.Any, rest: true }],
+                    doc: 'Copia los campos de las fuentes en el destino y lo devuelve.'
                 },
                 congelar: {
                     transpile: 'Object.freeze',
                     returns: PrimitiveDataType.BDO,
-                    static: true
+                    static: true,
+                    params: [{ name: 'objeto', type: AnyDataType.Any }],
+                    doc: 'Impide cambiar el objeto y lo devuelve.'
                 },
                 desdeEntradas: {
                     transpile: 'Object.fromEntries',
                     returns: PrimitiveDataType.BDO,
-                    static: true
+                    static: true,
+                    params: [{ name: 'entradas', type: AnyDataType.Any }],
+                    doc: 'Crea un objeto a partir de una lista de pares nombre y valor.'
                 },
                 tienePropia: {
                     transpile: 'Object.hasOwn',
                     returns: PrimitiveDataType.Booleano,
-                    static: true
+                    static: true,
+                    params: [{ name: 'objeto', type: AnyDataType.Any }, { name: 'clave', type: PrimitiveDataType.Texto }],
+                    doc: 'Indica si el objeto tiene el campo como propio.'
                 }
             }
         },
@@ -837,29 +924,40 @@ export const corelib = {
             methods: {
                 obtener: {
                     transpile: 'get',
-                    returns: AnyDataType.Any
+                    returns: AnyDataType.Any,
+                    params: [{ name: 'clave', type: AnyDataType.Any }],
+                    doc: 'Devuelve el valor guardado para la clave.'
                 },
                 poner: {
                     transpile: 'set',
-                    returns: ClassDataType.of(ClassesEnum.Mapa)
+                    returns: ClassDataType.of(ClassesEnum.Mapa),
+                    params: [{ name: 'clave', type: AnyDataType.Any }, { name: 'valor', type: AnyDataType.Any }],
+                    doc: 'Guarda un valor para la clave y devuelve el mapa.'
                 },
                 tiene: {
                     transpile: 'has',
-                    returns: PrimitiveDataType.Booleano
+                    returns: PrimitiveDataType.Booleano,
+                    params: [{ name: 'clave', type: AnyDataType.Any }],
+                    doc: 'Indica si hay un valor para la clave.'
                 },
                 borrar: {
                     transpile: 'delete',
-                    returns: PrimitiveDataType.Booleano
+                    returns: PrimitiveDataType.Booleano,
+                    params: [{ name: 'clave', type: AnyDataType.Any }],
+                    doc: 'Borra la clave y devuelve si existía.'
                 },
                 limpiar: {
                     transpile: 'clear',
-                    returns: VoidDataType.Void
+                    returns: VoidDataType.Void,
+                    params: [],
+                    doc: 'Borra todas las claves.'
                 }
             },
             properties: {
                 tamano: {
                     transpile: 'size',
-                    returns: PrimitiveDataType.Numero
+                    returns: PrimitiveDataType.Numero,
+                    doc: 'Cantidad de claves del mapa.'
                 }
             }
         },
@@ -875,25 +973,34 @@ export const corelib = {
             methods: {
                 agregar: {
                     transpile: 'add',
-                    returns: ClassDataType.of(ClassesEnum.Conjunto)
+                    returns: ClassDataType.of(ClassesEnum.Conjunto),
+                    params: [{ name: 'valor', type: AnyDataType.Any }],
+                    doc: 'Agrega un valor y devuelve el conjunto.'
                 },
                 tiene: {
                     transpile: 'has',
-                    returns: PrimitiveDataType.Booleano
+                    returns: PrimitiveDataType.Booleano,
+                    params: [{ name: 'valor', type: AnyDataType.Any }],
+                    doc: 'Indica si el conjunto contiene el valor.'
                 },
                 borrar: {
                     transpile: 'delete',
-                    returns: PrimitiveDataType.Booleano
+                    returns: PrimitiveDataType.Booleano,
+                    params: [{ name: 'valor', type: AnyDataType.Any }],
+                    doc: 'Quita el valor y devuelve si estaba.'
                 },
                 limpiar: {
                     transpile: 'clear',
-                    returns: VoidDataType.Void
+                    returns: VoidDataType.Void,
+                    params: [],
+                    doc: 'Quita todos los valores.'
                 }
             },
             properties: {
                 tamano: {
                     transpile: 'size',
-                    returns: PrimitiveDataType.Numero
+                    returns: PrimitiveDataType.Numero,
+                    doc: 'Cantidad de valores del conjunto.'
                 }
             }
         },
@@ -905,37 +1012,49 @@ export const corelib = {
                     transpile: 'Promise.all',
                     returns: AnyDataType.Any,
                     static: true,
-                    async: true
+                    async: true,
+                    params: [{ name: 'promesas', type: AnyDataType.Any }],
+                    doc: 'Espera a todas las promesas y devuelve la lista de resultados.'
                 },
                 todasResueltas: {
                     transpile: 'Promise.allSettled',
                     returns: AnyDataType.Any,
                     static: true,
-                    async: true
+                    async: true,
+                    params: [{ name: 'promesas', type: AnyDataType.Any }],
+                    doc: 'Espera a que todas terminen y devuelve el estado de cada una.'
                 },
                 primera: {
                     transpile: 'Promise.race',
                     returns: AnyDataType.Any,
                     static: true,
-                    async: true
+                    async: true,
+                    params: [{ name: 'promesas', type: AnyDataType.Any }],
+                    doc: 'Devuelve el resultado de la primera promesa en terminar.'
                 },
                 cualquiera: {
                     transpile: 'Promise.any',
                     returns: AnyDataType.Any,
                     static: true,
-                    async: true
+                    async: true,
+                    params: [{ name: 'promesas', type: AnyDataType.Any }],
+                    doc: 'Devuelve el resultado de la primera promesa que se cumpla.'
                 },
                 resolver: {
                     transpile: 'Promise.resolve',
                     returns: AnyDataType.Any,
                     static: true,
-                    async: true
+                    async: true,
+                    params: [{ name: 'valor', type: AnyDataType.Any, optional: true }],
+                    doc: 'Crea una promesa ya cumplida con el valor.'
                 },
                 rechazar: {
                     transpile: 'Promise.reject',
                     returns: AnyDataType.Any,
                     static: true,
-                    async: true
+                    async: true,
+                    params: [{ name: 'motivo', type: AnyDataType.Any, optional: true }],
+                    doc: 'Crea una promesa ya rechazada con el motivo.'
                 }
             }
         },
@@ -945,11 +1064,15 @@ export const corelib = {
             methods: {
                 probar: {
                     transpile: 'test',
-                    returns: PrimitiveDataType.Booleano
+                    returns: PrimitiveDataType.Booleano,
+                    params: [{ name: 'texto', type: PrimitiveDataType.Texto }],
+                    doc: 'Indica si el texto cumple la expresión.'
                 },
                 ejecutar: {
                     transpile: 'exec',
-                    returns: AnyDataType.Any
+                    returns: AnyDataType.Any,
+                    params: [{ name: 'texto', type: PrimitiveDataType.Texto }],
+                    doc: 'Busca la expresión en el texto y devuelve la coincidencia, o indefinido si no hay.'
                 }
             }
         },
@@ -960,60 +1083,88 @@ export const corelib = {
                 ahora: {
                     transpile: 'Date.now',
                     returns: PrimitiveDataType.Numero,
-                    static: true
+                    static: true,
+                    params: [],
+                    doc: 'Marca de tiempo actual, en milisegundos.'
                 },
                 parsear: {
                     transpile: 'Date.parse',
                     returns: PrimitiveDataType.Numero,
-                    static: true
+                    static: true,
+                    params: [{ name: 'texto', type: PrimitiveDataType.Texto }],
+                    doc: 'Convierte un texto de fecha en una marca de tiempo.'
                 },
                 año: {
                     transpile: 'getFullYear',
-                    returns: PrimitiveDataType.Numero
+                    returns: PrimitiveDataType.Numero,
+                    params: [],
+                    doc: 'Año de la fecha.'
                 },
                 mes: {
                     transpile: 'getMonth',
-                    returns: PrimitiveDataType.Numero
+                    returns: PrimitiveDataType.Numero,
+                    params: [],
+                    doc: 'Mes de la fecha, de 0 a 11.'
                 },
                 dia: {
                     transpile: 'getDate',
-                    returns: PrimitiveDataType.Numero
+                    returns: PrimitiveDataType.Numero,
+                    params: [],
+                    doc: 'Día del mes de la fecha.'
                 },
                 diaSemana: {
                     transpile: 'getDay',
-                    returns: PrimitiveDataType.Numero
+                    returns: PrimitiveDataType.Numero,
+                    params: [],
+                    doc: 'Día de la semana, de 0 (domingo) a 6.'
                 },
                 hora: {
                     transpile: 'getHours',
-                    returns: PrimitiveDataType.Numero
+                    returns: PrimitiveDataType.Numero,
+                    params: [],
+                    doc: 'Hora de la fecha.'
                 },
                 minuto: {
                     transpile: 'getMinutes',
-                    returns: PrimitiveDataType.Numero
+                    returns: PrimitiveDataType.Numero,
+                    params: [],
+                    doc: 'Minutos de la fecha.'
                 },
                 segundo: {
                     transpile: 'getSeconds',
-                    returns: PrimitiveDataType.Numero
+                    returns: PrimitiveDataType.Numero,
+                    params: [],
+                    doc: 'Segundos de la fecha.'
                 },
                 milisegundo: {
                     transpile: 'getMilliseconds',
-                    returns: PrimitiveDataType.Numero
+                    returns: PrimitiveDataType.Numero,
+                    params: [],
+                    doc: 'Milisegundos de la fecha.'
                 },
                 marcaDeTiempo: {
                     transpile: 'getTime',
-                    returns: PrimitiveDataType.Numero
+                    returns: PrimitiveDataType.Numero,
+                    params: [],
+                    doc: 'Milisegundos transcurridos desde 1970.'
                 },
                 aISO: {
                     transpile: 'toISOString',
-                    returns: PrimitiveDataType.Texto
+                    returns: PrimitiveDataType.Texto,
+                    params: [],
+                    doc: 'La fecha en formato ISO 8601.'
                 },
                 aTexto: {
                     transpile: 'toString',
-                    returns: PrimitiveDataType.Texto
+                    returns: PrimitiveDataType.Texto,
+                    params: [],
+                    doc: 'La fecha como texto.'
                 },
                 aLocal: {
                     transpile: 'toLocaleString',
-                    returns: PrimitiveDataType.Texto
+                    returns: PrimitiveDataType.Texto,
+                    params: [{ name: 'idioma', type: PrimitiveDataType.Texto, optional: true }, { name: 'opciones', type: AnyDataType.Any, optional: true }],
+                    doc: 'La fecha como texto según el idioma y las opciones dadas.'
                 }
             }
         },
@@ -1022,17 +1173,23 @@ export const corelib = {
                 elegir: {
                     transpile: 'chordElegir',
                     returns: AnyDataType.Any,
-                    static: true
+                    static: true,
+                    params: [{ name: 'lista', type: AnyDataType.Any }],
+                    doc: 'Elige un elemento al azar de la lista.'
                 },
                 mezclar: {
                     transpile: 'chordMezclar',
                     returns: ArrayDataType.AnyList,
-                    static: true
+                    static: true,
+                    params: [{ name: 'lista', type: AnyDataType.Any }],
+                    doc: 'Devuelve una copia de la lista con el orden al azar.'
                 },
                 entre: {
                     transpile: 'chordEntre',
                     returns: PrimitiveDataType.Numero,
-                    static: true
+                    static: true,
+                    params: [{ name: 'minimo', type: PrimitiveDataType.Numero }, { name: 'maximo', type: PrimitiveDataType.Numero }],
+                    doc: 'Número entero al azar entre dos valores, ambos incluidos.'
                 }
             }
         }
