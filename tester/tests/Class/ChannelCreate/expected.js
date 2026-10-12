@@ -18,7 +18,7 @@ export default class CanalesCommand extends Command {
         const canal = contexto.interaction ? contexto.interaction.channel : cliente.channels.fetch(contexto.channelId);
         const ctx = { cliente, contexto };
 
-        let c = await createChannel(ctx, undefined, {
+        let c = await createChannel(ctx, contexto.guildId, {
             name: 'avisos',
             type: 2,
             topic: 'Novedades',

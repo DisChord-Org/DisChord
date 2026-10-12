@@ -135,6 +135,7 @@ export interface ChannelActionNode extends BaseNode<DisChordNodeType> {
     type: typeof DisChordTokenType.ACCION_CANAL;
     action: ChannelAction;
     object: DisChordODBNode;
+    guild?: string;
 }
 
 /**

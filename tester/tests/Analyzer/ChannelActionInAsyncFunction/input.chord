@@ -1,0 +1,6 @@
+@asincrono
+funcion limpiar() {
+    borrar canal {
+        canal "1"
+    }
+}

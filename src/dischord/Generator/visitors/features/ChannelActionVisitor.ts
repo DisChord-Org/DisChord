@@ -44,7 +44,7 @@ export default class ChannelActionVisitor extends SubGenerator<DisChordNodeType,
 
         switch (node.action) {
             case ChannelAction.Crear:
-                return `await createChannel(ctx, ${properties['servidor']}, ${body})`;
+                return `await createChannel(ctx, ${node.object.blocks['servidor'] ? properties['servidor'] : node.guild}, ${body})`;
             case ChannelAction.Editar:
                 return `await editChannel(ctx, ${properties['canal']}, ${body}, ${properties['razon']})`;
             case ChannelAction.Borrar:

@@ -3,26 +3,46 @@ import { walkAST } from "../../../chord/walkAST";
 import { BDOValidator } from "../../../chord/Analyzer/BDOValidator";
 import { fieldKeys } from "../../../chord/BDOSchema";
 import { DisChordError, ErrorLevel } from "../../../errors/ChordError";
-import { ChannelActionNode, DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType } from "../../types";
+import { ChannelAction, ChannelActionNode, CommandNode, DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType, EventNode } from "../../types";
 import { ChannelActionSchemas } from "../../Generator/constants/schemas";
+import { CommandGuildSource, EventGuildSources, eventsMap } from "../../Generator/constants/mappings";
 
 /**
- * Validates every `crear canal`, `editar canal` and `borrar canal` block against the schema of its
- * action — the same one `ChannelActionVisitor` resolves it with. Besides the presence and
- * vocabulary checks every schema gets, a property the action does not take is an error instead of
- * being silently dropped (`razon` in a `crear canal`, `servidor` in an `editar canal`...): the
- * block would otherwise look like it did something it does not.
+ * Validates every `crear canal`, `editar canal` and `borrar canal` block, and settles what the
+ * generator could not work out on its own:
+ *
+ *  - The block against the schema of its action (the one `ChannelActionVisitor` resolves it with).
+ *  - That it sits inside a command or an event: the call needs the `cliente` and, by default, the
+ *    server of that context, which a function or the top level does not have.
+ *  - That `editar canal` changes something.
+ *  - The server `crear canal` defaults to when it names none, written on the node as `guild`: the
+ *    command's own, or the one carried by the event's first parameter that has one.
  */
 export class ValidateChannelActionsRule extends AnalysisRule<DisChordNodeType, DisChordNode> {
     private readonly validator = new BDOValidator<DisChordNodeType, DisChordNode>((message, location) => this.fail(message, location));
+
+    /** The command or event enclosing the node being visited, innermost last. */
+    private readonly enclosing: (CommandNode | EventNode)[] = [];
 
     /**
      * @override
      */
     check (nodes: DisChordASTNode[]): void {
-        nodes.forEach(node => walkAST<DisChordNodeType, DisChordNode>(node, current => {
-            if (current.type === DisChordTokenType.ACCION_CANAL) this.validate(current as ChannelActionNode);
-        }));
+        nodes.forEach(node => walkAST<DisChordNodeType, DisChordNode>(
+            node,
+            current => {
+                if (current.type === DisChordTokenType.CREAR_COMANDO || current.type === DisChordTokenType.EVENTO) {
+                    this.enclosing.push(current as CommandNode | EventNode);
+                }
+
+                if (current.type === DisChordTokenType.ACCION_CANAL) this.validate(current as ChannelActionNode);
+            },
+            current => {
+                if (current.type === DisChordTokenType.CREAR_COMANDO || current.type === DisChordTokenType.EVENTO) {
+                    this.enclosing.pop();
+                }
+            }
+        ));
     }
 
     /**
@@ -30,16 +50,50 @@ export class ValidateChannelActionsRule extends AnalysisRule<DisChordNodeType, D
      */
     private validate (node: ChannelActionNode): void {
         const schema = ChannelActionSchemas[node.action];
-        const known = schema.fields.flatMap(field => fieldKeys(field.key));
-
-        Object.entries(node.object.blocks).forEach(([ key, value ]) => {
-            if (!known.includes(key)) this.fail(
-                `'${node.action} canal' no admite '${key}'. Se admite: ${known.join(' / ')}.`,
-                value.location
-            );
-        });
-
         this.validator.validate(node.object, schema);
+
+        const context = this.enclosing[this.enclosing.length - 1];
+
+        if (!context) this.fail(
+            `'${node.action} canal' solo puede usarse dentro de un comando o un evento: necesita el cliente y el servidor de su contexto`,
+            node.location
+        );
+
+        if (node.action === ChannelAction.Editar) this.assertChangesSomething(node);
+        if (node.action === ChannelAction.Crear && !node.object.blocks['servidor']) node.guild = this.guildOf(context, node);
+    }
+
+    /**
+     * `editar canal` with only its target and a reason sends an empty body.
+     * @private
+     */
+    private assertChangesSomething (node: ChannelActionNode): void {
+        const changes = ChannelActionSchemas[node.action].fields
+            .flatMap(field => fieldKeys(field.key))
+            .filter(key => key !== 'canal' && key !== 'razon');
+
+        if (!changes.some(key => node.object.blocks[key])) this.fail(
+            `'editar canal' necesita al menos una propiedad que cambiar: ${changes.join(' / ')}.`,
+            node.location
+        );
+    }
+
+    /**
+     * The server `crear canal` defaults to inside `context`.
+     * @private
+     */
+    private guildOf (context: CommandNode | EventNode, node: ChannelActionNode): string {
+        if (context.type === DisChordTokenType.CREAR_COMANDO) return CommandGuildSource;
+
+        const event = eventsMap[(context as EventNode).name];
+        const source = event?.params.find(param => EventGuildSources[param] !== undefined);
+
+        if (source === undefined) this.fail(
+            `El evento '${(context as EventNode).name}' no trae un servidor: indica 'servidor' en 'crear canal'`,
+            node.location
+        );
+
+        return EventGuildSources[source];
     }
 
     /**

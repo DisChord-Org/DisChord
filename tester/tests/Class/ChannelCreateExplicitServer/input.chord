@@ -1,0 +1,6 @@
+evento encendido {
+    crear canal {
+        servidor "123456789"
+        nombre "inicio"
+    }
+}

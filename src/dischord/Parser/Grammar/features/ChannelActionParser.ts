@@ -43,6 +43,9 @@ export default class ChannelActionParser extends SubParser<DisChordNodeType, Dis
         const verb = parser.peek();
         const target = parser.peek('next');
 
+        // `nuevo crear canal {` is a class instantiation shape, not an action
+        if (parser.peek('prev').type === TokenType.Nuevo) return false;
+
         return verb.type === TokenType.IDENTIFICADOR
             && Object.values<string>(ChannelAction).includes(verb.value)
             && target.type === TokenType.IDENTIFICADOR

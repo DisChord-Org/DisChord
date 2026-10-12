@@ -252,3 +252,25 @@ export const ChannelTypes: Record<string, number> = dictionary({
     "foro": 15,
     "multimedia": 16
 } as const);
+
+/**
+ * Where an event's parameter holds the id of the server the event happened in, by parameter name.
+ * The first parameter of an event found here gives the server a channel action defaults to; an
+ * event with none (`encendido`, `limitado`) has no server to default to.
+ *
+ * @type {Readonly<Record<string, string>>}
+ */
+export const EventGuildSources: Record<string, string> = dictionary({
+    "mensaje": "mensaje.guildId",
+    "canal": "canal.guildId",
+    "miembro": "miembro.guildId",
+    "rol": "rol.guildId",
+    "servidor": "servidor.id",
+    "interaccion": "interaccion.guildId"
+} as const);
+
+/**
+ * The server a command's channel action defaults to: the one the command was run in.
+ * @type {string}
+ */
+export const CommandGuildSource = `${CommandContextParameter}.guildId`;

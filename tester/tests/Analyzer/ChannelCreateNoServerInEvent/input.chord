@@ -1,0 +1,5 @@
+evento encendido {
+    crear canal {
+        nombre "inicio"
+    }
+}

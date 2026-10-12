@@ -232,9 +232,9 @@ enviar mensaje {
 
 ### Managing channels
 
-`crear canal`, `editar canal` and `borrar canal` are awaited, so they follow the same rule as
-`enviar mensaje` (a command, an event, an `@asincrono` function or the top level). None of the three
-words is reserved: they are recognized by the `<verbo> canal {` shape alone.
+`crear canal`, `editar canal` and `borrar canal` are awaited and need the client and the server of
+their context, so they can only be used inside a command or an event. None of the three words is
+reserved: they are recognized by the `<verbo> canal {` shape alone.
 
 ```js
 var avisos es crear canal {
@@ -267,10 +267,14 @@ borrar canal {
 | `modoLento` | optional | optional | | Seconds between messages per user |
 | `bitrate` | optional | optional | | Voice bitrate |
 | `limiteUsuarios` | optional | optional | | Voice user limit |
-| `servidor` | optional | | | Guild to create in; defaults to the command's or event's |
+| `servidor` | optional | | | Guild to create in; defaults to the command's, or to the one of the event's parameter (`mensaje`, `canal`, `miembro`, `rol`, `servidor`, `interaccion`) |
 | `razon` | | optional | optional | Audit log reason |
 
-A property an action does not take is a compile error. `crear canal` returns the created channel.
+A property an action does not take is a compile error, as it is in every block (`comando`, `boton`,
+`embed`, `enviar mensaje`...): a misspelled property is reported with the list of what the block
+accepts instead of being ignored. `tipoCanal` takes a literal (`tipo` is a reserved word, hence the
+name). `editar canal` must change at least one property, and `crear canal` returns the created
+channel. In an event that carries no server (`encendido`, `limitado`) `crear canal` needs `servidor`.
 
 ---
 
