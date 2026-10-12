@@ -30,6 +30,7 @@ export function OptionSchema (
     const optionType = (literalStringValue(entry.blocks['opcion']) ?? '').toLowerCase();
 
     return {
+        name: 'opcion',
         fields: [
             {
                 key: 'opcion',
@@ -58,6 +59,7 @@ export function OptionSchema (
 
 /** `comando`'s own properties (its command flags and `opciones`). */
 export const CommandSchema: BDOSchema<DisChordNodeType, DisChordNode> = {
+    name: 'comando',
     fields: [
         {
             key: 'descripcion',
@@ -116,6 +118,7 @@ export const CommandSchema: BDOSchema<DisChordNodeType, DisChordNode> = {
  * defaults to `JSFallback.Empty` so `ButtonVisitor` can omit `.setEmoji(...)` entirely when absent.
  */
 export const ButtonSchema: BDOSchema<DisChordNodeType, DisChordNode> = {
+    name: 'boton',
     fields: [
         {
             key: 'id',
@@ -148,6 +151,7 @@ export const ButtonSchema: BDOSchema<DisChordNodeType, DisChordNode> = {
 /** An embed field entry (`campos [ { titulo "..." descripcion "..." lineado verdadero } ]`). Only
  * `titulo` is required; `descripcion`/`lineado` are plain optional pass-throughs. */
 export const EmbedFieldSchema: BDOSchema<DisChordNodeType, DisChordNode> = {
+    name: 'campo',
     fields: [
         {
             key: 'titulo',
@@ -170,6 +174,7 @@ export const EmbedFieldSchema: BDOSchema<DisChordNodeType, DisChordNode> = {
 
 /** An embed's footer (`pie { texto "..." icono "..." }`). Only `texto` is required. */
 export const EmbedFooterSchema: BDOSchema<DisChordNodeType, DisChordNode> = {
+    name: 'pie',
     fields: [
         {
             key: 'texto',
@@ -195,6 +200,7 @@ export const EmbedFooterSchema: BDOSchema<DisChordNodeType, DisChordNode> = {
  * validated here regardless.
  */
 export const EmbedSchema: BDOSchema<DisChordNodeType, DisChordNode> = {
+    name: 'embed',
     fields: [
         {
             key: 'color',
@@ -236,6 +242,7 @@ export const EmbedSchema: BDOSchema<DisChordNodeType, DisChordNode> = {
  * why `ClientInitVisitor` doesn't resolve it through `BDOResolver`.
  */
 export const StartBotSchema: BDOSchema<DisChordNodeType, DisChordNode> = {
+    name: 'encender bot',
     fields: [
         {
             key: [ 'prefijo', 'prefijos' ],
@@ -265,6 +272,8 @@ export const StartBotSchema: BDOSchema<DisChordNodeType, DisChordNode> = {
  * schema's only reader.
  */
 export const CollectorSchema: BDOSchema<DisChordNodeType, DisChordNode> = {
+    name: 'recolector',
+    passthrough: ['alPulsarId'],
     fields: [
         {
             key: 'filtro',
@@ -290,6 +299,8 @@ export const CollectorSchema: BDOSchema<DisChordNodeType, DisChordNode> = {
  * `MessageVisitor` is this schema's only reader.
  */
 export const MessageSchema: BDOSchema<DisChordNodeType, DisChordNode> = {
+    name: 'mensaje',
+    passthrough: ['boton', 'embed'],
     fields: [
         {
             key: 'canal',
@@ -366,6 +377,7 @@ const ChannelPropertyFields = [
 
 /** `crear canal { ... }`: `nombre` is required; `servidor` falls back to the current one. */
 export const CreateChannelSchema: BDOSchema<DisChordNodeType, DisChordNode> = {
+    name: 'crear canal',
     fields: [
         { key: 'servidor', kind: FieldKind.Value, default: JSFallback.Undefined },
         ...ChannelPropertyFields.map(field => field.key === 'nombre'
@@ -376,6 +388,7 @@ export const CreateChannelSchema: BDOSchema<DisChordNodeType, DisChordNode> = {
 
 /** `editar canal { ... }`: `canal` (the target) is required, everything else optional. */
 export const EditChannelSchema: BDOSchema<DisChordNodeType, DisChordNode> = {
+    name: 'editar canal',
     fields: [
         { key: 'canal', kind: FieldKind.Value, required: true, missingMessage: `En 'editar canal' se esperaba 'canal'.` },
         ...ChannelPropertyFields,
@@ -385,6 +398,7 @@ export const EditChannelSchema: BDOSchema<DisChordNodeType, DisChordNode> = {
 
 /** `borrar canal { ... }`: only the target and an optional reason. */
 export const DeleteChannelSchema: BDOSchema<DisChordNodeType, DisChordNode> = {
+    name: 'borrar canal',
     fields: [
         { key: 'canal', kind: FieldKind.Value, required: true, missingMessage: `En 'borrar canal' se esperaba 'canal'.` },
         { key: 'razon', kind: FieldKind.Value, default: JSFallback.Undefined }

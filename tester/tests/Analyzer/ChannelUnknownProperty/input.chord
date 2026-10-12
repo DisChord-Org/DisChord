@@ -1,0 +1,7 @@
+nuevo comando Canales {
+    descripcion "gestiona canales";
+
+    crear canal {
+        nomre "avisos"
+    }
+}

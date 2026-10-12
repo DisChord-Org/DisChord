@@ -127,8 +127,17 @@ type ODBNodeLike<T extends string, N extends BaseNode<T>> = { blocks: Record<str
  * @template {BaseNode<T>} N - Node extensions vector.
  */
 export interface BDOSchema<T extends string, N extends BaseNode<T>> {
+    /** What the construct is called in the source (`comando`, `crear canal`...); it names the
+     * construct in the message for a property it does not take. */
+    name?: string;
     fields: FieldSpec[];
     nested?: NestedSpec<T, N>[];
+    /** Keys the block accepts without this schema interpreting them: another visitor or rule
+     * reads them (a message's `boton`/`embed`, a collector's `alPulsarId`). */
+    passthrough?: string[];
+    /** Accept keys the schema does not know. Closed by default, so a typo is an error instead of
+     * a property that is silently ignored. */
+    open?: boolean;
 }
 
 /**

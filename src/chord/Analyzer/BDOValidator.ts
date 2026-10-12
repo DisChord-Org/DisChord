@@ -25,8 +25,29 @@ export class BDOValidator<T extends string, N extends BaseNode<T>> {
      * @returns {void}
      */
     public validate (node: ODBNode<T, N>, schema: BDOSchema<T, N>): void {
+        if (!schema.open) this.validateKnownKeys(node, schema);
+
         schema.fields.forEach(field => this.validateField(node, field));
         schema.nested?.forEach(nested => this.validateNested(node, nested));
+    }
+
+    /**
+     * A key the schema does not declare is an error: it would otherwise be ignored without a word.
+     * @private
+     */
+    private validateKnownKeys (node: ODBNode<T, N>, schema: BDOSchema<T, N>): void {
+        const known = [
+            ...schema.fields.flatMap(field => fieldKeys(field.key)),
+            ...(schema.nested?.map(nested => nested.key) ?? []),
+            ...(schema.passthrough ?? [])
+        ];
+
+        Object.entries(node.blocks).forEach(([ key, value ]) => {
+            if (known.includes(key)) return;
+
+            const subject = schema.name ? `'${schema.name}' no admite '${key}'` : `No se admite la propiedad '${key}'`;
+            this.fail(`${subject}. Se admite: ${known.join(' / ')}.`, value.location);
+        });
     }
 
     /**
