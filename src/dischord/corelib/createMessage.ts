@@ -23,8 +23,15 @@ export const createMessageModulePath = 'lib/createMessage.js';
  * * @type {string}
  */
 export const createMessageModuleContent = `
-    export const createMessage = async (channel, options, interactionContext, ctx) => {
+    export const createMessage = async (channel, options, interactionContext, ctx, user) => {
         const { cliente, contexto, mensaje } = ctx || {};
+
+        // if user (direct message), alongside the channel when both are given
+        if (user) {
+            const sent = channel ? await cliente.messages.write(channel, options) : undefined;
+            const direct = await cliente.users.write(typeof user === 'string' ? user : user.id, options);
+            return sent ?? direct;
+        }
 
         // if channel
         if (channel) {

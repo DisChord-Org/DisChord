@@ -1,0 +1,4 @@
+var msg es enviar mensaje {
+    usuario "123456789"
+    contenido "hola"
+}

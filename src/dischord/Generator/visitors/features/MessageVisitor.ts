@@ -5,6 +5,7 @@ import { CompilerMetadataKind, TokenTypeUnion } from "../../../../chord/types";
 import ButtonVisitor from "../components/ButtonVisitor";
 import EmbedVisitor from "../components/EmbedVisitor";
 import { MessageSchema } from "../../constants/schemas";
+import { JSFallback } from "../../../../chord/BDOSchema";
 
 /**
  * Generator class responsible for generating code related to message creation and interactions in DisChord.
@@ -32,6 +33,8 @@ export default class MessageVisitor extends SubGenerator<DisChordNodeType, DisCh
         const ComponentsData = [ Button, Embed ].join('');
         const interactionContext: string = this.parent.context.symbolTable.getMetadata<boolean>(CompilerMetadataKind.IsInteraction)? 'interaccion' : 'null';
 
-        return `await createMessage(${properties['canal']}, { content: ${properties['contenido']} ${ComponentsData} }, ${interactionContext}, ctx)`;
+        const user = properties['usuario'] === JSFallback.Undefined ? '' : `, ${properties['usuario']}`;
+
+        return `await createMessage(${properties['canal']}, { content: ${properties['contenido']} ${ComponentsData} }, ${interactionContext}, ctx${user})`;
     }
 }

@@ -201,6 +201,7 @@ export const CollectorSchema: BDOSchema<DisChordNodeType, DisChordNode> = {
 export const MessageSchema: BDOSchema<DisChordNodeType, DisChordNode> = {
     fields: [
         { key: 'canal', kind: FieldKind.Value, default: JSFallback.Undefined },
+        { key: 'usuario', kind: FieldKind.Value, default: JSFallback.Undefined },
         { key: 'contenido', kind: FieldKind.Value, default: JSFallback.Undefined }
     ]
 };
