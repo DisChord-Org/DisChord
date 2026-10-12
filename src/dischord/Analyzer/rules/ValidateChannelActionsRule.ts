@@ -2,10 +2,11 @@ import { AnalysisRule } from "../../../chord/Analyzer/AnalysisRule";
 import { walkAST } from "../../../chord/walkAST";
 import { BDOValidator } from "../../../chord/Analyzer/BDOValidator";
 import { fieldKeys } from "../../../chord/BDOSchema";
+import { TokenType } from "../../../chord/types";
 import { DisChordError, ErrorLevel } from "../../../errors/ChordError";
 import { ChannelAction, ChannelActionNode, ChannelProperty, CommandNode, DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType, EventNode } from "../../types";
 import { ChannelActionSchemas } from "../../Generator/constants/schemas";
-import { CommandGuildSource, EventGuildSources, eventsMap } from "../../Generator/constants/mappings";
+import { CommandGuildSource, EventGuildSources, EventSelfTriggers, eventsMap } from "../../Generator/constants/mappings";
 
 /**
  * Validates every `crear canal`, `editar canal` and `borrar canal` block, and settles what the
@@ -14,15 +15,22 @@ import { CommandGuildSource, EventGuildSources, eventsMap } from "../../Generato
  *  - The block against the schema of its action (the one `ChannelActionVisitor` resolves it with).
  *  - That it sits inside a command or an event: the call needs the `cliente` and, by default, the
  *    server of that context, which a function or the top level does not have.
+ *  - The preventive barriers: no channel action inside a loop (a mass creation or deletion), and
+ *    none in the event it triggers itself (`crear canal` in `canalCreado` would create channels
+ *    forever).
  *  - That `editar canal` changes something.
- *  - The server `crear canal` defaults to when it names none, written on the node as `guild`: the
- *    command's own, or the one carried by the event's first parameter that has one.
+ *  - The server of the context, written on the node as `guild`: the command's own, or the one
+ *    carried by the event's first parameter that has one. `crear canal` without `servidor` needs
+ *    it; the other two use it to check that the channel belongs to that server.
  */
 export class ValidateChannelActionsRule extends AnalysisRule<DisChordNodeType, DisChordNode> {
     private readonly validator = new BDOValidator<DisChordNodeType, DisChordNode>((message, location) => this.fail(message, location));
 
     /** The command or event enclosing the node being visited, innermost last. */
     private readonly enclosing: (CommandNode | EventNode)[] = [];
+
+    /** How many loops enclose the node being visited. */
+    private loops = 0;
 
     /**
      * @override
@@ -35,12 +43,15 @@ export class ValidateChannelActionsRule extends AnalysisRule<DisChordNodeType, D
                     this.enclosing.push(current as CommandNode | EventNode);
                 }
 
+                if (current.type === TokenType.BUCLE) this.loops++;
                 if (current.type === DisChordTokenType.ACCION_CANAL) this.validate(current as ChannelActionNode);
             },
             current => {
                 if (current.type === DisChordTokenType.CREAR_COMANDO || current.type === DisChordTokenType.EVENTO) {
                     this.enclosing.pop();
                 }
+
+                if (current.type === TokenType.BUCLE) this.loops--;
             }
         ));
     }
@@ -59,8 +70,36 @@ export class ValidateChannelActionsRule extends AnalysisRule<DisChordNodeType, D
             node.location
         );
 
+        if (this.loops > 0) this.fail(
+            `'${node.action} canal' no puede usarse dentro de un bucle: crear, editar o borrar canales en serie es el patrón de un borrado o una creación masivos`,
+            node.location
+        );
+
+        this.assertNotSelfTriggering(context, node);
+
         if (node.action === ChannelAction.Editar) this.assertChangesSomething(node);
-        if (node.action === ChannelAction.Crear && !node.object.blocks[ChannelProperty.Servidor]) node.guild = this.guildOf(context, node);
+
+        node.guild = this.guildOf(context);
+
+        if (node.action === ChannelAction.Crear && !node.object.blocks[ChannelProperty.Servidor] && node.guild === undefined) this.fail(
+            `El evento '${(context as EventNode).name}' no trae un servidor: indica 'servidor' en 'crear canal'`,
+            node.location
+        );
+    }
+
+    /**
+     * An event that performs the action which triggers it would run again for its own effect.
+     * @private
+     */
+    private assertNotSelfTriggering (context: CommandNode | EventNode, node: ChannelActionNode): void {
+        if (context.type !== DisChordTokenType.EVENTO) return;
+
+        const event = (context as EventNode).name;
+
+        if (EventSelfTriggers[event] === node.action) this.fail(
+            `'${node.action} canal' dentro del evento '${event}' lo dispararía a sí mismo una y otra vez`,
+            node.location
+        );
     }
 
     /**
@@ -79,21 +118,16 @@ export class ValidateChannelActionsRule extends AnalysisRule<DisChordNodeType, D
     }
 
     /**
-     * The server `crear canal` defaults to inside `context`.
+     * The server of `context`, or `undefined` when it carries none.
      * @private
      */
-    private guildOf (context: CommandNode | EventNode, node: ChannelActionNode): string {
+    private guildOf (context: CommandNode | EventNode): string | undefined {
         if (context.type === DisChordTokenType.CREAR_COMANDO) return CommandGuildSource;
 
         const event = eventsMap[(context as EventNode).name];
         const source = event?.params.find(param => EventGuildSources[param] !== undefined);
 
-        if (source === undefined) this.fail(
-            `El evento '${(context as EventNode).name}' no trae un servidor: indica 'servidor' en 'crear canal'`,
-            node.location
-        );
-
-        return EventGuildSources[source];
+        return source === undefined ? undefined : EventGuildSources[source];
     }
 
     /**

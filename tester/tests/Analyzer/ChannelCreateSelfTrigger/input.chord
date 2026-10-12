@@ -1,0 +1,5 @@
+evento canalCreado {
+    crear canal {
+        nombre "copia"
+    }
+}

@@ -1,0 +1,9 @@
+nuevo comando Canales {
+    descripcion "gestiona canales";
+
+    para (i en rango(3)) {
+        crear canal {
+            nombre "canal"
+        }
+    }
+}

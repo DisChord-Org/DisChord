@@ -424,7 +424,8 @@ export const EditChannelSchema: BDOSchema<DisChordNodeType, DisChordNode> = {
     ]
 };
 
-/** `borrar canal { ... }`: only the target and an optional reason. */
+/** `borrar canal { ... }`: only the target and the reason, which is required: it is the trace
+ * left in the audit log of a destructive action. */
 export const DeleteChannelSchema: BDOSchema<DisChordNodeType, DisChordNode> = {
     name: 'borrar canal',
     fields: [
@@ -437,7 +438,8 @@ export const DeleteChannelSchema: BDOSchema<DisChordNodeType, DisChordNode> = {
         {
             key: ChannelProperty.Razon,
             kind: FieldKind.Value,
-            default: JSFallback.Undefined
+            required: true,
+            missingMessage: `En 'borrar canal' se esperaba '${ChannelProperty.Razon}': queda en el registro de auditoría.`
         }
     ]
 };

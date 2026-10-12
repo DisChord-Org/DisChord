@@ -1,4 +1,4 @@
-evento canalCreado {
+evento canalBorrado {
     crear canal {
         nombre "copia"
     }

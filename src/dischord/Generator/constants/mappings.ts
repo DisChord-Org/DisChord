@@ -1,4 +1,4 @@
-import { ApplicationIntegrationType, DiscordOptionType, IgnoreCommandType, InteractionContextType } from "../../types";
+import { ApplicationIntegrationType, ChannelAction, DiscordOptionType, IgnoreCommandType, InteractionContextType } from "../../types";
 
 /**
  * @interface EventType
@@ -274,3 +274,15 @@ export const EventGuildSources: Record<string, string> = dictionary({
  * @type {string}
  */
 export const CommandGuildSource = `${CommandContextParameter}.guildId`;
+
+/**
+ * The channel action each channel event is triggered by. An event that performs it would trigger
+ * itself over and over, so the analyzer rejects it there.
+ *
+ * @type {Readonly<Record<string, ChannelAction>>}
+ */
+export const EventSelfTriggers: Record<string, ChannelAction> = dictionary({
+    "canalCreado": ChannelAction.Crear,
+    "canalEditado": ChannelAction.Editar,
+    "canalBorrado": ChannelAction.Borrar
+} as const);

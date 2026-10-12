@@ -1,0 +1,6 @@
+evento canalBorrado {
+    borrar canal {
+        canal canal
+        razon "limpieza"
+    }
+}

@@ -1,0 +1,6 @@
+evento canalEditado {
+    editar canal {
+        canal canal
+        nombre "x"
+    }
+}

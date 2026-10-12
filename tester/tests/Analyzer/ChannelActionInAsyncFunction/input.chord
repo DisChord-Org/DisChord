@@ -2,5 +2,6 @@
 funcion limpiar() {
     borrar canal {
         canal "1"
+        razon "limpieza"
     }
 }
