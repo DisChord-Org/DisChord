@@ -2,7 +2,7 @@ import { Test } from "../../../Test";
 
 /**
  * @class ChannelInvalidKindTest
- * @description Validates that `tipoCanal` only takes one of the known channel kinds.
+ * @description Validates that `tipo` only takes one of the known channel kinds.
  */
 export class ChannelInvalidKindTest extends Test {
     /**
@@ -13,7 +13,7 @@ export class ChannelInvalidKindTest extends Test {
     /**
      * @type {string}
      */
-    public readonly description: string = 'It has to throw when tipoCanal is not one of the channel kinds';
+    public readonly description: string = 'It has to throw when tipo is not one of the channel kinds';
 
     /**
      * @type {string}

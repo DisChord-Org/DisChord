@@ -2,7 +2,7 @@ import { Test } from "../../../Test";
 
 /**
  * @class ChannelCreateTest
- * @description Validates that `crear canal { ... }` is generated as an awaited `createChannel` call whose body holds only the properties the block declares, mapped to Discord's field names (`tipoCanal` to its numeric `type`).
+ * @description Validates that `crear canal { ... }` is generated as an awaited `createChannel` call whose body holds only the properties the block declares, mapped to Discord's field names (`tipo` to its numeric `type`).
  */
 export class ChannelCreateTest extends Test {
     /**

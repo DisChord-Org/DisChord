@@ -3,6 +3,6 @@ nuevo comando Canales {
 
     crear canal {
         nombre "a"
-        tipoCanal "inexistente"
+        tipo "inexistente"
     }
 }

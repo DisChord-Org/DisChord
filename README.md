@@ -239,7 +239,7 @@ reserved: they are recognized by the `<verbo> canal {` shape alone.
 ```js
 var avisos es crear canal {
     nombre "avisos"
-    tipoCanal "texto"
+    tipo "texto"
     tema "Novedades del servidor"
 }
 
@@ -259,7 +259,7 @@ borrar canal {
 |---|---|---|---|---|
 | `canal` | | required | required | The channel to act on (an object or an id) |
 | `nombre` | required | optional | | Channel name |
-| `tipoCanal` | optional | optional | | `texto`, `voz`, `categoria`, `anuncios`, `escenario`, `foro`, `multimedia` |
+| `tipo` | optional | optional | | `texto`, `voz`, `categoria`, `anuncios`, `escenario`, `foro`, `multimedia` |
 | `tema` | optional | optional | | Topic |
 | `nsfw` | optional | optional | | Age-restricted |
 | `categoria` | optional | optional | | Parent category id |
@@ -272,8 +272,7 @@ borrar canal {
 
 A property an action does not take is a compile error, as it is in every block (`comando`, `boton`,
 `embed`, `enviar mensaje`...): a misspelled property is reported with the list of what the block
-accepts instead of being ignored. `tipoCanal` takes a literal (`tipo` is a reserved word, hence the
-name). `editar canal` must change at least one property, and `crear canal` returns the created
+accepts instead of being ignored. `tipo` takes a literal. `editar canal` must change at least one property, and `crear canal` returns the created
 channel. In an event that carries no server (`encendido`, `limitado`) `crear canal` needs `servidor`.
 
 ---

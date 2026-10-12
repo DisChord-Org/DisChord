@@ -3,7 +3,7 @@ nuevo comando Canales {
 
     var c es crear canal {
         nombre "avisos"
-        tipoCanal "voz"
+        tipo "voz"
         tema "Novedades"
         categoria "123"
         nsfw falso
