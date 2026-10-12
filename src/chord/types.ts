@@ -330,6 +330,15 @@ export const ComparisonOperators: TokenType[] = [
 ] as const;
 
 /**
+ * Every binary operator: the additive, numeric, comparison and logical ones. After a word they make an
+ * expression, so a parser that has to tell an expression from a `clave valor` pair can ask here.
+ * @type {const}
+ */
+export const BinaryOperators: TokenType[] = [
+    TokenType.Mas, ...NumericOperators, ...ComparisonOperators, TokenType.Y, TokenType.O
+] as const;
+
+/**
  * The value tokens `LiteralParser` consumes, and `PrimaryParser` checks to decide to delegate to it.
  * @type {const}
  */
@@ -356,6 +365,9 @@ export type Token <T extends string> = {
     location: Location;
     /** Where the token ends: the position right after its last character */
     end: Location;
+    /** Present, and `true`, when an empty line (no characters, no comment) precedes the token. It
+     * is what separates the properties of a block from its code. */
+    blankLineBefore?: true;
 };
 
 /**

@@ -1,5 +1,5 @@
 import { ChordError, ErrorLevel } from "../../../errors/ChordError";
-import { ASTNode, BaseNode, ODBMode, ODBNode, TokenType, TokenTypeUnion } from "../../types";
+import { ASTNode, BaseNode, BinaryOperators, LiteralTokens, ODBMode, ODBNode, TokenType, TokenTypeUnion } from "../../types";
 import { Parser } from "../Parser";
 import { SubParser } from "../SubParser";
 import { ExpressionParser } from "./Expressions/ExpressionParser";
@@ -50,109 +50,142 @@ export class BDOParser<T extends string, N extends BaseNode<T>> extends SubParse
     }
 
     /**
-     * Main ODB parsing logic.
-     * Iterates through the block content, distinguishing between property assignments
-     * and standard language statements based on syntax patterns and the current mode.
-     * @param mode - Initial mode for the ODB.
+     * Main ODB parsing logic. A block has up to two parts: its **properties**, one `clave valor`
+     * after another with no separator, and its **code**, which starts at the first entry that is
+     * code and runs to the closing brace. A block with code is an intelligent one
+     * (`ODBMode.Intelligent`).
+     *
+     * What is code is decided by the shape of the entry (`looksLikeProperty`), and once properties
+     * exist an empty line must come before the first piece of code. An empty line followed by
+     * another property does not start the code: properties may be grouped. A word is a property
+     * key whatever it is (`si`, `clase`, `tipo`...), so a reserved word can name one.
+     *
+     * An optional `;` after a property is accepted and ignored.
+     * @param mode - Mode requested by the caller; a block with code is intelligent whatever it was.
      * @returns A constructed ODBNode containing properties (blocks) and logic (body).
-     * @throws {ChordError} If style rules are violated (e.g., missing ';' in BDOI).
+     * @throws {ChordError} If code follows the properties without an empty line in between.
      */
     private parseODB(mode: ODBMode = ODBMode.Simple): ODBNode<T, N> {
         this.consume(TokenType.L_BRACE);
-    
+
         const blocks: Record<string, ASTNode<T, N>> = {};
         const body: ASTNode<T, N>[] = [];
-        let definitionMode: boolean = true;
+        let inProperties = true;
 
         while (this.peek().type !== TokenType.R_BRACE) {
-            if (definitionMode && this.checkPropertyPattern(mode)) {
-                const key = this.consume(TokenType.IDENTIFICADOR, 'Se esperaba un nombre de la propiedad').value;
-                const value = this.parent.get(ExpressionParser).parse();
-
-                if (this.peek().type === TokenType.SEPARADOR) {
-                    if (mode === ODBMode.Simple) mode = ODBMode.Intelligent;
-                    this.consume(TokenType.SEPARADOR, 'En un BDOI, las definiciones deben terminar con ";"');
-                } else if (mode === ODBMode.Intelligent && value.type !== TokenType.BDO) {
-                    throw new ChordError({
-                        phase: ErrorLevel.Parser,
-                        message: `En un BDO inteligente, la propiedad '${key}' debe terminar en ';'`,
-                        location: this.peek().location
-                    });
-                }
-
-                blocks[key] = value;
-            } else {
-                if (mode === ODBMode.Simple) {
-                    if (Object.keys(blocks).length > 0) {
-                        throw new ChordError({
-                            phase: ErrorLevel.Parser,
-                            message: `Conflicto de estilo: Si el BDO contiene código ejecutable, todas las propiedades superiores deben terminar en ";"`,
-                            location: this.peek().location
-                        });
-                    }
-                    mode = ODBMode.Intelligent;
-                }
-                definitionMode = false;
-
-                const statement = this.parent.parseStatement();
-                if (statement) body.push(statement);
+            if (this.peek().type === TokenType.EOF) {
+                throw new ChordError({
+                    phase: ErrorLevel.Parser,
+                    message: "Falta '}' para cerrar el bloque",
+                    location: this.peek().location
+                });
             }
+
+            if (inProperties) {
+                if (this.looksLikeProperty()) {
+                    this.parseProperty(blocks);
+                    continue;
+                }
+
+                const token = this.peek();
+
+                if (Object.keys(blocks).length > 0 && !token.blankLineBefore) throw new ChordError({
+                    phase: ErrorLevel.Parser,
+                    message: 'Separa el código de las propiedades con una línea en blanco',
+                    location: token.location
+                });
+
+                inProperties = false;
+            }
+
+            const statement = this.parent.parseStatement();
+            if (statement) body.push(statement);
         }
-    
+
         this.consume(TokenType.R_BRACE);
-    
+
         return this.createNode<ODBNode<T, N>>({
             type: TokenType.BDO,
-            mode,
+            mode: mode === ODBMode.Intelligent || body.length > 0 ? ODBMode.Intelligent : ODBMode.Simple,
             blocks,
             body
         });
     }
 
     /**
-     * Heuristic analysis to determine if the upcoming tokens represent a property assignment.
-     * @param mode - The current ODBMode.
-     * @returns True if the pattern matches a property.
+     * Parses one `clave valor` property into `blocks`.
+     * @throws {ChordError} If the block already has a property with that key.
+     * @private
      */
-    private checkPropertyPattern(mode: ODBMode): boolean {
-        const current = this.peek();
+    private parseProperty (blocks: Record<string, ASTNode<T, N>>): void {
+        const keyToken = this.consume(this.peek().type);
+        const key = keyToken.value;
+
+        if (Object.prototype.hasOwnProperty.call(blocks, key)) throw new ChordError({
+            phase: ErrorLevel.Parser,
+            message: `La propiedad '${key}' está repetida en el bloque`,
+            location: keyToken.location
+        });
+
+        blocks[key] = this.parent.get(ExpressionParser).parse();
+
+        if (this.peek().type === TokenType.SEPARADOR) this.consume(TokenType.SEPARADOR);
+    }
+
+    /**
+     * Whether the entry about to be read is a property: a word followed by what can only be its
+     * value. It is code instead when the word is followed by what continues an expression or a
+     * statement (`consola.imprimir`, `f(x)`, `x es 1`, `lista[0]`, `a mas b`), when it is the
+     * start of a statement of the dialect (`enviar mensaje {`), when nothing
+     * follows it, or when it starts a statement (`var`, `si`, `funcion`...) and what follows is
+     * not a plain value (`si 1` is a property, `si (x)` is not).
+     * @private
+     */
+    private looksLikeProperty (): boolean {
+        const word = this.peek();
         const next = this.peek('next');
 
-        if (current.type !== TokenType.IDENTIFICADOR) return false;
-        if (this.parent.KeywordsManager.isKeyword(current.value)) return false;
-        // if (this.parent.KeywordsManager.isKeyword(next.value)) return false;
-        if (next.type === TokenType.Punto) return false;
-        if (next.type === TokenType.L_PAREN) return this.lookAheadForToken(TokenType.SEPARADOR);
-        if (next.type === TokenType.L_BRACE) return true;
-        if (mode === ODBMode.Simple && this.lookAheadForToken(TokenType.SEPARADOR)) return true;
-        if (mode === ODBMode.Intelligent) return this.lookAheadForToken(TokenType.SEPARADOR);
+        if (!this.isWord(word)) return false;
+        if (next.type === TokenType.R_BRACE || next.type === TokenType.EOF) return false;
+        if (next.type === TokenType.Punto || next.type === TokenType.Es) return false;
+        if ((BinaryOperators as string[]).includes(next.type)) return false;
+
+        if (this.isWord(next) && this.peek(this.parent.cursor + 2).type === TokenType.L_BRACE) return false;
+
+        const touching = next.location.line === word.end.line && next.location.column === word.end.column;
+        if (touching && (next.type === TokenType.L_PAREN || next.type === TokenType.L_SQUARE)) return false;
+
+        if (this.startsStatement(word.type)) return this.isPlainValue(next.type);
 
         return true;
     }
 
     /**
-     * Scans forward in the token stream within the current brace level 
-     * to find a specific token type.
-     * @param type - The token type to search for.
-     * @returns True if the token is found before the block closes or EOF.
+     * Whether a token of this type begins a statement: one a sub-parser is triggered by (`var`,
+     * `si`, `para`...), or one `StatementParser` handles by context (`funcion`, `prop`, a decorator)
+     * or `PrimaryParser` does (`nuevo`).
+     * @private
      */
-    private lookAheadForToken(type: string): boolean {
-        let i = this.parent.cursor;
-        let nestingLevel = 0;
+    private startsStatement (type: string): boolean {
+        const byContext: string[] = [ TokenType.Funcion, TokenType.Prop, TokenType.Decorador, TokenType.Nuevo ];
 
-        while (true) {
-            const token = this.peek(i);
+        return byContext.includes(type) || this.parent.getChordSubParserByToken(type as TokenTypeUnion<T>) !== undefined;
+    }
 
-            if (token.type === TokenType.L_BRACE) nestingLevel++;
-            if (token.type === TokenType.R_BRACE) {
-                if (nestingLevel === 0) return false;
-                nestingLevel--;
-            }
+    /**
+     * Whether a token of this type is a plain value (a literal, a list or a block), the only
+     * thing that makes a statement keyword a property key (`si 1`).
+     * @private
+     */
+    private isPlainValue (type: string): boolean {
+        return (LiteralTokens as string[]).includes(type) || type === TokenType.L_SQUARE || type === TokenType.L_BRACE;
+    }
 
-            if (nestingLevel === 0 && token.type === type) return true;
-
-            if (token.type === TokenType.EOF) return false;
-            i++;
-        }
+    /**
+     * Whether a token is a word: a letter-initial name, reserved or not, and not a literal.
+     * @private
+     */
+    private isWord (token: { type: string; value: string }): boolean {
+        return !(LiteralTokens as string[]).includes(token.type) && /^\p{L}/u.test(token.value);
     }
 }

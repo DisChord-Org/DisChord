@@ -1,0 +1,6 @@
+var ajustes es {
+    nombre "avisos"
+    tipo "voz"
+}
+
+var t es tipo ajustes

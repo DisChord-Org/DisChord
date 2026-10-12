@@ -1,0 +1,6 @@
+var persona es {
+    nombre "Juan"
+    edad 30
+
+    consola.imprimir("creada")
+}

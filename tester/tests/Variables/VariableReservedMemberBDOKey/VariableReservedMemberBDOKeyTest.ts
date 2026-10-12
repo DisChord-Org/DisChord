@@ -2,7 +2,7 @@ import { Test } from "../../../Test";
 
 /**
  * @class VariableReservedMemberBDOKeyTest
- * @description Validates that a reserved word is still rejected as a BDO key.
+ * @description Validates that a reserved word can name a BDO property and be read back as a member, as in an object literal.
  */
 export class VariableReservedMemberBDOKeyTest extends Test {
     /**
@@ -13,10 +13,6 @@ export class VariableReservedMemberBDOKeyTest extends Test {
     /**
      * @type {string}
      */
-    public readonly description: string = "It has to reject a reserved word as a BDO key";
+    public readonly description: string = "It has to accept a reserved word as a BDO key";
 
-    /**
-     * @type {string}
-     */
-    public readonly expectedError: string = "Token inesperado en expresión: en";
 }

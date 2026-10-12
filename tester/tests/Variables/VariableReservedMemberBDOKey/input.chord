@@ -1,1 +1,3 @@
 var x es { en 1 }
+
+consola.imprimir(x.en)

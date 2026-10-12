@@ -1,0 +1,4 @@
+nuevo comando Ping {
+    descripcion "latencia"
+    consola.imprimir("hola")
+}

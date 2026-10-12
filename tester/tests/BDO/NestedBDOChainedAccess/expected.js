@@ -1,11 +1,3 @@
 import './lib/consoleRuntime.js';
-let mibdo = (() => {
-    let bdoA = (() => {
-        let bdoB = { bool: true };
-
-        return { bdoB };
-    })();
-
-    return { bdoA };
-})();
+let mibdo = { bdoA: { bdoB: { bool: true } } };
 console.log(mibdo.bdoA.bdoB.bool);

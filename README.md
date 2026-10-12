@@ -293,6 +293,29 @@ channel. In an event that carries no server (`encendido`, `limitado`) `crear can
 
 There is no `null`: the absence of a value is always `indefinido`.
 
+### Blocks (`{ ... }`)
+
+A block holds **properties**, one `clave valor` after another with no separator, and optionally
+**code**. The code starts after an empty line; that is all that tells a block with code (an
+*intelligent* one) from a plain object. There are no semicolons.
+
+```js
+var persona es {
+    nombre "Juan"
+    edad 30
+
+    consola.imprimir("creada")
+}
+```
+
+- **Properties first.** Code right after a property, with no empty line between them, is an
+  error. A comment line is not an empty line.
+- **Grouping is fine.** An empty line followed by another property does not start the code.
+- **Any word is a key,** reserved ones included (`si 1`, `clase "a"`, `tipo "voz"`), as in an object
+  literal. A word followed by `.`, `(` without a space, `es` or an operator is code instead.
+- **A key can not be repeated** in one block.
+- The same rules apply to the body of a `comando`. A `;` after a property is still accepted.
+
 ### Types
 
 Types are optional. A variable, parameter or return value without an annotation has its type

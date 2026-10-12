@@ -1,0 +1,6 @@
+nuevo comando Ping {
+    descripcion "latencia"
+    nsfw falso
+
+    consola.imprimir("hola")
+}

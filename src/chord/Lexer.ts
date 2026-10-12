@@ -68,17 +68,34 @@ export class Lexer<T extends string> {
     public tokenize(): Token<T>[] {
         const tokens: Token<T>[] = [];
 
+        // an empty line is one with nothing on it: no token and no comment
+        let lineHasContent = false;
+        let blankLinePending = false;
+
+        const emit = (token: Token<T>): void => {
+            if (blankLinePending) token.blankLineBefore = true;
+            blankLinePending = false;
+            lineHasContent = true;
+            tokens.push(token);
+        };
+
         while (this.current < this.input.length) {
             const startLine = this.line;
             const startCol = this.column;
             let char = this.peek();
 
             if (/\s/.test(char)) { // Espacios en blanco
+                if (char === '\n') {
+                    if (!lineHasContent) blankLinePending = true;
+                    lineHasContent = false;
+                }
+
                 this.advance();
                 continue;
             }
 
             if (char === "/") {  // Comentarios
+                lineHasContent = true;
                 this.advance();
                 const nextChar = this.peek(); // Consume el primer "/"
             
@@ -101,7 +118,7 @@ export class Lexer<T extends string> {
                     continue;
                 } else {
                     // No es un comentario por lo que vamos a tratar "/" como operador "ENTRE"
-                    tokens.push(this.createToken(SymbolTranslationMap["/"], SymbolTranslationMap["/"], startLine, startCol));
+                    emit(this.createToken(SymbolTranslationMap["/"], SymbolTranslationMap["/"], startLine, startCol));
                     continue;
                 }
             }
@@ -113,7 +130,7 @@ export class Lexer<T extends string> {
                     value += this.advance();
                 }
                 this.advance();
-                tokens.push(this.createToken("TEXTO", value, startLine, startCol));
+                emit(this.createToken("TEXTO", value, startLine, startCol));
                 continue;
             }
 
@@ -144,9 +161,9 @@ export class Lexer<T extends string> {
 
                 if (this.peek() === "n") {
                     value += this.advance();
-                    tokens.push(this.createToken("BIGINT", value, startLine, startCol));
+                    emit(this.createToken("BIGINT", value, startLine, startCol));
                 } else {
-                    tokens.push(this.createToken(TokenType.NUMERO, value, startLine, startCol));
+                    emit(this.createToken(TokenType.NUMERO, value, startLine, startCol));
                 }
                 continue;
             }
@@ -159,7 +176,7 @@ export class Lexer<T extends string> {
                     value += this.advance();
                 }
 
-                tokens.push(this.createToken(TokenType.Decorador, value, startLine, startCol));
+                emit(this.createToken(TokenType.Decorador, value, startLine, startCol));
                 continue;
             }
 
@@ -175,17 +192,17 @@ export class Lexer<T extends string> {
                 // A word right after `.` is always a member name, even if it is a reserved word
                 // (`lista.en(0)`, `fecha.entre`), so it never goes through the keyword lookup.
                 if (tokens[tokens.length - 1]?.type === TokenType.Punto) {
-                    tokens.push(this.createToken(TokenType.IDENTIFICADOR, value, startLine, startCol));
+                    emit(this.createToken(TokenType.IDENTIFICADOR, value, startLine, startCol));
                 } else if (value === TokenType.Verdadero || value === TokenType.Falso) {
-                    tokens.push(this.createToken(TokenType.BOOLEANO, value, startLine, startCol));
+                    emit(this.createToken(TokenType.BOOLEANO, value, startLine, startCol));
                 } else if (value === TokenType.Indefinido) {
-                    tokens.push(this.createToken(TokenType.Indefinido, value, startLine, startCol));
+                    emit(this.createToken(TokenType.Indefinido, value, startLine, startCol));
                 } else if (Object.prototype.hasOwnProperty.call(NamedTextLiteral, value)) {
-                    tokens.push(this.createToken(TokenType.TEXTO, NamedTextLiteral[value as keyof typeof NamedTextLiteral], startLine, startCol));
+                    emit(this.createToken(TokenType.TEXTO, NamedTextLiteral[value as keyof typeof NamedTextLiteral], startLine, startCol));
                 } else if (Lexer.ASCII_ONLY.test(value) && this.context.keywordsManager.isKeyword(value)) {
-                    tokens.push(this.createToken(this.context.keywordsManager.resolve(value.toLowerCase()) as TokenType, value, startLine, startCol));
+                    emit(this.createToken(this.context.keywordsManager.resolve(value.toLowerCase()) as TokenType, value, startLine, startCol));
                 } else {
-                    tokens.push(this.createToken(TokenType.IDENTIFICADOR, value, startLine, startCol));
+                    emit(this.createToken(TokenType.IDENTIFICADOR, value, startLine, startCol));
                 }
                 continue;
             }
@@ -196,14 +213,14 @@ export class Lexer<T extends string> {
                 if (SymbolTranslationMap[twoChar]) {
                     this.advance();
                     this.advance();
-                    tokens.push(this.createToken(SymbolTranslationMap[twoChar], twoChar, startLine, startCol));
+                    emit(this.createToken(SymbolTranslationMap[twoChar], twoChar, startLine, startCol));
                     continue;
                 }
             }
 
             if (SymbolTranslationMap[char]) {
                 this.advance();
-                tokens.push(this.createToken(SymbolTranslationMap[char], char, startLine, startCol));
+                emit(this.createToken(SymbolTranslationMap[char], char, startLine, startCol));
                 continue;
             }
 

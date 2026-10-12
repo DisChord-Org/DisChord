@@ -1,0 +1,4 @@
+var persona es {
+    nombre "Juan"
+    consola.imprimir("hola")
+}
