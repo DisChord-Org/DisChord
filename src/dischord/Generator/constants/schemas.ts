@@ -334,12 +334,12 @@ const ChannelNameField = {
 /** The properties of a channel besides its name, shared by `crear canal` and `editar canal`. */
 const ChannelPropertyFields = [
     {
-        key: 'tipo',
+        key: 'tipoCanal',
         kind: FieldKind.MappedLiteral,
         mapping: ChannelTypes,
         default: JSFallback.Undefined,
         output: 'type',
-        invalidMessage: `El campo 'tipo' del canal debe ser un TEXTO`,
+        invalidMessage: `El campo 'tipoCanal' del canal debe ser un TEXTO`,
         unknownMessage: (value: string) => `Tipo de canal inválido: '${value}'. Se admite: ${Object.keys(ChannelTypes).join(' / ')}`
     },
     {
