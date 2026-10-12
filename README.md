@@ -217,6 +217,61 @@ nuevo comando Ping {
 }
 ```
 
+### Sending messages
+
+`enviar mensaje` sends to the current channel or interaction by default. `canal` redirects it to a
+channel and `usuario` sends it as a direct message; with both, the same body goes to the two.
+
+```js
+enviar mensaje {
+    canal canalAvisos
+    usuario usuario
+    contenido "Nuevo reporte"
+}
+```
+
+### Managing channels
+
+`crear canal`, `editar canal` and `borrar canal` are awaited, so they follow the same rule as
+`enviar mensaje` (a command, an event, an `@asincrono` function or the top level). None of the three
+words is reserved: they are recognized by the `<verbo> canal {` shape alone.
+
+```js
+var avisos es crear canal {
+    nombre "avisos"
+    tipoCanal "texto"
+    tema "Novedades del servidor"
+}
+
+editar canal {
+    canal avisos
+    nombre "novedades"
+    razon "Renombrado"
+}
+
+borrar canal {
+    canal avisos
+    razon "Limpieza"
+}
+```
+
+| Property | `crear` | `editar` | `borrar` | Meaning |
+|---|---|---|---|---|
+| `canal` | | required | required | The channel to act on (an object or an id) |
+| `nombre` | required | optional | | Channel name |
+| `tipoCanal` | optional | optional | | `texto`, `voz`, `categoria`, `anuncios`, `escenario`, `foro`, `multimedia` |
+| `tema` | optional | optional | | Topic |
+| `nsfw` | optional | optional | | Age-restricted |
+| `categoria` | optional | optional | | Parent category id |
+| `posicion` | optional | optional | | Position in the list |
+| `modoLento` | optional | optional | | Seconds between messages per user |
+| `bitrate` | optional | optional | | Voice bitrate |
+| `limiteUsuarios` | optional | optional | | Voice user limit |
+| `servidor` | optional | | | Guild to create in; defaults to the command's or event's |
+| `razon` | | optional | optional | Audit log reason |
+
+A property an action does not take is a compile error. `crear canal` returns the created channel.
+
 ---
 
 ## Syntax Overview
@@ -399,8 +454,9 @@ consola.imprimir(largo({ longitud 5 }))    // 5
 ### Discord Specific Keywords
 
 - **encender bot**: Initializes the bot client with token and intents.
-- **crear comando**: Defines a new slash or prefix command.
-- **crear mensaje**: Sends a message to the current channel or interaction.
+- **nuevo comando**: Defines a new slash or prefix command.
+- **enviar mensaje**: Sends a message to the current channel, a channel or a user.
+- **crear canal / editar canal / borrar canal**: Manage the server's channels.
 - **evento**: Listens to Discord gateway events (e.g., `entradaMiembro`, `mensajeCreado`).
 - **crear mensaje { embed { ... } }**: (Internal) High-level construct for Discord Embeds.
 

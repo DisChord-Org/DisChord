@@ -1,0 +1,12 @@
+nuevo comando Canales {
+    descripcion "gestiona canales";
+
+    var c es crear canal {
+        nombre "avisos"
+        tipoCanal "voz"
+        tema "Novedades"
+        categoria "123"
+        nsfw falso
+        modoLento 5
+    }
+}

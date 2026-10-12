@@ -1,0 +1,8 @@
+nuevo comando Canales {
+    descripcion "gestiona canales";
+
+    crear canal {
+        nombre "a"
+        razon "no se aplicaria"
+    }
+}

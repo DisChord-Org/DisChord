@@ -236,3 +236,19 @@ export const IgnoreCommandTypes: Record<string, IgnoreCommandType> = dictionary(
     "Mensajes": IgnoreCommandType.Message,
     "Slashs": IgnoreCommandType.Slash
 } as const);
+
+/**
+ * Map translating DisChord channel kinds to Discord's `ChannelType` numeric values (the ones a
+ * guild channel can be created or edited as).
+ *
+ * @type {Readonly<Record<string, number>>}
+ */
+export const ChannelTypes: Record<string, number> = dictionary({
+    "texto": 0,
+    "voz": 2,
+    "categoria": 4,
+    "anuncios": 5,
+    "escenario": 13,
+    "foro": 15,
+    "multimedia": 16
+} as const);

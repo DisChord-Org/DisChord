@@ -1,7 +1,7 @@
 import { ASTNode } from "../../../chord/types";
 import { BDOSchema, FieldKind, JSFallback, literalStringValue } from "../../../chord/BDOSchema";
-import { ApplicationIntegrationType, ButtonStyles, DisChordNode, DisChordNodeType, InteractionContextType } from "../../types";
-import { ContextTypes, DisChordTypeMap, IgnoreCommandTypes, IntegrationTypes, intentsMap } from "./mappings";
+import { ApplicationIntegrationType, ButtonStyles, ChannelAction, DisChordNode, DisChordNodeType, InteractionContextType } from "../../types";
+import { ChannelTypes, ContextTypes, DisChordTypeMap, IgnoreCommandTypes, IntegrationTypes, intentsMap } from "./mappings";
 
 /**
  * @file schemas.ts
@@ -59,8 +59,17 @@ export function OptionSchema (
 /** `comando`'s own properties (its command flags and `opciones`). */
 export const CommandSchema: BDOSchema<DisChordNodeType, DisChordNode> = {
     fields: [
-        { key: 'descripcion', kind: FieldKind.Value, required: true, missingMessage: `Se requiere descripción para el comando` },
-        { key: 'nsfw', kind: FieldKind.Value, default: JSFallback.False },
+        {
+            key: 'descripcion',
+            kind: FieldKind.Value,
+            required: true,
+            missingMessage: `Se requiere descripción para el comando`
+        },
+        {
+            key: 'nsfw',
+            kind: FieldKind.Value,
+            default: JSFallback.False
+        },
         {
             key: 'integraciones',
             kind: FieldKind.MappedList,
@@ -77,7 +86,11 @@ export const CommandSchema: BDOSchema<DisChordNodeType, DisChordNode> = {
             invalidMessage: `El campo 'contextos' debe ser una lista de opciones`,
             unknownMessage: () => `En las integraciones solo se puede especificar: ${Object.keys(ContextTypes).join(' / ')}`
         },
-        { key: 'servidoresPermitidos', kind: FieldKind.Value, default: JSFallback.Undefined },
+        {
+            key: 'servidoresPermitidos',
+            kind: FieldKind.Value,
+            default: JSFallback.Undefined
+        },
         {
             key: 'ignorar',
             kind: FieldKind.MappedLiteral,
@@ -86,7 +99,12 @@ export const CommandSchema: BDOSchema<DisChordNodeType, DisChordNode> = {
             invalidMessage: `Solo se permite tipo TEXTO en 'ignorar'`,
             unknownMessage: () => `En 'ignorar' solo se puede especificar un TEXTO de: ${Object.keys(IgnoreCommandTypes).join(' / ')}`
         },
-        { key: 'alias', kind: FieldKind.List, default: JSFallback.Undefined, invalidMessage: `Los alias deben ser una LISTA con valores tipo TEXTO` }
+        {
+            key: 'alias',
+            kind: FieldKind.List,
+            default: JSFallback.Undefined,
+            invalidMessage: `Los alias deben ser una LISTA con valores tipo TEXTO`
+        }
     ],
     nested: [
         { key: 'opciones', forEachEntry: true, schemaFor: OptionSchema }
@@ -99,8 +117,18 @@ export const CommandSchema: BDOSchema<DisChordNodeType, DisChordNode> = {
  */
 export const ButtonSchema: BDOSchema<DisChordNodeType, DisChordNode> = {
     fields: [
-        { key: 'id', kind: FieldKind.Value, required: true, missingMessage: `Se debe especificar una id en el botón` },
-        { key: 'etiqueta', kind: FieldKind.Value, required: true, missingMessage: `Se debe especificar una etiqueta en el botón` },
+        {
+            key: 'id',
+            kind: FieldKind.Value,
+            required: true,
+            missingMessage: `Se debe especificar una id en el botón`
+        },
+        {
+            key: 'etiqueta',
+            kind: FieldKind.Value,
+            required: true,
+            missingMessage: `Se debe especificar una etiqueta en el botón`
+        },
         {
             key: 'estilo',
             kind: FieldKind.MappedLiteral,
@@ -109,7 +137,11 @@ export const ButtonSchema: BDOSchema<DisChordNodeType, DisChordNode> = {
             missingMessage: `Se debe especificar el estilo en el botón`,
             unknownMessage: value => `Estilo inválido: '${value}'`
         },
-        { key: 'emoji', kind: FieldKind.Value, default: JSFallback.Empty }
+        {
+            key: 'emoji',
+            kind: FieldKind.Value,
+            default: JSFallback.Empty
+        }
     ]
 };
 
@@ -117,17 +149,39 @@ export const ButtonSchema: BDOSchema<DisChordNodeType, DisChordNode> = {
  * `titulo` is required; `descripcion`/`lineado` are plain optional pass-throughs. */
 export const EmbedFieldSchema: BDOSchema<DisChordNodeType, DisChordNode> = {
     fields: [
-        { key: 'titulo', kind: FieldKind.Value, required: true, missingMessage: `El campo requiere una propiedad 'titulo'` },
-        { key: 'descripcion', kind: FieldKind.Value, default: JSFallback.Empty },
-        { key: 'lineado', kind: FieldKind.Value, default: JSFallback.False }
+        {
+            key: 'titulo',
+            kind: FieldKind.Value,
+            required: true,
+            missingMessage: `El campo requiere una propiedad 'titulo'`
+        },
+        {
+            key: 'descripcion',
+            kind: FieldKind.Value,
+            default: JSFallback.Empty
+        },
+        {
+            key: 'lineado',
+            kind: FieldKind.Value,
+            default: JSFallback.False
+        }
     ]
 };
 
 /** An embed's footer (`pie { texto "..." icono "..." }`). Only `texto` is required. */
 export const EmbedFooterSchema: BDOSchema<DisChordNodeType, DisChordNode> = {
     fields: [
-        { key: 'texto', kind: FieldKind.Value, required: true, missingMessage: `El pie de página requiere una propiedad 'texto'` },
-        { key: 'icono', kind: FieldKind.Value, default: JSFallback.Undefined }
+        {
+            key: 'texto',
+            kind: FieldKind.Value,
+            required: true,
+            missingMessage: `El pie de página requiere una propiedad 'texto'`
+        },
+        {
+            key: 'icono',
+            kind: FieldKind.Value,
+            default: JSFallback.Undefined
+        }
     ]
 };
 
@@ -142,11 +196,31 @@ export const EmbedFooterSchema: BDOSchema<DisChordNodeType, DisChordNode> = {
  */
 export const EmbedSchema: BDOSchema<DisChordNodeType, DisChordNode> = {
     fields: [
-        { key: 'color', kind: FieldKind.Value, default: JSFallback.Empty },
-        { key: 'titulo', kind: FieldKind.Value, default: JSFallback.Empty },
-        { key: 'descripcion', kind: FieldKind.Value, default: JSFallback.Empty },
-        { key: 'imagen', kind: FieldKind.Value, default: JSFallback.Empty },
-        { key: 'cartel', kind: FieldKind.Value, default: JSFallback.Empty }
+        {
+            key: 'color',
+            kind: FieldKind.Value,
+            default: JSFallback.Empty
+        },
+        {
+            key: 'titulo',
+            kind: FieldKind.Value,
+            default: JSFallback.Empty
+        },
+        {
+            key: 'descripcion',
+            kind: FieldKind.Value,
+            default: JSFallback.Empty
+        },
+        {
+            key: 'imagen',
+            kind: FieldKind.Value,
+            default: JSFallback.Empty
+        },
+        {
+            key: 'cartel',
+            kind: FieldKind.Value,
+            default: JSFallback.Empty
+        }
     ],
     nested: [
         { key: 'campos', forEachItem: true, schema: EmbedFieldSchema, typeMismatchMessage: foundType => `Se esperaba un BDO para el campo, se recibió '${foundType}'` },
@@ -169,7 +243,12 @@ export const StartBotSchema: BDOSchema<DisChordNodeType, DisChordNode> = {
             required: true,
             missingMessage: `No se ha especificado el prefijo en el bloque 'encender bot'`
         },
-        { key: 'token', kind: FieldKind.Value, required: true, missingMessage: `Falta el bloque 'token' en la configuración del bot.` },
+        {
+            key: 'token',
+            kind: FieldKind.Value,
+            required: true,
+            missingMessage: `Falta el bloque 'token' en la configuración del bot.`
+        },
         {
             key: 'intenciones',
             kind: FieldKind.MappedList,
@@ -187,9 +266,21 @@ export const StartBotSchema: BDOSchema<DisChordNodeType, DisChordNode> = {
  */
 export const CollectorSchema: BDOSchema<DisChordNodeType, DisChordNode> = {
     fields: [
-        { key: 'filtro', kind: FieldKind.Value, default: JSFallback.Empty },
-        { key: 'tiempo', kind: FieldKind.Value, default: '60000' },
-        { key: 'alFinalizar', kind: FieldKind.Value, default: JSFallback.Empty }
+        {
+            key: 'filtro',
+            kind: FieldKind.Value,
+            default: JSFallback.Empty
+        },
+        {
+            key: 'tiempo',
+            kind: FieldKind.Value,
+            default: '60000'
+        },
+        {
+            key: 'alFinalizar',
+            kind: FieldKind.Value,
+            default: JSFallback.Empty
+        }
     ]
 };
 
@@ -200,8 +291,109 @@ export const CollectorSchema: BDOSchema<DisChordNodeType, DisChordNode> = {
  */
 export const MessageSchema: BDOSchema<DisChordNodeType, DisChordNode> = {
     fields: [
-        { key: 'canal', kind: FieldKind.Value, default: JSFallback.Undefined },
-        { key: 'usuario', kind: FieldKind.Value, default: JSFallback.Undefined },
-        { key: 'contenido', kind: FieldKind.Value, default: JSFallback.Undefined }
+        {
+            key: 'canal',
+            kind: FieldKind.Value,
+            default: JSFallback.Undefined
+        },
+        {
+            key: 'usuario',
+            kind: FieldKind.Value,
+            default: JSFallback.Undefined
+        },
+        {
+            key: 'contenido',
+            kind: FieldKind.Value,
+            default: JSFallback.Undefined
+        }
     ]
+};
+
+/**
+ * The properties describing a channel, shared by `crear canal` and `editar canal`. Every one is
+ * optional here; each action's schema decides which are required.
+ */
+const ChannelPropertyFields = [
+    {
+        key: 'nombre',
+        kind: FieldKind.Value,
+        default: JSFallback.Undefined
+    },
+    {
+        key: 'tipoCanal',
+        kind: FieldKind.MappedLiteral,
+        mapping: ChannelTypes,
+        default: JSFallback.Undefined,
+        invalidMessage: `El campo 'tipoCanal' del canal debe ser un TEXTO`,
+        unknownMessage: (value: string) => `Tipo de canal inválido: '${value}'. Se admite: ${Object.keys(ChannelTypes).join(' / ')}`
+    },
+    {
+        key: 'tema',
+        kind: FieldKind.Value,
+        default: JSFallback.Undefined
+    },
+    {
+        key: 'nsfw',
+        kind: FieldKind.Value,
+        default: JSFallback.Undefined
+    },
+    {
+        key: 'categoria',
+        kind: FieldKind.Value,
+        default: JSFallback.Undefined
+    },
+    {
+        key: 'posicion',
+        kind: FieldKind.Value,
+        default: JSFallback.Undefined
+    },
+    {
+        key: 'modoLento',
+        kind: FieldKind.Value,
+        default: JSFallback.Undefined
+    },
+    {
+        key: 'bitrate',
+        kind: FieldKind.Value,
+        default: JSFallback.Undefined
+    },
+    {
+        key: 'limiteUsuarios',
+        kind: FieldKind.Value,
+        default: JSFallback.Undefined
+    }
+] satisfies BDOSchema<DisChordNodeType, DisChordNode>['fields'];
+
+/** `crear canal { ... }`: `nombre` is required; `servidor` falls back to the current one. */
+export const CreateChannelSchema: BDOSchema<DisChordNodeType, DisChordNode> = {
+    fields: [
+        { key: 'servidor', kind: FieldKind.Value, default: JSFallback.Undefined },
+        ...ChannelPropertyFields.map(field => field.key === 'nombre'
+            ? { ...field, required: true, missingMessage: `En 'crear canal' se esperaba 'nombre'.` }
+            : field)
+    ]
+};
+
+/** `editar canal { ... }`: `canal` (the target) is required, everything else optional. */
+export const EditChannelSchema: BDOSchema<DisChordNodeType, DisChordNode> = {
+    fields: [
+        { key: 'canal', kind: FieldKind.Value, required: true, missingMessage: `En 'editar canal' se esperaba 'canal'.` },
+        ...ChannelPropertyFields,
+        { key: 'razon', kind: FieldKind.Value, default: JSFallback.Undefined }
+    ]
+};
+
+/** `borrar canal { ... }`: only the target and an optional reason. */
+export const DeleteChannelSchema: BDOSchema<DisChordNodeType, DisChordNode> = {
+    fields: [
+        { key: 'canal', kind: FieldKind.Value, required: true, missingMessage: `En 'borrar canal' se esperaba 'canal'.` },
+        { key: 'razon', kind: FieldKind.Value, default: JSFallback.Undefined }
+    ]
+};
+
+/** The schema each channel action's block is checked and resolved against. */
+export const ChannelActionSchemas: Record<ChannelAction, BDOSchema<DisChordNodeType, DisChordNode>> = {
+    [ChannelAction.Crear]: CreateChannelSchema,
+    [ChannelAction.Editar]: EditChannelSchema,
+    [ChannelAction.Borrar]: DeleteChannelSchema
 };

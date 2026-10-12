@@ -1,0 +1,8 @@
+nuevo comando Canales {
+    descripcion "gestiona canales";
+
+    borrar canal {
+        canal canal
+        razon "limpieza"
+    }
+}

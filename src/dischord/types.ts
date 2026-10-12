@@ -24,6 +24,7 @@ export const DisChordTokenType = {
     EVENTO: 'Evento',
     CREAR_COMANDO: 'CrearComando',
     CREAR_MENSAJE: 'CrearMensaje',
+    ACCION_CANAL: 'AccionCanal',
     CREAR_RECOLECTOR: 'CrearRecolector',
     CREAR_EMBED: 'CrearEmbed',
     CREAR_BOTON: 'CrearBoton'
@@ -43,6 +44,7 @@ export type DisChordNode =
     | EventNode
     | CommandNode
     | MessageNode
+    | ChannelActionNode
     | CollectorNode
     | EmbedDeclarationNode
     | ButtonDeclarationNode;
@@ -104,6 +106,34 @@ export interface CollectorNode extends BaseNode<DisChordNodeType> {
  */
 export interface MessageNode extends BaseNode<DisChordNodeType> {
     type: typeof DisChordTokenType.CREAR_MENSAJE;
+    object: DisChordODBNode;
+}
+
+/**
+ * The verbs a channel action block is written with: `crear canal`, `editar canal`, `borrar canal`.
+ * Unreserved words (they stay ordinary identifiers everywhere else), told apart by the literal
+ * `canal` that follows.
+ * @type {const}
+ */
+export const ChannelAction = {
+    Crear: 'crear',
+    Editar: 'editar',
+    Borrar: 'borrar'
+} as const;
+
+/** The action a `ChannelActionNode` performs. */
+export type ChannelAction = typeof ChannelAction[keyof typeof ChannelAction];
+
+/**
+ * Syntactic node for `crear canal { ... }`, `editar canal { ... }` and `borrar canal { ... }`:
+ * one node for the three, which differ only in the schema their block is checked against and the
+ * call generated.
+ * @interface ChannelActionNode
+ * @extends BaseNode<DisChordNodeType>
+ */
+export interface ChannelActionNode extends BaseNode<DisChordNodeType> {
+    type: typeof DisChordTokenType.ACCION_CANAL;
+    action: ChannelAction;
     object: DisChordODBNode;
 }
 

@@ -1,0 +1,6 @@
+funcion borrar(x) {
+    devolver x
+}
+
+var crear es 1
+var editar es borrar(2)

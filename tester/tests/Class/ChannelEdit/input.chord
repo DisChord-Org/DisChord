@@ -1,0 +1,9 @@
+nuevo comando Canales {
+    descripcion "gestiona canales";
+
+    editar canal {
+        canal canal
+        nombre "novedades"
+        razon "renombrado"
+    }
+}

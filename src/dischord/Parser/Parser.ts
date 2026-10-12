@@ -7,6 +7,7 @@ import { KeyWords } from '../../chord/KeywordsManager';
 
 import CommandParser from './Grammar/architectural/CommandParser';
 import MessageParser from './Grammar/features/MessageParser';
+import ChannelActionParser from './Grammar/features/ChannelActionParser';
 import CollectorParser from './Grammar/features/CollectorParser';
 import ClientParser from './Grammar/architectural/ClientParser';
 import EventParser from './Grammar/architectural/EventParser';
@@ -104,6 +105,8 @@ export class DisChordParser extends Parser<DisChordNodeType, DisChordNode> {
 
         const componentDeclaration = this.tryParseUnreservedComponentDeclaration(UnreservedComponentDeclarations);
         if (componentDeclaration) return componentDeclaration;
+
+        if (ChannelActionParser.matches(this)) return new ChannelActionParser(this).parse();
 
         const ParserClass = DisChordParser.DisChordSubParsers.find(SubParser =>
             SubParser.triggerToken !== undefined &&
