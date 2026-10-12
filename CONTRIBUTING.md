@@ -40,7 +40,7 @@ When proposing a new syntax/keyword, ensure it follows our **Natural Operator** 
 Before submitting a Pull Request, please ensure:
 
 - Your code follows existing formatting and style.
-- You've added examples in the `examples/` directory illustrating the new feature.
+- You've added a test under `tester/tests/` covering the new feature.
 - Your code builds successfully (`npm run build`).
 - Documentation (like `README.md` or comments) has been updated if applicable.
 

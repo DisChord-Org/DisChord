@@ -71,7 +71,7 @@ This will compile `hello.chord` to `dist/hello.js` and execute it automatically.
 
 ### Command Line Options
 
-Everything after `npm run dev --` goes to the CLI (the examples use `npm run dev --`; `entry` is a
+Everything after `npm run dev --` goes to the CLI (the snippets here use `npm run dev --`; `entry` is a
 `.chord` file or a project directory, `.` by default).
 
 | Option | What it does |
@@ -411,7 +411,7 @@ consola.imprimir(largo({ longitud 5 }))    // 5
 - `src/chord/`: Core language components (Base Lexer, Types).
 - `src/dischord/`: Discord-specific Parser extension and Code Generator.
 - `src/chord/parser.ts`: The main recursive descent parser.
-- `examples/`: Code samples for both generic logic and Discord bots.
+- `tester/tests/`: Test cases that double as code samples, for both generic logic and Discord bots.
 - `dist/`: Output directory for transpiled `.js` files.
 
 ---

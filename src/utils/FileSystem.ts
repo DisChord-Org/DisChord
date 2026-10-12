@@ -80,7 +80,7 @@ export class FileSystem {
      * just that file — the natural thing to do, since it's the designated entry — would otherwise
      * silently compile only that one file and skip every sibling `.chord` under `src/` (commands,
      * events, ...), with no indication anything was left out. A file that *isn't* inside a `src/`
-     * folder (e.g. one of the standalone scripts under `examples/`) keeps the original, literal
+     * folder (e.g. a standalone script outside any project) keeps the original, literal
      * single-file behavior.
      * @param input - The entry: a directory, or a single file.
      * @returns Every discovered .chord file.
