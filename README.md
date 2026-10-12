@@ -270,6 +270,33 @@ borrar canal {
 | `servidor` | optional | | | Guild to create in; defaults to the command's, or to the one of the event's parameter (`mensaje`, `canal`, `miembro`, `rol`, `servidor`, `interaccion`) |
 | `razon` | | optional | optional | Audit log reason |
 
+#### Safety barriers
+
+Creating, editing and deleting channels is what a bot is abused for (mass deletion, endless
+creation, a public command that lets anyone act with the bot's permissions), so DisChord
+puts barriers in the way. None of them can be turned off from the bot's code.
+
+At compile time, a channel action is an error when it is:
+
+- **inside a loop** (`para`), the shape of a mass creation or deletion;
+- **in the event it triggers** (`crear canal` in `canalCreado`, `editar canal` in `canalEditado`,
+  `borrar canal` in `canalBorrado`), which would run again for its own effect;
+- **a `borrar canal` without `razon`**, so every deletion leaves its trace in the audit log.
+
+At run time:
+
+- **Inside a command, whoever ran it needs the `Gestionar canales` permission.** The bot acts with
+  its own permissions, not theirs, so without this check any member could use it to do what they
+  can not. Events have no one who ran them and skip the check.
+- **The channel has to belong to the server of the context.**
+- **Each server has a quota per action in a ten minute window:** 10 creations, 10 edits and 5
+  deletions. It doubles for every order of magnitude of servers the bot is in (×2 from 10, ×4
+  from 100, ×8 from 1000, and no more), since a bot in a few servers is the likeliest to be a
+  throwaway one. It is kept in the memory of the process, so a restart resets it.
+
+These are barriers, not a lock: raw JavaScript (`js("...")`) and direct use of `cliente` skip
+them.
+
 A property an action does not take is a compile error, as it is in every block (`comando`, `boton`,
 `embed`, `enviar mensaje`...): a misspelled property is reported with the list of what the block
 accepts instead of being ignored. `tipo` takes a literal. `editar canal` must change at least one property, and `crear canal` returns the created

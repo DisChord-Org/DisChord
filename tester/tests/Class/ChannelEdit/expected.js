@@ -18,6 +18,6 @@ export default class CanalesCommand extends Command {
         const canal = contexto.interaction ? contexto.interaction.channel : cliente.channels.fetch(contexto.channelId);
         const ctx = { cliente, contexto };
 
-        await editChannel(ctx, canal, { name: 'novedades' }, 'renombrado');
+        await editChannel(ctx, canal, { name: 'novedades' }, 'renombrado', contexto.guildId);
     }
 }

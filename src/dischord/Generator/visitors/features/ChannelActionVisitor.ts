@@ -31,9 +31,9 @@ export default class ChannelActionVisitor extends SubGenerator<DisChordNodeType,
             case ChannelAction.Crear:
                 return `await ${helper}(ctx, ${this.guild(node, properties)}, ${this.body(node, properties)})`;
             case ChannelAction.Editar:
-                return `await ${helper}(ctx, ${properties[ChannelProperty.Canal]}, ${this.body(node, properties)}, ${properties[ChannelProperty.Razon]})`;
+                return `await ${helper}(ctx, ${properties[ChannelProperty.Canal]}, ${this.body(node, properties)}, ${properties[ChannelProperty.Razon]}, ${node.guild})`;
             case ChannelAction.Borrar:
-                return `await ${helper}(ctx, ${properties[ChannelProperty.Canal]}, ${properties[ChannelProperty.Razon]})`;
+                return `await ${helper}(ctx, ${properties[ChannelProperty.Canal]}, ${properties[ChannelProperty.Razon]}, ${node.guild})`;
         }
     }
 
