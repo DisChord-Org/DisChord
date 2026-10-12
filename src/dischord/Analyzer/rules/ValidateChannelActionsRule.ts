@@ -3,7 +3,7 @@ import { walkAST } from "../../../chord/walkAST";
 import { BDOValidator } from "../../../chord/Analyzer/BDOValidator";
 import { fieldKeys } from "../../../chord/BDOSchema";
 import { DisChordError, ErrorLevel } from "../../../errors/ChordError";
-import { ChannelAction, ChannelActionNode, CommandNode, DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType, EventNode } from "../../types";
+import { ChannelAction, ChannelActionNode, ChannelProperty, CommandNode, DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType, EventNode } from "../../types";
 import { ChannelActionSchemas } from "../../Generator/constants/schemas";
 import { CommandGuildSource, EventGuildSources, eventsMap } from "../../Generator/constants/mappings";
 
@@ -60,7 +60,7 @@ export class ValidateChannelActionsRule extends AnalysisRule<DisChordNodeType, D
         );
 
         if (node.action === ChannelAction.Editar) this.assertChangesSomething(node);
-        if (node.action === ChannelAction.Crear && !node.object.blocks['servidor']) node.guild = this.guildOf(context, node);
+        if (node.action === ChannelAction.Crear && !node.object.blocks[ChannelProperty.Servidor]) node.guild = this.guildOf(context, node);
     }
 
     /**
@@ -69,8 +69,8 @@ export class ValidateChannelActionsRule extends AnalysisRule<DisChordNodeType, D
      */
     private assertChangesSomething (node: ChannelActionNode): void {
         const changes = ChannelActionSchemas[node.action].fields
-            .flatMap(field => fieldKeys(field.key))
-            .filter(key => key !== 'canal' && key !== 'razon');
+            .filter(field => field.output !== undefined)
+            .flatMap(field => fieldKeys(field.key));
 
         if (!changes.some(key => node.object.blocks[key])) this.fail(
             `'editar canal' necesita al menos una propiedad que cambiar: ${changes.join(' / ')}.`,

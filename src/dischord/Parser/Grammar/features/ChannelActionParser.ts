@@ -11,9 +11,9 @@ import { Parser } from "../../../../chord/Parser/Parser";
  *
  * None of the three words is reserved: `crear`, `editar`, `borrar` and `canal` keep working as
  * ordinary identifiers (a method called `borrar`, the `canal` of a command...). The block is
- * recognized by its shape alone — `<verbo> canal {` — which `DisChordParser.parseCustomStatement`
- * checks through {@link ChannelActionParser.matches} before any other dispatch, so it needs no
- * `triggerToken` nor registered keywords.
+ * recognized by its shape alone — `<verbo> canal {` — through the `UnreservedActions` table
+ * `DisChordParser.parseCustomStatement` dispatches from, so it needs no `triggerToken` nor
+ * registered keywords.
  */
 export default class ChannelActionParser extends SubParser<DisChordNodeType, DisChordNode> {
     /** Recognized by shape, not by a reserved token. */
@@ -24,33 +24,11 @@ export default class ChannelActionParser extends SubParser<DisChordNodeType, Dis
      */
     static keywords: TokenTypeUnion<DisChordNodeType>[] = [];
 
-    /** The literal word that follows the verb. */
-    private static readonly target = 'canal';
-
     /**
      * @param parent - The main Parser context for token expression handling
      */
     constructor (protected parent: Parser<DisChordNodeType, DisChordNode>) {
         super(parent);
-    }
-
-    /**
-     * Whether the upcoming tokens are `<verbo> canal {`, without consuming any.
-     * @param parser - The parser to look ahead on.
-     * @returns {boolean} `true` when a channel action block starts here.
-     */
-    public static matches (parser: Parser<DisChordNodeType, DisChordNode>): boolean {
-        const verb = parser.peek();
-        const target = parser.peek('next');
-
-        // `nuevo crear canal {` is a class instantiation shape, not an action
-        if (parser.peek('prev').type === TokenType.Nuevo) return false;
-
-        return verb.type === TokenType.IDENTIFICADOR
-            && Object.values<string>(ChannelAction).includes(verb.value)
-            && target.type === TokenType.IDENTIFICADOR
-            && target.value === ChannelActionParser.target
-            && parser.peek(parser.cursor + 2)?.type === TokenType.L_BRACE;
     }
 
     /**

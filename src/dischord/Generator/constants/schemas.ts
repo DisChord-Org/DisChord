@@ -1,6 +1,6 @@
 import { ASTNode } from "../../../chord/types";
-import { BDOSchema, FieldKind, JSFallback, literalStringValue } from "../../../chord/BDOSchema";
-import { ApplicationIntegrationType, ButtonStyles, ChannelAction, DisChordNode, DisChordNodeType, InteractionContextType } from "../../types";
+import { BDOSchema, FieldKind, FieldSpec, JSFallback, literalStringValue } from "../../../chord/BDOSchema";
+import { ApplicationIntegrationType, ButtonStyles, ChannelAction, ChannelProperty, DisChordNode, DisChordNodeType, InteractionContextType } from "../../types";
 import { ChannelTypes, ContextTypes, DisChordTypeMap, IgnoreCommandTypes, IntegrationTypes, intentsMap } from "./mappings";
 
 /**
@@ -324,65 +324,83 @@ export const MessageSchema: BDOSchema<DisChordNodeType, DisChordNode> = {
  * The properties describing a channel, shared by `crear canal` and `editar canal`. Every one is
  * optional here; each action's schema decides which are required.
  */
+const ChannelNameField = {
+    key: 'nombre',
+    kind: FieldKind.Value,
+    default: JSFallback.Undefined,
+    output: 'name'
+} satisfies FieldSpec;
+
+/** The properties of a channel besides its name, shared by `crear canal` and `editar canal`. */
 const ChannelPropertyFields = [
     {
-        key: 'nombre',
-        kind: FieldKind.Value,
-        default: JSFallback.Undefined
-    },
-    {
-        key: 'tipoCanal',
+        key: 'tipo',
         kind: FieldKind.MappedLiteral,
         mapping: ChannelTypes,
         default: JSFallback.Undefined,
-        invalidMessage: `El campo 'tipoCanal' del canal debe ser un TEXTO`,
+        output: 'type',
+        invalidMessage: `El campo 'tipo' del canal debe ser un TEXTO`,
         unknownMessage: (value: string) => `Tipo de canal inválido: '${value}'. Se admite: ${Object.keys(ChannelTypes).join(' / ')}`
     },
     {
         key: 'tema',
         kind: FieldKind.Value,
-        default: JSFallback.Undefined
+        default: JSFallback.Undefined,
+        output: 'topic'
     },
     {
         key: 'nsfw',
         kind: FieldKind.Value,
-        default: JSFallback.Undefined
+        default: JSFallback.Undefined,
+        output: 'nsfw'
     },
     {
         key: 'categoria',
         kind: FieldKind.Value,
-        default: JSFallback.Undefined
+        default: JSFallback.Undefined,
+        output: 'parent_id'
     },
     {
         key: 'posicion',
         kind: FieldKind.Value,
-        default: JSFallback.Undefined
+        default: JSFallback.Undefined,
+        output: 'position'
     },
     {
         key: 'modoLento',
         kind: FieldKind.Value,
-        default: JSFallback.Undefined
+        default: JSFallback.Undefined,
+        output: 'rate_limit_per_user'
     },
     {
         key: 'bitrate',
         kind: FieldKind.Value,
-        default: JSFallback.Undefined
+        default: JSFallback.Undefined,
+        output: 'bitrate'
     },
     {
         key: 'limiteUsuarios',
         kind: FieldKind.Value,
-        default: JSFallback.Undefined
+        default: JSFallback.Undefined,
+        output: 'user_limit'
     }
-] satisfies BDOSchema<DisChordNodeType, DisChordNode>['fields'];
+] satisfies FieldSpec[];
 
 /** `crear canal { ... }`: `nombre` is required; `servidor` falls back to the current one. */
 export const CreateChannelSchema: BDOSchema<DisChordNodeType, DisChordNode> = {
     name: 'crear canal',
     fields: [
-        { key: 'servidor', kind: FieldKind.Value, default: JSFallback.Undefined },
-        ...ChannelPropertyFields.map(field => field.key === 'nombre'
-            ? { ...field, required: true, missingMessage: `En 'crear canal' se esperaba 'nombre'.` }
-            : field)
+        {
+            key: ChannelProperty.Servidor,
+            kind: FieldKind.Value,
+            default: JSFallback.Undefined
+        },
+        {
+            ...ChannelNameField,
+            required: true,
+            missingMessage: `En 'crear canal' se esperaba '${ChannelNameField.key}'.`
+        },
+        ...ChannelPropertyFields
     ]
 };
 
@@ -390,9 +408,19 @@ export const CreateChannelSchema: BDOSchema<DisChordNodeType, DisChordNode> = {
 export const EditChannelSchema: BDOSchema<DisChordNodeType, DisChordNode> = {
     name: 'editar canal',
     fields: [
-        { key: 'canal', kind: FieldKind.Value, required: true, missingMessage: `En 'editar canal' se esperaba 'canal'.` },
+        {
+            key: ChannelProperty.Canal,
+            kind: FieldKind.Value,
+            required: true,
+            missingMessage: `En 'editar canal' se esperaba '${ChannelProperty.Canal}'.` }
+        ,
+        ChannelNameField,
         ...ChannelPropertyFields,
-        { key: 'razon', kind: FieldKind.Value, default: JSFallback.Undefined }
+        {
+            key: ChannelProperty.Razon,
+            kind: FieldKind.Value,
+            default: JSFallback.Undefined
+        }
     ]
 };
 
@@ -400,8 +428,17 @@ export const EditChannelSchema: BDOSchema<DisChordNodeType, DisChordNode> = {
 export const DeleteChannelSchema: BDOSchema<DisChordNodeType, DisChordNode> = {
     name: 'borrar canal',
     fields: [
-        { key: 'canal', kind: FieldKind.Value, required: true, missingMessage: `En 'borrar canal' se esperaba 'canal'.` },
-        { key: 'razon', kind: FieldKind.Value, default: JSFallback.Undefined }
+        {
+            key: ChannelProperty.Canal,
+            kind: FieldKind.Value,
+            required: true,
+            missingMessage: `En 'borrar canal' se esperaba '${ChannelProperty.Canal}'.` }
+        ,
+        {
+            key: ChannelProperty.Razon,
+            kind: FieldKind.Value,
+            default: JSFallback.Undefined
+        }
     ]
 };
 

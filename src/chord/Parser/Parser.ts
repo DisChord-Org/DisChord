@@ -381,6 +381,37 @@ export class Parser<T extends string, N extends BaseNode<T>> extends ParserConte
     }
 
     /**
+     * Detects and parses an unreserved-keyword action: `<verbo> <objeto> { ... }` — a verb and a
+     * fixed object word that stay ordinary identifiers everywhere else (`crear canal {`), told
+     * apart from any other use of those words by the whole shape. Unlike a declaration, an action
+     * names nothing and is never introduced by `nuevo`, so `nuevo <Base> <Nombre> {` keeps its
+     * class meaning even when its words are a registered verb and object.
+     *
+     * The registered `ParserClass` receives the tokens untouched: it consumes the verb itself, so
+     * it can tell which one it was.
+     * @public
+     * @param registrations - Table of `{ verbs, object, ParserClass }` rows to match against.
+     * @returns {ASTNode<T, N> | null} The parsed action, or null if the upcoming tokens do not
+     * match the shape or any registered row (nothing is consumed).
+     */
+    public tryParseUnreservedAction (registrations: { verbs: string[]; object: string; ParserClass: SubParserClass<T, N> }[]): ASTNode<T, N> | null {
+        const verb = this.peek();
+        const object = this.peek('next');
+
+        const isActionShape = verb.type === TokenType.IDENTIFICADOR
+            && object.type === TokenType.IDENTIFICADOR
+            && this.peek(this.cursor + 2)?.type === TokenType.L_BRACE
+            && this.peek('prev').type !== TokenType.Nuevo;
+
+        if (!isActionShape) return null;
+
+        const registration = registrations.find(r => r.object === object.value && r.verbs.includes(verb.value));
+        if (!registration) return null;
+
+        return new registration.ParserClass(this).parse();
+    }
+
+    /**
      * Extensibility hook intended for parsing custom dialect elements or macro statements.
      *
      * @public

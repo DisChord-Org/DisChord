@@ -84,6 +84,10 @@ export interface FieldSpec<M = unknown> {
     /** Message factory for a recognized-shape value that isn't a key of `mapping`
      * (`'mappedLiteral'`/`'mappedList'` only). */
     unknownMessage?: (value: string) => string;
+    /** The name the field takes in the object the generator builds from the block, when it goes
+     * in one (a channel's `nombre` is `name` in Discord's payload). A field without it is not
+     * part of that object. */
+    output?: string;
 }
 
 /**

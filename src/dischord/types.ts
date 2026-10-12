@@ -19,6 +19,7 @@ export const DisChordTokenType = {
 
     Embed: 'embed',
     Boton: 'boton',
+    Canal: 'canal',
 
     ENCENDER_BOT: 'EncenderBot',
     EVENTO: 'Evento',
@@ -111,8 +112,8 @@ export interface MessageNode extends BaseNode<DisChordNodeType> {
 
 /**
  * The verbs a channel action block is written with: `crear canal`, `editar canal`, `borrar canal`.
- * Unreserved words (they stay ordinary identifiers everywhere else), told apart by the literal
- * `canal` that follows.
+ * Unreserved words (they stay ordinary identifiers everywhere else), told apart by the
+ * `DisChordTokenType.Canal` word that follows.
  * @type {const}
  */
 export const ChannelAction = {
@@ -123,6 +124,17 @@ export const ChannelAction = {
 
 /** The action a `ChannelActionNode` performs. */
 export type ChannelAction = typeof ChannelAction[keyof typeof ChannelAction];
+
+/**
+ * The properties of a channel action block that are read by name outside its schemas: the target
+ * channel, the server to create in and the audit log reason.
+ * @type {const}
+ */
+export const ChannelProperty = {
+    Canal: 'canal',
+    Servidor: 'servidor',
+    Razon: 'razon'
+} as const;
 
 /**
  * Syntactic node for `crear canal { ... }`, `editar canal { ... }` and `borrar canal { ... }`:

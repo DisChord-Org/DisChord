@@ -7,13 +7,13 @@ import { KeyWords } from '../../chord/KeywordsManager';
 
 import CommandParser from './Grammar/architectural/CommandParser';
 import MessageParser from './Grammar/features/MessageParser';
-import ChannelActionParser from './Grammar/features/ChannelActionParser';
 import CollectorParser from './Grammar/features/CollectorParser';
 import ClientParser from './Grammar/architectural/ClientParser';
 import EventParser from './Grammar/architectural/EventParser';
 import { CompilationContext } from '../../chord/model/CompilationContext';
 import DisChordStatementParser from './Grammar/DisChordStatementParser';
 import { UnreservedComponentDeclarations } from './Grammar/UnreservedComponentDeclarations';
+import { UnreservedActions } from './Grammar/UnreservedActions';
 
 /**
  * Main Orchestrator for DisChord's syntactic analysis.
@@ -106,7 +106,8 @@ export class DisChordParser extends Parser<DisChordNodeType, DisChordNode> {
         const componentDeclaration = this.tryParseUnreservedComponentDeclaration(UnreservedComponentDeclarations);
         if (componentDeclaration) return componentDeclaration;
 
-        if (ChannelActionParser.matches(this)) return new ChannelActionParser(this).parse();
+        const action = this.tryParseUnreservedAction(UnreservedActions);
+        if (action) return action;
 
         const ParserClass = DisChordParser.DisChordSubParsers.find(SubParser =>
             SubParser.triggerToken !== undefined &&

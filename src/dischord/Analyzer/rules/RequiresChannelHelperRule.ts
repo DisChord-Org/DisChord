@@ -3,18 +3,8 @@ import { AnalysisRule } from "../../../chord/Analyzer/AnalysisRule";
 import { walkAST } from "../../../chord/walkAST";
 import { buildSharedModuleImportSpecifier } from "../../../chord/Analyzer/sharedModulePath";
 import { ImportNode, TokenType } from "../../../chord/types";
-import { ChannelAction, ChannelActionNode, DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType } from "../../types";
-import { channelsModuleContent, channelsModulePath } from "../../corelib";
-
-/**
- * The name `ChannelActionVisitor` calls for each action, so the import brings exactly the ones
- * the file uses.
- */
-const HelperOf: Readonly<Record<ChannelAction, string>> = {
-    [ChannelAction.Crear]: 'createChannel',
-    [ChannelAction.Editar]: 'editChannel',
-    [ChannelAction.Borrar]: 'deleteChannel'
-};
+import { ChannelActionNode, DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType } from "../../types";
+import { channelHelperNames, channelsModuleContent, channelsModulePath } from "../../corelib";
 
 /**
  * Detects, over the complete AST, which channel actions the file performs and inserts a real,
@@ -30,7 +20,7 @@ export class RequiresChannelHelperRule extends AnalysisRule<DisChordNodeType, Di
         const used = new Set<string>();
 
         nodes.forEach(node => walkAST<DisChordNodeType, DisChordNode>(node, current => {
-            if (current.type === DisChordTokenType.ACCION_CANAL) used.add(HelperOf[(current as ChannelActionNode).action]);
+            if (current.type === DisChordTokenType.ACCION_CANAL) used.add(channelHelperNames[(current as ChannelActionNode).action]);
         }));
 
         if (used.size === 0) return;

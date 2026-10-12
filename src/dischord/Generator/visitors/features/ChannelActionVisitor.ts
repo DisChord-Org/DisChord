@@ -1,29 +1,14 @@
-import { ChannelAction, ChannelActionNode, DisChordNode, DisChordNodeType, DisChordTokenType } from "../../../types";
+import { ChannelAction, ChannelActionNode, ChannelProperty, DisChordNode, DisChordNodeType, DisChordTokenType } from "../../../types";
 import { SubGenerator } from "../../../../chord/Generator/SubGenerator";
 import { BDOResolver } from "../../../../chord/Generator/BDOResolver";
-import { JSFallback } from "../../../../chord/BDOSchema";
+import { fieldKeys, JSFallback } from "../../../../chord/BDOSchema";
 import { TokenTypeUnion } from "../../../../chord/types";
 import { ChannelActionSchemas } from "../../constants/schemas";
-
-/**
- * Maps each channel property's DisChord name to the Discord API field it fills. A property is left
- * out of the generated body when the block does not declare it.
- */
-const ChannelBodyFields: Readonly<Record<string, string>> = {
-    nombre: 'name',
-    tipoCanal: 'type',
-    tema: 'topic',
-    nsfw: 'nsfw',
-    categoria: 'parent_id',
-    posicion: 'position',
-    modoLento: 'rate_limit_per_user',
-    bitrate: 'bitrate',
-    limiteUsuarios: 'user_limit'
-};
+import { channelHelperNames } from "../../../corelib";
 
 /**
  * Generator class for `crear canal`, `editar canal` and `borrar canal`: each becomes an `await` of
- * the matching call of the shared `channels` runtime module.
+ * the matching helper of the shared `channels` runtime module.
  */
 export default class ChannelActionVisitor extends SubGenerator<DisChordNodeType, DisChordNode> {
     /**
@@ -40,26 +25,36 @@ export default class ChannelActionVisitor extends SubGenerator<DisChordNodeType,
     visit (node: ChannelActionNode): string {
         const resolver = new BDOResolver<DisChordNodeType, DisChordNode>(expression => this.parent.visit(expression));
         const properties = resolver.resolve(node.object, ChannelActionSchemas[node.action]);
-        const body = this.body(properties);
+        const helper = channelHelperNames[node.action];
 
         switch (node.action) {
             case ChannelAction.Crear:
-                return `await createChannel(ctx, ${node.object.blocks['servidor'] ? properties['servidor'] : node.guild}, ${body})`;
+                return `await ${helper}(ctx, ${this.guild(node, properties)}, ${this.body(node, properties)})`;
             case ChannelAction.Editar:
-                return `await editChannel(ctx, ${properties['canal']}, ${body}, ${properties['razon']})`;
+                return `await ${helper}(ctx, ${properties[ChannelProperty.Canal]}, ${this.body(node, properties)}, ${properties[ChannelProperty.Razon]})`;
             case ChannelAction.Borrar:
-                return `await deleteChannel(ctx, ${properties['canal']}, ${properties['razon']})`;
+                return `await ${helper}(ctx, ${properties[ChannelProperty.Canal]}, ${properties[ChannelProperty.Razon]})`;
         }
     }
 
     /**
-     * The API body: only the properties the block declared.
+     * The server to create in: the one the block names, or the context's own.
      * @private
      */
-    private body (properties: Record<string, string>): string {
-        const entries = Object.entries(ChannelBodyFields)
-            .filter(([ key ]) => properties[key] !== undefined && properties[key] !== JSFallback.Undefined)
-            .map(([ key, apiField ]) => `${apiField}: ${properties[key]}`);
+    private guild (node: ChannelActionNode, properties: Record<string, string>): string {
+        return node.object.blocks[ChannelProperty.Servidor] ? properties[ChannelProperty.Servidor] : node.guild!;
+    }
+
+    /**
+     * The API body: the fields of the schema that go in it, and only the ones the block declared.
+     * @private
+     */
+    private body (node: ChannelActionNode, properties: Record<string, string>): string {
+        const entries = ChannelActionSchemas[node.action].fields
+            .filter(field => field.output !== undefined)
+            .map(field => ({ output: field.output!, value: properties[fieldKeys(field.key)[0]] }))
+            .filter(({ value }) => value !== undefined && value !== JSFallback.Undefined)
+            .map(({ output, value }) => `${output}: ${value}`);
 
         return `{ ${entries.join(', ')} }`;
     }

@@ -1,3 +1,17 @@
+import { ChannelAction } from "../types";
+
+/**
+ * The name of the helper of the shared `channels` module that performs each channel action.
+ * The one place the names are written: the module below is built from them, `ChannelActionVisitor`
+ * emits the call to them and `RequiresChannelHelperRule` imports them.
+ * @type {Readonly<Record<ChannelAction, string>>}
+ */
+export const channelHelperNames: Readonly<Record<ChannelAction, string>> = {
+    [ChannelAction.Crear]: 'createChannel',
+    [ChannelAction.Editar]: 'editChannel',
+    [ChannelAction.Borrar]: 'deleteChannel'
+};
+
 /**
  * Path, relative to the project's `dist` directory, where `channelsModuleContent` is written.
  * Shared by `CompileCommand` (which writes the file there) and the rule that imports it, so both
@@ -47,21 +61,21 @@ export const channelsModuleContent = `
         return 'parent_id' in body ? { ...body, parent_id: await idOf(body.parent_id) } : body;
     };
 
-    export const createChannel = async (ctx, guild, body) => {
+    export const ${channelHelperNames.crear} = async (ctx, guild, body) => {
         const cliente = requireClient(ctx, 'crear');
         const guildId = await requireId(guild, 'servidor', 'crear');
 
         return await cliente.guilds.channels.create(guildId, await withParentId(body));
     };
 
-    export const editChannel = async (ctx, channel, body, reason) => {
+    export const ${channelHelperNames.editar} = async (ctx, channel, body, reason) => {
         const cliente = requireClient(ctx, 'editar');
         const channelId = await requireId(channel, 'canal', 'editar');
 
         return await cliente.channels.edit(channelId, await withParentId(body), { reason });
     };
 
-    export const deleteChannel = async (ctx, channel, reason) => {
+    export const ${channelHelperNames.borrar} = async (ctx, channel, reason) => {
         const cliente = requireClient(ctx, 'borrar');
         const channelId = await requireId(channel, 'canal', 'borrar');
 
