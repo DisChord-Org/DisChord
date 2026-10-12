@@ -1,6 +1,6 @@
 import { ASTNode } from "../../../chord/types";
 import { BDOSchema, FieldKind, FieldSpec, JSFallback, literalStringValue } from "../../../chord/BDOSchema";
-import { ApplicationIntegrationType, ButtonStyles, ChannelAction, ChannelProperty, DisChordNode, DisChordNodeType, InteractionContextType } from "../../types";
+import { ApplicationIntegrationType, ButtonStyles, ChannelAction, ChannelPayload, ChannelProperty, DisChordNode, DisChordNodeType, InteractionContextType } from "../../types";
 import { ChannelTypes, ContextTypes, DisChordTypeMap, IgnoreCommandTypes, IntegrationTypes, intentsMap } from "./mappings";
 
 /**
@@ -303,7 +303,7 @@ export const MessageSchema: BDOSchema<DisChordNodeType, DisChordNode> = {
     passthrough: ['boton', 'embed'],
     fields: [
         {
-            key: 'canal',
+            key: ChannelProperty.Canal,
             kind: FieldKind.Value,
             default: JSFallback.Undefined
         },
@@ -358,7 +358,7 @@ const ChannelPropertyFields = [
         key: 'categoria',
         kind: FieldKind.Value,
         default: JSFallback.Undefined,
-        output: 'parent_id'
+        output: ChannelPayload.Parent
     },
     {
         key: 'posicion',

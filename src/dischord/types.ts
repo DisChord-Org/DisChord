@@ -126,14 +126,25 @@ export const ChannelAction = {
 export type ChannelAction = typeof ChannelAction[keyof typeof ChannelAction];
 
 /**
- * The properties of a channel action block that are read by name outside its schemas: the target
- * channel, the server to create in and the audit log reason.
+ * The properties naming a channel or a server, or qualifying an action on one, that are read by
+ * name outside the schemas: the target channel (also the one a message is sent to), the server to
+ * create in and the audit log reason. `Canal` is the same word as the object of a channel action.
  * @type {const}
  */
 export const ChannelProperty = {
-    Canal: 'canal',
+    Canal: DisChordTokenType.Canal,
     Servidor: 'servidor',
     Razon: 'razon'
+} as const;
+
+/**
+ * The field of Discord's channel payload that holds a channel's parent category. Written once
+ * because both the schemas (which fill it from `categoria`) and the runtime helper (which resolves
+ * an object or a promise to its id) have to name it.
+ * @type {const}
+ */
+export const ChannelPayload = {
+    Parent: 'parent_id'
 } as const;
 
 /**

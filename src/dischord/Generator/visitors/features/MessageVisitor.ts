@@ -1,4 +1,4 @@
-import { DisChordNode, DisChordNodeType, DisChordTokenType, MessageNode } from "../../../types";
+import { ChannelProperty, DisChordNode, DisChordNodeType, DisChordTokenType, MessageNode } from "../../../types";
 import { SubGenerator } from "../../../../chord/Generator/SubGenerator";
 import { BDOResolver } from "../../../../chord/Generator/BDOResolver";
 import { CompilerMetadataKind, TokenTypeUnion } from "../../../../chord/types";
@@ -35,6 +35,6 @@ export default class MessageVisitor extends SubGenerator<DisChordNodeType, DisCh
 
         const user = properties['usuario'] === JSFallback.Undefined ? '' : `, ${properties['usuario']}`;
 
-        return `await createMessage(${properties['canal']}, { content: ${properties['contenido']} ${ComponentsData} }, ${interactionContext}, ctx${user})`;
+        return `await createMessage(${properties[ChannelProperty.Canal]}, { content: ${properties['contenido']} ${ComponentsData} }, ${interactionContext}, ctx${user})`;
     }
 }

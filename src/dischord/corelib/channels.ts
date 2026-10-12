@@ -1,4 +1,4 @@
-import { ChannelAction } from "../types";
+import { ChannelAction, ChannelPayload, ChannelProperty } from "../types";
 
 /**
  * The name of the helper of the shared `channels` module that performs each channel action.
@@ -58,26 +58,26 @@ export const channelsModuleContent = `
     };
 
     const withParentId = async (body) => {
-        return 'parent_id' in body ? { ...body, parent_id: await idOf(body.parent_id) } : body;
+        return '${ChannelPayload.Parent}' in body ? { ...body, ${ChannelPayload.Parent}: await idOf(body.${ChannelPayload.Parent}) } : body;
     };
 
     export const ${channelHelperNames.crear} = async (ctx, guild, body) => {
-        const cliente = requireClient(ctx, 'crear');
-        const guildId = await requireId(guild, 'servidor', 'crear');
+        const cliente = requireClient(ctx, '${ChannelAction.Crear}');
+        const guildId = await requireId(guild, '${ChannelProperty.Servidor}', '${ChannelAction.Crear}');
 
         return await cliente.guilds.channels.create(guildId, await withParentId(body));
     };
 
     export const ${channelHelperNames.editar} = async (ctx, channel, body, reason) => {
-        const cliente = requireClient(ctx, 'editar');
-        const channelId = await requireId(channel, 'canal', 'editar');
+        const cliente = requireClient(ctx, '${ChannelAction.Editar}');
+        const channelId = await requireId(channel, '${ChannelProperty.Canal}', '${ChannelAction.Editar}');
 
         return await cliente.channels.edit(channelId, await withParentId(body), { reason });
     };
 
     export const ${channelHelperNames.borrar} = async (ctx, channel, reason) => {
-        const cliente = requireClient(ctx, 'borrar');
-        const channelId = await requireId(channel, 'canal', 'borrar');
+        const cliente = requireClient(ctx, '${ChannelAction.Borrar}');
+        const channelId = await requireId(channel, '${ChannelProperty.Canal}', '${ChannelAction.Borrar}');
 
         return await cliente.channels.delete(channelId, { reason });
     };
