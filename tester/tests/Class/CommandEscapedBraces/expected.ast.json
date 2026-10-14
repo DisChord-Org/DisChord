@@ -1,0 +1,1 @@
+[{"type":"CrearComando","value":"Canales","body":{"type":"BDO","mode":1,"blocks":{"descripcion":{"type":"Literal","value":"usa {nombre}","raw":"usa {nombre}","location":{"line":2,"column":17}}},"body":[],"location":{"line":3,"column":1}},"location":{"line":3,"column":1}}]

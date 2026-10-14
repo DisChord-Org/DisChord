@@ -44,9 +44,6 @@ export class PrimaryParser<T extends string, N extends BaseNode<T>> extends SubP
             });
         }
 
-        // A dialect's custom statement (e.g. dischord's `enviar mensaje {}`) is reachable here too,
-        // not just from statement position — so its result can be used as a value directly
-        // (`var msg es enviar mensaje {...}`), the same way it already works after `nuevo`.
         const customStatement = this.parent.parseCustomStatement();
         if (customStatement) return customStatement;
 
@@ -72,12 +69,13 @@ export class PrimaryParser<T extends string, N extends BaseNode<T>> extends SubP
         }
 
         if (token.type === TokenType.L_PAREN) {
-            this.consume(TokenType.L_PAREN);
+            const open = this.consume(TokenType.L_PAREN);
             const node = this.parent.get(ExpressionParser).parse();
             this.consume(TokenType.R_PAREN);
 
             return this.createNode<ExpressionNode<T, N>>({
                 type: TokenType.EXPRESION,
+                ...(open.synthetic ? { interpolated: true as const } : {}),
                 object: node,
             });
         }

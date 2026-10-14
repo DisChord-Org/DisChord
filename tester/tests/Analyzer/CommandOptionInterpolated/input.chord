@@ -1,0 +1,10 @@
+nuevo comando Canales {
+    descripcion "x"
+    opciones {
+        n {
+            descripcion "texto {n}"
+            opcion "texto"
+            requerido verdadero
+        }
+    }
+}

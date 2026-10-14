@@ -2,7 +2,7 @@ import { AnalysisRule } from "../../../chord/Analyzer/AnalysisRule";
 import { walkAST } from "../../../chord/walkAST";
 import { BDOValidator } from "../../../chord/Analyzer/BDOValidator";
 import { DisChordError, ErrorLevel } from "../../../errors/ChordError";
-import { TokenType } from "../../../chord/types";
+import { ExpressionNode, TokenType } from "../../../chord/types";
 import { CommandNode, DisChordASTNode, DisChordODBNode, DisChordNode, DisChordNodeType, DisChordTokenType } from "../../types";
 import { CommandSchema } from "../../Generator/constants/schemas";
 import { discordNameProblem, slugifyCommandName } from "../../Generator/constants/commandNames";
@@ -28,6 +28,23 @@ export class ValidateCommandRule extends AnalysisRule<DisChordNodeType, DisChord
             this.validateName(`El nombre del comando '${command.value}'`, slugifyCommandName(command.value), command.location);
             this.validateOptionNames(command);
             validator.validate(command.body, CommandSchema);
+            this.validateNoInterpolation(command);
+        }));
+    }
+
+    /**
+     * The properties of a command (its description, its flags, the options and their descriptions)
+     * are written into the class Seyfert reads when the command is registered, outside the handler:
+     * a name interpolated into them (`"dice {nombre}"`) is not there yet, or not yet initialized. So
+     * the text of these properties is plain text; the text sent from the handler can interpolate.
+     * @private
+     */
+    private validateNoInterpolation (command: CommandNode): void {
+        Object.entries(command.body.blocks).forEach(([ property, value ]) => walkAST<DisChordNodeType, DisChordNode>(value, current => {
+            if (current.type === TokenType.EXPRESION && (current as ExpressionNode<DisChordNodeType, DisChordNode>).interpolated) this.fail(
+                `La propiedad '${property}' del comando '${command.value}' no admite texto con llaves: se lee al registrar el comando, antes de que existan sus variables. Escribe {{ y }} para llaves literales`,
+                current.location
+            );
         }));
     }
 

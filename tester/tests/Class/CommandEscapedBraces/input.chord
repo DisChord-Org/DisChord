@@ -1,0 +1,3 @@
+nuevo comando Canales {
+    descripcion "usa {{nombre}}"
+}
