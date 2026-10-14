@@ -1,0 +1,359 @@
+# DisChord language reference
+
+## Built for Discord Bots
+
+DisChord isn't just a general-purpose language; it's specifically optimized for building powerful Discord bots with almost zero boilerplate. Using the internal **Seyfert** integration, you can define commands and events using natural Spanish keywords.
+
+### Example: A Simple Ping Command
+
+```js
+encender bot {
+    token "TU_TOKEN_AQUÍ"
+    prefijo "!"
+    intenciones [ "MensajesDelServidor", "ContenidoDelMensaje" ]
+}
+
+nuevo comando Ping {
+    descripcion "¡Prueba la latencia del bot!";
+    
+    consola.imprimir("Ejecutando ping...")
+    
+    var pingMensaje es "¡Pong " mas cliente.ping mas "ms!"
+    enviar mensaje {
+        contenido "¡Pong!"
+    }
+}
+```
+
+### Sending messages
+
+`enviar mensaje` can only be used inside a command or an event, which are what give it the client and
+the place to reply in. It sends to the current channel or interaction by default. `canal` redirects it to a
+channel and `usuario` sends it as a direct message; with both, the same body goes to the two.
+
+```js
+enviar mensaje {
+    canal canalAvisos
+    usuario usuario
+    contenido "Nuevo reporte"
+}
+```
+
+### Managing channels
+
+`crear canal`, `editar canal` and `borrar canal` are awaited and need the client and the server of
+their context, so, like `enviar mensaje`, they can only be used inside a command or an event. None of the three words is
+reserved: they are recognized by the `<verbo> canal {` shape alone.
+
+```js
+var avisos es crear canal {
+    nombre "avisos"
+    tipo "texto"
+    tema "Novedades del servidor"
+}
+
+editar canal {
+    canal avisos
+    nombre "novedades"
+    razon "Renombrado"
+}
+
+borrar canal {
+    canal avisos
+    razon "Limpieza"
+}
+```
+
+| Property | `crear` | `editar` | `borrar` | Meaning |
+|---|---|---|---|---|
+| `canal` | | required | required | The channel to act on (an object or an id) |
+| `nombre` | required | optional | | Channel name |
+| `tipo` | optional | optional | | `texto`, `voz`, `categoria`, `anuncios`, `escenario`, `foro`, `multimedia` |
+| `tema` | optional | optional | | Topic |
+| `nsfw` | optional | optional | | Age-restricted |
+| `categoria` | optional | optional | | Parent category id |
+| `posicion` | optional | optional | | Position in the list |
+| `modoLento` | optional | optional | | Seconds between messages per user |
+| `bitrate` | optional | optional | | Voice bitrate |
+| `limiteUsuarios` | optional | optional | | Voice user limit |
+| `servidor` | optional | | | Guild to create in; defaults to the command's, or to the one of the event's parameter (`mensaje`, `canal`, `miembro`, `rol`, `servidor`, `interaccion`) |
+| `razon` | | optional | optional | Audit log reason |
+
+#### Reading channels
+
+`obtener canal` reads one channel by its `id` and `listar canales` lists the channels of a server,
+optionally filtered by `tipo` and `categoria`. Both give back what Seyfert returns, and so do
+`crear`, `editar` and `borrar canal`: keep the result in a variable and read it with Spanish
+property names.
+
+```js
+var voces es listar canales {
+    tipo "voz"
+}
+
+var canal1 es obtener canal { id "123456789" }
+consola.imprimir(canal1.nombre mas " (" mas canal1.tipo mas ")")
+
+var viejo es borrar canal {
+    canal canal1
+    razon "Limpieza"
+}
+consola.imprimir(viejo.nombre)
+```
+
+| Property | Meaning |
+|---|---|
+| `nombre`, `tema` | Name and topic |
+| `tipo` | `texto`, `voz`, `categoria`, `anuncios`, `escenario`, `foro` or `multimedia` |
+| `categoria`, `posicion` | Parent category and position |
+| `modoLento`, `limiteUsuarios` | Slow mode seconds and voice user limit |
+| `servidor`, `ultimoMensaje` | Server and last message ids |
+| `mencion`, `enlace`, `creadoEn` | Mention text, link and creation date |
+
+`id`, `nsfw` and `bitrate` are read as they are. Reading changes nothing, so it has no quota and may
+be used in a loop, but it keeps two barriers: the channel has to belong to the server of the
+context, and inside a command whoever ran it must be able to see the channel (`listar canales`
+leaves out the ones they can not). Like the other channel blocks it can only be used inside a
+command or an event.
+
+#### Safety barriers
+
+Creating, editing and deleting channels is what a bot is abused for (mass deletion, endless
+creation, a public command that lets anyone act with the bot's permissions), so DisChord
+puts barriers in the way. None of them can be turned off from the bot's code.
+
+At compile time, a channel action is an error when it is:
+
+- **inside a loop** (`para`), the shape of a mass creation or deletion;
+- **in the event it triggers** (`crear canal` in `canalCreado`, `editar canal` in `canalEditado`,
+  `borrar canal` in `canalBorrado`), which would run again for its own effect;
+- **a `borrar canal` without `razon`**, so every deletion leaves its trace in the audit log.
+
+At run time:
+
+- **Inside a command, whoever ran it needs the `Gestionar canales` permission.** The bot acts with
+  its own permissions, not theirs, so without this check any member could use it to do what they
+  can not. Events have no one who ran them and skip the check.
+- **The channel has to belong to the server of the context.**
+- **Each server has a quota per action in a ten minute window:** 10 creations, 10 edits and 5
+  deletions. It doubles for every order of magnitude of servers the bot is in (×2 from 10, ×4
+  from 100, ×8 from 1000, and no more), since a bot in a few servers is the likeliest to be a
+  throwaway one. It is kept in the memory of the process, so a restart resets it.
+
+These are barriers, not a lock: raw JavaScript (`js("...")`) and direct use of `cliente` skip
+them.
+
+A property an action does not take is a compile error, as it is in every block (`comando`, `boton`,
+`embed`, `enviar mensaje`...): a misspelled property is reported with the list of what the block
+accepts instead of being ignored. `tipo` takes a literal. `editar canal` must change at least one property, and `crear canal` returns the created
+channel. In an event that carries no server (`encendido`, `limitado`) `crear canal` needs `servidor`.
+
+---
+
+## Syntax Overview
+
+### Primitives & Variables
+
+| Type | Syntax Example |
+| :--- | :--- |
+| **Number** | `var n es 42` |
+| **Text** | `var t es "Hola"` |
+| **Boolean** | `var b es verdadero` |
+| **Undefined** | `var u es indefinido` |
+| **List** | `var l es [ 1, 2, 3 ]` |
+| **Object (BDO)** | `var o es { modo "rapido" }` |
+
+There is no `null`: the absence of a value is always `indefinido`.
+
+### Blocks (`{ ... }`)
+
+A block holds **properties**, one `clave valor` after another with no separator, and optionally
+**code**. The code starts after an empty line; that is all that tells a block with code (an
+*intelligent* one) from a plain object. There are no semicolons.
+
+```js
+var persona es {
+    nombre "Juan"
+    edad 30
+
+    consola.imprimir("creada")
+}
+```
+
+- **Properties first.** Code right after a property, with no empty line between them, is an
+  error. A comment line is not an empty line.
+- **Grouping is fine.** An empty line followed by another property does not start the code.
+- **Any word is a key,** reserved ones included (`si 1`, `clase "a"`, `tipo "voz"`), as in an object
+  literal. A word followed by `.`, `(` without a space, `es` or an operator is code instead.
+- **A key can not be repeated** in one block.
+- The same rules apply to the body of a `comando`. A `;` after a property is still accepted.
+
+### Types
+
+Types are optional. A variable, parameter or return value without an annotation has its type
+inferred from what it holds, and keeps it as long as every reassignment agrees. If a reassignment
+changes the type, or its type can't be inferred, the variable becomes `cualquiera` for its whole
+scope (and so does anything derived from it, such as `var b es a mas 1`). One with an annotation is
+checked, and a mismatch stops the compilation. Indexing a typed list or tuple gives the type of the
+element (`l[0]` of a `Mapa[]` is a `Mapa`; a tuple needs a literal index). A list literal of class
+instances is typed by them (`[ nuevo B(), nuevo A() ]` is a list of `A|B`), and one that mixes them with
+primitives is a list of the union.
+
+```js
+var a es 5
+a es "cinco"            // fine: `a` is now `cualquiera`
+
+var x                   // declared without a value
+x es 5                  // fine
+
+var b tipo numero es 5
+b es "cinco"
+// La variable 'b' es de tipo 'numero' pero se le asignó un valor de tipo 'texto'
+```
+
+| Type | Meaning | Example |
+| :--- | :--- | :--- |
+| `texto`, `numero`, `booleano`, `indefinido` | The primitives | `var n tipo numero es 5` |
+| `bdo` | A plain object (`{}`) | `var c tipo bdo es { modo "rapido" }` |
+| `T[]` | A list of `T` | `var tags tipo texto[] es [ "a", "b" ]` |
+| `[A, B]` | A tuple, position by position | `var par tipo [texto, numero] es [ "ether", 5 ]` |
+| `A\|B` | A union | `var id tipo texto\|numero es 7` |
+| `cualquiera` | Any value, unchecked | `var x tipo cualquiera es 1` |
+| `Mapa`, `Conjunto`, `Fecha`, ... | A core library class | `var m tipo Mapa es nuevo Mapa()` |
+| `MiClase` | A class declared in the file; accepts its subclasses | `var c tipo Caja es nuevo Caja()` |
+
+Functions annotate their parameters with `tipo` and their return value with `->`. `nada` is the
+return type of a function that returns no value, and is only valid there.
+
+```js
+funcion saludar(quien tipo texto, veces tipo numero) -> texto {
+    devolver "Hola " mas quien
+}
+
+funcion avisar(aviso tipo texto) -> nada {
+    consola.imprimir(aviso)
+}
+
+@asincrono
+funcion cargar(id tipo numero) -> texto {
+    devolver "x"
+}
+```
+
+Types are checked when a variable is declared or reassigned, when a function returns, and when it
+is called:
+
+```js
+var edad tipo numero es 5
+edad es "veinte"
+// La variable 'edad' es de tipo 'numero' pero se le asignó un valor de tipo 'texto'
+
+funcion doble(n tipo numero) -> numero {
+    devolver n por 2
+}
+doble("tres")
+// El argumento 1 de 'doble' es de tipo 'texto', se esperaba 'numero'
+```
+
+The checks are structural for core library classes (a `Mapa` is not a `Conjunto`) and nominal for
+the classes you declare: an instance is accepted where its own class or a class it extends is expected,
+not the other way round and not between unrelated classes (a class is identified by its name, so two
+classes of the same name in different scopes are the same type). Generic types
+(`Mapa<texto, numero>`) are not supported yet.
+
+A type name the compiler doesn't know stops the compilation and lists the valid ones: the primitives,
+`cualquiera`, `Lista`, `Mapa`, `Conjunto`, `Promesa`, `Expresion` and `Fecha`, a class declared in the
+file, and the shapes `T[]`, `[A, B]` and `A|B`. `Mates`, `JSON`, `Aleatorio` and `consola` are not types.
+
+```js
+var x tipo Mates es 1
+// Tipo desconocido 'Mates'. Tipos válidos: texto, numero, booleano, bdo, indefinido, cualquiera, Lista, Mapa, Conjunto, Promesa, Expresion, Fecha o una clase declarada en el archivo; también T[], [A, B] y A|B
+```
+
+Where the receiver's class is known, a core library method must be called and a property must not be;
+anything else would compile to JavaScript that doesn't do what was written.
+
+```js
+var f tipo Fecha es nuevo Fecha()
+f.dia
+// 'dia' es un método de Fecha: llámalo con paréntesis, dia()
+
+var t es "hola"
+t.longitud()
+// 'longitud' es una propiedad de Texto, no un método
+```
+
+Classes are checked too. A subclass must be declared after its base, inheriting in a cycle is an error,
+and a base that isn't declared in the file is taken as external (a class dischord generates, or a
+JavaScript global such as `Error`). A class that extends a core library class (`nuevo Mapa MiMapa {}`)
+extends the native `Map`, although the compiler doesn't know it inherits its methods. A method that
+overrides another can't change whether it is `@asincrono`, because a call is awaited by what the base
+class declares.
+
+```js
+clase B extiende A {
+}
+clase A {
+}
+// La clase 'B' extiende de 'A', que se declara más abajo; declara 'A' antes de 'B'
+
+clase A extiende B {
+}
+clase B extiende A {
+}
+// La clase 'A' hereda de sí misma (A → B → A)
+
+clase A {
+    funcion m() { devolver 1 }
+}
+clase B extiende A {
+    @asincrono
+    funcion m() { devolver 2 }
+}
+// El método 'm' de 'B' es asíncrono pero el de 'A' no
+```
+
+Reading `longitud` or `tamano` from a value whose type is not known (a parameter without
+`tipo`, or a `cualquiera` value) is resolved when the program runs: a text, a list, a `Mapa`
+or a `Conjunto` gives its length or size, and a `bdo` with a field of that name gives the
+field. Writing to it (`p.longitud es 3`) is always a field.
+
+```js
+funcion largo(valor) {          // `valor` has no type
+    devolver valor.longitud
+}
+
+consola.imprimir(largo("abc"))             // 3
+consola.imprimir(largo([ 1, 2 ]))          // 2
+consola.imprimir(largo({ longitud 5 }))    // 5
+```
+
+### Known limitations
+
+- A class is identified by its name, so two classes of the same name in different scopes are the same type.
+- A class that extends a core library class isn't assignable to it, and its inherited members aren't
+  resolved through it by the compiler.
+- There are no generic types, type aliases or interfaces, and `si` doesn't narrow a type.
+- The variable of a `para` loop, a function's return value without a `->` annotation and the implicit
+  parameters of dischord constructs are not typed.
+
+### Natural Operators
+
+| Symbolic | Natural Keyword |
+| :--- | :--- |
+| `+` | `mas` |
+| `-` | `menos` |
+| `*` | `por` |
+| `/` | `entre` |
+| `**` | `exp` |
+| `%` | `resto` |
+| ` ` | `espacio` |
+| `\n` | `intro` |
+
+### Discord Specific Keywords
+
+- **encender bot**: Initializes the bot client with token and intents.
+- **nuevo comando**: Defines a new slash or prefix command.
+- **enviar mensaje**: Sends a message to the current channel, a channel or a user.
+- **crear canal / editar canal / borrar canal**: Manage the server's channels.
+- **evento**: Listens to Discord gateway events (e.g., `entradaMiembro`, `mensajeCreado`).
