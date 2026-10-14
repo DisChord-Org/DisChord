@@ -1,0 +1,5 @@
+var ajustes es {
+    nombre "x"
+
+    [ 1, 2 ].paraCada(consola.imprimir)
+}

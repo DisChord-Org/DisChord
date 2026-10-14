@@ -165,6 +165,19 @@ export class Parser<T extends string, N extends BaseNode<T>> extends ParserConte
     }
 
     /**
+     * Inserts a token into the stream ahead of the cursor. A sub-parser uses it to close, with a
+     * separator, an entry the grammar would otherwise run on into the next one.
+     * @public
+     * @param {number} index - Where the token goes; has to be past the cursor.
+     * @param {Token<T>} token - The token to insert.
+     */
+    public insertToken (index: number, token: Token<T>): void {
+        if (index <= this.current) throw new Error('A token can only be inserted ahead of the cursor');
+
+        this.tokens.splice(index, 0, token);
+    }
+
+    /**
      * Gets the current stream iteration cursor index.
      * * @public
      * @readonly

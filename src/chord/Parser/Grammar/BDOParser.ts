@@ -127,9 +127,59 @@ export class BDOParser<T extends string, N extends BaseNode<T>> extends SubParse
             location: keyToken.location
         });
 
+        this.endEntryAtLineBreak();
         blocks[key] = this.parent.get(ExpressionParser).parse();
 
         if (this.peek().type === TokenType.SEPARADOR) this.consume(TokenType.SEPARADOR);
+    }
+
+    /**
+     * A property ends where its line ends, unless a bracket is still open or the line does not end
+     * in an operator that asks for more: the next line is another entry, whatever word it starts
+     * with. Without this, `y`, `o`, `mas`... at the start of the next entry (a key called `y`) would be
+     * taken as the operator of the previous value (`x 1` then `y 2` read as `x: 1 y 2`). It closes the
+     * entry by inserting a `;` ahead of the first token of the next line, the one the grammar already
+     * accepts after a property. A value that spans lines goes between brackets, or breaks after an
+     * operator.
+     * @private
+     */
+    private endEntryAtLineBreak (): void {
+        const start = this.parent.cursor;
+        const closers: string[] = [ TokenType.R_PAREN, TokenType.R_SQUARE, TokenType.R_BRACE ];
+        const openers: string[] = [ TokenType.L_PAREN, TokenType.L_SQUARE, TokenType.L_BRACE ];
+        let depth = 0;
+
+        for (let index = start; ; index++) {
+            const token = this.parent.peek(index);
+            if (!token || token.type === TokenType.EOF) return;
+
+            const closes = closers.includes(token.type);
+
+            // a bracket that closes the block, or a separator already written: the entry ends there
+            if (depth === 0 && (closes || token.type === TokenType.SEPARADOR)) return;
+
+            if (depth === 0 && index > start) {
+                const previous = this.parent.peek(index - 1);
+                const startsLine = token.location.line > previous.end.line;
+
+                if (startsLine && !this.asksForMore(previous.type)) {
+                    this.parent.insertToken(index, { type: TokenType.SEPARADOR, value: ';', location: token.location, end: token.location });
+                    return;
+                }
+            }
+
+            if (openers.includes(token.type)) depth++;
+            if (closes) depth--;
+        }
+    }
+
+    /**
+     * Whether a token of this type, at the end of a line, leaves its expression waiting for more:
+     * a binary operator, a comma, a dot.
+     * @private
+     */
+    private asksForMore (type: string): boolean {
+        return (BinaryOperators as string[]).includes(type) || type === TokenType.COMA || type === TokenType.Punto;
     }
 
     /**

@@ -1,0 +1,23 @@
+nuevo comando Punto {
+    descripcion "punto";
+
+    opciones {
+        x {
+            descripcion "x"
+            opcion "numero"
+            requerido verdadero
+        }
+        y {
+            descripcion "y"
+            opcion "numero"
+            requerido verdadero
+        }
+        o {
+            descripcion "o"
+            opcion "numero"
+            requerido verdadero
+        }
+    }
+
+    consola.imprimir(x)
+}
