@@ -1,0 +1,8 @@
+funcion f(a) {
+}
+
+nuevo comando Canales {
+    descripcion "x"
+
+    f ("hola")
+}
