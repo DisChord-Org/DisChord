@@ -72,9 +72,7 @@ In a block, the properties go first with no separators, and the code starts afte
 
 ## Documentation
 
-- **Tutorials:** the language is taught on the DisChord website.
-- **[Language reference](docs/language.md):** syntax, types, blocks, messages, channels and the safety barriers of the channel actions.
-- **[Command line and editor integration](docs/editor-integration.md):** every option, the exit codes, diagnostics as JSON, checking an unsaved buffer, `--emit` and `corelib --json`.
+The language is taught in the tutorials of the DisChord website.
 
 ### Command line at a glance
 
@@ -82,10 +80,11 @@ In a block, the properties go first with no separators, and the code starts afte
 | :--- | :--- |
 | `--no-run` | Compiles without running the resulting bot. |
 | `--check` | Runs every phase without writing anything or running the bot. |
-| `--json` | Prints the diagnostics as a single JSON document. |
+| `--json` | Prints the diagnostics as a single JSON document. Without `--check` the bot is run afterwards; an editor wants `--check --json`. |
 | `--stdin`, `--stdin-filepath <path>` | Compiles the code on standard input as if it were that file. |
 | `--emit tokens\|ast` | Prints the tokens or the syntax tree of a file as JSON. |
 | `-o, --out-dir <dir>` | Output directory. |
+| `corelib [--json]` | Prints the vocabulary of the language (keywords, classes, blocks, events), for editors. |
 
 Exit codes: `0` ok, `1` the code has errors (or the bot failed), `2` the tool could not do its job.
 
@@ -96,7 +95,7 @@ Exit codes: `0` ok, `1` the code has errors (or the bot failed), `2` the tool co
 Channel actions (`crear`, `editar`, `borrar canal`) come with barriers that the bot's code cannot turn off:
 no channel action inside a loop, none in the event it triggers, a reason for every deletion, the permission
 of whoever runs the command, the channel belonging to the server of the context, and a quota per server that
-grows with the number of servers the bot is in. The details are in the [language reference](docs/language.md).
+grows with the number of servers the bot is in.
 
 ---
 
