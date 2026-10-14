@@ -1,0 +1,11 @@
+var xs tipo texto[] es []
+var a tipo numero[] es [ 1 ]
+a es []
+
+funcion total(lista tipo numero[]) -> numero {
+    devolver lista.longitud
+}
+
+consola.imprimir(total([]))
+consola.imprimir(xs)
+consola.imprimir(a)
