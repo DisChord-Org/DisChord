@@ -9,6 +9,7 @@ import { ValidateClassHierarchyRule } from "./rules/ValidateClassHierarchyRule";
 import { ValidateTypeAnnotationsRule } from "./rules/ValidateTypeAnnotationsRule";
 import { ResolveVariableTypesRule } from "./rules/ResolveVariableTypesRule";
 import { ValidateAssignmentTypesRule } from "./rules/ValidateAssignmentTypesRule";
+import { ValidateTupleIndexRule } from "./rules/ValidateTupleIndexRule";
 import { ValidateCallTargetsRule } from "./rules/ValidateCallTargetsRule";
 import { ValidateReturnTypesRule } from "./rules/ValidateReturnTypesRule";
 import { ValidateCallArgumentsRule } from "./rules/ValidateCallArgumentsRule";
@@ -77,6 +78,9 @@ export class Analyzer<T extends string, N extends BaseNode<T>> {
         // Reassignment validation — needs every variable's dataType already resolved by Pass 3
         // above, so it runs after it rather than as part of it.
         ValidateAssignmentTypesRule,
+
+        // A literal index past the end of a tuple; needs the same resolved types.
+        ValidateTupleIndexRule,
 
         // Checks each `devolver` against the declared return type; needs the types resolved by Pass 3.
         ValidateReturnTypesRule,

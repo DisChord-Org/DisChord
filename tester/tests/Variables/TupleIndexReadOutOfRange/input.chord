@@ -1,0 +1,2 @@
+var p tipo [numero, texto] es [1, "a"]
+var a tipo texto es p[5]
