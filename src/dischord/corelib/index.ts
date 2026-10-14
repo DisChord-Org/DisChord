@@ -4,3 +4,4 @@ export * from "./DisChordCoreLibUtils";
 export * from "./createMessage";
 export * from "./userExtensions";
 export * from "./channels";
+export * from "./channelExtensions";

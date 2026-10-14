@@ -1,3 +1,4 @@
+import './lib/channelExtensions.js';
 import { editChannel } from './lib/channels.js';
 
 import { Command, IgnoreCommand, Embed, ActionRow, Button, createStringOption } from 'seyfert';
