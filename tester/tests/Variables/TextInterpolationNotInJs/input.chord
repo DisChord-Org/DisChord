@@ -1,0 +1,1 @@
+var resultado es js("({ a: 1 }).a")

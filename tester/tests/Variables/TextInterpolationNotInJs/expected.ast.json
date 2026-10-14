@@ -1,0 +1,1 @@
+[{"type":"Variable","id":"resultado","value":{"type":"js","value":"({ a: 1 }).a","location":{"line":1,"column":35}},"location":{"line":1,"column":35}}]

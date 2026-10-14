@@ -165,6 +165,27 @@ channel. In an event that carries no server (`encendido`, `limitado`) `crear can
 
 There is no `null`: the absence of a value is always `indefinido`.
 
+### Text interpolation
+
+A name between braces inside a text is the expression written there, joined to the text as `mas`
+would be:
+
+```js
+var nombre es "ether"
+var edad es 7
+
+consola.imprimir("mi nombre es {nombre}")          // mi nombre es ether
+consola.imprimir("{nombre} tendrá {edad mas 1}")    // ether tendrá 8
+```
+
+- The expression is any expression whose first character is a letter: a name, a member
+  (`{usuario.nombre}`), an operation (`{edad mas 1}`).
+- `{{` and `}}` write a `{` and a `}`. A brace that is not followed by a name (`{2}`, `{2,3}`) or is
+  never closed stays text.
+- An interpolated text is a `texto`, and what is inside is typed and checked like anywhere else.
+- The text of `js("...")` and the path of a `desde` are not interpolated.
+- Values are joined the way `mas` joins them, so a boolean comes out as `true`, not `verdadero`.
+
 ### Blocks (`{ ... }`)
 
 A block holds **properties**, one `clave valor` after another with no separator, and optionally

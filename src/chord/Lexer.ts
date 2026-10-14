@@ -1,4 +1,4 @@
-import { NamedTextLiteral, Token, TokenType } from './types';
+import { Location, NamedTextLiteral, Token, TokenType } from './types';
 import { ChordError, ErrorLevel } from '../errors/ChordError';
 import { CompilationContext } from './model/CompilationContext';
 import { SymbolTranslationMap } from './Symbols';
@@ -27,10 +27,16 @@ export class Lexer<T extends string> {
     private current = 0;
     private input: string;
 
+    /**
+     * @param context - The compilation context.
+     * @param source - The text to tokenize, when it is not the file being compiled: the expression
+     * written between the braces of an interpolated text.
+     */
     constructor(
-        private context: CompilationContext
+        private context: CompilationContext,
+        source?: string
     ) {
-        this.input = this.context.codeProvider.currentCode;
+        this.input = source ?? this.context.codeProvider.currentCode;
     }
 
     private peek(): string {
@@ -63,6 +69,93 @@ export class Lexer<T extends string> {
                 column: this.column
             }
         }
+    }
+
+    private interpolate (text: Token<T>): Token<T>[] {
+        const value = text.value;
+        const parts: ({ text: string } | { code: string; offset: number })[] = [];
+        let buffer = '';
+        let found = false;
+        let index = 0;
+
+        while (index < value.length) {
+            const char = value[index];
+
+            if ((char === '{' || char === '}') && value[index + 1] === char) {
+                buffer += char;
+                index += 2;
+                continue;
+            }
+
+            if (char === '{') {
+                const close = value.indexOf('}', index + 1);
+                const code = close === -1 ? '' : value.slice(index + 1, close);
+
+                if (close !== -1 && /^\s*[\p{L}_]/u.test(code) && !code.includes('{')) {
+                    parts.push({ text: buffer }, { code, offset: index + 1 });
+                    buffer = '';
+                    found = true;
+                    index = close + 1;
+                    continue;
+                }
+            }
+
+            buffer += char;
+            index++;
+        }
+
+        if (!found) return [ buffer === value ? text : { ...text, value: buffer } ];
+
+        parts.push({ text: buffer });
+
+        const synthetic = (type: TokenType, value: string, at: Location): Token<T> => ({ type, value, location: at, end: at } as Token<T>);
+        const textToken = (content: string): Token<T> => ({ ...text, value: content });
+        const result: Token<T>[] = [ synthetic(TokenType.L_PAREN, '(', text.location) ];
+        let first = true;
+
+        for (const part of parts) {
+            if ('code' in part) {
+                // the text always comes first, so the whole is a text however the expression is
+                if (first) result.push(textToken(''));
+
+                result.push(synthetic(TokenType.Mas, 'mas', text.location), synthetic(TokenType.L_PAREN, '(', text.location));
+                result.push(...this.tokenizeInside(text, part.code, part.offset));
+                result.push(synthetic(TokenType.R_PAREN, ')', text.end));
+                first = false;
+                continue;
+            }
+
+            if (part.text === '' && !first) continue;
+            if (part.text === '' && first && parts.length > 1) continue;
+
+            if (!first) result.push(synthetic(TokenType.Mas, 'mas', text.location));
+            result.push(textToken(part.text));
+            first = false;
+        }
+
+        result.push(synthetic(TokenType.R_PAREN, ')', text.end));
+
+        return result;
+    }
+
+    /**
+     * Tokenizes the expression written inside the braces of an interpolated text, with its tokens
+     * placed where they are in the file so an error points into the text.
+     * @private
+     */
+    private tokenizeInside (text: Token<T>, code: string, offset: number): Token<T>[] {
+        const inner = new Lexer<T>(this.context, code).tokenize();
+
+        // where each character of the text is in the file: the text starts right after its quote
+        const before = text.value.slice(0, offset).split('\n');
+        const line = text.location.line + before.length - 1;
+        const column = before.length === 1 ? text.location.column + 1 + offset : before[before.length - 1].length + 1;
+
+        const place = (at: Location): Location => at.line === 1
+            ? { line, column: column + at.column - 1 }
+            : { line: line + at.line - 1, column: at.column };
+
+        return inner.map(token => ({ ...token, location: place(token.location), end: place(token.end) }));
     }
 
     public tokenize(): Token<T>[] {
@@ -130,7 +223,12 @@ export class Lexer<T extends string> {
                     value += this.advance();
                 }
                 this.advance();
-                emit(this.createToken("TEXTO", value, startLine, startCol));
+
+                const text = this.createToken("TEXTO", value, startLine, startCol);
+                const raw = tokens.length >= 1 && (tokens[tokens.length - 1].type === TokenType.Desde
+                    || (tokens.length >= 2 && tokens[tokens.length - 2].type === TokenType.JS && tokens[tokens.length - 1].type === TokenType.L_PAREN));
+
+                (raw ? [ text ] : this.interpolate(text)).forEach(emit);
                 continue;
             }
 

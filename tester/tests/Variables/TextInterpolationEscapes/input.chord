@@ -1,0 +1,7 @@
+var nombre es "ether"
+
+var a es "llaves {{literales}}"
+var b es "cantidad {2}"
+var c es "regex a{2,3}"
+var d es "sin cerrar {nombre"
+var e es "mezcla {{x}} y {nombre}"

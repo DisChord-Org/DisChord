@@ -1,0 +1,8 @@
+var nombre es "ether"
+var edad es 7
+var lista es [ 1, 2 ]
+
+var uno es "mi nombre es {nombre}"
+var dos es "{nombre} tiene {edad mas 1} anos"
+var tres es "{nombre}"
+var cuatro es "hay {lista.longitud} elementos"
