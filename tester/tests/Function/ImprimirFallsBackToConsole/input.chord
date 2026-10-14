@@ -1,0 +1,7 @@
+imprimir("hola desde el nivel superior", verdadero)
+
+funcion saludar(cliente) {
+    imprimir("hola con cliente")
+}
+
+saludar(indefinido)

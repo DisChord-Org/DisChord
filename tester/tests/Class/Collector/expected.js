@@ -1,6 +1,9 @@
 import { createMessage } from './lib/createMessage.js';
+import './lib/consoleRuntime.js';
 function alPulsarMiId(interaccion, cliente) {
-    cliente.logger.info('Se ha pulsado el boton con id miid');
+    (typeof cliente !== 'undefined' && cliente.logger ? cliente.logger : { info: console.log }).info(
+        'Se ha pulsado el boton con id miid',
+    );
 }
 
 import { Command, IgnoreCommand, Embed, ActionRow, Button, createStringOption } from 'seyfert';

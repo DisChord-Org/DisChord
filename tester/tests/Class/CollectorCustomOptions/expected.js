@@ -1,12 +1,17 @@
 import { createMessage } from './lib/createMessage.js';
+import './lib/consoleRuntime.js';
 function soloAutor(interaccion, cliente, contexto) {
     return interaccion.user.id === contexto.author.id;
 }
 function cuandoTermine(razon, reiniciar, cliente, contexto) {
-    cliente.logger.info('El recolector terminó: ' + razon);
+    (typeof cliente !== 'undefined' && cliente.logger ? cliente.logger : { info: console.log }).info(
+        'El recolector terminó: ' + razon,
+    );
 }
 function alPulsarMiId(interaccion, cliente, contexto) {
-    cliente.logger.info('Se ha pulsado el boton con id miid');
+    (typeof cliente !== 'undefined' && cliente.logger ? cliente.logger : { info: console.log }).info(
+        'Se ha pulsado el boton con id miid',
+    );
 }
 
 import { Command, IgnoreCommand, Embed, ActionRow, Button, createStringOption } from 'seyfert';

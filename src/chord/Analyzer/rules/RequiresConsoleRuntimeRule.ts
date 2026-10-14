@@ -1,9 +1,8 @@
 import path from "node:path";
 import { AnalysisRule } from "../AnalysisRule";
-import { walkAST } from "../../walkAST";
 import { ASTNode, BaseNode, ImportNode, TokenType } from "../../types";
 import { consoleRuntimeModuleContent, consoleRuntimeModulePath } from "../../corelib";
-import { isAccessNode } from "../../ast.guards";
+import { isAccessNode, isCallNode, isIdentificatorNode } from "../../ast.guards";
 import { buildSharedModuleImportSpecifier } from "../sharedModulePath";
 
 /**
@@ -24,13 +23,21 @@ export class RequiresConsoleRuntimeRule<T extends string, N extends BaseNode<T>>
     check (nodes: ASTNode<T, N>[]): void {
         let needsConsoleRuntime = false;
 
-        nodes.forEach(node => walkAST<T, N>(node, current => {
-            if (needsConsoleRuntime || !isAccessNode(current)) return;
+        this.walkScoped(nodes, current => {
+            if (needsConsoleRuntime) return;
 
-            if (this.context.coreLib.resolveStatic(current)?.qualifiedName === 'consola.imprimir') {
+            if (isAccessNode(current) && this.context.coreLib.resolveStatic(current)?.qualifiedName === 'consola.imprimir') {
                 needsConsoleRuntime = true;
+                return;
             }
-        }));
+
+            // a free function that falls back to `console.log` (dischord's `imprimir`, when there is no client)
+            if (isCallNode(current) && isIdentificatorNode(current.object)) {
+                const callee = this.context.coreLib.resolveFunction(current.object, !!this.context.symbolTable.lookup(current.object.value));
+
+                if (callee?.includes('console.log')) needsConsoleRuntime = true;
+            }
+        });
 
         if (!needsConsoleRuntime) return;
 

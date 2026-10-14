@@ -1,3 +1,5 @@
+import './lib/consoleRuntime.js';
+
 import { createEvent, Embed, ActionRow, Button } from 'seyfert';
 
 export default createEvent({
@@ -7,8 +9,8 @@ export default createEvent({
         let a = usuario.constructor;
         let b = usuario.toString;
         let c = usuario.hasOwnProperty;
-        cliente.logger.info(a);
-        cliente.logger.info(b);
-        cliente.logger.info(c);
+        (typeof cliente !== 'undefined' && cliente.logger ? cliente.logger : { info: console.log }).info(a);
+        (typeof cliente !== 'undefined' && cliente.logger ? cliente.logger : { info: console.log }).info(b);
+        (typeof cliente !== 'undefined' && cliente.logger ? cliente.logger : { info: console.log }).info(c);
     },
 });

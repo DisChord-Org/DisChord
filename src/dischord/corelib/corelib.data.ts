@@ -14,6 +14,16 @@ export enum DisChordClassesEnum {
 }
 
 /**
+ * What `imprimir` is called through: the logger of the bot's client, and `console.log` when there
+ * is no client in scope (a function that did not receive `cliente`, the top level of a file) or it
+ * has no logger. Decided when the call runs, because whether `cliente` exists at that point is not
+ * something the compiler can know for every function. The `{ info: console.log }` fallback keeps
+ * the call a method call (`.info(...)`), so the logger keeps its `this`.
+ * @type {string}
+ */
+const imprimirCallee = "(typeof cliente !== 'undefined' && cliente.logger ? cliente.logger : { info: console.log }).info";
+
+/**
  * Core library definition: chord's table plus DisChord's own classes and functions, so a single
  * lookup covers both layers. Maps every class, and each of its methods and properties, from its
  * name in the source language to the Seyfert code it is transpiled to. Every member is static
@@ -298,6 +308,6 @@ export const corelib: DisChordCoreLib = {
     },
     functions: {
         ...chordCorelib.functions,
-        imprimir: 'cliente.logger.info'
+        imprimir: imprimirCallee
     }
 };
