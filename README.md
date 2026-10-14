@@ -219,7 +219,8 @@ nuevo comando Ping {
 
 ### Sending messages
 
-`enviar mensaje` sends to the current channel or interaction by default. `canal` redirects it to a
+`enviar mensaje` can only be used inside a command or an event, which are what give it the client and
+the place to reply in. It sends to the current channel or interaction by default. `canal` redirects it to a
 channel and `usuario` sends it as a direct message; with both, the same body goes to the two.
 
 ```js
@@ -233,7 +234,7 @@ enviar mensaje {
 ### Managing channels
 
 `crear canal`, `editar canal` and `borrar canal` are awaited and need the client and the server of
-their context, so they can only be used inside a command or an event. None of the three words is
+their context, so, like `enviar mensaje`, they can only be used inside a command or an event. None of the three words is
 reserved: they are recognized by the `<verbo> canal {` shape alone.
 
 ```js

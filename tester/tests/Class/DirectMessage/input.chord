@@ -1,4 +1,8 @@
-var msg es enviar mensaje {
-    usuario "123456789"
-    contenido "hola"
+nuevo comando Prueba {
+    descripcion "prueba";
+
+    var msg es enviar mensaje {
+        usuario "123456789"
+        contenido "hola"
+    }
 }

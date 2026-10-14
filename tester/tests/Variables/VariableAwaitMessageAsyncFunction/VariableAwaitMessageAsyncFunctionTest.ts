@@ -2,7 +2,7 @@ import { Test } from "../../../Test";
 
 /**
  * @class VariableAwaitMessageAsyncFunctionTest
- * @description Validates that `enviar mensaje` inside an `@asincrono` function compiles.
+ * @description Validates that `enviar mensaje` inside an `@asincrono` function is rejected even though the function may await: it has no `ctx`.
  */
 export class VariableAwaitMessageAsyncFunctionTest extends Test {
     /**
@@ -13,5 +13,10 @@ export class VariableAwaitMessageAsyncFunctionTest extends Test {
     /**
      * @type {string}
      */
-    public readonly description: string = "It has to compile 'enviar mensaje' inside an async function";
+    public readonly description: string = "It has to reject 'enviar mensaje' inside an async function";
+
+    /**
+     * @type {string}
+     */
+    public readonly expectedError: string = "solo puede usarse dentro de un comando o un evento";
 }

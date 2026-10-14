@@ -1,8 +1,12 @@
-enviar mensaje {
-    embed {
-        pie {
-            texto "DisChord Bot v1.0"
-            icono "https://ejemplo.com/logo.png"
+nuevo comando Prueba {
+    descripcion "prueba";
+
+    enviar mensaje {
+        embed {
+            pie {
+                texto "DisChord Bot v1.0"
+                icono "https://ejemplo.com/logo.png"
+            }
         }
     }
 }

@@ -1,0 +1,5 @@
+evento mensajeCreado {
+    enviar mensaje {
+        contenido "hola"
+    }
+}

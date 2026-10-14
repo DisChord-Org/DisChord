@@ -1,5 +1,9 @@
-var msg es enviar mensaje {
-    canal "111"
-    usuario "222"
-    contenido "hola"
+nuevo comando Prueba {
+    descripcion "prueba";
+
+    var msg es enviar mensaje {
+        canal "111"
+        usuario "222"
+        contenido "hola"
+    }
 }
