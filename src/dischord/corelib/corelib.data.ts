@@ -44,7 +44,30 @@ export const corelib: DisChordCoreLib = {
                     transpile: 'cliente.events.runEvent',
                     returns: VoidDataType.Void,
                     static: true,
-                    doc: 'Emite un evento del bot.'
+                    params: [
+                        {
+                            name: 'nombre',
+                            type: PrimitiveDataType.Texto
+                        },
+                        {
+                            name: 'destinatario',
+                            type: AnyDataType.Any
+                        },
+                        {
+                            name: 'paquete',
+                            type: AnyDataType.Any
+                        },
+                        {
+                            name: 'fragmento',
+                            type: PrimitiveDataType.Numero
+                        },
+                        {
+                            name: 'usarCache',
+                            type: PrimitiveDataType.Booleano,
+                            optional: true
+                        }
+                    ],
+                    doc: 'Reproduce un paquete de la puerta de enlace a través de los manejadores de eventos: recibe el nombre del evento de Discord (p. ej. "MESSAGE_CREATE"), el cliente, el paquete en bruto, el fragmento (shard) y, opcionalmente, si debe actualizar la caché. Devuelve una promesa.'
                 }
             },
             properties: {
