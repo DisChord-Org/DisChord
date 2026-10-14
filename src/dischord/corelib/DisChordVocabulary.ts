@@ -1,7 +1,7 @@
 import { BDOSchema, fieldKeys, FieldSpec } from "../../chord/BDOSchema";
 import { CommandContextParameter, CommandScope, eventsMap } from "../Generator/constants/mappings";
 import {
-    ButtonSchema, CollectorSchema, CommandSchema, CreateChannelSchema, DeleteChannelSchema, EditChannelSchema, EmbedFieldSchema, EmbedFooterSchema, EmbedSchema, MessageSchema, OptionSchema, StartBotSchema
+    ButtonSchema, CollectorSchema, CommandSchema, CreateChannelSchema, DeleteChannelSchema, EditChannelSchema, GetChannelSchema, ListChannelsSchema, EmbedFieldSchema, EmbedFooterSchema, EmbedSchema, MessageSchema, OptionSchema, StartBotSchema
 } from "../Generator/constants/schemas";
 import { UnreservedComponentDeclarations } from "../Parser/Grammar/UnreservedComponentDeclarations";
 import { DisChordNode, DisChordNodeType } from "../types";
@@ -84,7 +84,9 @@ export class DisChordVocabulary {
         'mensaje': MessageSchema,
         'crear canal': CreateChannelSchema,
         'editar canal': EditChannelSchema,
-        'borrar canal': DeleteChannelSchema
+        'borrar canal': DeleteChannelSchema,
+        'obtener canal': GetChannelSchema,
+        'listar canales': ListChannelsSchema
     };
 
     /**

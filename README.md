@@ -270,6 +270,43 @@ borrar canal {
 | `servidor` | optional | | | Guild to create in; defaults to the command's, or to the one of the event's parameter (`mensaje`, `canal`, `miembro`, `rol`, `servidor`, `interaccion`) |
 | `razon` | | optional | optional | Audit log reason |
 
+#### Reading channels
+
+`obtener canal` reads one channel by its `id` and `listar canales` lists the channels of a server,
+optionally filtered by `tipo` and `categoria`. Both give back what Seyfert returns, and so do
+`crear`, `editar` and `borrar canal`: keep the result in a variable and read it with Spanish
+property names.
+
+```js
+var voces es listar canales {
+    tipo "voz"
+}
+
+var canal1 es obtener canal { id "123456789" }
+consola.imprimir(canal1.nombre mas " (" mas canal1.tipo mas ")")
+
+var viejo es borrar canal {
+    canal canal1
+    razon "Limpieza"
+}
+consola.imprimir(viejo.nombre)
+```
+
+| Property | Meaning |
+|---|---|
+| `nombre`, `tema` | Name and topic |
+| `tipo` | `texto`, `voz`, `categoria`, `anuncios`, `escenario`, `foro` or `multimedia` |
+| `categoria`, `posicion` | Parent category and position |
+| `modoLento`, `limiteUsuarios` | Slow mode seconds and voice user limit |
+| `servidor`, `ultimoMensaje` | Server and last message ids |
+| `mencion`, `enlace`, `creadoEn` | Mention text, link and creation date |
+
+`id`, `nsfw` and `bitrate` are read as they are. Reading changes nothing, so it has no quota and may
+be used in a loop, but it keeps two barriers: the channel has to belong to the server of the
+context, and inside a command whoever ran it must be able to see the channel (`listar canales`
+leaves out the ones they can not). Like the other channel blocks it can only be used inside a
+command or an event.
+
 #### Safety barriers
 
 Creating, editing and deleting channels is what a bot is abused for (mass deletion, endless

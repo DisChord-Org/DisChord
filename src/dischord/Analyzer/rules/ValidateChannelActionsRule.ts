@@ -4,7 +4,7 @@ import { BDOValidator } from "../../../chord/Analyzer/BDOValidator";
 import { fieldKeys } from "../../../chord/BDOSchema";
 import { TokenType } from "../../../chord/types";
 import { DisChordError, ErrorLevel } from "../../../errors/ChordError";
-import { ChannelAction, ChannelActionNode, ChannelProperty, CommandNode, DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType, EventNode } from "../../types";
+import { ChannelAction, ChannelActionNode, ChannelActionObject, ChannelProperty, ChannelWriteActions, CommandNode, DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType, EventNode } from "../../types";
 import { ChannelActionSchemas } from "../../Generator/constants/schemas";
 import { CommandGuildSource, EventGuildSources, EventSelfTriggers, eventsMap } from "../../Generator/constants/mappings";
 
@@ -15,7 +15,7 @@ import { CommandGuildSource, EventGuildSources, EventSelfTriggers, eventsMap } f
  *  - The block against the schema of its action (the one `ChannelActionVisitor` resolves it with).
  *  - That it sits inside a command or an event: the call needs the `cliente` and, by default, the
  *    server of that context, which a function or the top level does not have.
- *  - The preventive barriers: no channel action inside a loop (a mass creation or deletion), and
+ *  - The preventive barriers, for the actions that change the server: no channel action inside a loop (a mass creation or deletion), and
  *    none in the event it triggers itself (`crear canal` in `canalCreado` would create channels
  *    forever).
  *  - That `editar canal` changes something.
@@ -65,24 +65,31 @@ export class ValidateChannelActionsRule extends AnalysisRule<DisChordNodeType, D
 
         const context = this.enclosing[this.enclosing.length - 1];
 
+        const name = `${node.action} ${ChannelActionObject[node.action]}`;
+
         if (!context) this.fail(
-            `'${node.action} canal' solo puede usarse dentro de un comando o un evento: necesita el cliente y el servidor de su contexto`,
+            `'${name}' solo puede usarse dentro de un comando o un evento: necesita el cliente y el servidor de su contexto`,
             node.location
         );
 
-        if (this.loops > 0) this.fail(
-            `'${node.action} canal' no puede usarse dentro de un bucle: crear, editar o borrar canales en serie es el patrón de un borrado o una creación masivos`,
-            node.location
-        );
+        // the barriers are for what changes the server; reading in a loop only costs requests
+        if (ChannelWriteActions.includes(node.action)) {
+            if (this.loops > 0) this.fail(
+                `'${name}' no puede usarse dentro de un bucle: crear, editar o borrar canales en serie es el patrón de un borrado o una creación masivos`,
+                node.location
+            );
 
-        this.assertNotSelfTriggering(context, node);
+            this.assertNotSelfTriggering(context, node);
+        }
 
         if (node.action === ChannelAction.Editar) this.assertChangesSomething(node);
 
         node.guild = this.guildOf(context);
 
-        if (node.action === ChannelAction.Crear && !node.object.blocks[ChannelProperty.Servidor] && node.guild === undefined) this.fail(
-            `El evento '${(context as EventNode).name}' no trae un servidor: indica 'servidor' en 'crear canal'`,
+        const needsOwnServer = node.action === ChannelAction.Crear || node.action === ChannelAction.Listar;
+
+        if (needsOwnServer && !node.object.blocks[ChannelProperty.Servidor] && node.guild === undefined) this.fail(
+            `El evento '${(context as EventNode).name}' no trae un servidor: indica 'servidor' en '${name}'`,
             node.location
         );
     }

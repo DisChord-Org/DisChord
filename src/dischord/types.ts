@@ -20,6 +20,7 @@ export const DisChordTokenType = {
     Embed: 'embed',
     Boton: 'boton',
     Canal: 'canal',
+    Canales: 'canales',
 
     ENCENDER_BOT: 'EncenderBot',
     EVENTO: 'Evento',
@@ -111,28 +112,50 @@ export interface MessageNode extends BaseNode<DisChordNodeType> {
 }
 
 /**
- * The verbs a channel action block is written with: `crear canal`, `editar canal`, `borrar canal`.
- * Unreserved words (they stay ordinary identifiers everywhere else), told apart by the
- * `DisChordTokenType.Canal` word that follows.
+ * The verbs a channel block is written with: `crear canal`, `editar canal`, `borrar canal`,
+ * `obtener canal` and `listar canales`. Unreserved words (they stay ordinary identifiers
+ * everywhere else), told apart by the object word that follows (`ChannelActionObject`).
  * @type {const}
  */
 export const ChannelAction = {
     Crear: 'crear',
     Editar: 'editar',
-    Borrar: 'borrar'
+    Borrar: 'borrar',
+    Obtener: 'obtener',
+    Listar: 'listar'
 } as const;
 
 /** The action a `ChannelActionNode` performs. */
 export type ChannelAction = typeof ChannelAction[keyof typeof ChannelAction];
 
 /**
+ * The word that follows each verb: `canal`, except for listing, which is of `canales`.
+ * @type {Readonly<Record<ChannelAction, string>>}
+ */
+export const ChannelActionObject: Readonly<Record<ChannelAction, string>> = {
+    [ChannelAction.Crear]: DisChordTokenType.Canal,
+    [ChannelAction.Editar]: DisChordTokenType.Canal,
+    [ChannelAction.Borrar]: DisChordTokenType.Canal,
+    [ChannelAction.Obtener]: DisChordTokenType.Canal,
+    [ChannelAction.Listar]: DisChordTokenType.Canales
+};
+
+/**
+ * The actions that change something on the server, which are the ones the preventive barriers
+ * apply to. Reading (`obtener`, `listar`) changes nothing.
+ * @type {readonly ChannelAction[]}
+ */
+export const ChannelWriteActions: readonly ChannelAction[] = [ ChannelAction.Crear, ChannelAction.Editar, ChannelAction.Borrar ];
+
+/**
  * The properties naming a channel or a server, or qualifying an action on one, that are read by
- * name outside the schemas: the target channel (also the one a message is sent to), the server to
- * create in and the audit log reason. `Canal` is the same word as the object of a channel action.
+ * name outside the schemas: the target channel (also the one a message is sent to), the id of the
+ * channel to obtain, the server to create in and the audit log reason. `Canal` is the same word as the object of a channel action.
  * @type {const}
  */
 export const ChannelProperty = {
     Canal: DisChordTokenType.Canal,
+    Id: 'id',
     Servidor: 'servidor',
     Razon: 'razon'
 } as const;

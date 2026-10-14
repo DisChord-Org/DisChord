@@ -1,5 +1,5 @@
 import { ResolveAwaitedCallsRule } from "../../../chord/Analyzer/rules/ResolveAwaitedCallsRule";
-import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType } from "../../types";
+import { ChannelActionObject, DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType } from "../../types";
 
 /**
  * Chord's `ResolveAwaitedCallsRule` plus dischord's own awaiting construct: `enviar mensaje` is
@@ -17,7 +17,7 @@ export class DisChordResolveAwaitedCallsRule extends ResolveAwaitedCallsRule<Dis
         }
 
         if (node.type === DisChordTokenType.ACCION_CANAL) {
-            return `'${node.action} canal' espera una respuesta y solo puede usarse en un comando, un evento, una función @asincrono o a nivel superior`;
+            return `'${node.action} ${ChannelActionObject[node.action]}' espera una respuesta y solo puede usarse en un comando, un evento, una función @asincrono o a nivel superior`;
         }
 
         return undefined;

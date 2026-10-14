@@ -1,5 +1,5 @@
 import { SubParserClass } from "../../../chord/Parser/SubParser";
-import { ChannelAction, DisChordNode, DisChordNodeType, DisChordTokenType } from "../../types";
+import { ChannelAction, ChannelActionObject, DisChordNode, DisChordNodeType } from "../../types";
 import ChannelActionParser from "./features/ChannelActionParser";
 
 /**
@@ -19,9 +19,9 @@ export interface UnreservedAction {
  * is a row here, not a branch there.
  */
 export const UnreservedActions: UnreservedAction[] = [
-    {
-        verbs: Object.values(ChannelAction),
-        object: DisChordTokenType.Canal,
+    ...Array.from(new Set(Object.values(ChannelActionObject))).map(object => ({
+        verbs: Object.values<string>(ChannelAction).filter(verb => ChannelActionObject[verb as ChannelAction] === object),
+        object,
         ParserClass: ChannelActionParser
-    }
+    }))
 ];

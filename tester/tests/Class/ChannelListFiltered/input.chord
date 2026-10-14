@@ -1,0 +1,10 @@
+nuevo comando Canales {
+    descripcion "gestiona canales";
+
+    var voces es listar canales {
+        servidor "1"
+        tipo "voz"
+        categoria "9"
+    }
+    consola.imprimir(voces)
+}

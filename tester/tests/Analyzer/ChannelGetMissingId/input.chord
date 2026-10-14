@@ -1,0 +1,6 @@
+nuevo comando Canales {
+    descripcion "gestiona canales";
+
+    var c es obtener canal {
+    }
+}

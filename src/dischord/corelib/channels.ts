@@ -9,16 +9,30 @@ import { ChannelAction, ChannelPayload, ChannelProperty } from "../types";
 export const channelHelperNames: Readonly<Record<ChannelAction, string>> = {
     [ChannelAction.Crear]: 'createChannel',
     [ChannelAction.Editar]: 'editChannel',
-    [ChannelAction.Borrar]: 'deleteChannel'
+    [ChannelAction.Borrar]: 'deleteChannel',
+    [ChannelAction.Obtener]: 'getChannel',
+    [ChannelAction.Listar]: 'listChannels'
+};
+
+/**
+ * What each action is called in the message of an error: "No se pudo <esto>.".
+ * @type {Readonly<Record<ChannelAction, string>>}
+ */
+export const channelActionPhrases: Readonly<Record<ChannelAction, string>> = {
+    [ChannelAction.Crear]: 'crear el canal',
+    [ChannelAction.Editar]: 'editar el canal',
+    [ChannelAction.Borrar]: 'borrar el canal',
+    [ChannelAction.Obtener]: 'obtener el canal',
+    [ChannelAction.Listar]: 'listar los canales'
 };
 
 /**
  * How many channel actions of each kind a server allows inside one window, for a bot in fewer than
  * ten servers. Deliberately not configurable by whoever writes the bot: a barrier its author can
  * lift is not one. A bigger bot gets more room (see `channelQuotaMaxTier`).
- * @type {Readonly<Record<ChannelAction, number>>}
+ * @type {Readonly<Record<'crear' | 'editar' | 'borrar', number>>}
  */
-export const channelQuota: Readonly<Record<ChannelAction, number>> = {
+export const channelQuota: Readonly<Record<'crear' | 'editar' | 'borrar', number>> = {
     [ChannelAction.Crear]: 10,
     [ChannelAction.Editar]: 10,
     [ChannelAction.Borrar]: 5
@@ -61,7 +75,10 @@ export const channelsModulePath = 'lib/channels.js';
  *    to the server of the context. And each server has a quota of actions per window, which grows
  *    with the number of servers the bot is in.
  *
- * Which server a `crear canal` defaults to is decided at compile time and arrives here resolved.
+ * Which server a `crear canal` or a `listar canales` defaults to is decided at compile time and
+ * arrives here resolved. Reading (`obtener`, `listar`) has no quota: it changes nothing. It does
+ * check that the channel belongs to the server of the context and, inside a command, that whoever
+ * ran it can see it, so the bot does not read for them what they could not.
  *
  * The module opens with a notice for whoever, human or AI agent, is about to edit the generated
  * file: it is rewritten on every compilation and holds the barriers against raiding. Kept in
@@ -83,6 +100,8 @@ export const channelsModuleContent = `
     const BASE_QUOTA = ${JSON.stringify(channelQuota)};
     const MAX_TIER = ${channelQuotaMaxTier};
 
+    const WHAT = ${JSON.stringify(channelActionPhrases)};
+
     const usage = new Map();
 
     const idOf = async (value) => {
@@ -92,7 +111,7 @@ export const channelsModuleContent = `
 
     const requireClient = (ctx, action) => {
         if (!ctx || !ctx.cliente) {
-            throw new Error("DisChord Error: No se pudo " + action + " el canal. No hay un cliente en el contexto (solo se puede dentro de un comando o un evento).");
+            throw new Error("DisChord Error: No se pudo " + WHAT[action] + ". No hay un cliente en el contexto (solo se puede dentro de un comando o un evento).");
         }
 
         return ctx.cliente;
@@ -102,7 +121,7 @@ export const channelsModuleContent = `
         const id = await idOf(value);
 
         if (!id) {
-            throw new Error("DisChord Error: No se pudo " + action + " el canal. Falta el valor de '" + name + "'.");
+            throw new Error("DisChord Error: No se pudo " + WHAT[action] + ". Falta el valor de '" + name + "'.");
         }
 
         return id;
@@ -120,13 +139,13 @@ export const channelsModuleContent = `
         const member = contexto.member;
 
         if (!member) {
-            throw new Error("DisChord Error: No se pudo " + action + " el canal. Solo se puede desde un servidor.");
+            throw new Error("DisChord Error: No se pudo " + WHAT[action] + ". Solo se puede desde un servidor.");
         }
 
         const permissions = member.permissions ?? await member.roles.permissions();
 
         if (!permissions.has(['ManageChannels'])) {
-            throw new Error("DisChord Error: No se pudo " + action + " el canal. Quien ejecuta el comando necesita el permiso 'Gestionar canales'.");
+            throw new Error("DisChord Error: No se pudo " + WHAT[action] + ". Quien ejecuta el comando necesita el permiso 'Gestionar canales'.");
         }
     };
 
@@ -143,7 +162,7 @@ export const channelsModuleContent = `
         const allowance = BASE_QUOTA[action] * 2 ** await tierOf(cliente);
 
         if (recent.length >= allowance) {
-            throw new Error("DisChord Error: No se pudo " + action + " el canal. Se alcanzó el límite de seguridad de " + allowance + " acciones de este tipo cada ${channelQuotaWindowMinutes} minutos en este servidor.");
+            throw new Error("DisChord Error: No se pudo " + WHAT[action] + ". Se alcanzó el límite de seguridad de " + allowance + " acciones de este tipo cada ${channelQuotaWindowMinutes} minutos en este servidor.");
         }
 
         recent.push(now);
@@ -156,10 +175,19 @@ export const channelsModuleContent = `
         const guildId = channel.guildId;
 
         if (expectedGuildId && guildId !== expectedGuildId) {
-            throw new Error("DisChord Error: No se pudo " + action + " el canal. El canal no pertenece al servidor del contexto.");
+            throw new Error("DisChord Error: No se pudo " + WHAT[action] + ". El canal no pertenece al servidor del contexto.");
         }
 
         return guildId ?? expectedGuildId;
+    };
+
+    // inside a command, the bot reads for whoever ran it: it must be something they can see too
+    const canSee = async (contexto, channel) => {
+        if (!contexto.member || typeof channel.memberPermissions !== 'function') return false;
+
+        const permissions = await channel.memberPermissions(contexto.member);
+
+        return permissions.has(['ViewChannel']);
     };
 
     export const ${channelHelperNames.crear} = async (ctx, guild, body) => {
@@ -195,5 +223,47 @@ export const channelsModuleContent = `
         await consumeQuota(cliente, guildId, action);
 
         return await cliente.channels.delete(channelId, { reason });
+    };
+
+    export const ${channelHelperNames.obtener} = async (ctx, channel, guild) => {
+        const action = '${ChannelAction.Obtener}';
+        const cliente = requireClient(ctx, action);
+
+        const channelId = await requireId(channel, '${ChannelProperty.Id}', action);
+        const found = await cliente.channels.fetch(channelId);
+        const expectedGuildId = await idOf(guild);
+
+        if (expectedGuildId && found.guildId !== expectedGuildId) {
+            throw new Error("DisChord Error: No se pudo " + WHAT[action] + ". El canal no pertenece al servidor del contexto.");
+        }
+
+        if (ctx.contexto && !(await canSee(ctx.contexto, found))) {
+            throw new Error("DisChord Error: No se pudo " + WHAT[action] + ". Quien ejecuta el comando no puede ver ese canal.");
+        }
+
+        return found;
+    };
+
+    export const ${channelHelperNames.listar} = async (ctx, guild, filters) => {
+        const action = '${ChannelAction.Listar}';
+        const cliente = requireClient(ctx, action);
+
+        const guildId = await requireId(guild, '${ChannelProperty.Servidor}', action);
+        let channels = await cliente.guilds.channels.list(guildId);
+
+        if (filters && filters.type !== undefined) channels = channels.filter(channel => channel.type === filters.type);
+
+        if (filters && filters.${ChannelPayload.Parent} !== undefined) {
+            const parentId = await idOf(filters.${ChannelPayload.Parent});
+            channels = channels.filter(channel => channel.parentId === parentId);
+        }
+
+        // a command lists only what whoever ran it can see
+        if (ctx.contexto) {
+            const visible = await Promise.all(channels.map(channel => canSee(ctx.contexto, channel)));
+            channels = channels.filter((_, index) => visible[index]);
+        }
+
+        return channels;
     };
 `;

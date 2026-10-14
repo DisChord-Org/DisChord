@@ -331,17 +331,28 @@ const ChannelNameField = {
     output: 'name'
 } satisfies FieldSpec;
 
+/** The kind of a channel: one of `ChannelTypes`. Also a filter of `listar canales`. */
+const ChannelKindField = {
+    key: 'tipo',
+    kind: FieldKind.MappedLiteral,
+    mapping: ChannelTypes,
+    default: JSFallback.Undefined,
+    output: 'type',
+    invalidMessage: `El campo 'tipo' del canal debe ser un TEXTO`,
+    unknownMessage: (value: string) => `Tipo de canal inválido: '${value}'. Se admite: ${Object.keys(ChannelTypes).join(' / ')}`
+} satisfies FieldSpec;
+
+/** The category a channel is in. Also a filter of `listar canales`. */
+const ChannelCategoryField = {
+    key: 'categoria',
+    kind: FieldKind.Value,
+    default: JSFallback.Undefined,
+    output: ChannelPayload.Parent
+} satisfies FieldSpec;
+
 /** The properties of a channel besides its name, shared by `crear canal` and `editar canal`. */
 const ChannelPropertyFields = [
-    {
-        key: 'tipo',
-        kind: FieldKind.MappedLiteral,
-        mapping: ChannelTypes,
-        default: JSFallback.Undefined,
-        output: 'type',
-        invalidMessage: `El campo 'tipo' del canal debe ser un TEXTO`,
-        unknownMessage: (value: string) => `Tipo de canal inválido: '${value}'. Se admite: ${Object.keys(ChannelTypes).join(' / ')}`
-    },
+    ChannelKindField,
     {
         key: 'tema',
         kind: FieldKind.Value,
@@ -354,12 +365,7 @@ const ChannelPropertyFields = [
         default: JSFallback.Undefined,
         output: 'nsfw'
     },
-    {
-        key: 'categoria',
-        kind: FieldKind.Value,
-        default: JSFallback.Undefined,
-        output: ChannelPayload.Parent
-    },
+    ChannelCategoryField,
     {
         key: 'posicion',
         kind: FieldKind.Value,
@@ -444,9 +450,38 @@ export const DeleteChannelSchema: BDOSchema<DisChordNodeType, DisChordNode> = {
     ]
 };
 
+/** `obtener canal { ... }`: only the id of the channel to read. */
+export const GetChannelSchema: BDOSchema<DisChordNodeType, DisChordNode> = {
+    name: 'obtener canal',
+    fields: [
+        {
+            key: ChannelProperty.Id,
+            kind: FieldKind.Value,
+            required: true,
+            missingMessage: `En 'obtener canal' se esperaba '${ChannelProperty.Id}'.`
+        }
+    ]
+};
+
+/** `listar canales { ... }`: the server (the context's by default) and what to filter by. */
+export const ListChannelsSchema: BDOSchema<DisChordNodeType, DisChordNode> = {
+    name: 'listar canales',
+    fields: [
+        {
+            key: ChannelProperty.Servidor,
+            kind: FieldKind.Value,
+            default: JSFallback.Undefined
+        },
+        ChannelKindField,
+        ChannelCategoryField
+    ]
+};
+
 /** The schema each channel action's block is checked and resolved against. */
 export const ChannelActionSchemas: Record<ChannelAction, BDOSchema<DisChordNodeType, DisChordNode>> = {
     [ChannelAction.Crear]: CreateChannelSchema,
     [ChannelAction.Editar]: EditChannelSchema,
-    [ChannelAction.Borrar]: DeleteChannelSchema
+    [ChannelAction.Borrar]: DeleteChannelSchema,
+    [ChannelAction.Obtener]: GetChannelSchema,
+    [ChannelAction.Listar]: ListChannelsSchema
 };

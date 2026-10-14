@@ -7,8 +7,9 @@ import { ChannelActionSchemas } from "../../constants/schemas";
 import { channelHelperNames } from "../../../corelib";
 
 /**
- * Generator class for `crear canal`, `editar canal` and `borrar canal`: each becomes an `await` of
- * the matching helper of the shared `channels` runtime module.
+ * Generator class for the channel blocks (`crear`, `editar`, `borrar` `canal`, `obtener canal` and
+ * `listar canales`): each becomes an `await` of the matching helper of the shared `channels` runtime
+ * module.
  */
 export default class ChannelActionVisitor extends SubGenerator<DisChordNodeType, DisChordNode> {
     /**
@@ -34,6 +35,10 @@ export default class ChannelActionVisitor extends SubGenerator<DisChordNodeType,
                 return `await ${helper}(ctx, ${properties[ChannelProperty.Canal]}, ${this.body(node, properties)}, ${properties[ChannelProperty.Razon]}, ${node.guild})`;
             case ChannelAction.Borrar:
                 return `await ${helper}(ctx, ${properties[ChannelProperty.Canal]}, ${properties[ChannelProperty.Razon]}, ${node.guild})`;
+            case ChannelAction.Obtener:
+                return `await ${helper}(ctx, ${properties[ChannelProperty.Id]}, ${node.guild})`;
+            case ChannelAction.Listar:
+                return `await ${helper}(ctx, ${this.guild(node, properties)}, ${this.body(node, properties)})`;
         }
     }
 
@@ -46,7 +51,8 @@ export default class ChannelActionVisitor extends SubGenerator<DisChordNodeType,
     }
 
     /**
-     * The API body: the fields of the schema that go in it, and only the ones the block declared.
+     * The API body (for `listar canales`, its filters): the fields of the schema that go in it, and
+     * only the ones the block declared.
      * @private
      */
     private body (node: ChannelActionNode, properties: Record<string, string>): string {
