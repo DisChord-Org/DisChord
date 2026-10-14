@@ -119,13 +119,14 @@ export class CoreLibUtils<C extends string = string> {
 
     /**
      * @param {ASTNode<T, N>} callee - What is being called.
-     * @param {boolean} [declaredByUser=false] - Whether the file declares something of that name (a function, variable or parameter) that is visible at the call. It wins, so the name is not mapped.
+     * @param {{ lookup(name: string): unknown }} symbols - The file's symbol table, with the scope of the call open. A function, variable or parameter it declares under that name, visible at the call, wins over the core library function, so the name is not mapped.
      * @returns {string | undefined} The callee it is transpiled to, or `undefined` if it isn't a plain name the core library maps or the user's declaration wins.
      */
-    resolveFunction<T extends string, N extends BaseNode<T>> (callee: ASTNode<T, N>, declaredByUser: boolean = false): string | undefined {
-        if (declaredByUser) return undefined;
+    resolveFunction<T extends string, N extends BaseNode<T>> (callee: ASTNode<T, N>, symbols: { lookup(name: string): unknown }): string | undefined {
+        if (!isIdentificatorNode(callee) || !this.hasOwn(this.corelib.functions, callee.value)) return undefined;
+        if (symbols.lookup(callee.value)) return undefined;
 
-        return isIdentificatorNode(callee) && this.hasOwn(this.corelib.functions, callee.value) ? this.corelib.functions[callee.value] : undefined;
+        return this.corelib.functions[callee.value];
     }
 
     /**

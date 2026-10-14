@@ -2,7 +2,7 @@ import path from "node:path";
 import { AnalysisRule } from "../AnalysisRule";
 import { ASTNode, BaseNode, ImportNode, TokenType } from "../../types";
 import { runtimeHelperNames, runtimeHelpersModuleContent, runtimeHelpersModulePath } from "../../corelib";
-import { isAccessNode, isCallNode, isIdentificatorNode } from "../../ast.guards";
+import { isAccessNode, isCallNode } from "../../ast.guards";
 import { buildSharedModuleImportSpecifier } from "../sharedModulePath";
 
 /**
@@ -11,7 +11,7 @@ import { buildSharedModuleImportSpecifier } from "../sharedModulePath";
  * `esperar`), or that a call on a receiver of union type was decided to be dispatched through (`chordTiene`).
  * If any, inserts a synthetic `ImportNode` for the shared helpers module at the front
  * of `nodes`, importing only the ones used, and registers the module's content in
- * `context.extraFiles` â€” the same lowering `RequiresConsoleRuntimeRule` does for the console
+ * `context.extraFiles` — the same lowering `RequiresConsoleRuntimeRule` does for the console
  * override. A file that uses none gets no import.
  */
 export class RequiresRuntimeHelpersRule<T extends string, N extends BaseNode<T>> extends AnalysisRule<T, N> {
@@ -40,7 +40,7 @@ export class RequiresRuntimeHelpersRule<T extends string, N extends BaseNode<T>>
             ? ('helper' in dispatch ? dispatch.helper : undefined)
             : isAccessNode(node)
                 ? this.context.coreLib.resolveStatic(node)?.member.transpile
-                : isCallNode(node) ? this.context.coreLib.resolveFunction(node.object, this.isDeclared(node.object)) : undefined);
+                : isCallNode(node) ? this.context.coreLib.resolveFunction(node.object, this.context.symbolTable) : undefined);
 
         return transpiled !== undefined && runtimeHelperNames.has(transpiled) ? transpiled : undefined;
     }
@@ -79,14 +79,5 @@ export class RequiresRuntimeHelpersRule<T extends string, N extends BaseNode<T>>
         nodes.unshift(importNode);
 
         this.context.extraFiles.set(path.join(this.context.distDir, runtimeHelpersModulePath), runtimeHelpersModuleContent);
-    }
-
-    /**
-     * Whether the callee is a name the file declares and that is visible where the call is, which
-     * then wins over a core library function of the same name.
-     * @private
-     */
-    private isDeclared (callee: ASTNode<T, N>): boolean {
-        return isIdentificatorNode(callee) && !!this.context.symbolTable.lookup(callee.value);
     }
 }

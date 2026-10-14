@@ -6,10 +6,10 @@ import { isAccessNode, isCallNode, isIdentificatorNode } from "../../ast.guards"
 import { buildSharedModuleImportSpecifier } from "../sharedModulePath";
 
 /**
- * Detects, over the *complete* AST (any nesting depth â€” inside functions, classes, conditions,
+ * Detects, over the *complete* AST (any nesting depth — inside functions, classes, conditions,
  * loops, etc., not just top-level statements), whether the file calls a corelib helper that
  * resolves to `console.log` (e.g. `consola.imprimir`). If so, inserts a real, synthetic
- * `ImportNode` for the shared `console.log` override module at the front of `nodes` â€” a standard
+ * `ImportNode` for the shared `console.log` override module at the front of `nodes` — a standard
  * compiler "lowering" step: by the time `Generator` runs, the import is just another statement in
  * the AST, rendered by the existing `ImportVisitor` like any user-written import. `Generator`
  * itself needs zero special-casing for this. The module's *content* is registered into
@@ -33,7 +33,7 @@ export class RequiresConsoleRuntimeRule<T extends string, N extends BaseNode<T>>
 
             // a free function that falls back to `console.log` (dischord's `imprimir`, when there is no client)
             if (isCallNode(current) && isIdentificatorNode(current.object)) {
-                const callee = this.context.coreLib.resolveFunction(current.object, !!this.context.symbolTable.lookup(current.object.value));
+                const callee = this.context.coreLib.resolveFunction(current.object, this.context.symbolTable);
 
                 if (callee?.includes('console.log')) needsConsoleRuntime = true;
             }
