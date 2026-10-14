@@ -111,6 +111,23 @@ export class Directory {
     }
 
     /**
+     * What lives directly in the directory — files and subdirectories, in the order the file
+     * system lists them. Anything that is neither (a broken link, a socket) is left out.
+     *
+     * @returns {(File | Directory)[]}
+     */
+    public entries(): (File | Directory)[] {
+        return fs.readdirSync(this.absolutePath, { withFileTypes: true }).flatMap((entry): (File | Directory)[] => {
+            const entryPath = this.resolve(entry.name);
+
+            if (entry.isDirectory()) return [Directory.of(entryPath)];
+            if (entry.isFile()) return [File.of(entryPath)];
+
+            return [];
+        });
+    }
+
+    /**
      * Every regular file under the directory, at any depth. Walks the tree by hand instead of
      * using `readdirSync`'s `recursive` option, which is only honoured from Node 20.1 onward and
      * is silently ignored on older runtimes, which would quietly turn this into a shallow scan.

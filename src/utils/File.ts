@@ -76,6 +76,22 @@ export class File {
     }
 
     /**
+     * Writes UTF-8 text to a path, creating the file or replacing it.
+     *
+     * @param {string} rawPath - Absolute path, or relative to the working directory.
+     * @param {string} content - The file's content.
+     * @returns {File} The file written.
+     * @throws {Error} If the directory it would live in is missing, or a directory sits at the path.
+     */
+    public static write(rawPath: string, content: string): File {
+        const file = File.withContent(rawPath, content);
+
+        fs.writeFileSync(file.absolutePath, content, 'utf-8');
+
+        return File.of(file.absolutePath);
+    }
+
+    /**
      * Same as `of`, but answers `undefined` instead of throwing when the path is not an
      * existing regular file (it is missing, or it is a directory).
      *

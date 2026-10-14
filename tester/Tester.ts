@@ -1,8 +1,7 @@
-import path from "node:path";
-import fs from "node:fs";
 import { pathToFileURL } from "node:url";
 
 import { Test } from "./Test";
+import { Directory } from "../src/utils/Directory";
 
 /**
  * Interface representing a discovered test entry with its file system location.
@@ -38,7 +37,7 @@ export class Tester {
      * @private
      * @readonly
      */
-    private readonly testsDirectory: string = path.join(process.cwd(), 'tester', 'tests');
+    private readonly testsDirectory: string = Directory.of(process.cwd()).resolve('tester', 'tests');
 
     /**
      * Global flag determined by the `UPDATE_SNAPSHOTS` environment variable to enforce snapshot file updates.
@@ -95,26 +94,21 @@ export class Tester {
     private async discoverTestClasses(dir?: string): Promise<Array<DiscoveredTest>> {
         const testClasses: Array<DiscoveredTest> = [];
 
-        if (!dir) dir = this.testsDirectory;
-        if (!fs.existsSync(dir)) return testClasses;
+        const directory = Directory.tryOf(dir ?? this.testsDirectory);
+        if (!directory) return testClasses;
 
-        const entries = fs.readdirSync(dir, { withFileTypes: true });
-
-        for (const entry of entries) {
-            const fullPath = path.join(dir, entry.name);
-
-            if (entry.isDirectory()) {
-                const nestedClasses = await this.discoverTestClasses(fullPath);
+        for (const entry of directory.entries()) {
+            if (entry instanceof Directory) {
+                const nestedClasses = await this.discoverTestClasses(entry.absolutePath);
                 testClasses.push(...nestedClasses);
                 continue;
             }
 
-            const isTestFile = entry.isFile() && (entry.name.endsWith(".ts") || entry.name.endsWith(".js"))
-                && !entry.name.startsWith("expected.");
+            const isTestFile = (entry.hasExtension(".ts") || entry.hasExtension(".js")) && !entry.name.startsWith("expected.");
             const isDeclarationFile = entry.name.endsWith(".d.ts");
 
             if (isTestFile && !isDeclarationFile) {
-                const importedModule = await import(pathToFileURL(fullPath).href);
+                const importedModule = await import(pathToFileURL(entry.absolutePath).href);
 
                 for (const exportKey of Object.keys(importedModule)) {
                     const exportedItem = importedModule[exportKey];
@@ -122,7 +116,7 @@ export class Tester {
                     if (typeof exportedItem === "function" && exportedItem.prototype instanceof Test && exportedItem !== Test) {
                         testClasses.push({
                             TestClass: exportedItem as new () => Test,
-                            directory: path.dirname(fullPath)
+                            directory: entry.directory
                         });
                     }
                 }

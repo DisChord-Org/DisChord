@@ -1,5 +1,3 @@
-import path from "node:path";
-import fs from "node:fs";
 
 import { DisChordGenerator } from "../src/dischord/Generator/Generator";
 import { KeyWords } from "../src/chord/KeywordsManager";
@@ -12,6 +10,7 @@ import { disChordCoreLibUtils, disChordCoreLibDispatch } from "../src/dischord/c
 import { DisChordASTNode, DisChordNodeType, DisChordTokenType } from "../src/dischord/types";
 import { FileSystem } from "../src/utils/FileSystem";
 import { File } from "../src/utils/File";
+import { Directory } from "../src/utils/Directory";
 import { CompilationContext } from "../src/chord/model/CompilationContext";
 import Prettifier from "../src/utils/Prettifier";
 
@@ -69,6 +68,17 @@ export abstract class Test {
     public readonly expectedError?: string;
 
     /**
+     * The directory of this test's fixture.
+     *
+     * @type {Directory}
+     * @protected
+     * @throws {Error} If the directory does not exist.
+     */
+    protected get fixture(): Directory {
+        return Directory.of(this.fixturePath);
+    }
+
+    /**
      * Reads the raw input .chord file for this test.
      *
      * @type {string}
@@ -76,8 +86,7 @@ export abstract class Test {
      * @throws {Error} If the file cannot be read.
      */
     protected get code(): string {
-        const file = path.join(this.fixturePath, 'input.chord');
-        return fs.readFileSync(file, 'utf-8');
+        return this.fixture.file('input.chord').read();
     }
 
     /**
@@ -88,8 +97,7 @@ export abstract class Test {
      * @throws {Error} If the file cannot be read.
      */
     protected get expectedAST(): string {
-        const file = path.join(this.fixturePath, 'expected.ast.json');
-        return fs.readFileSync(file, 'utf-8');
+        return this.fixture.file('expected.ast.json').read();
     }
 
     /**
@@ -100,8 +108,7 @@ export abstract class Test {
      * @throws {Error} If the file cannot be read.
      */
     protected get expectedCode(): string {
-        const file = path.join(this.fixturePath, 'expected.js');
-        return fs.readFileSync(file, 'utf-8');
+        return this.fixture.file('expected.js').read();
     }
 
     /**
@@ -153,13 +160,12 @@ export abstract class Test {
             coreLibDispatch: disChordCoreLibDispatch
         };
 
-        const fileName = path.basename(this.fixturePath);
-        console.log(`Compilando: ${path.relative(context.projectRoot.absolutePath, fileName)}`);
+        console.log(`Compilando: ${this.fixture.name}`);
 
         DisChordParser.registerGrammar(context);
 
         const code = this.code;
-        context.codeProvider.currentCode = { file: File.of(path.join(this.fixturePath, 'input.chord')), content: code };
+        context.codeProvider.currentCode = { file: this.fixture.file('input.chord'), content: code };
 
         const lexer = new Lexer<DisChordTokenType>(context);
         const tokens = lexer.tokenize();
@@ -215,9 +221,9 @@ export abstract class Test {
      */
     protected async assertOrUpdateSnapshot(actualContent: string, snapshotType: 'ast' | 'code'): Promise<void> {
         const targetFilename = snapshotType === 'ast' ? 'expected.ast.json' : 'expected.js';
-        const targetPath = path.join(this.fixturePath, targetFilename);
+        const targetPath = this.fixture.resolve(targetFilename);
 
-        if (this.forceUpdate || !fs.existsSync(targetPath)) {
+        if (this.forceUpdate || !this.fixture.hasFile(targetFilename)) {
             const formatted = snapshotType === 'code'
                 ? await Prettifier.prettify(actualContent.trim() + '\n')
                 : JSON.stringify(JSON.parse(actualContent));
@@ -251,13 +257,15 @@ export abstract class Test {
 
         let eol = '\n';
 
-        if (fs.existsSync(targetPath)) {
-            const existing = fs.readFileSync(targetPath, 'utf-8');
+        const current = File.tryOf(targetPath);
+
+        if (current) {
+            const existing = current.read();
             if (normalize(existing) === normalize(content)) return false;
             if (existing.includes('\r\n')) eol = '\r\n';
         }
 
-        fs.writeFileSync(targetPath, content.replace(/\r\n/g, '\n').replace(/\n/g, eol), 'utf-8');
+        File.write(targetPath, content.replace(/\r\n/g, '\n').replace(/\n/g, eol));
         return true;
     }
 
