@@ -1,7 +1,7 @@
 import path from "node:path";
 import { AnalysisRule } from "../../../chord/Analyzer/AnalysisRule";
 import { walkAST } from "../../../chord/walkAST";
-import { buildSharedModuleImportSpecifier } from "../../../chord/Analyzer/sharedModulePath";
+import { SharedModuleSpecifier } from "../../../chord/Analyzer/SharedModuleSpecifier";
 import { ImportNode, TokenType } from "../../../chord/types";
 import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType } from "../../types";
 import { createMessageModuleContent, createMessageModulePath } from "../../corelib";
@@ -30,7 +30,7 @@ export class RequiresMessageHelperRule extends AnalysisRule<DisChordNodeType, Di
             type: TokenType.Importar,
             identificators: [ 'createMessage' ],
             isDestructured: true,
-            path: buildSharedModuleImportSpecifier(this.context, createMessageModulePath),
+            path: SharedModuleSpecifier.of(this.context, createMessageModulePath),
             location: { line: 0, column: 0 }
         };
 

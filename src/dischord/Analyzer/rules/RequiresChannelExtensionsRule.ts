@@ -1,7 +1,7 @@
 import path from "node:path";
 import { AnalysisRule } from "../../../chord/Analyzer/AnalysisRule";
 import { walkAST } from "../../../chord/walkAST";
-import { buildSharedModuleImportSpecifier } from "../../../chord/Analyzer/sharedModulePath";
+import { SharedModuleSpecifier } from "../../../chord/Analyzer/SharedModuleSpecifier";
 import { ImportNode, LiteralNode, ODBNode, TokenType } from "../../../chord/types";
 import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType } from "../../types";
 import { channelExtensionsModuleContent, channelExtensionsModulePath } from "../../corelib";
@@ -46,7 +46,7 @@ export class RequiresChannelExtensionsRule extends AnalysisRule<DisChordNodeType
             type: TokenType.Importar,
             identificators: [],
             isDestructured: false,
-            path: buildSharedModuleImportSpecifier(this.context, channelExtensionsModulePath),
+            path: SharedModuleSpecifier.of(this.context, channelExtensionsModulePath),
             location: { line: 0, column: 0 }
         };
 

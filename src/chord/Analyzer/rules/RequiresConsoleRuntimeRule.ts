@@ -3,13 +3,13 @@ import { AnalysisRule } from "../AnalysisRule";
 import { ASTNode, BaseNode, ImportNode, TokenType } from "../../types";
 import { consoleRuntimeModuleContent, consoleRuntimeModulePath } from "../../corelib";
 import { isAccessNode, isCallNode, isIdentificatorNode } from "../../ast.guards";
-import { buildSharedModuleImportSpecifier } from "../sharedModulePath";
+import { SharedModuleSpecifier } from "../SharedModuleSpecifier";
 
 /**
- * Detects, over the *complete* AST (any nesting depth — inside functions, classes, conditions,
+ * Detects, over the *complete* AST (any nesting depth â€” inside functions, classes, conditions,
  * loops, etc., not just top-level statements), whether the file calls a corelib helper that
  * resolves to `console.log` (e.g. `consola.imprimir`). If so, inserts a real, synthetic
- * `ImportNode` for the shared `console.log` override module at the front of `nodes` — a standard
+ * `ImportNode` for the shared `console.log` override module at the front of `nodes` â€” a standard
  * compiler "lowering" step: by the time `Generator` runs, the import is just another statement in
  * the AST, rendered by the existing `ImportVisitor` like any user-written import. `Generator`
  * itself needs zero special-casing for this. The module's *content* is registered into
@@ -44,7 +44,7 @@ export class RequiresConsoleRuntimeRule<T extends string, N extends BaseNode<T>>
         const importNode: ImportNode<T> = {
             type: TokenType.Importar,
             identificators: [],
-            path: buildSharedModuleImportSpecifier(this.context, consoleRuntimeModulePath),
+            path: SharedModuleSpecifier.of(this.context, consoleRuntimeModulePath),
             isDestructured: false,
             location: { line: 0, column: 0 }
         };

@@ -3,7 +3,7 @@ import { AnalysisRule } from "../AnalysisRule";
 import { ASTNode, BaseNode, ImportNode, TokenType } from "../../types";
 import { runtimeHelperNames, runtimeHelpersModuleContent, runtimeHelpersModulePath } from "../../corelib";
 import { isAccessNode, isCallNode } from "../../ast.guards";
-import { buildSharedModuleImportSpecifier } from "../sharedModulePath";
+import { SharedModuleSpecifier } from "../SharedModuleSpecifier";
 
 /**
  * Detects, over the *complete* AST, which runtime helpers the file uses (a core library member or
@@ -11,7 +11,7 @@ import { buildSharedModuleImportSpecifier } from "../sharedModulePath";
  * `esperar`), or that a call on a receiver of union type was decided to be dispatched through (`chordTiene`).
  * If any, inserts a synthetic `ImportNode` for the shared helpers module at the front
  * of `nodes`, importing only the ones used, and registers the module's content in
- * `context.extraFiles` — the same lowering `RequiresConsoleRuntimeRule` does for the console
+ * `context.extraFiles` â€” the same lowering `RequiresConsoleRuntimeRule` does for the console
  * override. A file that uses none gets no import.
  */
 export class RequiresRuntimeHelpersRule<T extends string, N extends BaseNode<T>> extends AnalysisRule<T, N> {
@@ -72,7 +72,7 @@ export class RequiresRuntimeHelpersRule<T extends string, N extends BaseNode<T>>
             type: TokenType.Importar,
             identificators: [ ...helpers ].sort(),
             isDestructured: true,
-            path: buildSharedModuleImportSpecifier(this.context, runtimeHelpersModulePath),
+            path: SharedModuleSpecifier.of(this.context, runtimeHelpersModulePath),
             location: { line: 0, column: 0 }
         };
 
