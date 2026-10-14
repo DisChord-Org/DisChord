@@ -12,6 +12,8 @@ import { BaseChordError } from './errors/ChordError';
  *    errors, logging formatted diagnostics and exiting the process with the code `ExitCode`
  *    assigns to the failure.
  */
+const wantsTrace = process.argv.some(argument => argument === '-d' || argument === '--debug' || argument.startsWith('--debug='));
+
 new Program()
     .parse(process.argv)
     .catch((error: unknown) => {
@@ -23,8 +25,12 @@ new Program()
             console.error(error.format());
         
         } else if (error instanceof Error) {
-            console.error(`\x1b[31m[Fatal Error]\x1b[0m ${error.message}`);
-            if (error.stack) console.error(error.stack);
+            // a path that does not exist is a usage error: one clear line, the trace only with --debug
+            const { code, path } = error as NodeJS.ErrnoException;
+            const message = code === 'ENOENT' && path ? `No existe la ruta: ${path}` : error.message;
+
+            console.error(`\x1b[31m[Fatal Error]\x1b[0m ${message}`);
+            if (error.stack && wantsTrace) console.error(error.stack);
 
         } else {
             console.error('\x1b[31m[Fatal Error]\x1b[0m Ha ocurrido un error desconocido:', error);
