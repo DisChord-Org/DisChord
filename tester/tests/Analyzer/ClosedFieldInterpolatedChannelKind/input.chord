@@ -1,0 +1,10 @@
+var x es "texto"
+
+nuevo comando Canales {
+    descripcion "gestiona canales"
+
+    crear canal {
+        nombre "a"
+        tipo "{x}"
+    }
+}

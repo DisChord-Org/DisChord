@@ -1,0 +1,7 @@
+var t es "MensajesDirectos"
+
+encender bot {
+    prefijo "!"
+    token "t"
+    intenciones [ "{t}" ]
+}

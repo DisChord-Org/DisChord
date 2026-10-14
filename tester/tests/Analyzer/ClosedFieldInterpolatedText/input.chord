@@ -1,0 +1,7 @@
+var e es "verde"
+
+nuevo boton B {
+    id "b"
+    etiqueta "B"
+    estilo "{e}"
+}

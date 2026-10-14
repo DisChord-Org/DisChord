@@ -1,0 +1,5 @@
+nuevo boton B {
+    id "b"
+    etiqueta "B"
+    estilo verde
+}

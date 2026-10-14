@@ -1,0 +1,17 @@
+var t es "texto"
+
+nuevo comando Prueba {
+    descripcion "prueba"
+
+    opciones {
+        valor {
+            opcion "{t}"
+            descripcion "un valor"
+            requerido verdadero
+        }
+    }
+
+    enviar mensaje {
+        contenido "hola"
+    }
+}

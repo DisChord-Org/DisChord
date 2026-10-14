@@ -1,0 +1,10 @@
+var t es "Mensajes"
+
+nuevo comando Prueba {
+    descripcion "prueba"
+    ignorar "{t}"
+
+    enviar mensaje {
+        contenido "hola"
+    }
+}
