@@ -71,10 +71,32 @@ export class Lexer<T extends string> {
         }
     }
 
+    /**
+     * Where the character at `offset` of a text's content is in the file: the content starts right
+     * after the opening quote, and a new line inside the text starts a new line of the file.
+     * @private
+     */
+    private locate (text: Token<T>, offset: number): Location {
+        const before = text.value.slice(0, offset).split('\n');
+
+        return before.length === 1
+            ? { line: text.location.line, column: text.location.column + 1 + offset }
+            : { line: text.location.line + before.length - 1, column: before[before.length - 1].length + 1 };
+    }
+
+    /**
+     * Rewrites an interpolated text (`"hola {n}!"`) to the tokens of `("hola " mas (n) mas "!")`.
+     * Each fragment of text spans exactly what it was read from, and what the rewrite invents (the
+     * parentheses, `mas`, and an empty text that opens the whole) is marked `synthetic` and has no
+     * width: the `(` and `mas` of an expression sit at its `{`, its `)` at its `}`, the outer
+     * parentheses at the start and at the end of the literal.
+     * @private
+     */
     private interpolate (text: Token<T>): Token<T>[] {
         const value = text.value;
-        const parts: ({ text: string } | { code: string; offset: number })[] = [];
+        const parts: ({ text: string; from: number; to: number } | { code: string; offset: number; open: number; close: number })[] = [];
         let buffer = '';
+        let bufferStart = 0;
         let found = false;
         let index = 0;
 
@@ -92,10 +114,11 @@ export class Lexer<T extends string> {
                 const code = close === -1 ? '' : value.slice(index + 1, close);
 
                 if (close !== -1 && /^\s*[\p{L}_]/u.test(code) && !code.includes('{')) {
-                    parts.push({ text: buffer }, { code, offset: index + 1 });
+                    parts.push({ text: buffer, from: bufferStart, to: index }, { code, offset: index + 1, open: index, close });
                     buffer = '';
                     found = true;
                     index = close + 1;
+                    bufferStart = index;
                     continue;
                 }
             }
@@ -106,21 +129,25 @@ export class Lexer<T extends string> {
 
         if (!found) return [ buffer === value ? text : { ...text, value: buffer } ];
 
-        parts.push({ text: buffer });
+        parts.push({ text: buffer, from: bufferStart, to: value.length });
 
-        const synthetic = (type: TokenType, value: string, at: Location): Token<T> => ({ type, value, location: at, end: at } as Token<T>);
-        const textToken = (content: string): Token<T> => ({ ...text, value: content });
+        const synthetic = (type: TokenType, tokenValue: string, at: Location): Token<T> => ({ type, value: tokenValue, location: at, end: at, synthetic: true } as Token<T>);
+        const fragment = (content: string, from: number, to: number): Token<T> => ({ ...text, value: content, location: this.locate(text, from), end: this.locate(text, to) });
+        const start = this.locate(text, 0);
         const result: Token<T>[] = [ synthetic(TokenType.L_PAREN, '(', text.location) ];
         let first = true;
 
         for (const part of parts) {
             if ('code' in part) {
-                // the text always comes first, so the whole is a text however the expression is
-                if (first) result.push(textToken(''));
+                const open = this.locate(text, part.open);
+                const close = this.locate(text, part.close);
 
-                result.push(synthetic(TokenType.Mas, 'mas', text.location), synthetic(TokenType.L_PAREN, '(', text.location));
+                // the text always comes first, so the whole is a text however the expression is
+                if (first) result.push({ ...synthetic(TokenType.TEXTO, '', start) });
+
+                result.push(synthetic(TokenType.Mas, 'mas', open), synthetic(TokenType.L_PAREN, '(', open));
                 result.push(...this.tokenizeInside(text, part.code, part.offset));
-                result.push(synthetic(TokenType.R_PAREN, ')', text.end));
+                result.push(synthetic(TokenType.R_PAREN, ')', close));
                 first = false;
                 continue;
             }
@@ -128,8 +155,8 @@ export class Lexer<T extends string> {
             if (part.text === '' && !first) continue;
             if (part.text === '' && first && parts.length > 1) continue;
 
-            if (!first) result.push(synthetic(TokenType.Mas, 'mas', text.location));
-            result.push(textToken(part.text));
+            if (!first) result.push(synthetic(TokenType.Mas, 'mas', this.locate(text, part.from)));
+            result.push(fragment(part.text, part.from, part.to));
             first = false;
         }
 

@@ -183,7 +183,8 @@ export class CompileCommand {
                     type: token.type,
                     value: token.value,
                     start: token.location as Location,
-                    end: token.end
+                    end: token.end,
+                    ...(token.synthetic ? { synthetic: true } : {})
                 }));
 
                 return { schema: CompileCommand.emitSchema, emit: kind, file: file.absolutePath, tokens };

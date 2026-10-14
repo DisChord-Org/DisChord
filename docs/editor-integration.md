@@ -74,7 +74,8 @@ function check(source, filepath, cwd) {
 `--emit` works over a single file and stops before the analyzer, so it also works on code the compiler would
 reject later. The result carries `schema` (`1`), `emit`, `file` and `tokens` or `ast`; an error comes as a
 diagnostic, as with `--json`. Each token has `start` and `end` (`{ line, column }`, `end` is just after the last
-character). The shape of the `ast` nodes is internal and is not covered by `schema`. `--emit ast` adds
+character); a token the lexer invented (the parentheses and `mas` an interpolated text is rewritten to, and the
+empty text that opens it) carries `synthetic: true`, has no width, and is left out of the source. The shape of the `ast` nodes is internal and is not covered by `schema`. `--emit ast` adds
 `declarations`: every name the source declares, each with its exact range, for an outline, go to definition
 or rename without ranges on every node.
 
