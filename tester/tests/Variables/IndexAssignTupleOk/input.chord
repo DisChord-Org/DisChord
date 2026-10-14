@@ -1,0 +1,3 @@
+var p tipo [numero, texto] es [1, "a"]
+p[1] es "x"
+consola.imprimir(p)

@@ -1,0 +1,2 @@
+var p tipo [numero, texto] es [1, "a"]
+p[0] es "x"

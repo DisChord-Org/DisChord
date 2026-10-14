@@ -1,5 +1,5 @@
 import { AnalysisRule } from "../AnalysisRule";
-import { AssignmentNode, ASTNode, BaseNode, TokenType } from "../../types";
+import { AccessNodeByIndex, AssignmentNode, ASTNode, BaseNode, FunctionNode, LiteralNode, Symbol, TokenType, VariableNode } from "../../types";
 import { isIdentificatorNode } from "../../ast.guards";
 import { TypeInferrer } from "../TypeInferrer";
 import { ChordError, ErrorLevel } from "../../../errors/ChordError";
@@ -18,9 +18,11 @@ import { ChordError, ErrorLevel } from "../../../errors/ChordError";
  * by then (see `ResolveVariableTypesRule`), so only the ones that keep it, and the annotated
  * ones, can be rejected here.
  *
- * Only checks a simple `identificador es <expr>` target — a property or index assignment
- * (`objeto.propiedad es x`, `lista[0] es x`) has no tracked `dataType` to check against, so it's
- * silently left alone, same as any other currently-untyped target.
+ * Checks a simple `identificador es <expr>` target against the variable's type, and an index
+ * assignment (`lista[0] es x`) against the type of that element when the list or tuple comes from a
+ * variable or parameter declared with a type. A property assignment (`objeto.propiedad es x`) has no
+ * tracked `dataType` to check against, so it's silently left alone, same as any other currently-untyped
+ * target.
  */
 export class ValidateAssignmentTypesRule<T extends string, N extends BaseNode<T>> extends AnalysisRule<T, N> {
     /**
@@ -31,10 +33,43 @@ export class ValidateAssignmentTypesRule<T extends string, N extends BaseNode<T>
     private readonly typeInferrer: TypeInferrer<T, N> = new TypeInferrer(this.context);
 
     /**
+     * The variables and parameters declared with a type. An element of a list or tuple is only checked
+     * on assignment through one of these: one whose type was inferred stays free to change, as the
+     * variable itself does.
+     * @private
+     * @readonly
+     */
+    private readonly annotated: Set<Symbol> = new Set();
+
+    /**
      * @override
      */
     check (nodes: ASTNode<T, N>[]): void {
+        this.walkScoped(nodes, current => this.collectAnnotated(current));
         this.walkScoped(nodes, current => this.enter(current));
+    }
+
+    /**
+     * Records the symbol of a variable or parameter that was declared with a type, looked up with its
+     * scope open.
+     * @private
+     */
+    private collectAnnotated (node: ASTNode<T, N>): void {
+        const symbolTable = this.context.symbolTable;
+
+        if (node.type === TokenType.VARIABLE && (node as VariableNode<T, N>).dataType) {
+            const symbol = symbolTable.lookup((node as VariableNode<T, N>).id);
+            if (symbol) this.annotated.add(symbol);
+        }
+
+        if (node.type === TokenType.Funcion) {
+            const fn = node as FunctionNode<T, N>;
+
+            fn.params.forEach((param, index) => {
+                const symbol = fn.paramTypes?.[index] ? symbolTable.lookup(param) : undefined;
+                if (symbol) this.annotated.add(symbol);
+            });
+        }
     }
 
     /**
@@ -62,6 +97,11 @@ export class ValidateAssignmentTypesRule<T extends string, N extends BaseNode<T>
      * target's resolved type.
      */
     private validateAssignment (node: AssignmentNode<T, N>): void {
+        if (node.left.type === TokenType.ACCESO_POR_INDICE) {
+            this.validateElementAssignment(node, node.left as AccessNodeByIndex<T, N>);
+            return;
+        }
+
         if (!isIdentificatorNode(node.left)) return;
 
         const declaredType = this.context.symbolTable.lookup(node.left.value)?.dataType;
@@ -75,5 +115,43 @@ export class ValidateAssignmentTypesRule<T extends string, N extends BaseNode<T>
             message: `La variable '${node.left.value}' es de tipo '${declaredType.format()}' pero se le asignó un valor de tipo '${assignedType.format()}'`,
             location: node.location
         });
+    }
+
+    /**
+     * Checks an assignment to an element (`notas[0] es "x"`) against the type of that element, when it
+     * comes from a variable or parameter declared with a type: the element type of its list or the type
+     * at that position of its tuple. A list whose type was inferred is left alone.
+     * @private
+     * @throws {ChordError} If the assigned value's type isn't assignable to the element's.
+     */
+    private validateElementAssignment (node: AssignmentNode<T, N>, target: AccessNodeByIndex<T, N>): void {
+        let root: ASTNode<T, N> = target;
+        while (root.type === TokenType.ACCESO_POR_INDICE) root = (root as AccessNodeByIndex<T, N>).object;
+
+        const symbol = isIdentificatorNode(root) ? this.context.symbolTable.lookup(root.value) : undefined;
+        if (!symbol || !this.annotated.has(symbol)) return;
+
+        const elementType = this.typeInferrer.infer(target);
+        const assignedType = elementType ? this.typeInferrer.infer(node.assignment) : undefined;
+        if (!elementType || !assignedType) return;
+
+        if (!elementType.isAssignableFrom(assignedType)) throw new ChordError({
+            phase: ErrorLevel.Analysis,
+            message: `La variable '${this.describe(target)}' es de tipo '${elementType.format()}' pero se le asignó un valor de tipo '${assignedType.format()}'`,
+            location: node.location
+        });
+    }
+
+    /**
+     * @returns The target as written, `notas[0]`; an index that isn't a literal is shown as `…`.
+     * @private
+     */
+    private describe (target: ASTNode<T, N>): string {
+        if (target.type !== TokenType.ACCESO_POR_INDICE) return isIdentificatorNode(target) ? target.value : '…';
+
+        const access = target as AccessNodeByIndex<T, N>;
+        const index = access.index.type === TokenType.LITERAL ? (access.index as LiteralNode<T>).raw : '…';
+
+        return `${this.describe(access.object)}[${index}]`;
     }
 }
