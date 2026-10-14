@@ -91,7 +91,7 @@ export class Generator<T extends string, N extends BaseNode<T>> extends Generato
      * JavaScript string.
      */
     public generate(): string {
-        const body = this.nodes.map(node => this.visitStatement(node)).join('\n');
+        const body = this.nodes.map(node => this.visitStatement(node) + ';').join('\n');
 
         return `\n${body}\n`;
     }

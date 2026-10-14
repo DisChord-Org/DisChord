@@ -22,5 +22,4 @@ export default class UnoCommand extends Command {
         x = 'b';
     }
 }
-
 x = 2;
