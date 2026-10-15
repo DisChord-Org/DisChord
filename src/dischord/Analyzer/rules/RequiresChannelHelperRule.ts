@@ -1,9 +1,8 @@
 import { AnalysisRule } from "../../../chord/Analyzer/AnalysisRule";
 import { walkAST } from "../../../chord/walkAST";
 import { SharedModuleImporter } from "../../../chord/Analyzer/SharedModuleImporter";
-import { ImportNode } from "../../../chord/model/types";
 import { ChannelActionNode, DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType } from "../../types";
-import { channelHelperNames, channelsModuleContent, channelsModulePath } from "../../corelib";
+import { channelHelperNames, channelsModule } from "../../corelib";
 
 /**
  * Detects, over the complete AST, which channel actions the file performs and inserts a real,
@@ -26,6 +25,6 @@ export class RequiresChannelHelperRule extends AnalysisRule<DisChordNodeType, Di
 
         if (used.size === 0) return;
 
-        this.sharedModules.insert(nodes, { path: channelsModulePath, content: channelsModuleContent }, [ ...used ]);
+        this.sharedModules.insert(nodes, channelsModule, [ ...used ]);
     }
 }

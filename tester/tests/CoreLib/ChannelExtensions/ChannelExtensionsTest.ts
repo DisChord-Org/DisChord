@@ -3,7 +3,7 @@ import os from "node:os";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { Test } from "../../../Test";
-import { channelExtensionsModuleContent, channelPropertyNames } from "../../../../src/dischord/corelib";
+import { channelExtensionsModule, channelPropertyNames } from "../../../../src/dischord/corelib";
 
 /**
  * @class ChannelExtensionsTest
@@ -42,7 +42,7 @@ export class ChannelExtensionsTest extends Test {
             `);
 
             const file = path.join(directory, 'channelExtensions.mjs');
-            fs.writeFileSync(file, channelExtensionsModuleContent);
+            fs.writeFileSync(file, channelExtensionsModule.content);
             await import(pathToFileURL(file).href);
 
             const { BaseNoEditableChannel } = await import(pathToFileURL(path.join(stub, 'index.js')).href);

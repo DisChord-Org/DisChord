@@ -3,7 +3,7 @@ import os from "node:os";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { Test } from "../../../Test";
-import { channelsModuleContent } from "../../../../src/dischord/corelib";
+import { channelsModule } from "../../../../src/dischord/corelib";
 
 type Helpers = {
     getChannel: (ctx: any, channel: any, guild: any) => Promise<any>;
@@ -48,7 +48,7 @@ export class ChannelsReadRuntimeTest extends Test {
 
     private async load (): Promise<Helpers> {
         const file = path.join(this.directory, 'channels.mjs');
-        fs.writeFileSync(file, channelsModuleContent);
+        fs.writeFileSync(file, channelsModule.content);
 
         return await import(pathToFileURL(file).href) as Helpers;
     }

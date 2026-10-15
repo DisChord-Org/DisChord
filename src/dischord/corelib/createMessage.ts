@@ -1,12 +1,9 @@
-/**
- * Path, relative to the project's `dist` directory, where `createMessageModuleContent` is
- * written. Shared by `CompileCommand` (which writes the file there) and any generator that
- * needs to import it, so both sides agree on the location from a single source of truth.
- * @type {string}
- */
-export const createMessageModulePath = 'lib/createMessage.js';
+import { SharedModule } from "../../chord/model/SharedModule";
 
 /**
+ * A shared module: its `path`, relative to the project's `dist` directory, where `CompileCommand` writes it,
+ * and its `content`.
+ *
  * Raw JavaScript string content for the shared, standalone `createMessage` runtime module.
  * Written once to `dist/lib/createMessage.js` by `CompileCommand` (only when at least one
  * compiled file actually needs it) and imported by any command/event file that calls it,
@@ -20,9 +17,11 @@ export const createMessageModulePath = 'lib/createMessage.js';
  * @param {unknown} [interactionContext=null] - Execution context when triggered from interactive components.
  * @returns {Promise<unknown>} Resolves with the dispatched message outcome or interaction response.
  * @throws {Error} Throws an error if no valid target channel or messaging execution context is available.
- * * @type {string}
+ * * @type {SharedModule}
  */
-export const createMessageModuleContent = `
+export const createMessageModule: SharedModule = {
+    path: 'lib/createMessage.js',
+    content: `
     export const createMessage = async (channel, options, interactionContext, ctx, user) => {
         const { cliente, contexto, mensaje } = ctx || {};
 
@@ -61,4 +60,5 @@ export const createMessageModuleContent = `
 
         throw new Error("DisChord Error: No se pudo enviar el mensaje. Falta el parámetro 'canal' o no hay un contexto de respuesta (comando/mensaje).");
     };
-`;
+`
+};

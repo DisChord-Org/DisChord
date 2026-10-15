@@ -3,7 +3,7 @@ import os from "node:os";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { Test } from "../../../Test";
-import { channelsModuleContent, channelQuota, channelQuotaMaxTier, channelQuotaWindowMinutes } from "../../../../src/dischord/corelib";
+import { channelsModule, channelQuota, channelQuotaMaxTier, channelQuotaWindowMinutes } from "../../../../src/dischord/corelib";
 
 type Helpers = {
     createChannel: (ctx: any, guild: any, body: any) => Promise<any>;
@@ -56,7 +56,7 @@ export class ChannelsRuntimeTest extends Test {
     /** A fresh instance of the module, so its quota counters start empty. */
     private async load (): Promise<Helpers> {
         const file = path.join(this.directory, `channels-${this.loaded++}.mjs`);
-        fs.writeFileSync(file, channelsModuleContent);
+        fs.writeFileSync(file, channelsModule.content);
 
         return await import(pathToFileURL(file).href) as Helpers;
     }

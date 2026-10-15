@@ -8,7 +8,7 @@ import { Test } from "../../../Test";
  * literal identifier `usuario` — `mencion.nombre` compiled to itself unchanged and returned
  * `undefined` at runtime, since no such property exists on Seyfert's real `User`/`GuildMember`.
  * Fixed by moving the translation from a compile-time, identifier-name-keyed rewrite into a
- * runtime prototype patch (`RequiresUserExtensionsRule` / `userExtensionsModuleContent`) that
+ * runtime prototype patch (`RequiresUserExtensionsRule` / `userExtensionsModule`) that
  * defines the Spanish getters directly on `User`/`GuildMember`, so they work no matter what the
  * variable holding one is called.
  */

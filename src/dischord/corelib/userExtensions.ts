@@ -1,8 +1,9 @@
 import { corelib, DisChordClassesEnum } from "./corelib.data";
+import { SharedModule } from "../../chord/model/SharedModule";
 
 /**
  * Spanish property name -> the real Seyfert `User` property/method it reads, taken from the
- * `Usuario` class of `corelib`. `userExtensionsModuleContent` below generates its runtime getters
+ * `Usuario` class of `corelib`. `userExtensionsModule` below generates its runtime getters
  * straight from this map (so the two can never drift apart), and `RequiresUserExtensionsRule`
  * scans for these same keys to decide whether a file needs the import.
  * @type {Readonly<Record<string, string>>}
@@ -12,15 +13,9 @@ export const userPropertyNames: Readonly<Record<string, string>> = Object.fromEn
 );
 
 /**
- * Path, relative to the project's `dist` directory, where `userExtensionsModuleContent` is
- * written. Shared by `CompileCommand` (which writes the file there) and
- * `RequiresUserExtensionsRule` (which imports it), so both sides agree on the location from a
- * single source of truth.
- * @type {string}
- */
-export const userExtensionsModulePath = 'lib/userExtensions.js';
-
-/**
+ * A shared module: its `path`, relative to the project's `dist` directory, where `CompileCommand` writes it,
+ * and its `content`.
+ *
  * Raw JavaScript string content for the shared runtime module that patches Seyfert's `User` and
  * `GuildMember` prototypes with Spanish-named getters (`usuario.nombre`, `mencion.colorPerfil`, ...).
  *
@@ -35,9 +30,11 @@ export const userExtensionsModulePath = 'lib/userExtensions.js';
  * `InteractionGuildMember extends GuildMember` — so patching both `User` and `GuildMember`
  * prototypes (with `GuildMember`'s getters delegating to `.user`) covers every shape a resolved
  * `"usuario"` option or event/command's `usuario` parameter can actually take.
- * @type {string}
+ * @type {SharedModule}
  */
-export const userExtensionsModuleContent = `
+export const userExtensionsModule: SharedModule = {
+    path: 'lib/userExtensions.js',
+    content: `
     import { User, GuildMember } from 'seyfert';
 
     const userAccessors = new Map([
@@ -48,4 +45,5 @@ ${Object.entries(userPropertyNames).map(([spanish, real]) => `        ['${spanis
         Object.defineProperty(User.prototype, name, { get() { return resolve(this); }, configurable: true });
         Object.defineProperty(GuildMember.prototype, name, { get() { return resolve(this.user); }, configurable: true });
     }
-`;
+`
+};

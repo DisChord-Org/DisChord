@@ -1,14 +1,14 @@
 import { AnalysisRule } from "../../../chord/Analyzer/AnalysisRule";
 import { walkAST } from "../../../chord/walkAST";
 import { SharedModuleImporter } from "../../../chord/Analyzer/SharedModuleImporter";
-import { ImportNode, LiteralNode, ODBNode, TokenType } from "../../../chord/model/types";
+import { LiteralNode, ODBNode, TokenType } from "../../../chord/model/types";
 import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType } from "../../types";
-import { channelExtensionsModuleContent, channelExtensionsModulePath } from "../../corelib";
+import { channelExtensionsModule } from "../../corelib";
 
 /**
  * Detects, over the complete AST, whether the file can receive a channel object whose Spanish
  * properties (`c.nombre`, `c.tipo`, ...) need the runtime getters of
- * `channelExtensionsModuleContent`, and if so inserts a synthetic `ImportNode` for it — the same
+ * `channelExtensionsModule.content`, and if so inserts a synthetic `ImportNode` for it — the same
  * lowering step `RequiresUserExtensionsRule` does for users.
  *
  * Two triggers, as there:
@@ -43,6 +43,6 @@ export class RequiresChannelExtensionsRule extends AnalysisRule<DisChordNodeType
 
         if (!needsExtensions) return;
 
-        this.sharedModules.insert(nodes, { path: channelExtensionsModulePath, content: channelExtensionsModuleContent });
+        this.sharedModules.insert(nodes, channelExtensionsModule);
     }
 }

@@ -1,15 +1,15 @@
 import { AnalysisRule } from "../../../chord/Analyzer/AnalysisRule";
 import { walkAST } from "../../../chord/walkAST";
 import { SharedModuleImporter } from "../../../chord/Analyzer/SharedModuleImporter";
-import { ImportNode, LiteralNode, ODBNode, TokenType } from "../../../chord/model/types";
+import { LiteralNode, ODBNode, TokenType } from "../../../chord/model/types";
 import { isAccessNode, isIdentificatorNode } from "../../../chord/ast.guards";
 import { DisChordASTNode, DisChordNode, DisChordNodeType } from "../../types";
-import { userExtensionsModuleContent, userExtensionsModulePath, userPropertyNames } from "../../corelib";
+import { userExtensionsModule, userPropertyNames } from "../../corelib";
 
 /**
  * Detects, over the *complete* AST, whether the file needs the Spanish user-data getters
  * (`usuario.nombre`, `mencion.colorPerfil`, ...) — patched onto Seyfert's `User`/`GuildMember`
- * prototypes by the shared runtime module `userExtensionsModuleContent` — and if so inserts a
+ * prototypes by the shared runtime module `userExtensionsModule.content` — and if so inserts a
  * real, synthetic `ImportNode` for it, the same "lowering" step `RequiresMessageHelperRule` and
  * `RequiresConsoleRuntimeRule` already do for their own shared modules.
  *
@@ -53,6 +53,6 @@ export class RequiresUserExtensionsRule extends AnalysisRule<DisChordNodeType, D
 
         if (!needsUserExtensions) return;
 
-        this.sharedModules.insert(nodes, { path: userExtensionsModulePath, content: userExtensionsModuleContent });
+        this.sharedModules.insert(nodes, userExtensionsModule);
     }
 }

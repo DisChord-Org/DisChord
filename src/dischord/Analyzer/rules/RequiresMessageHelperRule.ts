@@ -1,9 +1,8 @@
 import { AnalysisRule } from "../../../chord/Analyzer/AnalysisRule";
 import { walkAST } from "../../../chord/walkAST";
 import { SharedModuleImporter } from "../../../chord/Analyzer/SharedModuleImporter";
-import { ImportNode } from "../../../chord/model/types";
 import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType } from "../../types";
-import { createMessageModuleContent, createMessageModulePath } from "../../corelib";
+import { createMessageModule } from "../../corelib";
 
 /**
  * Detects, over the *complete* AST (any nesting depth — inside a `comando`/`evento`'s body, etc.),
@@ -27,6 +26,6 @@ export class RequiresMessageHelperRule extends AnalysisRule<DisChordNodeType, Di
 
         if (!needsMessageHelper) return;
 
-        this.sharedModules.insert(nodes, { path: createMessageModulePath, content: createMessageModuleContent }, [ 'createMessage' ]);
+        this.sharedModules.insert(nodes, createMessageModule, [ 'createMessage' ]);
     }
 }
