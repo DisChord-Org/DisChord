@@ -1,12 +1,7 @@
-/**
- * Path, relative to the project's `dist` directory, where `runtimeHelpersModuleContent` is
- * written. Shared by the analyzer rule that imports it and `CompileCommand`, which writes the file.
- * @type {string}
- */
-export const runtimeHelpersModulePath = 'lib/runtimeHelpers.js';
+import { SharedModule } from "../model/SharedModule";
 
 /**
- * Names `runtimeHelpersModuleContent` exports. The core library's `transpile` of a helper-backed
+ * Names `runtimeHelpersModule` exports. The core library's `transpile` of a helper-backed
  * member (or function) is one of these, so `RequiresRuntimeHelpersRule` knows which ones a file
  * uses and imports only those. They carry a `chord` prefix so they can't collide with a name the
  * user declares (a program is free to define its own `limitar`).
@@ -33,6 +28,9 @@ export const runtimeHelperNames: ReadonlySet<string> = new Set([
 export const asyncRuntimeHelperNames: ReadonlySet<string> = new Set([ 'chordEsperar' ]);
 
 /**
+ * A shared module: its `path`, relative to the project's `dist` directory, where `CompileCommand` writes it,
+ * and its `content`.
+ *
  * Raw JavaScript string content for the shared helpers that have no one-to-one JavaScript
  * equivalent (`esperar`, `Aleatorio.*`, `Mates.limitar`) and the three that dispatch on the receiver at
  * run time (`chordTiene`, `chordLimpiar`, `chordAgregar`, see `CoreLibDispatch.resolveUnionDispatch`; and
@@ -42,9 +40,11 @@ export const asyncRuntimeHelperNames: ReadonlySet<string> = new Set([ 'chordEspe
  * been emitted as (`includes`, `trim`, `push`). Written once to
  * `dist/lib/runtimeHelpers.js` (only when a compiled file uses at least one) and imported by name
  * by the files that do, instead of each one duplicating them inline.
- * @type {string}
+ * @type {SharedModule}
  */
-export const runtimeHelpersModuleContent = `
+export const runtimeHelpersModule: SharedModule = {
+    path: 'lib/runtimeHelpers.js',
+    content: `
     export function chordEsperar(ms) {
         return new Promise((resolve) => setTimeout(resolve, ms));
     }
@@ -115,4 +115,5 @@ export const runtimeHelpersModuleContent = `
     export function chordLimitar(value, min, max) {
         return Math.min(Math.max(value, Math.min(min, max)), Math.max(min, max));
     }
-` as const;
+`
+};

@@ -1,6 +1,6 @@
 import { AnalysisRule } from "../AnalysisRule";
 import { ASTNode, BaseNode, ImportNode } from "../../model/types";
-import { runtimeHelperNames, runtimeHelpersModuleContent, runtimeHelpersModulePath } from "../../corelib";
+import { runtimeHelperNames, runtimeHelpersModule } from "../../corelib";
 import { isAccessNode, isCallNode } from "../../ast.guards";
 import { SharedModuleImporter } from "../SharedModuleImporter";
 
@@ -69,6 +69,6 @@ export class RequiresRuntimeHelpersRule<T extends string, N extends BaseNode<T>>
      * @private
      */
     private insertImport (nodes: ASTNode<T, N>[], helpers: Set<string>): void {
-        this.sharedModules.insert(nodes, { path: runtimeHelpersModulePath, content: runtimeHelpersModuleContent }, [ ...helpers ].sort());
+        this.sharedModules.insert(nodes, runtimeHelpersModule, [ ...helpers ].sort());
     }
 }

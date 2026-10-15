@@ -1,6 +1,6 @@
 import { AnalysisRule } from "../AnalysisRule";
 import { ASTNode, BaseNode } from "../../model/types";
-import { consoleRuntimeModuleContent, consoleRuntimeModulePath } from "../../corelib";
+import { consoleRuntimeModule } from "../../corelib";
 import { isAccessNode, isCallNode, isIdentificatorNode } from "../../ast.guards";
 import { SharedModuleImporter } from "../SharedModuleImporter";
 
@@ -42,6 +42,6 @@ export class RequiresConsoleRuntimeRule<T extends string, N extends BaseNode<T>>
 
         if (!needsConsoleRuntime) return;
 
-        this.sharedModules.insert(nodes, { path: consoleRuntimeModulePath, content: consoleRuntimeModuleContent });
+        this.sharedModules.insert(nodes, consoleRuntimeModule);
     }
 }
