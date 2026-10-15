@@ -1,4 +1,4 @@
-import { TokenType, TokenTypeUnion, ExpressionNode, BaseNode } from "../../../types";
+import { TokenType, TokenTypeUnion, ExpressionNode, BaseNode } from "../../../model/types";
 import { SubGenerator } from "../../SubGenerator";
 
 /**
@@ -25,6 +25,11 @@ export class ExpressionVisitor<T extends string, N extends BaseNode<T>> extends 
      * @public
      */
     public visit(node: ExpressionNode<T, N>): string {
-        return `(${this.parent.visit(node.object)})`;
+        const inner = this.parent.visit(node.object);
+
+        // a boolean in an interpolated text is written with the words of the language
+        if (this.parent.context.symbolTable.marks.isBoolean(node)) return `(${inner} ? "verdadero" : "falso")`;
+
+        return `(${inner})`;
     }
 }

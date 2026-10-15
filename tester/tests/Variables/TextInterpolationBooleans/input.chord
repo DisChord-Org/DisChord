@@ -1,0 +1,7 @@
+var activo tipo booleano es verdadero
+var n tipo numero es 3
+var valor tipo cualquiera es falso
+
+var a tipo texto es "activo: {activo}, n: {n}"
+var b tipo texto es "{activo} y {no activo}"
+var c tipo texto es "sin tipo: {valor}"

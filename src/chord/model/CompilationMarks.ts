@@ -32,6 +32,11 @@ export class CompilationMarks {
     private readonly dispatchedCalls: WeakMap<object, CallDispatch> = new WeakMap();
 
     /**
+     * Expressions of an interpolated text that are a `booleano` (see {@link markBoolean}).
+     */
+    private readonly booleans: WeakSet<object> = new WeakSet();
+
+    /**
      * Records that the analyzer decided this call must be awaited, so the generator only has to
      * read the decision.
      *
@@ -104,5 +109,23 @@ export class CompilationMarks {
      */
     public dispatchOf(call: object): CallDispatch | undefined {
         return this.dispatchedCalls.get(call);
+    }
+
+    /**
+     * Records that an expression of an interpolated text is a `booleano`, so it is emitted as
+     * `verdadero`/`falso` and not as `true`/`false`.
+     *
+     * @param {object} expression - The parenthesized expression node.
+     */
+    public markBoolean(expression: object): void {
+        this.booleans.add(expression);
+    }
+
+    /**
+     * @param {object} expression - The parenthesized expression node.
+     * @returns {boolean} Whether the analyzer decided this expression is emitted as a boolean word.
+     */
+    public isBoolean(expression: object): boolean {
+        return this.booleans.has(expression);
     }
 }

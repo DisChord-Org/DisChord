@@ -1,4 +1,4 @@
-import { ASTNode, BaseNode, TokenType } from "../types";
+import { ASTNode, BaseNode, TokenType } from "../model/types";
 import { CompilationContext } from "../model/CompilationContext";
 import { AnalysisRule, AnalysisRuleClass } from "./AnalysisRule";
 import { ValidateDeclarationNamesRule } from "./rules/ValidateDeclarationNamesRule";
@@ -16,6 +16,7 @@ import { ValidateCallArgumentsRule } from "./rules/ValidateCallArgumentsRule";
 import { ResolveAwaitedCallsRule } from "./rules/ResolveAwaitedCallsRule";
 import { ResolveDispatchedCallsRule } from "./rules/ResolveDispatchedCallsRule";
 import { ResolveMemberAccessesRule } from "./rules/ResolveMemberAccessesRule";
+import { MarkInterpolatedBooleansRule } from "./rules/MarkInterpolatedBooleansRule";
 import { RequiresConsoleRuntimeRule } from "./rules/RequiresConsoleRuntimeRule";
 import { RequiresRuntimeHelpersRule } from "./rules/RequiresRuntimeHelpersRule";
 
@@ -96,6 +97,9 @@ export class Analyzer<T extends string, N extends BaseNode<T>> {
 
         // Decides the name each member access is emitted with; needs the types above.
         ResolveMemberAccessesRule,
+
+        // Marks the booleans of interpolated texts; needs the types above.
+        MarkInterpolatedBooleansRule,
 
         // Lowering rules — independent of the 3-pass binding model above, they don't touch
         // SymbolTable at all.
