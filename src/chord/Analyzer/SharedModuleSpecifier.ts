@@ -1,13 +1,10 @@
 import path from "path";
 import { CompilationContext } from "../model/CompilationContext";
+import { ImportSpecifier } from "../../utils/ImportSpecifier";
 
 /**
- * Computes the relative specifier (always starting with `./` or `../`, with `/` separators) with which
- * one file imports another, in the one place that does it: the shared modules a rule inserts an import
- * of, and the imports a generated file re-relativizes from the project root.
- *
- * Lives in the Analyzer folder because `AnalysisRule`s are its main callers: a rule needs it to insert a
- * synthetic shared-module import correctly, before generation ever runs.
+ * The import specifier of a shared module, as a rule inserts it: it needs the compilation context to
+ * know where the file being compiled is written. The path arithmetic itself is `ImportSpecifier`'s.
  * @class SharedModuleSpecifier
  */
 export class SharedModuleSpecifier {
@@ -22,17 +19,6 @@ export class SharedModuleSpecifier {
      * @returns {string} A relative import specifier.
      */
     public static of<T extends string> (context: CompilationContext<T>, modulePathRelativeToDist: string): string {
-        return SharedModuleSpecifier.relative(context.outputDir, path.join(context.distDir, modulePathRelativeToDist));
-    }
-
-    /**
-     * @param {string} fromDirectory - Absolute path of the directory the import is written from.
-     * @param {string} absoluteTarget - Absolute path of the imported file.
-     * @returns {string} The specifier of `absoluteTarget` from `fromDirectory`, with `/` separators and a leading `./` when it doesn't climb.
-     */
-    public static relative (fromDirectory: string, absoluteTarget: string): string {
-        const specifier = path.relative(fromDirectory, absoluteTarget).split(path.sep).join('/');
-
-        return specifier.startsWith('.') ? specifier : `./${specifier}`;
+        return ImportSpecifier.relative(context.outputDir, path.join(context.distDir, modulePathRelativeToDist));
     }
 }
