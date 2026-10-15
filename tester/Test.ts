@@ -68,6 +68,15 @@ export abstract class Test {
     public readonly expectedError?: string;
 
     /**
+     * The files the last `compile()` asked to write besides the compiled one (`seyfert.config.mjs`,
+     * the shared runtime modules), by absolute path.
+     *
+     * @type {Map<string, string>}
+     * @protected
+     */
+    protected compiledExtraFiles: Map<string, string> = new Map();
+
+    /**
      * The directory of this test's fixture.
      *
      * @type {Directory}
@@ -177,6 +186,7 @@ export abstract class Test {
 
         const generator = new DisChordGenerator(context, ast);
         const output = generator.generate();
+        this.compiledExtraFiles = context.extraFiles;
 
         return { ast, output };
     }

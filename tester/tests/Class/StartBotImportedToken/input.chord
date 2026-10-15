@@ -1,0 +1,7 @@
+importar { TOKEN } desde "lib:ent"
+importar { PREFIJO } desde "./otro"
+
+encender bot {
+    token TOKEN
+    prefijo PREFIJO()
+}
