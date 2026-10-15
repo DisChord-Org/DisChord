@@ -2,6 +2,7 @@ import path from "node:path";
 import { CompilationContext } from "../model/CompilationContext";
 import { ASTNode, BaseNode, ImportNode, TokenType } from "../model/types";
 import { ImportSpecifier } from "../../utils/ImportSpecifier";
+import { SharedModule } from "../model/SharedModule";
 
 /**
  * Inserts the import of a shared module (one the compiler writes once to `dist/`, like the console
@@ -25,10 +26,10 @@ export class SharedModuleImporter<T extends string> {
      * destructured (`import { a, b } from './x.js'`).
      * @template {BaseNode<T>} N - Extensible abstract syntax tree node layout.
      * @param {ASTNode<T, N>[]} nodes - The top-level AST nodes of the file, which the import is put in front of.
-     * @param {{ path: string; content: string }} module - The module: its path relative to `dist/` and its content.
+     * @param {SharedModule} module - The module: its path relative to `dist/` and its content.
      * @param {readonly string[]} [identifiers=[]] - The names imported from it.
      */
-    public insert<N extends BaseNode<T>> (nodes: ASTNode<T, N>[], module: { path: string; content: string }, identifiers: readonly string[] = []): void {
+    public insert<N extends BaseNode<T>> (nodes: ASTNode<T, N>[], module: SharedModule, identifiers: readonly string[] = []): void {
         const importNode: ImportNode<T> = {
             type: TokenType.Importar,
             identificators: [ ...identifiers ],
