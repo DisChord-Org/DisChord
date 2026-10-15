@@ -1,7 +1,6 @@
-import path from "node:path";
 import { AnalysisRule } from "../../../chord/Analyzer/AnalysisRule";
 import { walkAST } from "../../../chord/walkAST";
-import { SharedModuleSpecifier } from "../../../chord/Analyzer/SharedModuleSpecifier";
+import { SharedModuleImporter } from "../../../chord/Analyzer/SharedModuleImporter";
 import { ImportNode, LiteralNode, ODBNode, TokenType } from "../../../chord/model/types";
 import { isAccessNode, isIdentificatorNode } from "../../../chord/ast.guards";
 import { DisChordASTNode, DisChordNode, DisChordNodeType } from "../../types";
@@ -26,6 +25,8 @@ import { userExtensionsModuleContent, userExtensionsModulePath, userPropertyName
  *   never actually reads any of its Spanish-named user data.
  */
 export class RequiresUserExtensionsRule extends AnalysisRule<DisChordNodeType, DisChordNode> {
+    private readonly sharedModules = new SharedModuleImporter(this.context);
+
     /**
      * @override
      */
@@ -52,16 +53,6 @@ export class RequiresUserExtensionsRule extends AnalysisRule<DisChordNodeType, D
 
         if (!needsUserExtensions) return;
 
-        const importNode: ImportNode<DisChordNodeType> = {
-            type: TokenType.Importar,
-            identificators: [],
-            isDestructured: false,
-            path: SharedModuleSpecifier.of(this.context, userExtensionsModulePath),
-            location: { line: 0, column: 0 }
-        };
-
-        nodes.unshift(importNode);
-
-        this.context.extraFiles.set(path.join(this.context.distDir, userExtensionsModulePath), userExtensionsModuleContent);
+        this.sharedModules.insert(nodes, { path: userExtensionsModulePath, content: userExtensionsModuleContent });
     }
 }

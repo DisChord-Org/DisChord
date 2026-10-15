@@ -1,7 +1,6 @@
-import path from "node:path";
 import { AnalysisRule } from "../../../chord/Analyzer/AnalysisRule";
 import { walkAST } from "../../../chord/walkAST";
-import { SharedModuleSpecifier } from "../../../chord/Analyzer/SharedModuleSpecifier";
+import { SharedModuleImporter } from "../../../chord/Analyzer/SharedModuleImporter";
 import { ImportNode, LiteralNode, ODBNode, TokenType } from "../../../chord/model/types";
 import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType } from "../../types";
 import { channelExtensionsModuleContent, channelExtensionsModulePath } from "../../corelib";
@@ -20,6 +19,8 @@ import { channelExtensionsModuleContent, channelExtensionsModulePath } from "../
  * The implicit `canal` identifier does not need it: its members are rewritten at compile time.
  */
 export class RequiresChannelExtensionsRule extends AnalysisRule<DisChordNodeType, DisChordNode> {
+    private readonly sharedModules = new SharedModuleImporter(this.context);
+
     /**
      * @override
      */
@@ -42,16 +43,6 @@ export class RequiresChannelExtensionsRule extends AnalysisRule<DisChordNodeType
 
         if (!needsExtensions) return;
 
-        const importNode: ImportNode<DisChordNodeType> = {
-            type: TokenType.Importar,
-            identificators: [],
-            isDestructured: false,
-            path: SharedModuleSpecifier.of(this.context, channelExtensionsModulePath),
-            location: { line: 0, column: 0 }
-        };
-
-        nodes.unshift(importNode);
-
-        this.context.extraFiles.set(path.join(this.context.distDir, channelExtensionsModulePath), channelExtensionsModuleContent);
+        this.sharedModules.insert(nodes, { path: channelExtensionsModulePath, content: channelExtensionsModuleContent });
     }
 }

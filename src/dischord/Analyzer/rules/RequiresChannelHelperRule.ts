@@ -1,8 +1,7 @@
-import path from "node:path";
 import { AnalysisRule } from "../../../chord/Analyzer/AnalysisRule";
 import { walkAST } from "../../../chord/walkAST";
-import { SharedModuleSpecifier } from "../../../chord/Analyzer/SharedModuleSpecifier";
-import { ImportNode, TokenType } from "../../../chord/model/types";
+import { SharedModuleImporter } from "../../../chord/Analyzer/SharedModuleImporter";
+import { ImportNode } from "../../../chord/model/types";
 import { ChannelActionNode, DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType } from "../../types";
 import { channelHelperNames, channelsModuleContent, channelsModulePath } from "../../corelib";
 
@@ -13,6 +12,8 @@ import { channelHelperNames, channelsModuleContent, channelsModulePath } from ".
  * `ChannelActionVisitor` never has to decide whether to import them.
  */
 export class RequiresChannelHelperRule extends AnalysisRule<DisChordNodeType, DisChordNode> {
+    private readonly sharedModules = new SharedModuleImporter(this.context);
+
     /**
      * @override
      */
@@ -25,16 +26,6 @@ export class RequiresChannelHelperRule extends AnalysisRule<DisChordNodeType, Di
 
         if (used.size === 0) return;
 
-        const importNode: ImportNode<DisChordNodeType> = {
-            type: TokenType.Importar,
-            identificators: [ ...used ],
-            isDestructured: true,
-            path: SharedModuleSpecifier.of(this.context, channelsModulePath),
-            location: { line: 0, column: 0 }
-        };
-
-        nodes.unshift(importNode);
-
-        this.context.extraFiles.set(path.join(this.context.distDir, channelsModulePath), channelsModuleContent);
+        this.sharedModules.insert(nodes, { path: channelsModulePath, content: channelsModuleContent }, [ ...used ]);
     }
 }
