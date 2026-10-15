@@ -5,7 +5,7 @@ import { intentsMap } from "../../constants/mappings";
 import { SubGenerator } from "../../../../chord/Generator/SubGenerator";
 import { IdentificatorNode, ImportNode, TokenType, TokenTypeUnion } from "../../../../chord/model/types";
 import { walkAST } from "../../../../chord/walkAST";
-import { SharedModuleSpecifier } from "../../../../chord/Analyzer/SharedModuleSpecifier";
+import { ImportSpecifier } from "../../../../utils/ImportSpecifier";
 import { ImportVisitor } from "../../../../chord/Generator/visitors/modularity/ImportVisitor";
 
 /**
@@ -165,7 +165,7 @@ export default class ClietInitVisitor extends SubGenerator<DisChordNodeType, Dis
             if (!absoluteTarget.endsWith('.js')) absoluteTarget += '.js';
         }
 
-        return SharedModuleSpecifier.relative(projectRoot.absolutePath, absoluteTarget);
+        return ImportSpecifier.relative(projectRoot.absolutePath, absoluteTarget);
     }
 
     /**
