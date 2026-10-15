@@ -1,9 +1,8 @@
-import path from "node:path";
 import { AnalysisRule } from "../AnalysisRule";
-import { ASTNode, BaseNode, ImportNode, TokenType } from "../../model/types";
+import { ASTNode, BaseNode } from "../../model/types";
 import { consoleRuntimeModuleContent, consoleRuntimeModulePath } from "../../corelib";
 import { isAccessNode, isCallNode, isIdentificatorNode } from "../../ast.guards";
-import { SharedModuleSpecifier } from "../SharedModuleSpecifier";
+import { SharedModuleImporter } from "../SharedModuleImporter";
 
 /**
  * Detects, over the *complete* AST (any nesting depth — inside functions, classes, conditions,
@@ -17,6 +16,8 @@ import { SharedModuleSpecifier } from "../SharedModuleSpecifier";
  * the same generic path any phase uses to ask for an extra file.
  */
 export class RequiresConsoleRuntimeRule<T extends string, N extends BaseNode<T>> extends AnalysisRule<T, N> {
+    private readonly sharedModules: SharedModuleImporter<T> = new SharedModuleImporter(this.context);
+
     /**
      * @override
      */
@@ -41,16 +42,6 @@ export class RequiresConsoleRuntimeRule<T extends string, N extends BaseNode<T>>
 
         if (!needsConsoleRuntime) return;
 
-        const importNode: ImportNode<T> = {
-            type: TokenType.Importar,
-            identificators: [],
-            path: SharedModuleSpecifier.of(this.context, consoleRuntimeModulePath),
-            isDestructured: false,
-            location: { line: 0, column: 0 }
-        };
-
-        nodes.unshift(importNode);
-
-        this.context.extraFiles.set(path.join(this.context.distDir, consoleRuntimeModulePath), consoleRuntimeModuleContent);
+        this.sharedModules.insert(nodes, { path: consoleRuntimeModulePath, content: consoleRuntimeModuleContent });
     }
 }
