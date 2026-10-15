@@ -13,6 +13,8 @@ import { BDOInferrer } from "./inferrers/BDOInferrer";
 import { ThisInferrer } from "./inferrers/ThisInferrer";
 import { IndexInferrer } from "./inferrers/IndexInferrer";
 import { ExpressionInferrer } from "./inferrers/ExpressionInferrer";
+import { UnaryInferrer } from "./inferrers/UnaryInferrer";
+import { NoUnaryInferrer } from "./inferrers/NoUnaryInferrer";
 
 /**
  * Dispatches a `DataType` inference request to the `SubInferrer` registered for the node's shape —
@@ -45,7 +47,8 @@ export class TypeInferrer<T extends string, N extends BaseNode<T>> {
         LiteralInferrer, IdentifierInferrer, BinaryExpressionInferrer,
         ListInferrer, CallInferrer, AccessInferrer,
         NewInferrer, BDOInferrer, ThisInferrer,
-        IndexInferrer, ExpressionInferrer
+        IndexInferrer, ExpressionInferrer,
+        UnaryInferrer, NoUnaryInferrer
     ];
 
     /**

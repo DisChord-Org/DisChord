@@ -5,3 +5,5 @@ var valor tipo cualquiera es falso
 var a tipo texto es "activo: {activo}, n: {n}"
 var b tipo texto es "{activo} y {no activo}"
 var c tipo texto es "sin tipo: {valor}"
+
+var d tipo texto es "mayor: {n mayor 2}, tipo: {tipo n}"
