@@ -1,9 +1,8 @@
-import path from "node:path";
 import { AnalysisRule } from "../AnalysisRule";
-import { ASTNode, BaseNode, ImportNode, TokenType } from "../../model/types";
+import { ASTNode, BaseNode, ImportNode } from "../../model/types";
 import { runtimeHelperNames, runtimeHelpersModuleContent, runtimeHelpersModulePath } from "../../corelib";
 import { isAccessNode, isCallNode } from "../../ast.guards";
-import { SharedModuleSpecifier } from "../SharedModuleSpecifier";
+import { SharedModuleImporter } from "../SharedModuleImporter";
 
 /**
  * Detects, over the *complete* AST, which runtime helpers the file uses (a core library member or
@@ -15,6 +14,8 @@ import { SharedModuleSpecifier } from "../SharedModuleSpecifier";
  * override. A file that uses none gets no import.
  */
 export class RequiresRuntimeHelpersRule<T extends string, N extends BaseNode<T>> extends AnalysisRule<T, N> {
+    private readonly sharedModules = new SharedModuleImporter(this.context);
+
     /**
      * @override
      */
@@ -68,16 +69,6 @@ export class RequiresRuntimeHelpersRule<T extends string, N extends BaseNode<T>>
      * @private
      */
     private insertImport (nodes: ASTNode<T, N>[], helpers: Set<string>): void {
-        const importNode: ImportNode<T> = {
-            type: TokenType.Importar,
-            identificators: [ ...helpers ].sort(),
-            isDestructured: true,
-            path: SharedModuleSpecifier.of(this.context, runtimeHelpersModulePath),
-            location: { line: 0, column: 0 }
-        };
-
-        nodes.unshift(importNode);
-
-        this.context.extraFiles.set(path.join(this.context.distDir, runtimeHelpersModulePath), runtimeHelpersModuleContent);
+        this.sharedModules.insert(nodes, { path: runtimeHelpersModulePath, content: runtimeHelpersModuleContent }, [ ...helpers ].sort());
     }
 }
