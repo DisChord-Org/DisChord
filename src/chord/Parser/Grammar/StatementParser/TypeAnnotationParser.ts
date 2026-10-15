@@ -1,4 +1,4 @@
-import { BaseNode, PrimitiveType, PrimitiveTypeName, TokenType } from "../../../types";
+import { BaseNode, PrimitiveType, PrimitiveTypeName, TokenType } from "../../../model/types";
 import { AnyDataType, ArrayDataType, DataType, PrimitiveDataType, TupleDataType, UnionDataType, UserClassDataType, VoidDataType } from "../../../model/DataType";
 
 import { Parser } from "../../Parser";

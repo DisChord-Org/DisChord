@@ -9,7 +9,7 @@ import { Stdin } from '../../utils/Stdin';
 import { Directory } from '../../utils/Directory';
 import { ExitCode } from '../ExitCode';
 import { FileCompiler, FileCompilation } from './FileCompiler';
-import { Location } from '../../chord/types';
+import { Location } from '../../chord/model/types';
 import { RunCommand } from './RunCommand';
 
 /**

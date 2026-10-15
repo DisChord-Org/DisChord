@@ -1,4 +1,4 @@
-import { ASTNode, BaseNode, LiteralNode, TokenType } from "./types";
+import { ASTNode, BaseNode, LiteralNode, TokenType } from "./model/types";
 
 /**
  * @file BDOSchema.ts

@@ -1,6 +1,6 @@
 import { AnalysisRule } from "../AnalysisRule";
 import { walkAST } from "../../walkAST";
-import { ASTNode, BaseNode, ClassNode, FunctionNode, TokenType } from "../../types";
+import { ASTNode, BaseNode, ClassNode, FunctionNode, TokenType } from "../../model/types";
 import { isFunctionNode } from "../../ast.guards";
 import { ChordError, ErrorLevel } from "../../../errors/ChordError";
 

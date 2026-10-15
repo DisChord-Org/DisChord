@@ -1,4 +1,4 @@
-import { ListNode, BaseNode, TokenType, TokenTypeUnion, ASTNode } from "../../../types";
+import { ListNode, BaseNode, TokenType, TokenTypeUnion, ASTNode } from "../../../model/types";
 import { SubGenerator } from "../../SubGenerator";
 
 /**

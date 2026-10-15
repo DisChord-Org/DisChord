@@ -6,7 +6,7 @@ import { SymbolTable } from '../../chord/model/SymbolsTable';
 import { CodeProvider } from '../../chord/CodeProvider';
 import { KeyWords } from '../../chord/KeywordsManager';
 import { Lexer } from '../../chord/Lexer';
-import { DeclaredName, Token } from '../../chord/types';
+import { DeclaredName, Token } from '../../chord/model/types';
 import { disChordCoreLibUtils, disChordCoreLibDispatch } from '../../dischord/corelib';
 import { DisChordParser } from '../../dischord/Parser/Parser';
 import { DisChordAnalyzer } from '../../dischord/Analyzer/Analyzer';

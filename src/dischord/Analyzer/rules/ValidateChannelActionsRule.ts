@@ -2,7 +2,7 @@ import { AnalysisRule } from "../../../chord/Analyzer/AnalysisRule";
 import { walkAST } from "../../../chord/walkAST";
 import { BDOValidator } from "../../../chord/Analyzer/BDOValidator";
 import { fieldKeys } from "../../../chord/BDOSchema";
-import { TokenType } from "../../../chord/types";
+import { TokenType } from "../../../chord/model/types";
 import { DisChordError, ErrorLevel } from "../../../errors/ChordError";
 import { ChannelAction, ChannelActionNode, ChannelActionObject, ChannelProperty, ChannelWriteActions, CommandNode, DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType, EventNode } from "../../types";
 import { ChannelActionSchemas } from "../../Generator/constants/schemas";

@@ -1,4 +1,4 @@
-import { TokenTypeUnion } from "./types";
+import { TokenTypeUnion } from "./model/types";
 
 /**
  * Registry and manager for protected reserved keywords and syntax identifiers within the Chord language.

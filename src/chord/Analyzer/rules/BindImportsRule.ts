@@ -1,7 +1,7 @@
 import { AnalysisRule } from "../AnalysisRule";
 import { walkAST } from "../../walkAST";
 import { isImportNode } from "../../ast.guards";
-import { ASTNode, BaseNode, SymbolKind } from "../../types";
+import { ASTNode, BaseNode, SymbolKind } from "../../model/types";
 
 /**
  * Pass 1 of the Analyzer's binding model ("Imports"): walks the complete AST and registers every

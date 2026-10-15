@@ -1,4 +1,4 @@
-import { Symbol } from "../types";
+import { Symbol } from "./types";
 
 /**
  * The classes declared in the file, by name: each one's parent class and the members it declares

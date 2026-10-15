@@ -1,4 +1,4 @@
-import { ASTNode } from "../../../chord/types";
+import { ASTNode } from "../../../chord/model/types";
 import { BDOSchema, FieldKind, FieldSpec, JSFallback, literalStringValue } from "../../../chord/BDOSchema";
 import { ApplicationIntegrationType, ButtonStyles, ChannelAction, ChannelPayload, ChannelProperty, DisChordNode, DisChordNodeType, InteractionContextType } from "../../types";
 import { ChannelTypes, ContextTypes, DisChordTypeMap, IgnoreCommandTypes, IntegrationTypes, intentsMap } from "./mappings";

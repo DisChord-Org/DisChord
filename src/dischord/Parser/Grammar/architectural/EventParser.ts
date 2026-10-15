@@ -1,6 +1,6 @@
 import { DisChordDeclarationKind, DisChordNode, DisChordNodeType, DisChordTokenType, EventNode } from "../../../types";
 import { SubParser } from "../../../../chord/Parser/SubParser";
-import { TokenType, TokenTypeUnion } from "../../../../chord/types";
+import { TokenType, TokenTypeUnion } from "../../../../chord/model/types";
 import { BlockParser } from "../../../../chord/Parser/Grammar/BlockParser";
 import { Parser } from "../../../../chord/Parser/Parser";
 

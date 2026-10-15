@@ -1,4 +1,4 @@
-import { BaseNode } from "../types";
+import { BaseNode } from "../model/types";
 import { Parser } from "./Parser";
 import { SubParser } from "./SubParser";
 

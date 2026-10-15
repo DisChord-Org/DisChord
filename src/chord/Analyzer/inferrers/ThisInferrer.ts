@@ -1,4 +1,4 @@
-import { ASTNode, BaseNode, CompilerMetadataKind, TokenType, TokenTypeUnion } from "../../types";
+import { ASTNode, BaseNode, CompilerMetadataKind, TokenType, TokenTypeUnion } from "../../model/types";
 import { DataType, UserClassDataType } from "../../model/DataType";
 import { SubInferrer } from "../SubInferrer";
 

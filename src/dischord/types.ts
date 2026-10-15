@@ -1,4 +1,4 @@
-import { ASTNode, BaseNode, ODBNode, TokenType } from "../chord/types";
+import { ASTNode, BaseNode, ODBNode, TokenType } from "../chord/model/types";
 
 /**
  * @file types.ts

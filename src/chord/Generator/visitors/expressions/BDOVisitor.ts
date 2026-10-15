@@ -1,4 +1,4 @@
-import { ODBNode, BaseNode, FunctionNode, TokenType, TokenTypeUnion, ODBMode, ASTNode } from "../../../types";
+import { ODBNode, BaseNode, FunctionNode, TokenType, TokenTypeUnion, ODBMode, ASTNode } from "../../../model/types";
 import { SubGenerator } from "../../SubGenerator";
 
 /**

@@ -1,4 +1,4 @@
-import { AccessNode, CallNode, BaseNode, TokenType, TokenTypeUnion } from "../../../types";
+import { AccessNode, CallNode, BaseNode, TokenType, TokenTypeUnion } from "../../../model/types";
 import { CallDispatch } from "../../../model/CompilationMarks";
 import { isAccessNode, isIdentificatorNode } from "../../../ast.guards";
 import { SubGenerator } from "../../SubGenerator";

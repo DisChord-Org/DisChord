@@ -1,6 +1,6 @@
 import { AnalysisRule } from "../AnalysisRule";
 import { TypeInferrer } from "../TypeInferrer";
-import { ASTNode, AccessNode, AssignmentNode, BaseNode, CallNode, TokenType } from "../../types";
+import { ASTNode, AccessNode, AssignmentNode, BaseNode, CallNode, TokenType } from "../../model/types";
 import { isAccessNode, isIdentificatorNode } from "../../ast.guards";
 import { AnyDataType, DataType, UnionDataType } from "../../model/DataType";
 import { ResolvedMember } from "../../corelib";

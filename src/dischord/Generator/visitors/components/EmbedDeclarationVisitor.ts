@@ -1,6 +1,6 @@
 import { DisChordNode, DisChordNodeType, DisChordTokenType, EmbedDeclarationNode } from "../../../types";
 import { SubGenerator } from "../../../../chord/Generator/SubGenerator";
-import { TokenTypeUnion } from "../../../../chord/types";
+import { TokenTypeUnion } from "../../../../chord/model/types";
 import EmbedVisitor from "./EmbedVisitor";
 
 /**

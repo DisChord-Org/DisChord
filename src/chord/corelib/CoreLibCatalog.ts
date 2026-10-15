@@ -1,5 +1,5 @@
 import { AnyDataType, VoidDataType } from "../model/DataType";
-import { Decorator, NamedTextLiteral, PrimitiveType, SyntaxFunction } from "../types";
+import { Decorator, NamedTextLiteral, PrimitiveType, SyntaxFunction } from "../model/types";
 import { CoreLibClass, CoreLibMember, CoreLibParameter } from "./corelib.types";
 import { CoreLibUtils } from "./CoreLibUtils";
 import { asyncRuntimeHelperNames } from "./runtimeHelpers";

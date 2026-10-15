@@ -1,4 +1,4 @@
-import { DeclaredName, Token } from '../types';
+import { DeclaredName, Token } from './types';
 
 /**
  * The names a source declares, in the order they are written, each with exactly where and with

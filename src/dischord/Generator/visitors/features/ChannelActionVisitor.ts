@@ -2,7 +2,7 @@ import { ChannelAction, ChannelActionNode, ChannelProperty, DisChordNode, DisCho
 import { SubGenerator } from "../../../../chord/Generator/SubGenerator";
 import { BDOResolver } from "../../../../chord/Generator/BDOResolver";
 import { fieldKeys, JSFallback } from "../../../../chord/BDOSchema";
-import { TokenTypeUnion } from "../../../../chord/types";
+import { TokenTypeUnion } from "../../../../chord/model/types";
 import { ChannelActionSchemas } from "../../constants/schemas";
 import { channelHelperNames } from "../../../corelib";
 

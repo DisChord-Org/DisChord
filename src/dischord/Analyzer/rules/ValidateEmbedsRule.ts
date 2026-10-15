@@ -1,7 +1,7 @@
 import { AnalysisRule } from "../../../chord/Analyzer/AnalysisRule";
 import { walkAST } from "../../../chord/walkAST";
 import { BDOValidator } from "../../../chord/Analyzer/BDOValidator";
-import { TokenType } from "../../../chord/types";
+import { TokenType } from "../../../chord/model/types";
 import { DisChordError, ErrorLevel } from "../../../errors/ChordError";
 import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordODBNode, DisChordTokenType, EmbedDeclarationNode, MessageNode } from "../../types";
 import { EmbedSchema } from "../../Generator/constants/schemas";

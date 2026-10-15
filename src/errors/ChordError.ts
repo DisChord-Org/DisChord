@@ -1,4 +1,4 @@
-import { Location } from "../chord/types";
+import { Location } from "../chord/model/types";
 import { File } from "../utils/File";
 
 /** Life cycle phase where the failure originated. */

@@ -1,6 +1,6 @@
 import { DisChordNode, DisChordNodeType, DisChordODBNode, DisChordTokenType, StartBotNode } from "../../../types";
 import { DisChordError, ErrorLevel } from "../../../../errors/ChordError";
-import { ODBMode, TokenTypeUnion } from "../../../../chord/types";
+import { ODBMode, TokenTypeUnion } from "../../../../chord/model/types";
 import { SubParser } from "../../../../chord/Parser/SubParser";
 import { BDOParser } from "../../../../chord/Parser/Grammar/BDOParser";
 import { Parser } from "../../../../chord/Parser/Parser";

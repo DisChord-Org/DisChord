@@ -1,4 +1,4 @@
-import { ASTNode, BaseNode, CallNode, NewNode, TokenType, TokenTypeUnion } from "../../types";
+import { ASTNode, BaseNode, CallNode, NewNode, TokenType, TokenTypeUnion } from "../../model/types";
 import { isIdentificatorNode } from "../../ast.guards";
 import { DataType, UserClassDataType } from "../../model/DataType";
 

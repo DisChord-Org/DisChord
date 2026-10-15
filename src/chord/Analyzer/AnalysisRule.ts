@@ -1,4 +1,4 @@
-import { ASTNode, BaseNode } from "../types";
+import { ASTNode, BaseNode } from "../model/types";
 import { CompilationContext } from "../model/CompilationContext";
 import { walkAST } from "../walkAST";
 

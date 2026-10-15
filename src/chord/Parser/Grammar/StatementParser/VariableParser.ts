@@ -1,4 +1,4 @@
-import { ASTNode, BaseNode, DeclarationKind, LiteralNode, TokenType, TokenTypeUnion, VariableNode } from "../../../types";
+import { ASTNode, BaseNode, DeclarationKind, LiteralNode, TokenType, TokenTypeUnion, VariableNode } from "../../../model/types";
 import { Parser } from "../../Parser";
 import { SubParser } from "../../SubParser";
 import { ExpressionParser } from "../Expressions/ExpressionParser";

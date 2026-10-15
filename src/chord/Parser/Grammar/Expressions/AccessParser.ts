@@ -1,4 +1,4 @@
-import { ASTNode, AccessNode, AccessNodeByIndex, BaseNode, CallNode, IdentificatorNode, TokenType, TokenTypeUnion } from "../../../types";
+import { ASTNode, AccessNode, AccessNodeByIndex, BaseNode, CallNode, IdentificatorNode, TokenType, TokenTypeUnion } from "../../../model/types";
 import { AssignmentParser } from "./AssignmentParser";
 import { Parser } from "../../Parser";
 import { SubParser } from "../../SubParser";

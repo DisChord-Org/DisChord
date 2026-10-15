@@ -1,4 +1,4 @@
-import { ASTNode, BaseNode, TokenTypeUnion } from "../types";
+import { ASTNode, BaseNode, TokenTypeUnion } from "../model/types";
 import { DataType } from "../model/DataType";
 import { TypeInferrer } from "./TypeInferrer";
 

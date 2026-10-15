@@ -1,4 +1,4 @@
-import { AccessNode, ASTNode, BaseNode, CallNode, ClassNode, FunctionNode, IdentificatorNode, ImportNode, PropertyNode, TokenType, VariableNode } from "./types";
+import { AccessNode, ASTNode, BaseNode, CallNode, ClassNode, FunctionNode, IdentificatorNode, ImportNode, PropertyNode, TokenType, VariableNode } from "./model/types";
 
 /**
  * Type guards for `ASTNode`. `ASTNode` is a union that ends in the extensible `N`, whose `type`

@@ -1,4 +1,4 @@
-import { Decorator } from './types';
+import { Decorator } from './model/types';
 
 /** Name a decorator is kept under: one of the keys of `Decorator`, so a rename cannot go unnoticed by its consumers. */
 type DecoratorName = keyof typeof Decorator;

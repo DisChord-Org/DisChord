@@ -2,7 +2,7 @@ import path from "node:path";
 import { AnalysisRule } from "../../../chord/Analyzer/AnalysisRule";
 import { walkAST } from "../../../chord/walkAST";
 import { SharedModuleSpecifier } from "../../../chord/Analyzer/SharedModuleSpecifier";
-import { ImportNode, TokenType } from "../../../chord/types";
+import { ImportNode, TokenType } from "../../../chord/model/types";
 import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType } from "../../types";
 import { createMessageModuleContent, createMessageModulePath } from "../../corelib";
 

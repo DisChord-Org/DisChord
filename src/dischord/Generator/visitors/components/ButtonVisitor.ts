@@ -2,7 +2,7 @@ import { DisChordError, ErrorLevel } from "../../../../errors/ChordError";
 import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordODBNode, DisChordTokenType } from "../../../types";
 import { SubGenerator } from "../../../../chord/Generator/SubGenerator";
 import { BDOResolver } from "../../../../chord/Generator/BDOResolver";
-import { TokenType, TokenTypeUnion } from "../../../../chord/types";
+import { TokenType, TokenTypeUnion } from "../../../../chord/model/types";
 import { BDOVisitor } from "../../../../chord/Generator/visitors/expressions/BDOVisitor";
 import ActionRowVisitor from "./ActionRowVisitor";
 import { ButtonSchema } from "../../constants/schemas";

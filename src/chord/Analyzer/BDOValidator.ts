@@ -1,5 +1,5 @@
 import { BDOSchema, fieldKeys, FieldKind, FieldSpec, literalStringValue, NestedSpec } from "../BDOSchema";
-import { ASTNode, BaseNode, ListNode, Location, ODBNode, TokenType } from "../types";
+import { ASTNode, BaseNode, ListNode, Location, ODBNode, TokenType } from "../model/types";
 
 /**
  * Validates a BDO against a {@link BDOSchema} — the Analyzer-side interpreter of that shared

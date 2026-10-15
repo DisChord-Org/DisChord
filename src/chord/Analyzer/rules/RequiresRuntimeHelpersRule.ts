@@ -1,6 +1,6 @@
 import path from "node:path";
 import { AnalysisRule } from "../AnalysisRule";
-import { ASTNode, BaseNode, ImportNode, TokenType } from "../../types";
+import { ASTNode, BaseNode, ImportNode, TokenType } from "../../model/types";
 import { runtimeHelperNames, runtimeHelpersModuleContent, runtimeHelpersModulePath } from "../../corelib";
 import { isAccessNode, isCallNode } from "../../ast.guards";
 import { SharedModuleSpecifier } from "../SharedModuleSpecifier";

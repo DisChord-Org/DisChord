@@ -1,6 +1,6 @@
 import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType } from "../../../types";
 import { SubGenerator } from "../../../../chord/Generator/SubGenerator";
-import { ListNode, TokenType, TokenTypeUnion } from "../../../../chord/types";
+import { ListNode, TokenType, TokenTypeUnion } from "../../../../chord/model/types";
 import ButtonVisitor from "./ButtonVisitor";
 
 /**

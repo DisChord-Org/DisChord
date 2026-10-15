@@ -1,4 +1,4 @@
-import { ASTNode, BaseNode, ODBMode, ODBNode, TokenType, TokenTypeUnion } from "../../types";
+import { ASTNode, BaseNode, ODBMode, ODBNode, TokenType, TokenTypeUnion } from "../../model/types";
 import { DataType, PrimitiveDataType } from "../../model/DataType";
 import { SubInferrer } from "../SubInferrer";
 

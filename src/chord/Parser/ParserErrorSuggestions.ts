@@ -1,4 +1,4 @@
-import { TokenType } from "../types";
+import { TokenType } from "../model/types";
 
 /**
  * Registry mapping structural parser token type failures to intuitive user-friendly troubleshooting suggestions.

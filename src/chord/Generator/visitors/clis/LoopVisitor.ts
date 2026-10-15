@@ -1,4 +1,4 @@
-import { LoopNode, BaseNode, SyntaxFunction, TokenType, TokenTypeUnion, ASTNode, CallNode } from "../../../types";
+import { LoopNode, BaseNode, SyntaxFunction, TokenType, TokenTypeUnion, ASTNode, CallNode } from "../../../model/types";
 import { isIdentificatorNode } from "../../../ast.guards";
 import { SubGenerator } from "../../SubGenerator";
 import { walkAST } from "../../../walkAST";

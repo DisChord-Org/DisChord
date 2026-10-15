@@ -3,7 +3,7 @@ import path from "node:path";
 import { DisChordNode, DisChordNodeType, DisChordTokenType, StartBotNode } from "../../../types";
 import { intentsMap } from "../../constants/mappings";
 import { SubGenerator } from "../../../../chord/Generator/SubGenerator";
-import { IdentificatorNode, ImportNode, TokenType, TokenTypeUnion } from "../../../../chord/types";
+import { IdentificatorNode, ImportNode, TokenType, TokenTypeUnion } from "../../../../chord/model/types";
 import { walkAST } from "../../../../chord/walkAST";
 import { SharedModuleSpecifier } from "../../../../chord/Analyzer/SharedModuleSpecifier";
 import { ImportVisitor } from "../../../../chord/Generator/visitors/modularity/ImportVisitor";

@@ -1,7 +1,7 @@
 import { Test } from "../../../Test";
 import { AnalysisRule } from "../../../../src/chord/Analyzer/AnalysisRule";
 import { SymbolTable } from "../../../../src/chord/model/SymbolsTable";
-import { ASTNode, BaseNode, Location, TokenType } from "../../../../src/chord/types";
+import { ASTNode, BaseNode, Location, TokenType } from "../../../../src/chord/model/types";
 import { CompilationContext } from "../../../../src/chord/model/CompilationContext";
 
 type Mode = 'none' | 'visit' | 'exit';

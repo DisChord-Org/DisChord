@@ -1,5 +1,5 @@
 import { BDOSchema, fieldKeys, FieldKind, FieldSpec, JSFallback, literalStringValue } from "../BDOSchema";
-import { ASTNode, BaseNode, ListNode, ODBNode, TokenType } from "../types";
+import { ASTNode, BaseNode, ListNode, ODBNode, TokenType } from "../model/types";
 
 /**
  * Resolves a BDO against a {@link BDOSchema} — the Generator-side interpreter of the same schema

@@ -2,7 +2,7 @@ import { AnalysisRule } from "../../../chord/Analyzer/AnalysisRule";
 import { walkAST } from "../../../chord/walkAST";
 import { BDOValidator } from "../../../chord/Analyzer/BDOValidator";
 import { DisChordError, ErrorLevel } from "../../../errors/ChordError";
-import { ExpressionNode, TokenType } from "../../../chord/types";
+import { ExpressionNode, TokenType } from "../../../chord/model/types";
 import { CommandNode, DisChordASTNode, DisChordODBNode, DisChordNode, DisChordNodeType, DisChordTokenType } from "../../types";
 import { CommandSchema } from "../../Generator/constants/schemas";
 import { discordNameProblem, slugifyCommandName } from "../../Generator/constants/commandNames";

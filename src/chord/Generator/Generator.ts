@@ -1,7 +1,7 @@
 import { ChordError, ErrorLevel } from "../../errors/ChordError";
 import { DisChordNode, DisChordNodeType } from "../../dischord/types";
 import { CompilationContext } from "../model/CompilationContext";
-import { ASTNode, BaseNode } from "../types";
+import { ASTNode, BaseNode } from "../model/types";
 import { GeneratorContext } from "./GeneratorContext";
 import { SubGeneratorClass } from "./SubGenerator";
 

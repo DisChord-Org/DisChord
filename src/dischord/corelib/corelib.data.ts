@@ -1,6 +1,6 @@
 import { ClassesEnum, corelib as chordCorelib } from "../../chord/corelib/corelib.data";
 import { AnyDataType, ClassDataType, PrimitiveDataType, UnionDataType, VoidDataType } from "../../chord/model/DataType";
-import { PrimitiveType } from "../../chord/types";
+import { PrimitiveType } from "../../chord/model/types";
 import { DisChordCoreLib } from "./corelib.types";
 
 /**

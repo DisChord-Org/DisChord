@@ -1,6 +1,6 @@
 import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType, EventNode } from "../../../types";
 import { SubGenerator } from '../../../../chord/Generator/SubGenerator';
-import { TokenTypeUnion } from '../../../../chord/types';
+import { TokenTypeUnion } from '../../../../chord/model/types';
 import { eventsMap } from '../../constants/mappings';
 
 /**

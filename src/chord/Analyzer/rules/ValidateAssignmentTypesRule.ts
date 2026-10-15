@@ -1,5 +1,5 @@
 import { AnalysisRule } from "../AnalysisRule";
-import { AccessNodeByIndex, AssignmentNode, ASTNode, BaseNode, FunctionNode, LiteralNode, Symbol, TokenType, VariableNode } from "../../types";
+import { AccessNodeByIndex, AssignmentNode, ASTNode, BaseNode, FunctionNode, LiteralNode, Symbol, TokenType, VariableNode } from "../../model/types";
 import { isIdentificatorNode } from "../../ast.guards";
 import { TypeInferrer } from "../TypeInferrer";
 import { ChordError, ErrorLevel } from "../../../errors/ChordError";

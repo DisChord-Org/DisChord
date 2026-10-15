@@ -9,7 +9,7 @@ import { KeyWords } from "../../../../src/chord/KeywordsManager";
 import { SymbolTable } from "../../../../src/chord/model/SymbolsTable";
 import { CodeProvider } from "../../../../src/chord/CodeProvider";
 import { Lexer } from "../../../../src/chord/Lexer";
-import { TokenType } from "../../../../src/chord/types";
+import { TokenType } from "../../../../src/chord/model/types";
 import { corelib } from "../../../../src/dischord/corelib/corelib.data";
 import { disChordCoreLibUtils, disChordCoreLibDispatch } from "../../../../src/dischord/corelib";
 import { DisChordParser } from "../../../../src/dischord/Parser/Parser";

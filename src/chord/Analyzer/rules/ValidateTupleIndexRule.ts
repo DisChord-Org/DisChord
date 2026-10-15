@@ -1,6 +1,6 @@
 import { AnalysisRule } from "../AnalysisRule";
 import { TypeInferrer } from "../TypeInferrer";
-import { AccessNodeByIndex, ASTNode, BaseNode, LiteralNode, TokenType } from "../../types";
+import { AccessNodeByIndex, ASTNode, BaseNode, LiteralNode, TokenType } from "../../model/types";
 import { TupleDataType } from "../../model/DataType";
 import { ChordError, ErrorLevel } from "../../../errors/ChordError";
 

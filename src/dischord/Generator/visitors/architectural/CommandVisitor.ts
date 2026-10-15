@@ -1,7 +1,7 @@
 import { CommandNode, DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType } from "../../../types";
 import { SubGenerator } from '../../../../chord/Generator/SubGenerator';
 import { BDOResolver } from '../../../../chord/Generator/BDOResolver';
-import { CompilerMetadataKind, TokenTypeUnion } from '../../../../chord/types';
+import { CompilerMetadataKind, TokenTypeUnion } from '../../../../chord/model/types';
 import CommandOptionVisitor from '../components/CommandOptionVisitor';
 import { CommandSchema } from '../../constants/schemas';
 import { CommandContextParameter, CommandScope } from '../../constants/mappings';

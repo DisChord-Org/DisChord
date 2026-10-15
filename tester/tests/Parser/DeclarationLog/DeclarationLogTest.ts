@@ -1,6 +1,6 @@
 import { Test } from "../../../Test";
 import { DeclarationLog } from "../../../../src/chord/model/DeclarationLog";
-import { Token, TokenType } from "../../../../src/chord/types";
+import { Token, TokenType } from "../../../../src/chord/model/types";
 
 /**
  * @class DeclarationLogTest

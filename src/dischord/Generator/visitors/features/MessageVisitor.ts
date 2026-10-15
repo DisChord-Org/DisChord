@@ -1,7 +1,7 @@
 import { ChannelProperty, DisChordNode, DisChordNodeType, DisChordTokenType, MessageNode } from "../../../types";
 import { SubGenerator } from "../../../../chord/Generator/SubGenerator";
 import { BDOResolver } from "../../../../chord/Generator/BDOResolver";
-import { CompilerMetadataKind, TokenTypeUnion } from "../../../../chord/types";
+import { CompilerMetadataKind, TokenTypeUnion } from "../../../../chord/model/types";
 import ButtonVisitor from "../components/ButtonVisitor";
 import EmbedVisitor from "../components/EmbedVisitor";
 import { MessageSchema } from "../../constants/schemas";

@@ -1,5 +1,5 @@
 import { SubParser } from "../../../SubParser";
-import { BaseNode, DeclarationKind, ImportNode, TokenType, TokenTypeUnion } from "../../../../types";
+import { BaseNode, DeclarationKind, ImportNode, TokenType, TokenTypeUnion } from "../../../../model/types";
 import { Parser } from "../../../Parser";
 
 /*

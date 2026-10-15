@@ -4,7 +4,7 @@
     before, only Claude and I knew what this file did, now only Claude knows. good luck
 */
 
-import { Location, Symbol, SymbolKind, CompilerMetadataKind, TokenType } from "../types";
+import { Location, Symbol, SymbolKind, CompilerMetadataKind, TokenType } from "./types";
 import { DataType } from "./DataType";
 import { ClassRegistry } from "./ClassRegistry";
 import { CompilationMarks } from "./CompilationMarks";

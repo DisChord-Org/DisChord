@@ -1,5 +1,5 @@
 import { SubParser } from "../../SubParser";
-import { BaseNode, DeclarationKind, FunctionNode, TokenType, TokenTypeUnion } from "../../../types";
+import { BaseNode, DeclarationKind, FunctionNode, TokenType, TokenTypeUnion } from "../../../model/types";
 import { BlockParser } from "../BlockParser";
 import { Parser } from "../../Parser";
 import { DecoratorProcessor } from "../../../DecoratorProcessor";

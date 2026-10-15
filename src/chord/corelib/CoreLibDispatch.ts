@@ -1,5 +1,5 @@
 import { UnionDataType, UserClassDataType } from "../model/DataType";
-import { AccessNode, BaseNode } from "../types";
+import { AccessNode, BaseNode } from "../model/types";
 import { CoreLibUtils } from "./CoreLibUtils";
 import { runtimeHelperNames } from "./runtimeHelpers";
 

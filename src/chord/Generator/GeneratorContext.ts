@@ -1,5 +1,5 @@
 import { Generator } from "./Generator";
-import { BaseNode } from "../types";
+import { BaseNode } from "../model/types";
 import { SubGenerator } from "./SubGenerator";
 
 /**

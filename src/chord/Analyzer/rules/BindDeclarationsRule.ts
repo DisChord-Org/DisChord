@@ -1,7 +1,7 @@
 import { AnalysisRule } from "../AnalysisRule";
 import { walkAST } from "../../walkAST";
 import { isClassNode, isFunctionNode, isPropertyNode, isVariableNode } from "../../ast.guards";
-import { ASTNode, BaseNode, CompilerMetadataKind, SymbolKind } from "../../types";
+import { ASTNode, BaseNode, CompilerMetadataKind, SymbolKind } from "../../model/types";
 
 /**
  * Pass 2 of the Analyzer's binding model ("Variables"): walks the complete AST and registers

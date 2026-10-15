@@ -1,5 +1,5 @@
 import { SubParser } from "../../../SubParser";
-import { BaseNode, ExportNode, TokenType, TokenTypeUnion } from "../../../../types";
+import { BaseNode, ExportNode, TokenType, TokenTypeUnion } from "../../../../model/types";
 import { Parser } from "../../../Parser";
 
 export class ExportParser<T extends string, N extends BaseNode<T>> extends SubParser<T, N> {

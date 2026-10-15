@@ -1,7 +1,7 @@
-import { Location, NamedTextLiteral, Token, TokenType } from './types';
+import { Location, NamedTextLiteral, Token, TokenType } from './model/types';
 import { ChordError, ErrorLevel } from '../errors/ChordError';
 import { CompilationContext } from './model/CompilationContext';
-import { SymbolTranslationMap } from './Symbols';
+import { SymbolTranslationMap } from './model/Symbols';
 
 export class Lexer<T extends string> {
     /**

@@ -1,4 +1,4 @@
-import { NewNode, TokenType, TokenTypeUnion, VariableNode } from '../../../chord/types';
+import { NewNode, TokenType, TokenTypeUnion, VariableNode } from '../../../chord/model/types';
 import { SubParser } from '../../../chord/Parser/SubParser';
 import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType } from '../../types';
 import { Parser } from '../../../chord/Parser/Parser';

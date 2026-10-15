@@ -2,7 +2,7 @@ import path from "node:path";
 import { AnalysisRule } from "../AnalysisRule";
 import { walkAST } from "../../walkAST";
 import { isImportNode } from "../../ast.guards";
-import { ASTNode, BaseNode } from "../../types";
+import { ASTNode, BaseNode } from "../../model/types";
 import { ChordError, ErrorLevel } from "../../../errors/ChordError";
 import { File } from "../../../utils/File";
 

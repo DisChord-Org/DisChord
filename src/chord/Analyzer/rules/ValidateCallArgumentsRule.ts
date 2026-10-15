@@ -1,10 +1,10 @@
 import { AnalysisRule } from "../AnalysisRule";
 import { TypeInferrer } from "../TypeInferrer";
 import { UserMemberResolver } from "../UserMemberResolver";
-import { ASTNode, BaseNode, CallNode, CompilerMetadataKind, Symbol, SymbolKind, TokenType } from "../../types";
+import { ASTNode, BaseNode, CallNode, CompilerMetadataKind, Symbol, SymbolKind, TokenType } from "../../model/types";
 import { isAccessNode, isIdentificatorNode } from "../../ast.guards";
 import { PrimitiveDataType } from "../../model/DataType";
-import { PrimitiveType } from "../../types";
+import { PrimitiveType } from "../../model/types";
 import { ChordError, ErrorLevel } from "../../../errors/ChordError";
 
 /**

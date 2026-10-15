@@ -1,5 +1,5 @@
 import { SUGGESTIONS } from "./ParserErrorSuggestions";
-import { ASTNode, Token, TokenType, BaseNode, PeekType, Location, TokenTypeUnion } from "../types";
+import { ASTNode, Token, TokenType, BaseNode, PeekType, Location, TokenTypeUnion } from "../model/types";
 
 import { ChordError, ErrorLevel } from "../../errors/ChordError";
 import { CompilationContext } from "../model/CompilationContext";

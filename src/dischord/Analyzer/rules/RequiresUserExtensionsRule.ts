@@ -2,7 +2,7 @@ import path from "node:path";
 import { AnalysisRule } from "../../../chord/Analyzer/AnalysisRule";
 import { walkAST } from "../../../chord/walkAST";
 import { SharedModuleSpecifier } from "../../../chord/Analyzer/SharedModuleSpecifier";
-import { ImportNode, LiteralNode, ODBNode, TokenType } from "../../../chord/types";
+import { ImportNode, LiteralNode, ODBNode, TokenType } from "../../../chord/model/types";
 import { isAccessNode, isIdentificatorNode } from "../../../chord/ast.guards";
 import { DisChordASTNode, DisChordNode, DisChordNodeType } from "../../types";
 import { userExtensionsModuleContent, userExtensionsModulePath, userPropertyNames } from "../../corelib";

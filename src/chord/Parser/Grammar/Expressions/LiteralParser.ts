@@ -1,5 +1,5 @@
 import { SubParser } from "../../SubParser";
-import { ASTNode, BaseNode, LiteralNode, LiteralTokens, TokenType, TokenTypeUnion } from "../../../types";
+import { ASTNode, BaseNode, LiteralNode, LiteralTokens, TokenType, TokenTypeUnion } from "../../../model/types";
 import { Parser } from "../../Parser";
 
 export class LiteralParser<T extends string, N extends BaseNode<T>> extends SubParser<T, N> {

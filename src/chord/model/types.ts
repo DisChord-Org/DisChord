@@ -3,7 +3,7 @@
  * @description Core AST node type definitions and generic structural bindings for the DisChord compiler.
  */
 
-import { DataType } from "./model/DataType";
+import { DataType } from "./DataType";
 
 /**
  * Valid variant token lookup strategies allowed within the parser stream inspection pipeline.

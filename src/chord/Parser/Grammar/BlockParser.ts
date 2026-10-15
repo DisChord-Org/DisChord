@@ -1,4 +1,4 @@
-import { ASTNode, BaseNode, BlockNode, TokenType, TokenTypeUnion } from "../../types";
+import { ASTNode, BaseNode, BlockNode, TokenType, TokenTypeUnion } from "../../model/types";
 import { Parser } from "../Parser";
 import { SubParser } from "../SubParser";
 
