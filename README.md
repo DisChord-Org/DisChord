@@ -43,8 +43,10 @@ si (total mayor 10) {
 Compile and run it:
 
 ```bash
-npm run dev hello.chord
+dischord hello.chord
 ```
+
+Without installing it, from the repository: `npm run dev hello.chord`. To get the `dischord` command, run `npm link` (or `pnpm link --global`) in the repository.
 
 This compiles `hello.chord` to `dist/hello.js` and executes it.
 
