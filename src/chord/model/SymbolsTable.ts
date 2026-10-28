@@ -206,6 +206,13 @@ export class SymbolTable {
     }
 
     /**
+     * @returns {string[]} The names of every symbol visible from the current scope.
+     */
+    public visibleNames(): string[] {
+        return [ ...new Set(this.scopes.flatMap(scope => [ ...scope.symbols.keys() ])) ];
+    }
+
+    /**
      * Sets a compiler metadata value in the current active scope.
      * 
      * @template T

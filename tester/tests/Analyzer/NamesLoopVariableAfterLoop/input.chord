@@ -1,0 +1,4 @@
+para (i en rango(2)) {
+    consola.imprimir(i)
+}
+consola.imprimir(i)

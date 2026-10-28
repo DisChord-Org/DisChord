@@ -5,6 +5,7 @@ import { ValidateDeclarationNamesRule } from "./rules/ValidateDeclarationNamesRu
 import { BindImportsRule } from "./rules/BindImportsRule";
 import { ValidateImportTargetsRule } from "./rules/ValidateImportTargetsRule";
 import { BindDeclarationsRule } from "./rules/BindDeclarationsRule";
+import { ValidateKnownNamesRule } from "./rules/ValidateKnownNamesRule";
 import { ValidateClassHierarchyRule } from "./rules/ValidateClassHierarchyRule";
 import { ValidateTypeAnnotationsRule } from "./rules/ValidateTypeAnnotationsRule";
 import { ResolveVariableTypesRule } from "./rules/ResolveVariableTypesRule";
@@ -73,6 +74,10 @@ export class Analyzer<T extends string, N extends BaseNode<T>> {
         // Pass 3 ("Tipos"): reference/type validation against the now-complete symbol table. The
         // names an annotation uses are checked first, so the rest can trust them.
         ValidateTypeAnnotationsRule,
+
+        // Every name that is used has to be declared somewhere; runs before the rules that type the names.
+        ValidateKnownNamesRule,
+
         ResolveVariableTypesRule,
         ValidateCallTargetsRule,
 

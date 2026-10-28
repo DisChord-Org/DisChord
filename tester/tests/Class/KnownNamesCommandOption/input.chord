@@ -1,0 +1,13 @@
+nuevo comando Prueba {
+    descripcion "prueba"
+
+    opciones {
+        texto1 {
+            opcion "texto"
+            descripcion "un texto"
+            requerido verdadero
+        }
+    }
+
+    consola.imprimir(texto1)
+}

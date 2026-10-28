@@ -1,0 +1,34 @@
+consola.imprimir(despues(2))
+
+funcion despues(n) {
+    si (n mayor 0) {
+        devolver despues(n menos 1)
+    }
+    devolver n
+}
+
+para (i en rango(2)) {
+    consola.imprimir(i)
+}
+
+@BDOI
+var chainsawman es {
+    makima "narcisista";
+    denji ("mascota de una " + makima);
+}
+
+var n es 1
+funcion sombra() {
+    var n es 2
+    consola.imprimir(n)
+}
+
+clase Caja {
+    funcion uno() { devolver 1 }
+    funcion dos() { devolver esta.uno() }
+}
+
+consola.imprimir(Mates.PI)
+consola.imprimir(JSON.escribir(1))
+var pausa es setTimeout
+js("x")

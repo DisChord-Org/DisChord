@@ -1,0 +1,4 @@
+nuevo evento ban {
+    consola.imprimir(miembro)
+    consola.imprimir(cliente)
+}

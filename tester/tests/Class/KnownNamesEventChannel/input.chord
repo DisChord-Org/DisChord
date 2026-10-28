@@ -1,0 +1,4 @@
+nuevo evento canalCreado {
+    consola.imprimir(canal)
+    consola.imprimir(cliente)
+}

@@ -1,0 +1,9 @@
+nuevo comando Prueba {
+    descripcion "prueba"
+
+    consola.imprimir(contexto)
+    consola.imprimir(cliente)
+    consola.imprimir(usuario)
+    consola.imprimir(canal)
+    consola.imprimir(ctx)
+}

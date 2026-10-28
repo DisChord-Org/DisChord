@@ -1,3 +1,5 @@
+var nombre es "mundo"
+
 nuevo comando Canales {
     descripcion "dice {nombre}"
 }

@@ -17,6 +17,8 @@ import { ValidateChannelActionsRule } from "./rules/ValidateChannelActionsRule";
 import { RequiresUserExtensionsRule } from "./rules/RequiresUserExtensionsRule";
 import { DisChordResolveAwaitedCallsRule } from "./rules/DisChordResolveAwaitedCallsRule";
 import { ResolveAwaitedCallsRule } from "../../chord/Analyzer/rules/ResolveAwaitedCallsRule";
+import { ValidateKnownNamesRule } from "../../chord/Analyzer/rules/ValidateKnownNamesRule";
+import { DisChordValidateKnownNamesRule } from "./rules/DisChordValidateKnownNamesRule";
 
 /**
  * DisChord's semantic analysis rules, run over a file's complete AST between parsing and
@@ -62,7 +64,13 @@ export class DisChordAnalyzer extends Analyzer<DisChordNodeType, DisChordNode> {
 
         // Chord's awaited-calls rule is swapped for the dialect's, which also covers `enviar mensaje`,
         // so the context stack is tracked once and not duplicated in a second rule.
-        this.rules = this.rules.map(rule => rule instanceof ResolveAwaitedCallsRule ? new DisChordResolveAwaitedCallsRule(this.context) : rule);
+        this.rules = this.rules.map(rule => {
+            if (rule instanceof ResolveAwaitedCallsRule) return new DisChordResolveAwaitedCallsRule(this.context);
+            // and so is the known-names rule, which also needs to know what a command and an event put in scope
+            if (rule instanceof ValidateKnownNamesRule) return new DisChordValidateKnownNamesRule(this.context);
+
+            return rule;
+        });
 
         DisChordAnalyzer.DisChordRules.forEach(RuleClass => {
             this.rules.push(new RuleClass(this.context));
