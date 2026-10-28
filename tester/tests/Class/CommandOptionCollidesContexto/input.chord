@@ -1,0 +1,15 @@
+nuevo comando Saluda {
+    descripcion "saluda"
+
+    opciones {
+        contexto {
+            opcion "texto"
+            descripcion "un valor"
+            requerido verdadero
+        }
+    }
+
+    enviar mensaje {
+        contenido "hola {contexto}"
+    }
+}

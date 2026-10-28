@@ -1,0 +1,15 @@
+nuevo comando Saluda {
+    descripcion "saluda"
+
+    opciones {
+        usuario {
+            opcion "usuario"
+            descripcion "a quien saludar"
+            requerido verdadero
+        }
+    }
+
+    enviar mensaje {
+        contenido "hola {usuario}"
+    }
+}

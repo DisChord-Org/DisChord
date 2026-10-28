@@ -6,6 +6,7 @@ import CommandOptionVisitor from '../components/CommandOptionVisitor';
 import { CommandSchema } from '../../constants/schemas';
 import { CommandContextParameter, CommandScope } from '../../constants/mappings';
 import { slugifyCommandName } from '../../constants/commandNames';
+import { CommandScopeNames } from '../../../CommandScopeNames';
 
 /**
  * Generator class responsible for generating code related to command definitions.
@@ -38,8 +39,10 @@ export default class CommandVisitor extends SubGenerator<DisChordNodeType, DisCh
         const OptionsConstDeclaration: string = OptionsData.length > 0? 'options = options;' : '';
         const OptionsConstExtraction: string = CommandOptionVisitorData.variables;
 
-        const scopeDeclarations = Object.entries(CommandScope)
-            .map(([name, expression]) => `const ${name} = ${expression};`)
+        // an option named like an injected name wins: it is declared with the other options below, and
+        // declaring both in the same scope would be a SyntaxError
+        const scopeDeclarations = CommandScopeNames.declaredInjected(node.body)
+            .map(name => `const ${name} = ${CommandScope[name]};`)
             .join('\n');
 
         const body = node.body.body

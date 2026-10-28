@@ -4,6 +4,7 @@ import { BDOResolver } from "../../../../chord/Generator/BDOResolver";
 import { TokenTypeUnion } from "../../../../chord/model/types";
 import { BDOVisitor } from "../../../../chord/Generator/visitors/expressions/BDOVisitor";
 import { OptionSchema } from "../../constants/schemas";
+import { CommandScopeNames } from "../../../CommandScopeNames";
 
 /**
  * Data structure representing the complete output of the command option processing phase.
@@ -43,7 +44,7 @@ export default class CommandOptionVisitor extends SubGenerator<DisChordNodeType,
 
         return {
             options: `const options = [${this.visit(optionsBlock)}];`,
-            variables: this.generateVariables(optionsBlock)
+            variables: this.generateVariables(CommandScopeNames.optionNames(node))
         };
     }
 
@@ -78,13 +79,10 @@ export default class CommandOptionVisitor extends SubGenerator<DisChordNodeType,
 
     /**
      * Generates the extraction code block based on option keys without mutating state.
-     * @param {DisChordASTNode} node - The AST node containing the options map.
+     * @param {string[]} optionNames - The names of the command's options.
      * @returns {string} The formatted JS destructured constant code.
      */
-    public generateVariables (node: DisChordASTNode): string {
-        if (node.type != 'BDO') return '';
-
-        const optionNames = Object.keys(node.blocks);
+    public generateVariables (optionNames: string[]): string {
         if (optionNames.length === 0) return '';
 
         return `const { ${optionNames.join(', ')} } = contexto.options;`;

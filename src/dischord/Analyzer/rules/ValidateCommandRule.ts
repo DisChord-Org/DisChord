@@ -1,3 +1,4 @@
+import { CommandScopeNames } from "../../CommandScopeNames";
 import { AnalysisRule } from "../../../chord/Analyzer/AnalysisRule";
 import { walkAST } from "../../../chord/walkAST";
 import { BDOValidator } from "../../../chord/Analyzer/BDOValidator";
@@ -57,8 +58,12 @@ export class ValidateCommandRule extends AnalysisRule<DisChordNodeType, DisChord
         const options = command.body.blocks['opciones'];
         if (options?.type !== TokenType.BDO) return;
 
+        const collisions = CommandScopeNames.collisions(command.body);
+
         Object.entries((options as DisChordODBNode).blocks).forEach(([ optionName, entry ]) => {
             this.validateName(`El nombre de la opción '${optionName}' del comando '${command.value}'`, optionName, entry.location);
+
+            if (collisions.includes(optionName)) this.fail(`La opción '${optionName}' choca con un nombre que DisChord usa internamente.`, entry.location);
         });
     }
 
