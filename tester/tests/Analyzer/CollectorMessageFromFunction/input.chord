@@ -1,0 +1,19 @@
+funcion alPulsar(interaccion, cliente) {
+    imprimir("pulsado")
+}
+
+funcion crear() {
+    devolver 1
+}
+
+nuevo comando Prueba {
+    descripcion "prueba"
+
+    var msg es crear()
+
+    recolector msg {
+        alPulsarId {
+            cualquiera alPulsar
+        }
+    }
+}

@@ -1,0 +1,22 @@
+funcion alPulsar(interaccion, cliente) {
+    imprimir("pulsado")
+}
+
+nuevo comando Prueba {
+    descripcion "prueba"
+
+    var msg es enviar mensaje {
+        contenido "hola"
+        boton {
+            id "aceptar"
+            etiqueta "Aceptar"
+            estilo "verde"
+        }
+    }
+
+    recolector msg {
+        alPulsarId {
+            aceptar alPulsar
+        }
+    }
+}
