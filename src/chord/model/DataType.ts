@@ -175,6 +175,9 @@ export class AnyDataType extends DataType {
     }
 
     /** The shared `cualquiera` instance. */
+    /** The name `cualquiera` is written with in a type annotation. */
+    public static readonly typeName = 'cualquiera';
+
     public static readonly Any = new AnyDataType();
 
     protected acceptsNonUnionSource (): boolean {
@@ -182,7 +185,7 @@ export class AnyDataType extends DataType {
     }
 
     public format (): string {
-        return 'cualquiera';
+        return AnyDataType.typeName;
     }
 }
 
@@ -200,6 +203,9 @@ export class VoidDataType extends DataType {
     }
 
     /** The shared `nada` instance. */
+    /** The name `nada` is written with in a type annotation. */
+    public static readonly typeName = 'nada';
+
     public static readonly Void = new VoidDataType();
 
     protected acceptsNonUnionSource (source: DataType): boolean {
@@ -207,7 +213,7 @@ export class VoidDataType extends DataType {
     }
 
     public format (): string {
-        return 'nada';
+        return VoidDataType.typeName;
     }
 }
 

@@ -46,7 +46,7 @@ export class ValidateTypeAnnotationsRule<T extends string, N extends BaseNode<T>
     private validate (type: DataType, location: BaseNode<T>['location'], allowsVoid: boolean, inContainer = false): void {
         if (type instanceof UserClassDataType && !this.context.symbolTable.classes.isUserClass(type.name)) this.fail(`Tipo desconocido '${type.name}'. Tipos válidos: ${this.context.coreLib.annotableTypeNames()} o una clase declarada en el archivo; también T[], [A, B] y A|B`, location);
 
-        if (type instanceof VoidDataType && !allowsVoid) this.fail(inContainer ? `'nada' no puede ser el tipo de los elementos de una lista ni de una tupla` : `'nada' solo puede usarse como tipo de retorno`, location);
+        if (type instanceof VoidDataType && !allowsVoid) this.fail(inContainer ? `'${VoidDataType.typeName}' no puede ser el tipo de los elementos de una lista ni de una tupla` : `'${VoidDataType.typeName}' solo puede usarse como tipo de retorno`, location);
 
         if (type instanceof UnionDataType) type.members.forEach(member => this.validate(member, location, allowsVoid));
         if (type instanceof ArrayDataType) this.validate(type.element, location, false, true);

@@ -6,6 +6,16 @@ import { AnyDataType, DataType, UnionDataType } from "../../model/DataType";
 import { ResolvedMember } from "../../corelib";
 
 /**
+ * What a member access is used as, told by its parent: the callee of a call, the target of an
+ * assignment, or otherwise a read.
+ */
+enum AccessRole {
+    Read,
+    Callee,
+    Assignment
+}
+
+/**
  * Decides the name every non-static member access is emitted with, and records it in the
  * `SymbolTable` for `AccessVisitor` to read — the analyzer decides, the generator translates.
  * The name is the JavaScript name of the core library member the access stands for (resolved
@@ -61,14 +71,14 @@ export class ResolveMemberAccessesRule<T extends string, N extends BaseNode<T>> 
         const declaredByUser = symbolTable.classes.hasMemberNamed(node.property);
         const resolved = this.context.coreLib.resolveInstanceMember(node, receiverType, declaredByUser);
 
-        const role = this.callees.has(node) ? 'callee' : this.targets.has(node) ? 'assignment' : 'read';
+        const role = this.callees.has(node) ? AccessRole.Callee : this.targets.has(node) ? AccessRole.Assignment : AccessRole.Read;
         if (resolved && receiverType && !declaredByUser) this.checkUse(node, resolved, receiverType, role);
         const isUnknownReceiver = !receiverType || receiverType instanceof AnyDataType;
-        const isFieldUse = resolved && isUnknownReceiver && (resolved.isProperty ? role !== 'read' : role !== 'callee');
+        const isFieldUse = resolved && isUnknownReceiver && (resolved.isProperty ? role !== AccessRole.Read : role !== AccessRole.Callee);
 
         symbolTable.marks.markMember(node, resolved && !isFieldUse ? resolved.member.transpile : node.property);
 
-        if (resolved?.isProperty && isUnknownReceiver && role === 'read') {
+        if (resolved?.isProperty && isUnknownReceiver && role === AccessRole.Read) {
             const dispatch = this.context.coreLibDispatch.resolveUnknownPropertyDispatch(node);
             if (dispatch && 'helper' in dispatch) symbolTable.marks.markMemberHelper(node, dispatch.helper);
         }
@@ -82,13 +92,13 @@ export class ResolveMemberAccessesRule<T extends string, N extends BaseNode<T>> 
      * @throws {DisChordError} If the member is used the wrong way.
      * @private
      */
-    private checkUse (access: AccessNode<T, N>, resolved: ResolvedMember, receiverType: DataType, role: string): void {
+    private checkUse (access: AccessNode<T, N>, resolved: ResolvedMember, receiverType: DataType, role: AccessRole): void {
         if (receiverType instanceof AnyDataType || receiverType instanceof UnionDataType) return;
 
         const className = resolved.qualifiedName.split('.')[0];
 
-        if (!resolved.isProperty && role === 'read') this.failAt(access, `'${access.property}' es un método de ${className}: llámalo con paréntesis, ${access.property}()`);
-        if (resolved.isProperty && role === 'callee') this.failAt(access, `'${access.property}' es una propiedad de ${className}, no un método`);
+        if (!resolved.isProperty && role === AccessRole.Read) this.failAt(access, `'${access.property}' es un método de ${className}: llámalo con paréntesis, ${access.property}()`);
+        if (resolved.isProperty && role === AccessRole.Callee) this.failAt(access, `'${access.property}' es una propiedad de ${className}, no un método`);
     }
 
     /**

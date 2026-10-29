@@ -181,8 +181,8 @@ export class TypeAnnotationParser<T extends string, N extends BaseNode<T>> {
         const classType = this.parser.CoreLib.resolveClassType(token.value) ?? this.parser.CoreLib.resolveClassReceiver(token.value);
         if (classType) return classType;
 
-        if (lowered === 'cualquiera') return AnyDataType.Any;
-        if (lowered === 'nada') return VoidDataType.Void;
+        if (lowered === AnyDataType.typeName) return AnyDataType.Any;
+        if (lowered === VoidDataType.typeName) return VoidDataType.Void;
 
         return UserClassDataType.of(token.value, this.parser.SymbolTable.classes);
     }
