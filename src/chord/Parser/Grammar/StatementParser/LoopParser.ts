@@ -2,6 +2,7 @@ import { SubParser } from "../../SubParser";
 import { LoopNode, BaseNode, DeclarationKind, TokenType, TokenTypeUnion } from "../../../model/types";
 import { BlockParser } from "../BlockParser";
 import { Parser } from "../../Parser";
+import { ExpressionParser } from "../Expressions/ExpressionParser";
 
 export class LoopParser<T extends string, N extends BaseNode<T>> extends SubParser<T, N> {
     /** To identify when this parser should be used */
@@ -26,7 +27,7 @@ export class LoopParser<T extends string, N extends BaseNode<T>> extends SubPars
         const variable = this.declare(DeclarationKind.Variable, this.consume(TokenType.IDENTIFICADOR, "Se debe especificar un nombre para la variable del bucle."));
         this.consume(TokenType.En, "Se esperaba la palabra 'en' para definir el iterable.");
         
-        const iterable = this.parent.parseExpression();
+        const iterable = this.parent.get(ExpressionParser).parse();
         this.consume(TokenType.R_PAREN);
 
         const body = (this.parent.get(BlockParser) as BlockParser<T, N>).parse().body;

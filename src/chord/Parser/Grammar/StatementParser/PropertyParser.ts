@@ -1,6 +1,7 @@
 import { SubParser } from "../../SubParser";
 import { PropertyNode, LiteralNode, ASTNode, BaseNode, DeclarationKind, TokenType, TokenTypeUnion } from "../../../model/types";
 import { Parser } from "../../Parser";
+import { ExpressionParser } from "../Expressions/ExpressionParser";
 import { DecoratorProcessor } from "../../../DecoratorProcessor";
 
 export class PropertyParser<T extends string, N extends BaseNode<T>> extends SubParser<T, N> {
@@ -47,7 +48,7 @@ export class PropertyParser<T extends string, N extends BaseNode<T>> extends Sub
         });
 
         if (this.match(TokenType.Es)) {
-            value = this.parent.parseExpression();
+            value = this.parent.get(ExpressionParser).parse();
         }
 
         const isStatic: boolean = DecoratorProcessor.matchAndDelete('fijar', true);
