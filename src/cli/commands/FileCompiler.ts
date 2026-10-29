@@ -2,7 +2,6 @@ import { GlobalCLIOptions, DebugFlags } from '../Program';
 import { CompilerConfig } from '../../utils/FileSystem';
 import { CompilationContext } from '../../chord/model/CompilationContext';
 import { File } from '../../utils/File';
-import { CodeProvider } from '../../chord/CodeProvider';
 import { Lexer } from '../../chord/Lexer';
 import { DeclaredName, Token } from '../../chord/model/types';
 import { DisChordParser } from '../../dischord/Parser/Parser';
