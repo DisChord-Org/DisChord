@@ -5,13 +5,10 @@ import { CommandSchema, ButtonSchema, StartBotSchema } from "../../../../src/dis
 import { UnreservedComponentDeclarations } from "../../../../src/dischord/Parser/Grammar/UnreservedComponentDeclarations";
 import { CoreLibCatalog } from "../../../../src/chord/corelib/CoreLibCatalog";
 import { CoreLibMember } from "../../../../src/chord/corelib/corelib.types";
-import { KeyWords } from "../../../../src/chord/KeywordsManager";
-import { SymbolTable } from "../../../../src/chord/model/SymbolsTable";
 import { CodeProvider } from "../../../../src/chord/CodeProvider";
 import { Lexer } from "../../../../src/chord/Lexer";
 import { TokenType } from "../../../../src/chord/model/types";
 import { corelib } from "../../../../src/dischord/corelib/corelib.data";
-import { disChordCoreLibUtils, disChordCoreLibDispatch } from "../../../../src/dischord/corelib";
 import { DisChordParser } from "../../../../src/dischord/Parser/Parser";
 import { DisChordNodeType, DisChordTokenType } from "../../../../src/dischord/types";
 import { FileSystem } from "../../../../src/utils/FileSystem";
@@ -19,6 +16,7 @@ import { File } from "../../../../src/utils/File";
 import { CompilationContext } from "../../../../src/chord/model/CompilationContext";
 import path from "node:path";
 import { Program } from "../../../../src/cli/Program";
+import { DisChordCompilationContext } from "../../../../src/cli/DisChordCompilationContext";
 
 /**
  * @class CorelibCatalogTest
@@ -153,18 +151,7 @@ export class CorelibCatalogTest extends Test {
      */
     private assertKeywords (document: CorelibDocument): void {
         const config = FileSystem.configure(this.fixturePath);
-        const context: CompilationContext<DisChordNodeType> = {
-            symbolTable: new SymbolTable(),
-            keywordsManager: new KeyWords(),
-            codeProvider: new CodeProvider(),
-            projectRoot: config.projectRoot,
-            distDir: config.distDir,
-            outputDir: config.distDir,
-            extraFiles: new Map(),
-            extraDirectories: new Set(),
-            coreLib: disChordCoreLibUtils,
-            coreLibDispatch: disChordCoreLibDispatch
-        };
+        const context: CompilationContext<DisChordNodeType> = DisChordCompilationContext.create(config);
 
         DisChordParser.registerGrammar(context);
 
@@ -314,18 +301,7 @@ export class CorelibCatalogTest extends Test {
 
     private lex (code: string): { type: string; value: string }[] {
         const config = FileSystem.configure(this.fixturePath);
-        const context: CompilationContext<DisChordNodeType> = {
-            symbolTable: new SymbolTable(),
-            keywordsManager: new KeyWords(),
-            codeProvider: new CodeProvider(),
-            projectRoot: config.projectRoot,
-            distDir: config.distDir,
-            outputDir: config.distDir,
-            extraFiles: new Map(),
-            extraDirectories: new Set(),
-            coreLib: disChordCoreLibUtils,
-            coreLibDispatch: disChordCoreLibDispatch
-        };
+        const context: CompilationContext<DisChordNodeType> = DisChordCompilationContext.create(config);
 
         DisChordParser.registerGrammar(context);
         context.codeProvider.currentCode = { file: File.of(path.join(this.fixturePath, 'CorelibCatalogTest.ts')), content: code };

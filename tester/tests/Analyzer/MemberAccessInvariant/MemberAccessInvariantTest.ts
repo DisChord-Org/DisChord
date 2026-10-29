@@ -1,19 +1,19 @@
 import path from "node:path";
 
 import { Test } from "../../../Test";
-import { KeyWords } from "../../../../src/chord/KeywordsManager";
 import { Lexer } from "../../../../src/chord/Lexer";
 import { SymbolTable } from "../../../../src/chord/model/SymbolsTable";
 import { CodeProvider } from "../../../../src/chord/CodeProvider";
 import { walkAST } from "../../../../src/chord/walkAST";
 import { isAccessNode } from "../../../../src/chord/ast.guards";
-import { disChordCoreLibUtils, disChordCoreLibDispatch } from "../../../../src/dischord/corelib";
+import { disChordCoreLibUtils } from "../../../../src/dischord/corelib";
 import { DisChordParser } from "../../../../src/dischord/Parser/Parser";
 import { DisChordAnalyzer } from "../../../../src/dischord/Analyzer/Analyzer";
 import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType } from "../../../../src/dischord/types";
 import { FileSystem } from "../../../../src/utils/FileSystem";
 import { File } from "../../../../src/utils/File";
 import { CompilationContext } from "../../../../src/chord/model/CompilationContext";
+import { DisChordCompilationContext } from "../../../../src/cli/DisChordCompilationContext";
 
 /**
  * Programs that between them use every kind of member access: on texts, lists, typed and untyped
@@ -79,18 +79,7 @@ export class MemberAccessInvariantTest extends Test {
      */
     private analyze (code: string): { ast: DisChordASTNode[]; symbolTable: SymbolTable } {
         const config = FileSystem.configure(this.fixturePath);
-        const context: CompilationContext<DisChordNodeType> = {
-            symbolTable: new SymbolTable(),
-            keywordsManager: new KeyWords(),
-            codeProvider: new CodeProvider(),
-            projectRoot: config.projectRoot,
-            distDir: config.distDir,
-            outputDir: config.distDir,
-            extraFiles: new Map(),
-            extraDirectories: new Set(),
-            coreLib: disChordCoreLibUtils,
-            coreLibDispatch: disChordCoreLibDispatch
-        };
+        const context: CompilationContext<DisChordNodeType> = DisChordCompilationContext.create(config);
 
         DisChordParser.registerGrammar(context);
         // The programs are generated, not read from disk: this file only gives them a directory to resolve imports from.

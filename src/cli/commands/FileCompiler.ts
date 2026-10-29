@@ -2,16 +2,14 @@ import { GlobalCLIOptions, DebugFlags } from '../Program';
 import { CompilerConfig } from '../../utils/FileSystem';
 import { CompilationContext } from '../../chord/model/CompilationContext';
 import { File } from '../../utils/File';
-import { SymbolTable } from '../../chord/model/SymbolsTable';
 import { CodeProvider } from '../../chord/CodeProvider';
-import { KeyWords } from '../../chord/KeywordsManager';
 import { Lexer } from '../../chord/Lexer';
 import { DeclaredName, Token } from '../../chord/model/types';
-import { disChordCoreLibUtils, disChordCoreLibDispatch } from '../../dischord/corelib';
 import { DisChordParser } from '../../dischord/Parser/Parser';
 import { DisChordAnalyzer } from '../../dischord/Analyzer/Analyzer';
 import { DisChordGenerator } from '../../dischord/Generator/Generator';
 import { DisChordASTNode, DisChordNodeType, DisChordTokenType } from '../../dischord/types';
+import { DisChordCompilationContext } from "../DisChordCompilationContext";
 
 /** What compiling one source file produces. */
 export interface FileCompilation {
@@ -100,18 +98,7 @@ export class FileCompiler {
      * @returns {CompilationContext<DisChordNodeType>}
      */
     private createContext(file: File, config: CompilerConfig, outputDir: string): CompilationContext<DisChordNodeType> {
-        const context: CompilationContext<DisChordNodeType> = {
-            symbolTable: new SymbolTable(),
-            keywordsManager: new KeyWords(),
-            codeProvider: new CodeProvider(),
-            projectRoot: config.projectRoot,
-            distDir: config.distDir,
-            outputDir,
-            extraFiles: new Map(),
-            extraDirectories: new Set(),
-            coreLib: disChordCoreLibUtils,
-            coreLibDispatch: disChordCoreLibDispatch
-        };
+        const context: CompilationContext<DisChordNodeType> = DisChordCompilationContext.create(config, outputDir);
 
         DisChordParser.registerGrammar(context);
 

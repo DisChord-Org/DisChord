@@ -1,18 +1,16 @@
 
 import { DisChordGenerator } from "../src/dischord/Generator/Generator";
-import { KeyWords } from "../src/chord/KeywordsManager";
 import { Lexer } from "../src/chord/Lexer";
 import { DisChordParser } from "../src/dischord/Parser/Parser";
 import { DisChordAnalyzer } from "../src/dischord/Analyzer/Analyzer";
-import { SymbolTable } from "../src/chord/model/SymbolsTable";
 import { CodeProvider } from "../src/chord/CodeProvider";
-import { disChordCoreLibUtils, disChordCoreLibDispatch } from "../src/dischord/corelib";
 import { DisChordASTNode, DisChordNodeType, DisChordTokenType } from "../src/dischord/types";
 import { FileSystem } from "../src/utils/FileSystem";
 import { File } from "../src/utils/File";
 import { Directory } from "../src/utils/Directory";
 import { CompilationContext } from "../src/chord/model/CompilationContext";
 import Prettifier from "../src/utils/Prettifier";
+import { DisChordCompilationContext } from "../src/cli/DisChordCompilationContext";
 
 /**
  * Base test class implementing the standard compilation pipeline execution.
@@ -156,18 +154,7 @@ export abstract class Test {
      */
     protected async compile(): Promise<{ ast: DisChordASTNode[]; output: string }> {
         const config = FileSystem.configure(this.fixturePath);
-        const context: CompilationContext<DisChordNodeType> = {
-            symbolTable: new SymbolTable(),
-            keywordsManager: new KeyWords(),
-            codeProvider: new CodeProvider(),
-            projectRoot: config.projectRoot,
-            distDir: config.distDir,
-            outputDir: config.distDir,
-            extraFiles: new Map(),
-            extraDirectories: new Set(),
-            coreLib: disChordCoreLibUtils,
-            coreLibDispatch: disChordCoreLibDispatch
-        };
+        const context: CompilationContext<DisChordNodeType> = DisChordCompilationContext.create(config);
 
         console.log(`Compilando: ${this.fixture.name}`);
 
