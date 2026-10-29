@@ -10,6 +10,7 @@
     "dev": "tsx ./src/index.ts",
     "test": "tsx ./src/index.ts test",
     "test:update": "tsx ./scripts/test-update.ts",
+    "typecheck": "tsc --noEmit",
     "prepare": "node scripts/prepare.js"
   },
   "keywords": [],
