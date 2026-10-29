@@ -1,4 +1,4 @@
-import { Token } from '../../chord/model/types';
+import { Token, TokenType } from '../../chord/model/types';
 import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType } from '../types';
 
 import { Parser } from '../../chord/Parser/Parser';
@@ -83,6 +83,67 @@ export class DisChordParser extends Parser<DisChordNodeType, DisChordNode> {
         });
 
         super.registerInstances();
+    }
+
+    /**
+     * Detects and parses an unreserved-keyword component declaration: `<keyword> <Nombre> { ... }`
+     * — for keywords a dialect deliberately keeps as ordinary identifiers instead of registering
+     * them as real reserved tokens (so the same word still works as an ordinary property key
+     * elsewhere), which means they can't be matched by the normal `triggerToken`-based dispatch.
+     * Matched by literal value instead, requiring the shared `<Nombre> {` shape so it can't be
+     * confused with the same word used as a property key (e.g. dischord's `embed <Nombre> {}`,
+     * `boton <Nombre> {}` vs. `embed { ... }` as a message's `embed` property).
+     *
+     * @private
+     * @param registrations - Table of `{ keyword, ParserClass }` pairs to match against.
+     * @returns {DisChordASTNode | null} The parsed component declaration, or null if the upcoming
+     * tokens don't match the shape or don't match any registered keyword (nothing is consumed).
+     */
+    private tryParseUnreservedComponentDeclaration (registrations: { keyword: string; ParserClass: SubParserClass<DisChordNodeType, DisChordNode> }[]): DisChordASTNode | null {
+        const token = this.peek();
+
+        const isDeclarationShape = token.type === TokenType.IDENTIFICADOR
+            && this.peek('next').type === TokenType.IDENTIFICADOR
+            && this.peek(this.cursor + 2)?.type === TokenType.L_BRACE;
+
+        if (!isDeclarationShape) return null;
+
+        const registration = registrations.find(r => r.keyword === token.value);
+        if (!registration) return null;
+
+        this.consume(TokenType.IDENTIFICADOR);
+        return new registration.ParserClass(this).parse();
+    }
+
+    /**
+     * Detects and parses an unreserved-keyword action: `<verbo> <objeto> { ... }` — a verb and a
+     * fixed object word that stay ordinary identifiers everywhere else (`crear canal {`), told
+     * apart from any other use of those words by the whole shape. Unlike a declaration, an action
+     * names nothing and is never introduced by `nuevo`, so `nuevo <Base> <Nombre> {` keeps its
+     * class meaning even when its words are a registered verb and object.
+     *
+     * The registered `ParserClass` receives the tokens untouched: it consumes the verb itself, so
+     * it can tell which one it was.
+     * @private
+     * @param registrations - Table of `{ verbs, object, ParserClass }` rows to match against.
+     * @returns {DisChordASTNode | null} The parsed action, or null if the upcoming tokens do not
+     * match the shape or any registered row (nothing is consumed).
+     */
+    private tryParseUnreservedAction (registrations: { verbs: string[]; object: string; ParserClass: SubParserClass<DisChordNodeType, DisChordNode> }[]): DisChordASTNode | null {
+        const verb = this.peek();
+        const object = this.peek('next');
+
+        const isActionShape = verb.type === TokenType.IDENTIFICADOR
+            && object.type === TokenType.IDENTIFICADOR
+            && this.peek(this.cursor + 2)?.type === TokenType.L_BRACE
+            && this.peek('prev').type !== TokenType.Nuevo;
+
+        if (!isActionShape) return null;
+
+        const registration = registrations.find(r => r.object === object.value && r.verbs.includes(verb.value));
+        if (!registration) return null;
+
+        return new registration.ParserClass(this).parse();
     }
 
     /**
