@@ -1,9 +1,7 @@
 import path from "node:path";
 import { AnalysisRule } from "../AnalysisRule";
-import { walkAST } from "../../walkAST";
 import { isImportNode } from "../../ast.guards";
 import { ASTNode, BaseNode } from "../../model/types";
-import { ChordError, ErrorLevel } from "../../../errors/ChordError";
 import { File } from "../../../utils/File";
 
 /**
@@ -23,19 +21,15 @@ export class ValidateImportTargetsRule<T extends string, N extends BaseNode<T>> 
      * @override
      */
     check (nodes: ASTNode<T, N>[]): void {
-        nodes.forEach(node => walkAST<T, N>(node, current => {
+        this.walk(nodes, current => {
             if (!isImportNode(current)) return;
 
             const candidates = this.resolveCandidates(current.path);
 
             if (candidates.some(candidate => File.tryOf(candidate))) return;
 
-            throw new ChordError({
-                phase: ErrorLevel.Analysis,
-                message: `No se encontró el módulo '${current.path}' (se buscó en: ${candidates.map(candidate => path.relative(this.context.projectRoot.absolutePath, candidate)).join(', ')}).`,
-                location: current.location
-            });
-        }));
+            this.failAt(current, `No se encontró el módulo '${current.path}' (se buscó en: ${candidates.map(candidate => path.relative(this.context.projectRoot.absolutePath, candidate)).join(', ')}).`);
+        });
     }
 
     /**

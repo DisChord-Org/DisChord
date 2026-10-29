@@ -1,5 +1,4 @@
 import { AnalysisRule } from "../../../chord/Analyzer/AnalysisRule";
-import { walkAST } from "../../../chord/walkAST";
 import { SharedModuleImporter } from "../../../chord/Analyzer/SharedModuleImporter";
 import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType } from "../../types";
 import { createMessageModule } from "../../corelib";
@@ -20,9 +19,9 @@ export class RequiresMessageHelperRule extends AnalysisRule<DisChordNodeType, Di
     check (nodes: DisChordASTNode[]): void {
         let needsMessageHelper = false;
 
-        nodes.forEach(node => walkAST<DisChordNodeType, DisChordNode>(node, current => {
+        this.walk(nodes, current => {
             if (current.type === DisChordTokenType.CREAR_MENSAJE) needsMessageHelper = true;
-        }));
+        });
 
         if (!needsMessageHelper) return;
 

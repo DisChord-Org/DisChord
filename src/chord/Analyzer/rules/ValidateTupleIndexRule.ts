@@ -2,7 +2,6 @@ import { AnalysisRule } from "../AnalysisRule";
 import { TypeInferrer } from "../TypeInferrer";
 import { AccessNodeByIndex, ASTNode, BaseNode, LiteralNode, TokenType } from "../../model/types";
 import { TupleDataType } from "../../model/DataType";
-import { ChordError, ErrorLevel } from "../../../errors/ChordError";
 
 /**
  * Rejects an access by index to a tuple (`par[5]`, read or written) whose literal index lies past its
@@ -25,7 +24,7 @@ export class ValidateTupleIndexRule<T extends string, N extends BaseNode<T>> ext
     }
 
     /**
-     * @throws {ChordError} If the index is a literal number at or past the end of the tuple.
+     * @throws {DisChordError} If the index is a literal number at or past the end of the tuple.
      * @private
      */
     private validate (access: AccessNodeByIndex<T, N>): void {
@@ -39,10 +38,6 @@ export class ValidateTupleIndexRule<T extends string, N extends BaseNode<T>> ext
 
         const length = receiverType.elements.length;
 
-        throw new ChordError({
-            phase: ErrorLevel.Analysis,
-            message: `El índice ${position} está fuera de rango: la tupla tiene ${length} elemento(s) (índices del 0 al ${length - 1})`,
-            location: access.location
-        });
+        this.failAt(access, `El índice ${position} está fuera de rango: la tupla tiene ${length} elemento(s) (índices del 0 al ${length - 1})`);
     }
 }

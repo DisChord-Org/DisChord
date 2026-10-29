@@ -1,9 +1,7 @@
 import { AnalysisRule } from "../AnalysisRule";
-import { walkAST } from "../../walkAST";
 import { ASTNode, BaseNode, FunctionNode, TokenType, VariableNode } from "../../model/types";
 import { ArrayDataType, DataType, TupleDataType, UnionDataType, UserClassDataType, VoidDataType } from "../../model/DataType";
 
-import { ChordError, ErrorLevel } from "../../../errors/ChordError";
 
 /**
  * Checks the names a `tipo` annotation uses, which `TypeAnnotationParser` can't: a class of the
@@ -21,7 +19,7 @@ export class ValidateTypeAnnotationsRule<T extends string, N extends BaseNode<T>
      * @override
      */
     check (nodes: ASTNode<T, N>[]): void {
-        nodes.forEach(node => walkAST<T, N>(node, current => {
+        this.walk(nodes, current => {
             if (current.type === TokenType.Funcion) {
                 const fn = current as FunctionNode<T, N>;
 
@@ -34,7 +32,7 @@ export class ValidateTypeAnnotationsRule<T extends string, N extends BaseNode<T>
 
             const variable = current as VariableNode<T, N>;
             if (variable.dataType) this.validate(variable.dataType, variable.location, false);
-        }));
+        });
     }
 
     /**
@@ -42,21 +40,13 @@ export class ValidateTypeAnnotationsRule<T extends string, N extends BaseNode<T>
      * @param {BaseNode<T>['location']} location - Where the annotation is, for the error.
      * @param {boolean} allowsVoid - Whether `nada` is valid here (a return type, or a member of a union that is one).
      * @param {boolean} inContainer - Whether the type is the element of a list or tuple, where `nada` never is.
-     * @throws {ChordError} If it names a class that doesn't exist, or uses `nada` where it isn't valid.
+     * @throws {DisChordError} If it names a class that doesn't exist, or uses `nada` where it isn't valid.
      * @private
      */
     private validate (type: DataType, location: BaseNode<T>['location'], allowsVoid: boolean, inContainer = false): void {
-        if (type instanceof UserClassDataType && !this.context.symbolTable.classes.isUserClass(type.name)) throw new ChordError({
-            phase: ErrorLevel.Analysis,
-            message: `Tipo desconocido '${type.name}'. Tipos válidos: ${this.context.coreLib.annotableTypeNames()} o una clase declarada en el archivo; también T[], [A, B] y A|B`,
-            location
-        });
+        if (type instanceof UserClassDataType && !this.context.symbolTable.classes.isUserClass(type.name)) this.fail(`Tipo desconocido '${type.name}'. Tipos válidos: ${this.context.coreLib.annotableTypeNames()} o una clase declarada en el archivo; también T[], [A, B] y A|B`, location);
 
-        if (type instanceof VoidDataType && !allowsVoid) throw new ChordError({
-            phase: ErrorLevel.Analysis,
-            message: inContainer ? `'nada' no puede ser el tipo de los elementos de una lista ni de una tupla` : `'nada' solo puede usarse como tipo de retorno`,
-            location
-        });
+        if (type instanceof VoidDataType && !allowsVoid) this.fail(inContainer ? `'nada' no puede ser el tipo de los elementos de una lista ni de una tupla` : `'nada' solo puede usarse como tipo de retorno`, location);
 
         if (type instanceof UnionDataType) type.members.forEach(member => this.validate(member, location, allowsVoid));
         if (type instanceof ArrayDataType) this.validate(type.element, location, false, true);

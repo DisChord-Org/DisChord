@@ -1,6 +1,8 @@
-import { ASTNode, BaseNode } from "../model/types";
+import { ASTNode, BaseNode, Location } from "../model/types";
 import { CompilationContext } from "../model/CompilationContext";
 import { walkAST } from "../walkAST";
+import { BDOValidator } from "./BDOValidator";
+import { DisChordError, ErrorLevel } from "../../errors/ChordError";
 
 /**
  * Base class for a single semantic analysis rule.
@@ -30,6 +32,49 @@ export abstract class AnalysisRule<T extends string, N extends BaseNode<T>> {
      * @throws {ChordError} For any violation this rule finds.
      */
     abstract check (nodes: ASTNode<T, N>[]): void;
+
+    /**
+     * Reports a violation of this rule: an analysis error at a place in the source.
+     * @param {string} message - What is wrong, in the language of the user.
+     * @param {Location} location - Where in the source.
+     * @throws {DisChordError} Always.
+     * @protected
+     */
+    protected fail (message: string, location: Location): never {
+        throw new DisChordError({ phase: ErrorLevel.Analysis, message, location });
+    }
+
+    /**
+     * Reports a violation of this rule at a node.
+     * @param {{ location: Location }} node - The node the violation is about.
+     * @param {string} message - What is wrong, in the language of the user.
+     * @throws {DisChordError} Always.
+     * @protected
+     */
+    protected failAt (node: { location: Location }, message: string): never {
+        return this.fail(message, node.location);
+    }
+
+    /**
+     * A validator of BDOs that reports its violations through {@link fail}.
+     * @returns {BDOValidator<T, N>}
+     * @protected
+     */
+    protected createBDOValidator (): BDOValidator<T, N> {
+        return new BDOValidator<T, N>((message, location) => this.fail(message, location));
+    }
+
+    /**
+     * Walks `nodes` like `walkAST`, without entering any scope (see {@link walkScoped} for that), with
+     * the types of the rule inferred.
+     * @param {ASTNode<T, N>[]} nodes - The top-level AST nodes to walk.
+     * @param {(node: ASTNode<T, N>) => void} visit - Called for each node, pre-order.
+     * @param {(node: ASTNode<T, N>) => void} [exit] - Called for each node, post-order.
+     * @protected
+     */
+    protected walk (nodes: ASTNode<T, N>[], visit: (node: ASTNode<T, N>) => void, exit?: (node: ASTNode<T, N>) => void): void {
+        nodes.forEach(node => walkAST<T, N>(node, visit, exit));
+    }
 
     /**
      * Walks `nodes` like `walkAST`, keeping the `SymbolTable` scope of every node that owns one

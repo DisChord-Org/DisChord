@@ -2,7 +2,6 @@ import { AnalysisRule } from "../AnalysisRule";
 import { AccessNodeByIndex, AssignmentNode, ASTNode, BaseNode, FunctionNode, LiteralNode, Symbol, TokenType, VariableNode } from "../../model/types";
 import { isIdentificatorNode } from "../../ast.guards";
 import { TypeInferrer } from "../TypeInferrer";
-import { ChordError, ErrorLevel } from "../../../errors/ChordError";
 
 /**
  * Validates that every reassignment (`x es <expr>`, an `ASIGNACION` node — not `var x tipo ... es
@@ -93,7 +92,7 @@ export class ValidateAssignmentTypesRule<T extends string, N extends BaseNode<T>
      * expression itself isn't inferrable — the same "nothing to check against" cases
      * `ResolveVariableTypesRule.resolveDataType` already leaves alone for a declaration.
      * @private
-     * @throws {ChordError} If the assigned expression's inferred type isn't assignable to the
+     * @throws {DisChordError} If the assigned expression's inferred type isn't assignable to the
      * target's resolved type.
      */
     private validateAssignment (node: AssignmentNode<T, N>): void {
@@ -110,11 +109,7 @@ export class ValidateAssignmentTypesRule<T extends string, N extends BaseNode<T>
         const assignedType = this.typeInferrer.infer(node.assignment);
         if (!assignedType) return;
 
-        if (!declaredType.isAssignableFrom(assignedType)) throw new ChordError({
-            phase: ErrorLevel.Analysis,
-            message: `La variable '${node.left.value}' es de tipo '${declaredType.format()}' pero se le asignó un valor de tipo '${assignedType.format()}'`,
-            location: node.location
-        });
+        if (!declaredType.isAssignableFrom(assignedType)) this.failAt(node, `La variable '${node.left.value}' es de tipo '${declaredType.format()}' pero se le asignó un valor de tipo '${assignedType.format()}'`);
     }
 
     /**
@@ -122,7 +117,7 @@ export class ValidateAssignmentTypesRule<T extends string, N extends BaseNode<T>
      * comes from a variable or parameter declared with a type: the element type of its list or the type
      * at that position of its tuple. A list whose type was inferred is left alone.
      * @private
-     * @throws {ChordError} If the assigned value's type isn't assignable to the element's.
+     * @throws {DisChordError} If the assigned value's type isn't assignable to the element's.
      */
     private validateElementAssignment (node: AssignmentNode<T, N>, target: AccessNodeByIndex<T, N>): void {
         let root: ASTNode<T, N> = target;
@@ -135,11 +130,7 @@ export class ValidateAssignmentTypesRule<T extends string, N extends BaseNode<T>
         const assignedType = elementType ? this.typeInferrer.infer(node.assignment) : undefined;
         if (!elementType || !assignedType) return;
 
-        if (!elementType.isAssignableFrom(assignedType)) throw new ChordError({
-            phase: ErrorLevel.Analysis,
-            message: `La variable '${this.describe(target)}' es de tipo '${elementType.format()}' pero se le asignó un valor de tipo '${assignedType.format()}'`,
-            location: node.location
-        });
+        if (!elementType.isAssignableFrom(assignedType)) this.failAt(node, `La variable '${this.describe(target)}' es de tipo '${elementType.format()}' pero se le asignó un valor de tipo '${assignedType.format()}'`);
     }
 
     /**

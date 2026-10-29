@@ -1,8 +1,5 @@
 import { AnalysisRule } from "../../../chord/Analyzer/AnalysisRule";
-import { walkAST } from "../../../chord/walkAST";
-import { BDOValidator } from "../../../chord/Analyzer/BDOValidator";
 import { TokenType } from "../../../chord/model/types";
-import { DisChordError, ErrorLevel } from "../../../errors/ChordError";
 import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordODBNode, DisChordTokenType, EmbedDeclarationNode, MessageNode } from "../../types";
 import { EmbedSchema } from "../../Generator/constants/schemas";
 
@@ -18,16 +15,16 @@ import { EmbedSchema } from "../../Generator/constants/schemas";
  * already cover `campos`/`pie`).
  */
 export class ValidateEmbedsRule extends AnalysisRule<DisChordNodeType, DisChordNode> {
-    private readonly validator = new BDOValidator<DisChordNodeType, DisChordNode>((message, location) => this.fail(message, location));
+    private readonly validator = this.createBDOValidator();
 
     /**
      * @override
      */
     check (nodes: DisChordASTNode[]): void {
-        nodes.forEach(node => walkAST<DisChordNodeType, DisChordNode>(node, current => {
+        this.walk(nodes, current => {
             if (current.type === DisChordTokenType.CREAR_EMBED) this.validator.validate((current as EmbedDeclarationNode).body, EmbedSchema);
             if (current.type === DisChordTokenType.CREAR_MENSAJE) this.validateEmbedProperty((current as MessageNode).object.blocks['embed']);
-        }));
+        });
     }
 
     /**
@@ -47,13 +44,5 @@ export class ValidateEmbedsRule extends AnalysisRule<DisChordNodeType, DisChordN
         }
 
         if (embed.type === TokenType.BDO) this.validator.validate(embed as DisChordODBNode, EmbedSchema);
-    }
-
-    /**
-     * @throws {DisChordError} Always.
-     * @private
-     */
-    private fail (message: string, location: DisChordASTNode['location']): never {
-        throw new DisChordError({ phase: ErrorLevel.Analysis, message, location });
     }
 }

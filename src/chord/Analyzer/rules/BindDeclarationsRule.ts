@@ -1,5 +1,4 @@
 import { AnalysisRule } from "../AnalysisRule";
-import { walkAST } from "../../walkAST";
 import { isClassNode, isFunctionNode, isPropertyNode, isVariableNode } from "../../ast.guards";
 import { ASTNode, BaseNode, CompilerMetadataKind, SymbolKind } from "../../model/types";
 
@@ -21,7 +20,7 @@ export class BindDeclarationsRule<T extends string, N extends BaseNode<T>> exten
      * @override
      */
     check (nodes: ASTNode<T, N>[]): void {
-        nodes.forEach(node => walkAST<T, N>(node, current => this.enter(current), current => this.exit(current)));
+        this.walk(nodes, current => this.enter(current), current => this.exit(current));
     }
 
     private enter (node: ASTNode<T, N>): void {

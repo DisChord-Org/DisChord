@@ -1,8 +1,6 @@
 import { AnalysisRule } from "../AnalysisRule";
-import { walkAST } from "../../walkAST";
 import { ASTNode, BaseNode, ClassNode, FunctionNode, TokenType } from "../../model/types";
 import { isFunctionNode } from "../../ast.guards";
-import { ChordError, ErrorLevel } from "../../../errors/ChordError";
 
 /**
  * Checks the `extiende` chains between classes of the file: a class can't inherit from itself, directly
@@ -21,9 +19,9 @@ export class ValidateClassHierarchyRule<T extends string, N extends BaseNode<T>>
     check (nodes: ASTNode<T, N>[]): void {
         const classes: ClassNode<T, N>[] = [];
 
-        nodes.forEach(node => walkAST<T, N>(node, current => {
+        this.walk(nodes, current => {
             if (current.type === TokenType.Clase) classes.push(current as ClassNode<T, N>);
-        }));
+        });
 
         const firstPosition = new Map<string, number>();
         classes.forEach((node, position) => {
@@ -34,11 +32,11 @@ export class ValidateClassHierarchyRule<T extends string, N extends BaseNode<T>>
             if (node.superClass === undefined) return;
 
             const cycle = this.cycleThrough(node);
-            if (cycle) this.fail(`La clase '${node.id}' hereda de sí misma (${cycle.join(' → ')})`, node);
+            if (cycle) this.failAt(node, `La clase '${node.id}' hereda de sí misma (${cycle.join(' → ')})`);
 
             const parentPosition = firstPosition.get(node.superClass);
             if (parentPosition !== undefined && parentPosition > position) {
-                this.fail(`La clase '${node.id}' extiende de '${node.superClass}', que se declara más abajo; declara '${node.superClass}' antes de '${node.id}'`, node);
+                this.failAt(node, `La clase '${node.id}' extiende de '${node.superClass}', que se declara más abajo; declara '${node.superClass}' antes de '${node.id}'`);
             }
         });
 
@@ -50,7 +48,7 @@ export class ValidateClassHierarchyRule<T extends string, N extends BaseNode<T>>
      * is awaited, or not, by what the base declares, so an override that changes it would be called the
      * wrong way. Each instance method (not a static one nor a constructor) is compared with the one of
      * the same name in the nearest ancestor of the file that declares one.
-     * @throws {ChordError} If an override is async and the method it overrides isn't, or the reverse.
+     * @throws {DisChordError} If an override is async and the method it overrides isn't, or the reverse.
      * @private
      */
     private checkOverrides (classes: ClassNode<T, N>[]): void {
@@ -76,12 +74,10 @@ export class ValidateClassHierarchyRule<T extends string, N extends BaseNode<T>>
                 const overridden = this.nearestAncestorMethod(node.superClass!, method.id, methodsOf);
                 if (!overridden || !!overridden.method.metadata.isAsync === !!method.metadata.isAsync) return;
 
-                this.fail(
+                this.failAt(method,
                     method.metadata.isAsync
                         ? `El método '${method.id}' de '${node.id}' es asíncrono pero el de '${overridden.owner}' no`
-                        : `El método '${method.id}' de '${node.id}' no es asíncrono pero el de '${overridden.owner}' sí`,
-                    method
-                );
+                        : `El método '${method.id}' de '${node.id}' no es asíncrono pero el de '${overridden.owner}' sí`);
             });
         });
     }
@@ -130,9 +126,5 @@ export class ValidateClassHierarchyRule<T extends string, N extends BaseNode<T>>
         }
 
         return undefined;
-    }
-
-    private fail (message: string, node: ASTNode<T, N>): never {
-        throw new ChordError({ phase: ErrorLevel.Analysis, message, location: node.location });
     }
 }

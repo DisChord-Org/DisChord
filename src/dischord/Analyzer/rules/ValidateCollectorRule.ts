@@ -1,8 +1,6 @@
 import { AnalysisRule } from "../../../chord/Analyzer/AnalysisRule";
-import { BDOValidator } from "../../../chord/Analyzer/BDOValidator";
 import { Symbol, TokenType } from "../../../chord/model/types";
 import { isIdentificatorNode, isVariableNode } from "../../../chord/ast.guards";
-import { DisChordError, ErrorLevel } from "../../../errors/ChordError";
 import { CollectorNode, DisChordASTNode, DisChordNode, DisChordNodeType, DisChordODBNode, DisChordTokenType, MessageNode } from "../../types";
 import { ButtonIdIndex } from "../ButtonIdIndex";
 import { CollectorSchema } from "../../Generator/constants/schemas";
@@ -24,7 +22,7 @@ import { CollectorSchema } from "../../Generator/constants/schemas";
  * every button of that message is visible; a message that comes from elsewhere is not checked.
  */
 export class ValidateCollectorRule extends AnalysisRule<DisChordNodeType, DisChordNode> {
-    private readonly validator = new BDOValidator<DisChordNodeType, DisChordNode>((message, location) => this.fail(message, location));
+    private readonly validator = this.createBDOValidator();
 
     /**
      * @override
@@ -96,13 +94,5 @@ export class ValidateCollectorRule extends AnalysisRule<DisChordNodeType, DisCho
                 handler.location
             );
         });
-    }
-
-    /**
-     * @throws {DisChordError} Always.
-     * @private
-     */
-    private fail (message: string, location: DisChordASTNode['location']): never {
-        throw new DisChordError({ phase: ErrorLevel.Analysis, message, location });
     }
 }

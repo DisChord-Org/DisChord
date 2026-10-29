@@ -1,5 +1,4 @@
 import { AnalysisRule } from "../../../chord/Analyzer/AnalysisRule";
-import { walkAST } from "../../../chord/walkAST";
 import { SharedModuleImporter } from "../../../chord/Analyzer/SharedModuleImporter";
 import { LiteralNode, ODBNode, TokenType } from "../../../chord/model/types";
 import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType } from "../../types";
@@ -27,7 +26,7 @@ export class RequiresChannelExtensionsRule extends AnalysisRule<DisChordNodeType
     check (nodes: DisChordASTNode[]): void {
         let needsExtensions = false;
 
-        nodes.forEach(node => walkAST<DisChordNodeType, DisChordNode>(node, current => {
+        this.walk(nodes, current => {
             if (needsExtensions) return;
 
             if (current.type === DisChordTokenType.ACCION_CANAL) {
@@ -39,7 +38,7 @@ export class RequiresChannelExtensionsRule extends AnalysisRule<DisChordNodeType
                 const opcion = (current as unknown as ODBNode<DisChordNodeType, DisChordNode>).blocks['opcion'];
                 if (opcion?.type === TokenType.LITERAL && (opcion as LiteralNode<DisChordNodeType>).value === 'canal') needsExtensions = true;
             }
-        }));
+        });
 
         if (!needsExtensions) return;
 

@@ -1,5 +1,4 @@
 import { AnalysisRule } from "../AnalysisRule";
-import { walkAST } from "../../walkAST";
 import { isImportNode } from "../../ast.guards";
 import { ASTNode, BaseNode, SymbolKind } from "../../model/types";
 
@@ -14,7 +13,7 @@ export class BindImportsRule<T extends string, N extends BaseNode<T>> extends An
      * @override
      */
     check (nodes: ASTNode<T, N>[]): void {
-        nodes.forEach(node => walkAST<T, N>(node, current => {
+        this.walk(nodes, current => {
             if (!isImportNode(current)) return;
 
             current.identificators.forEach(name => {
@@ -23,6 +22,6 @@ export class BindImportsRule<T extends string, N extends BaseNode<T>> extends An
                     kind: SymbolKind.Declaration
                 }, current.location);
             });
-        }));
+        });
     }
 }

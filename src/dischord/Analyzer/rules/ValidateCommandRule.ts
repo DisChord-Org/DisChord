@@ -1,8 +1,5 @@
 import { CommandScopeNames } from "../../CommandScopeNames";
 import { AnalysisRule } from "../../../chord/Analyzer/AnalysisRule";
-import { walkAST } from "../../../chord/walkAST";
-import { BDOValidator } from "../../../chord/Analyzer/BDOValidator";
-import { DisChordError, ErrorLevel } from "../../../errors/ChordError";
 import { ExpressionNode, TokenType } from "../../../chord/model/types";
 import { CommandNode, DisChordASTNode, DisChordODBNode, DisChordNode, DisChordNodeType, DisChordTokenType } from "../../types";
 import { CommandSchema } from "../../Generator/constants/schemas";
@@ -19,9 +16,9 @@ export class ValidateCommandRule extends AnalysisRule<DisChordNodeType, DisChord
      * @override
      */
     check (nodes: DisChordASTNode[]): void {
-        const validator = new BDOValidator<DisChordNodeType, DisChordNode>((message, location) => this.fail(message, location));
+        const validator = this.createBDOValidator();
 
-        nodes.forEach(node => walkAST<DisChordNodeType, DisChordNode>(node, current => {
+        this.walk(nodes, current => {
             if (current.type !== DisChordTokenType.CREAR_COMANDO) return;
 
             const command = current as CommandNode;
@@ -30,7 +27,7 @@ export class ValidateCommandRule extends AnalysisRule<DisChordNodeType, DisChord
             this.validateOptionNames(command);
             validator.validate(command.body, CommandSchema);
             this.validateNoInterpolation(command);
-        }));
+        });
     }
 
     /**
@@ -41,7 +38,7 @@ export class ValidateCommandRule extends AnalysisRule<DisChordNodeType, DisChord
      * @private
      */
     private validateNoInterpolation (command: CommandNode): void {
-        Object.entries(command.body.blocks).forEach(([ property, value ]) => walkAST<DisChordNodeType, DisChordNode>(value, current => {
+        Object.entries(command.body.blocks).forEach(([ property, value ]) => this.walk([ value ], current => {
             if (current.type === TokenType.EXPRESION && (current as ExpressionNode<DisChordNodeType, DisChordNode>).interpolated) this.fail(
                 `La propiedad '${property}' del comando '${command.value}' no admite texto con llaves: se lee al registrar el comando, antes de que existan sus variables. Escribe {{ y }} para llaves literales`,
                 current.location
@@ -76,13 +73,5 @@ export class ValidateCommandRule extends AnalysisRule<DisChordNodeType, DisChord
     private validateName (subject: string, name: string, location: DisChordASTNode['location']): void {
         const problem = discordNameProblem(name);
         if (problem !== undefined) this.fail(`${subject} ${problem}.`, location);
-    }
-
-    /**
-     * @throws {DisChordError} Always.
-     * @private
-     */
-    private fail (message: string, location: DisChordASTNode['location']): never {
-        throw new DisChordError({ phase: ErrorLevel.Analysis, message, location });
     }
 }

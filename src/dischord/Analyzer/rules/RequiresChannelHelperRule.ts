@@ -1,5 +1,4 @@
 import { AnalysisRule } from "../../../chord/Analyzer/AnalysisRule";
-import { walkAST } from "../../../chord/walkAST";
 import { SharedModuleImporter } from "../../../chord/Analyzer/SharedModuleImporter";
 import { ChannelActionNode, DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType } from "../../types";
 import { channelHelperNames, channelsModule } from "../../corelib";
@@ -19,9 +18,9 @@ export class RequiresChannelHelperRule extends AnalysisRule<DisChordNodeType, Di
     check (nodes: DisChordASTNode[]): void {
         const used = new Set<string>();
 
-        nodes.forEach(node => walkAST<DisChordNodeType, DisChordNode>(node, current => {
+        this.walk(nodes, current => {
             if (current.type === DisChordTokenType.ACCION_CANAL) used.add(channelHelperNames[(current as ChannelActionNode).action]);
-        }));
+        });
 
         if (used.size === 0) return;
 

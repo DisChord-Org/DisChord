@@ -3,7 +3,6 @@ import { TypeInferrer } from "../TypeInferrer";
 import { ASTNode, BaseNode, FunctionNode, ReturnNode, TokenType } from "../../model/types";
 import { isFunctionNode } from "../../ast.guards";
 import { DataType, VoidDataType } from "../../model/DataType";
-import { ChordError, ErrorLevel } from "../../../errors/ChordError";
 
 /**
  * Checks every `devolver` of a function that declares its return type (`-> numero`) against it,
@@ -42,16 +41,14 @@ export class ValidateReturnTypesRule<T extends string, N extends BaseNode<T>> ex
             const frame = this.functions.pop()!;
             const declared = frame.node.returnType;
 
-            if (declared && !frame.returns && !declared.isAssignableFrom(VoidDataType.Void)) this.fail(
-                `La función '${frame.node.id}' declara retorno '${declared.format()}' pero no devuelve ningún valor`,
-                frame.node
-            );
+            if (declared && !frame.returns && !declared.isAssignableFrom(VoidDataType.Void)) this.failAt(frame.node,
+                `La función '${frame.node.id}' declara retorno '${declared.format()}' pero no devuelve ningún valor`);
         }
     }
 
     /**
      * Checks one `devolver` against the return type of the function it belongs to.
-     * @throws {ChordError} If the returned value, or its absence, doesn't fit the declared type.
+     * @throws {DisChordError} If the returned value, or its absence, doesn't fit the declared type.
      */
     private validate (node: ReturnNode<T, N>): void {
         const frame = this.functions[this.functions.length - 1];
@@ -65,22 +62,14 @@ export class ValidateReturnTypesRule<T extends string, N extends BaseNode<T>> ex
         const name = frame.node.id;
 
         if (!node.object) {
-            if (!declared.isAssignableFrom(VoidDataType.Void)) this.fail(
-                `La función '${name}' declara retorno '${declared.format()}' pero 'devolver' no devuelve ningún valor`,
-                node
-            );
+            if (!declared.isAssignableFrom(VoidDataType.Void)) this.failAt(node,
+                `La función '${name}' declara retorno '${declared.format()}' pero 'devolver' no devuelve ningún valor`);
             return;
         }
 
         const valueType: DataType | undefined = this.typeInferrer.infer(node.object);
 
-        if (valueType && !declared.isAssignableFrom(valueType)) this.fail(
-            `La función '${name}' declara retorno '${declared.format()}' pero devuelve un valor de tipo '${valueType.format()}'`,
-            node
-        );
-    }
-
-    private fail (message: string, node: ASTNode<T, N>): never {
-        throw new ChordError({ phase: ErrorLevel.Analysis, message, location: node.location });
+        if (valueType && !declared.isAssignableFrom(valueType)) this.failAt(node,
+            `La función '${name}' declara retorno '${declared.format()}' pero devuelve un valor de tipo '${valueType.format()}'`);
     }
 }

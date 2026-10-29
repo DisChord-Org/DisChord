@@ -5,7 +5,6 @@ import { ASTNode, AccessNode, BaseNode, CallNode, ClassNode, FunctionNode, Token
 import { isAccessNode, isIdentificatorNode } from "../../ast.guards";
 import { AnyDataType, UnionDataType, UserClassDataType } from "../../model/DataType";
 import { asyncRuntimeHelperNames } from "../../corelib";
-import { ChordError, ErrorLevel } from "../../../errors/ChordError";
 
 /**
  * Decides, for every call, whether the generated JavaScript must `await` it, and records the
@@ -71,15 +70,11 @@ export class ResolveAwaitedCallsRule<T extends string, N extends BaseNode<T>> ex
     /**
      * @param {string} message - The error to report.
      * @param {BaseNode<T>['location']} location - Where.
-     * @throws {ChordError} If the innermost enclosing function-like body can't `await`.
+     * @throws {DisChordError} If the innermost enclosing function-like body can't `await`.
      * @private
      */
     private assertMayAwait (message: string, location: BaseNode<T>['location']): void {
-        if (this.callers.length > 0 && !this.callers[this.callers.length - 1]) throw new ChordError({
-            phase: ErrorLevel.Analysis,
-            message,
-            location
-        });
+        if (this.callers.length > 0 && !this.callers[this.callers.length - 1]) this.fail(message, location);
     }
 
     private exit (node: ASTNode<T, N>): void {
@@ -88,7 +83,7 @@ export class ResolveAwaitedCallsRule<T extends string, N extends BaseNode<T>> ex
 
     /**
      * Decides one call and, if it is awaited, checks that its caller may await.
-     * @throws {ChordError} If an async function or method is called from a function that isn't async.
+     * @throws {DisChordError} If an async function or method is called from a function that isn't async.
      */
     private resolve (call: CallNode<T, N>): void {
         const callee = call.object;

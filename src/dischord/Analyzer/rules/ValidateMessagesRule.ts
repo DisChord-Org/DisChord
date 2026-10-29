@@ -1,7 +1,4 @@
 import { AnalysisRule } from "../../../chord/Analyzer/AnalysisRule";
-import { walkAST } from "../../../chord/walkAST";
-import { BDOValidator } from "../../../chord/Analyzer/BDOValidator";
-import { DisChordError, ErrorLevel } from "../../../errors/ChordError";
 import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType, MessageNode } from "../../types";
 import { MessageSchema } from "../../Generator/constants/schemas";
 
@@ -17,7 +14,7 @@ import { MessageSchema } from "../../Generator/constants/schemas";
  *    have: it would fail with a `ReferenceError` when run.
  */
 export class ValidateMessagesRule extends AnalysisRule<DisChordNodeType, DisChordNode> {
-    private readonly validator = new BDOValidator<DisChordNodeType, DisChordNode>((message, location) => this.fail(message, location));
+    private readonly validator = this.createBDOValidator();
 
     /** How many commands or events enclose the node being visited. */
     private enclosing = 0;
@@ -26,16 +23,14 @@ export class ValidateMessagesRule extends AnalysisRule<DisChordNodeType, DisChor
      * @override
      */
     check (nodes: DisChordASTNode[]): void {
-        nodes.forEach(node => walkAST<DisChordNodeType, DisChordNode>(
-            node,
-            current => {
+        this.walk(nodes, current => {
                 if (this.opensContext(current)) this.enclosing++;
                 if (current.type === DisChordTokenType.CREAR_MENSAJE) this.validate(current as MessageNode);
             },
             current => {
                 if (this.opensContext(current)) this.enclosing--;
             }
-        ));
+        );
     }
 
     /**
@@ -56,13 +51,5 @@ export class ValidateMessagesRule extends AnalysisRule<DisChordNodeType, DisChor
             "'enviar mensaje' solo puede usarse dentro de un comando o un evento: necesita el cliente y el contexto donde responder",
             node.location
         );
-    }
-
-    /**
-     * @throws {DisChordError} Always.
-     * @private
-     */
-    private fail (message: string, location: DisChordASTNode['location']): never {
-        throw new DisChordError({ phase: ErrorLevel.Analysis, message, location });
     }
 }

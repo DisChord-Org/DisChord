@@ -3,7 +3,6 @@ import { ASTNode, AssignmentNode, BaseNode, ListNode, Symbol, TokenType, Variabl
 import { isIdentificatorNode } from "../../ast.guards";
 import { AnyDataType, DataType, TupleDataType, VoidDataType } from "../../model/DataType";
 import { TypeInferrer } from "../TypeInferrer";
-import { ChordError, ErrorLevel } from "../../../errors/ChordError";
 
 /**
  * Pass 3 of the Analyzer's binding model ("Tipos"): resolves and validates each variable's
@@ -144,7 +143,7 @@ export class ResolveVariableTypesRule<T extends string, N extends BaseNode<T>> e
      * @returns {DataType | undefined} The resolved type, or `undefined` if neither an annotation
      * nor an inferrable initializer is present. `cualquiera` for a variable without an annotation
      * that a reassignment degraded.
-     * @throws {ChordError} If the explicit `tipo` annotation isn't assignable from the inferred
+     * @throws {DisChordError} If the explicit `tipo` annotation isn't assignable from the inferred
      * type (or, for a tuple, if the list literal's shape doesn't match it).
      * @private
      */
@@ -156,17 +155,9 @@ export class ResolveVariableTypesRule<T extends string, N extends BaseNode<T>> e
 
         const inferredType = this.typeInferrer.infer(variableNode.value);
 
-        if (inferredType instanceof VoidDataType) throw new ChordError({
-            phase: ErrorLevel.Analysis,
-            message: `La variable '${variableNode.id}' se inicializó con una llamada que no devuelve ningún valor`,
-            location: variableNode.location
-        });
+        if (inferredType instanceof VoidDataType) this.failAt(variableNode, `La variable '${variableNode.id}' se inicializó con una llamada que no devuelve ningún valor`);
 
-        if (variableNode.dataType && inferredType && !variableNode.dataType.isAssignableFrom(inferredType)) throw new ChordError({
-            phase: ErrorLevel.Analysis,
-            message: `La variable '${variableNode.id}' se declaró con tipo '${variableNode.dataType.format()}' pero se le asignó un valor de tipo '${inferredType.format()}'`,
-            location: variableNode.location
-        });
+        if (variableNode.dataType && inferredType && !variableNode.dataType.isAssignableFrom(inferredType)) this.failAt(variableNode, `La variable '${variableNode.id}' se declaró con tipo '${variableNode.dataType.format()}' pero se le asignó un valor de tipo '${inferredType.format()}'`);
 
         if (variableNode.dataType) return variableNode.dataType;
 
@@ -185,26 +176,18 @@ export class ResolveVariableTypesRule<T extends string, N extends BaseNode<T>> e
      * @param {string} id - The variable's name, for the error message.
      * @param {TupleDataType} tupleType - The declared tuple type.
      * @param {ListNode<T, N>} listNode - The list literal assigned to the variable.
-     * @throws {ChordError} If the list's length doesn't match the tuple's, or an element's
+     * @throws {DisChordError} If the list's length doesn't match the tuple's, or an element's
      * inferred type isn't assignable to its declared position.
      * @private
      */
     private validateTupleLiteral (id: string, tupleType: TupleDataType, listNode: ListNode<T, N>): void {
-        if (listNode.body.length !== tupleType.elements.length) throw new ChordError({
-            phase: ErrorLevel.Analysis,
-            message: `La variable '${id}' se declaró como tupla de ${tupleType.elements.length} elemento(s) pero se le asignó una lista de ${listNode.body.length}`,
-            location: listNode.location
-        });
+        if (listNode.body.length !== tupleType.elements.length) this.failAt(listNode, `La variable '${id}' se declaró como tupla de ${tupleType.elements.length} elemento(s) pero se le asignó una lista de ${listNode.body.length}`);
 
         listNode.body.forEach((element, index) => {
             const elementType = this.typeInferrer.infer(element);
             const expectedType = tupleType.elements[index];
 
-            if (elementType && !expectedType.isAssignableFrom(elementType)) throw new ChordError({
-                phase: ErrorLevel.Analysis,
-                message: `La variable '${id}' se declaró con tipo '${tupleType.format()}', pero el elemento ${index} es de tipo '${elementType.format()}', se esperaba '${expectedType.format()}'`,
-                location: element.location
-            });
+            if (elementType && !expectedType.isAssignableFrom(elementType)) this.failAt(element, `La variable '${id}' se declaró con tipo '${tupleType.format()}', pero el elemento ${index} es de tipo '${elementType.format()}', se esperaba '${expectedType.format()}'`);
         });
     }
 }

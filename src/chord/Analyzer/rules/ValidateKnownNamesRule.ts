@@ -1,7 +1,6 @@
 import { AnalysisRule } from "../AnalysisRule";
 import { ASTNode, BaseNode, IdentificatorNode, LoopNode, ODBMode, ODBNode, SyntaxFunction, TokenType } from "../../model/types";
 import { JsGlobals } from "../../corelib/JsGlobals";
-import { ChordError, ErrorLevel } from "../../../errors/ChordError";
 
 /**
  * Rejects a name that is used but declared nowhere: `mostrar nadie` or `"hola {nadie}"` would compile
@@ -77,7 +76,7 @@ export class ValidateKnownNamesRule<T extends string, N extends BaseNode<T>> ext
     }
 
     /**
-     * @throws {ChordError} If the identifier names nothing visible.
+     * @throws {DisChordError} If the identifier names nothing visible.
      */
     private validate (node: IdentificatorNode<T>): void {
         if (this.isKnown(node.value, node)) return;
@@ -85,11 +84,7 @@ export class ValidateKnownNamesRule<T extends string, N extends BaseNode<T>> ext
         const close = this.closestVisible(node.value);
         const message = `El nombre '${node.value}' no está declarado.${close ? ` ¿Querías decir '${close}'?` : ''}`;
 
-        this.fail(message, node);
-    }
-
-    private fail (message: string, node: IdentificatorNode<T>): never {
-        throw new ChordError({ phase: ErrorLevel.Analysis, message, location: node.location });
+        this.failAt(node, message);
     }
 
     /**

@@ -4,7 +4,6 @@ import { ASTNode, AccessNode, AssignmentNode, BaseNode, CallNode, TokenType } fr
 import { isAccessNode, isIdentificatorNode } from "../../ast.guards";
 import { AnyDataType, DataType, UnionDataType } from "../../model/DataType";
 import { ResolvedMember } from "../../corelib";
-import { ChordError, ErrorLevel } from "../../../errors/ChordError";
 
 /**
  * Decides the name every non-static member access is emitted with, and records it in the
@@ -80,7 +79,7 @@ export class ResolveMemberAccessesRule<T extends string, N extends BaseNode<T>> 
      * be: anything else would be emitted as JavaScript that doesn't do what was written (`f.dia` as the
      * function `f.getDate`, `t.longitud()` as a call of a number). A receiver of unknown type, a union
      * or `cualquiera` is not checked. A method assigned to is left as it was.
-     * @throws {ChordError} If the member is used the wrong way.
+     * @throws {DisChordError} If the member is used the wrong way.
      * @private
      */
     private checkUse (access: AccessNode<T, N>, resolved: ResolvedMember, receiverType: DataType, role: string): void {
@@ -88,15 +87,15 @@ export class ResolveMemberAccessesRule<T extends string, N extends BaseNode<T>> 
 
         const className = resolved.qualifiedName.split('.')[0];
 
-        if (!resolved.isProperty && role === 'read') this.fail(`'${access.property}' es un método de ${className}: llámalo con paréntesis, ${access.property}()`, access);
-        if (resolved.isProperty && role === 'callee') this.fail(`'${access.property}' es una propiedad de ${className}, no un método`, access);
+        if (!resolved.isProperty && role === 'read') this.failAt(access, `'${access.property}' es un método de ${className}: llámalo con paréntesis, ${access.property}()`);
+        if (resolved.isProperty && role === 'callee') this.failAt(access, `'${access.property}' es una propiedad de ${className}, no un método`);
     }
 
     /**
      * An instance member of a core library class can't be reached through the class itself
      * (`Texto.limpiar`, `Mapa.tiene`): there is no instance for it to act on. A name the file declares
      * itself is not the class.
-     * @throws {ChordError} If the member isn't static.
+     * @throws {DisChordError} If the member isn't static.
      * @private
      */
     private checkInstanceMemberOnClass (access: AccessNode<T, N>, member: ResolvedMember): void {
@@ -105,10 +104,6 @@ export class ResolveMemberAccessesRule<T extends string, N extends BaseNode<T>> 
         const className = member.qualifiedName.split('.')[0];
         const kind = member.isProperty ? 'una propiedad' : 'un método';
 
-        this.fail(`'${access.property}' es ${kind} de instancia de ${className}, no se puede usar sobre la clase`, access);
-    }
-
-    private fail (message: string, node: ASTNode<T, N>): never {
-        throw new ChordError({ phase: ErrorLevel.Analysis, message, location: node.location });
+        this.failAt(access, `'${access.property}' es ${kind} de instancia de ${className}, no se puede usar sobre la clase`);
     }
 }

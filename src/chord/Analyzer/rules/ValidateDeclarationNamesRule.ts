@@ -1,7 +1,5 @@
 import { AnalysisRule } from "../AnalysisRule";
-import { walkAST } from "../../walkAST";
 import { ASTNode, BaseNode, ClassNode, FunctionNode, ImportNode, LoopNode, TokenType, VariableNode } from "../../model/types";
-import { ChordError, ErrorLevel } from "../../../errors/ChordError";
 
 /**
  * Rejects declaring a name that belongs to a class of the core library (`Mapa`, `Mates`,
@@ -19,7 +17,7 @@ export class ValidateDeclarationNamesRule<T extends string, N extends BaseNode<T
      * @override
      */
     check (nodes: ASTNode<T, N>[]): void {
-        nodes.forEach(node => walkAST<T, N>(node, current => this.validate(current)));
+        this.walk(nodes, current => this.validate(current));
     }
 
     private validate (node: ASTNode<T, N>): void {
@@ -54,7 +52,7 @@ export class ValidateDeclarationNamesRule<T extends string, N extends BaseNode<T
      * @param {string} what - What it declares, for the message.
      * @param {ASTNode<T, N>} node - The declaring node.
      * @param {boolean} isParameter - Whether it is a parameter, the one place an injected name is allowed.
-     * @throws {ChordError} If the name is one of a class of the core library.
+     * @throws {DisChordError} If the name is one of a class of the core library.
      * @private
      */
     private reject (name: string, what: string, node: ASTNode<T, N>, isParameter: boolean): void {
@@ -64,13 +62,9 @@ export class ValidateDeclarationNamesRule<T extends string, N extends BaseNode<T
         if (coreLib.isInjectedName(name)) {
             if (isParameter) return;
 
-            this.fail(`No se puede declarar ${what} '${name}': es un identificador reservado por DisChord`, node);
+            this.failAt(node, `No se puede declarar ${what} '${name}': es un identificador reservado por DisChord`);
         }
 
-        this.fail(`No se puede declarar ${what} '${name}': es el nombre de una clase de la biblioteca estándar`, node);
-    }
-
-    private fail (message: string, node: ASTNode<T, N>): never {
-        throw new ChordError({ phase: ErrorLevel.Analysis, message, location: node.location });
+        this.failAt(node, `No se puede declarar ${what} '${name}': es el nombre de una clase de la biblioteca estándar`);
     }
 }

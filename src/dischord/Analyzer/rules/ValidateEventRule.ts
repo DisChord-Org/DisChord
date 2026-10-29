@@ -1,6 +1,4 @@
 import { AnalysisRule } from "../../../chord/Analyzer/AnalysisRule";
-import { walkAST } from "../../../chord/walkAST";
-import { DisChordError, ErrorLevel } from "../../../errors/ChordError";
 import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType, EventNode } from "../../types";
 import { eventsMap } from "../../Generator/constants/mappings";
 
@@ -14,15 +12,11 @@ export class ValidateEventRule extends AnalysisRule<DisChordNodeType, DisChordNo
      * @override
      */
     check (nodes: DisChordASTNode[]): void {
-        nodes.forEach(node => walkAST<DisChordNodeType, DisChordNode>(node, current => {
+        this.walk(nodes, current => {
             if (current.type !== DisChordTokenType.EVENTO) return;
 
             const eventNode = current as EventNode;
-            if (!eventsMap[eventNode.name]) throw new DisChordError({
-                phase: ErrorLevel.Analysis,
-                message: `El evento '${eventNode.name}' no existe`,
-                location: eventNode.location
-            });
-        }));
+            if (!eventsMap[eventNode.name]) this.failAt(eventNode, `El evento '${eventNode.name}' no existe`);
+        });
     }
 }

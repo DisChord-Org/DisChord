@@ -1,5 +1,4 @@
 import { AnalysisRule } from "../../../chord/Analyzer/AnalysisRule";
-import { walkAST } from "../../../chord/walkAST";
 import { SharedModuleImporter } from "../../../chord/Analyzer/SharedModuleImporter";
 import { LiteralNode, ODBNode, TokenType } from "../../../chord/model/types";
 import { isAccessNode, isIdentificatorNode } from "../../../chord/ast.guards";
@@ -33,7 +32,7 @@ export class RequiresUserExtensionsRule extends AnalysisRule<DisChordNodeType, D
     check (nodes: DisChordASTNode[]): void {
         let needsUserExtensions = false;
 
-        nodes.forEach(node => walkAST<DisChordNodeType, DisChordNode>(node, current => {
+        this.walk(nodes, current => {
             if (needsUserExtensions) return;
 
             if (isAccessNode(current)) {
@@ -49,7 +48,7 @@ export class RequiresUserExtensionsRule extends AnalysisRule<DisChordNodeType, D
                     needsUserExtensions = true;
                 }
             }
-        }));
+        });
 
         if (!needsUserExtensions) return;
 

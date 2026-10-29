@@ -1,9 +1,6 @@
 import { AnalysisRule } from "../../../chord/Analyzer/AnalysisRule";
-import { walkAST } from "../../../chord/walkAST";
-import { BDOValidator } from "../../../chord/Analyzer/BDOValidator";
 import { fieldKeys } from "../../../chord/BDOSchema";
 import { TokenType } from "../../../chord/model/types";
-import { DisChordError, ErrorLevel } from "../../../errors/ChordError";
 import { ChannelAction, ChannelActionNode, ChannelActionObject, ChannelProperty, ChannelWriteActions, CommandNode, DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType, EventNode } from "../../types";
 import { ChannelActionSchemas } from "../../Generator/constants/schemas";
 import { CommandGuildSource, EventGuildSources, EventSelfTriggers, eventsMap } from "../../Generator/constants/mappings";
@@ -24,7 +21,7 @@ import { CommandGuildSource, EventGuildSources, EventSelfTriggers, eventsMap } f
  *    it; the other two use it to check that the channel belongs to that server.
  */
 export class ValidateChannelActionsRule extends AnalysisRule<DisChordNodeType, DisChordNode> {
-    private readonly validator = new BDOValidator<DisChordNodeType, DisChordNode>((message, location) => this.fail(message, location));
+    private readonly validator = this.createBDOValidator();
 
     /** The command or event enclosing the node being visited, innermost last. */
     private readonly enclosing: (CommandNode | EventNode)[] = [];
@@ -36,9 +33,7 @@ export class ValidateChannelActionsRule extends AnalysisRule<DisChordNodeType, D
      * @override
      */
     check (nodes: DisChordASTNode[]): void {
-        nodes.forEach(node => walkAST<DisChordNodeType, DisChordNode>(
-            node,
-            current => {
+        this.walk(nodes, current => {
                 if (current.type === DisChordTokenType.CREAR_COMANDO || current.type === DisChordTokenType.EVENTO) {
                     this.enclosing.push(current as CommandNode | EventNode);
                 }
@@ -53,7 +48,7 @@ export class ValidateChannelActionsRule extends AnalysisRule<DisChordNodeType, D
 
                 if (current.type === TokenType.BUCLE) this.loops--;
             }
-        ));
+        );
     }
 
     /**
@@ -135,13 +130,5 @@ export class ValidateChannelActionsRule extends AnalysisRule<DisChordNodeType, D
         const source = event?.params.find(param => EventGuildSources[param] !== undefined);
 
         return source === undefined ? undefined : EventGuildSources[source];
-    }
-
-    /**
-     * @throws {DisChordError} Always.
-     * @private
-     */
-    private fail (message: string, location: DisChordASTNode['location']): never {
-        throw new DisChordError({ phase: ErrorLevel.Analysis, message, location });
     }
 }

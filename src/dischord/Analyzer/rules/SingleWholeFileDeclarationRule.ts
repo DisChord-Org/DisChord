@@ -1,6 +1,5 @@
 import { AnalysisRule } from "../../../chord/Analyzer/AnalysisRule";
 import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType } from "../../types";
-import { DisChordError, ErrorLevel } from "../../../errors/ChordError";
 
 /**
  * Validates that at most one whole-file declaration (`comando`, `evento`) exists per file. Since
@@ -31,10 +30,6 @@ export class SingleWholeFileDeclarationRule extends AnalysisRule<DisChordNodeTyp
     check (nodes: DisChordASTNode[]): void {
         const wholeFileNodes = nodes.filter(node => SingleWholeFileDeclarationRule.WholeFileDeclarationTypes.includes(node.type));
 
-        if (wholeFileNodes.length > 1) throw new DisChordError({
-            phase: ErrorLevel.Analysis,
-            message: `Solo se permite un 'comando' o 'evento' por archivo. Este archivo declara ${wholeFileNodes.length}: separalos en un archivo por cada uno.`,
-            location: wholeFileNodes[1].location
-        });
+        if (wholeFileNodes.length > 1) this.failAt(wholeFileNodes[1], `Solo se permite un 'comando' o 'evento' por archivo. Este archivo declara ${wholeFileNodes.length}: separalos en un archivo por cada uno.`);
     }
 }

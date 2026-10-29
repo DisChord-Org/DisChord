@@ -1,8 +1,5 @@
 import { AnalysisRule } from "../../../chord/Analyzer/AnalysisRule";
-import { walkAST } from "../../../chord/walkAST";
-import { BDOValidator } from "../../../chord/Analyzer/BDOValidator";
 import { TokenType } from "../../../chord/model/types";
-import { DisChordError, ErrorLevel } from "../../../errors/ChordError";
 import { ButtonDeclarationNode, DisChordASTNode, DisChordNode, DisChordNodeType, DisChordODBNode, DisChordTokenType, MessageNode } from "../../types";
 import { ButtonSchema } from "../../Generator/constants/schemas";
 
@@ -22,16 +19,16 @@ export class ValidateButtonsRule extends AnalysisRule<DisChordNodeType, DisChord
     /** Discord's maximum number of components (buttons) allowed in a single ActionRow. */
     private static readonly MAX_PER_ROW = 5;
 
-    private readonly validator = new BDOValidator<DisChordNodeType, DisChordNode>((message, location) => this.fail(message, location));
+    private readonly validator = this.createBDOValidator();
 
     /**
      * @override
      */
     check (nodes: DisChordASTNode[]): void {
-        nodes.forEach(node => walkAST<DisChordNodeType, DisChordNode>(node, current => {
+        this.walk(nodes, current => {
             if (current.type === DisChordTokenType.CREAR_BOTON) this.validator.validate((current as ButtonDeclarationNode).body, ButtonSchema);
             if (current.type === DisChordTokenType.CREAR_MENSAJE) this.validateButtonProperty((current as MessageNode).object.blocks['boton']);
-        }));
+        });
     }
 
     /**
@@ -75,13 +72,5 @@ export class ValidateButtonsRule extends AnalysisRule<DisChordNodeType, DisChord
      */
     private validateButtonElement (element: DisChordASTNode): void {
         if (element.type === TokenType.BDO) this.validator.validate(element as DisChordODBNode, ButtonSchema);
-    }
-
-    /**
-     * @throws {DisChordError} Always.
-     * @private
-     */
-    private fail (message: string, location: DisChordASTNode['location']): never {
-        throw new DisChordError({ phase: ErrorLevel.Analysis, message, location });
     }
 }
