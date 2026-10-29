@@ -1,9 +1,8 @@
 import { ChordError, ErrorLevel } from "../../errors/ChordError";
-import { DisChordNode, DisChordNodeType } from "../../dischord/types";
 import { CompilationContext } from "../model/CompilationContext";
-import { ASTNode, BaseNode } from "../model/types";
+import { ASTNode, BaseNode, TokenType } from "../model/types";
 import { GeneratorContext } from "./GeneratorContext";
-import { SubGeneratorClass } from "./SubGenerator";
+import { SubGenerator, SubGeneratorClass } from "./SubGenerator";
 
 import { ConditionVisitor } from "./visitors/clis/ConditionVisitor";
 import { ExitVisitor } from "./visitors/clis/ExitVisitor";
@@ -67,7 +66,7 @@ export class Generator<T extends string, N extends BaseNode<T>> extends Generato
      * Registry of all native Chord sub-generators.
      * Maps the AST node type string to its corresponding class constructor.
      */
-    private static readonly SubGenerators: SubGeneratorClass<DisChordNodeType, DisChordNode>[] = [
+    private static readonly SubGenerators: SubGeneratorClass<TokenType, BaseNode<TokenType>>[] = [
         ConditionVisitor, ExitVisitor, LoopVisitor, PassVisitor, ReturnVisitor,
         JSVisitor, NewVisitor, BDOVisitor, BinaryExpressionVisitor, ExpressionVisitor,
         ListVisitor, LiteralVisitor, NoUnaryVisitor, UnaryVisitor,
@@ -81,9 +80,26 @@ export class Generator<T extends string, N extends BaseNode<T>> extends Generato
      * @protected
      */
     protected registerVisitors (): void {
-        Generator.SubGenerators.forEach(instance => {
-            this.register(instance as unknown as SubGeneratorClass<T, N>);
-        })
+        this.nativeVisitors.forEach(instance => this.register(instance));
+    }
+
+    /**
+     * The native sub-generators as this generator's own types — the one cast of the registry, which is
+     * declared over chord's token types.
+     * @private
+     */
+    private get nativeVisitors (): SubGeneratorClass<T, N>[] {
+        return Generator.SubGenerators as unknown as SubGeneratorClass<T, N>[];
+    }
+
+    /**
+     * The native sub-generator in charge of a node, if there is one.
+     * @private
+     */
+    private visitorFor (node: ASTNode<T, N>): SubGenerator<T, N> | undefined {
+        const VisitorClass = this.nativeVisitors.find(cls => cls.triggerToken === node.type);
+
+        return VisitorClass && this.get(VisitorClass);
     }
 
     /**
@@ -104,15 +120,15 @@ export class Generator<T extends string, N extends BaseNode<T>> extends Generato
      * @param node - The target node to be generated.
      */
     public visit(node: ASTNode<T, N>): string {
-        const VisitorClass = Generator.SubGenerators.find(cls => cls.triggerToken === node.type);
+        const visitor = this.visitorFor(node);
 
-        if (!VisitorClass) throw new ChordError({
+        if (!visitor) throw new ChordError({
             phase: ErrorLevel.Compiler,
             message: `Generador: Error al procesar el tipo de nodo '${node.type}'. Asegúrate de que su visitor esté correctamente registrado.`,
             location: node.location
         });
 
-        return this.get(VisitorClass as unknown as SubGeneratorClass<T, N>).visit(node);
+        return visitor.visit(node);
     }
 
     /**
@@ -138,11 +154,6 @@ export class Generator<T extends string, N extends BaseNode<T>> extends Generato
     public visitStatement(node: ASTNode<T, N>): string {
         const code = this.visit(node);
 
-        const VisitorClass = Generator.SubGenerators.find(cls => cls.triggerToken === node.type);
-        const needsParens = VisitorClass
-            ? this.get(VisitorClass as unknown as SubGeneratorClass<T, N>).needsStatementParens(node)
-            : false;
-
-        return needsParens ? `(${code})` : code;
+        return this.visitorFor(node)?.needsStatementParens(node) ? `(${code})` : code;
     }
 }
