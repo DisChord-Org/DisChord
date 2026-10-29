@@ -1,4 +1,4 @@
-import { Token, TokenTypeUnion } from '../../chord/model/types';
+import { Token } from '../../chord/model/types';
 import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType } from '../types';
 
 import { Parser } from '../../chord/Parser/Parser';
@@ -67,15 +67,7 @@ export class DisChordParser extends Parser<DisChordNodeType, DisChordNode> {
      * @override
      */
     static override registerKeywords (keywordsManager: KeyWords<string>): void {
-        DisChordParser.DisChordSubParsers.forEach(instance => {
-            keywordsManager.extend(
-                instance.keywords.reduce<Record<string, TokenTypeUnion<DisChordNodeType>>>((accumulator, keyword) => {
-                    accumulator[keyword] = keyword as TokenTypeUnion<DisChordNodeType>;
-
-                    return accumulator;
-                }, {})
-            );
-        });
+        DisChordParser.DisChordSubParsers.forEach(instance => keywordsManager.extendWith(instance.keywords));
 
         super.registerKeywords(keywordsManager);
     }

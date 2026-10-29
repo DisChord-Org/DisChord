@@ -29,6 +29,15 @@ export class KeyWords <T extends string> {
     }
 
     /**
+     * Registers words that are their own token type, which is how a sub-parser lists the keywords it brings.
+     * @param {readonly string[]} keywords - The keywords, each one the token type it resolves to.
+     * @returns {void}
+     */
+    public extendWith (keywords: readonly string[]): void {
+        this.extend(Object.fromEntries(keywords.map(keyword => [ keyword, keyword as TokenTypeUnion<T> ])));
+    }
+
+    /**
      * Checks whether a scanned text identifier matches a protected reserved word registry entry.
      * @param {string} identifier - The raw source text identifier to evaluate.
      * @returns {boolean} True if the identifier is a locked reserved keyword.

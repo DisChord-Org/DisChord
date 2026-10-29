@@ -126,15 +126,7 @@ export class Parser<T extends string, N extends BaseNode<T>> extends ParserConte
      * @returns {void}
      */
     protected static registerKeywords (keywordsManager: KeyWords<string>): void {
-        Parser.SubParsers.forEach(instance => {
-            keywordsManager.extend(
-                instance.keywords.reduce<Record<string, TokenTypeUnion<string>>>((accumulator, keyword) => {
-                    accumulator[keyword] = keyword;
-
-                    return accumulator;
-                }, {})
-            );
-        });
+        Parser.SubParsers.forEach(instance => keywordsManager.extendWith(instance.keywords));
     }
 
     /**
