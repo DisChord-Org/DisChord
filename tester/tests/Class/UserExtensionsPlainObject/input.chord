@@ -1,0 +1,3 @@
+var c es { nombre "x" }
+
+consola.imprimir(c.nombre)

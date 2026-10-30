@@ -1,0 +1,13 @@
+clase Animal {
+    Animal(nombre) {
+        esta.nombre es nombre
+    }
+
+    funcion hablar() {
+        consola.imprimir(esta.nombre)
+    }
+}
+
+nuevo evento encendido {
+    consola.imprimir("hola")
+}
