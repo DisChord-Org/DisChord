@@ -1,5 +1,5 @@
 nuevo comando uno {
-    descripcion "uno";
+    descripcion "uno"
 
     enviar mensaje {
         contenido "hola"

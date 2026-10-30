@@ -4,7 +4,7 @@ nuevo embed Bienvenida {
 }
 
 nuevo comando Prueba {
-    descripcion "prueba";
+    descripcion "prueba"
 
     var msg es enviar mensaje {
         embed Bienvenida

@@ -1,5 +1,5 @@
 nuevo comando prueba {
-    descripcion "Test";
+    descripcion "Test"
 
     opciones {
         miOpcion {

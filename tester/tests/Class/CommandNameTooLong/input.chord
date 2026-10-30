@@ -1,5 +1,5 @@
 nuevo comando abcdefghijklmnopqrstuvwxyzabcdefg {
-    descripcion "Test";
+    descripcion "Test"
 
     enviar mensaje {
         contenido "hola"

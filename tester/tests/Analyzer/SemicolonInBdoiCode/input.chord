@@ -1,0 +1,6 @@
+@BDOI
+var c es {
+    a 1
+
+    consola.imprimir(a);
+}

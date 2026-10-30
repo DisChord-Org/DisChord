@@ -1,5 +1,5 @@
 nuevo comando X {
-    descripcion "x";
+    descripcion "x"
 
     var msg es enviar mensaje {
         contenido "hola"

@@ -1,5 +1,5 @@
 var mibdo es {
-    bdoA {};
+    bdoA {}
 
     { bdoC [] }
     consola.imprimir("después del bloque")

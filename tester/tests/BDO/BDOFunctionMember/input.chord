@@ -1,6 +1,6 @@
 @BDOI
 var persona es {
-    nombre "Juan";
+    nombre "Juan"
 
     funcion saludar() {
         consola.imprimir("Hola, " + esta.nombre)

@@ -8,8 +8,8 @@ import { Test } from "../../../Test";
  * property (`bdoB { ... }` inside another BDO's body), `checkPropertyPattern` sees the decorator
  * token first (not an IDENTIFICADOR) and falls through to generic statement parsing, which does
  * not know how to reconstruct "decorator + property key + brace" — it parses `bdoB` as an
- * orphaned bare expression and abandons the following `{`, leading to a stray ';' the parser
- * can't recover from. This test pins the current (broken) behavior so a future fix is a
+ * orphaned bare expression and abandons the following `{`, so `bdoB` is later reported as an
+ * undeclared name. This test pins the current (broken) behavior so a future fix is a
  * deliberate change, not a silent regression.
  */
 export class BDOIOnNestedPropertyTest extends Test {
@@ -26,5 +26,5 @@ export class BDOIOnNestedPropertyTest extends Test {
     /**
      * @type {string}
      */
-    public readonly expectedError: string = 'Token inesperado en expresión';
+    public readonly expectedError: string = "El nombre 'bdoB' no está declarado";
 }

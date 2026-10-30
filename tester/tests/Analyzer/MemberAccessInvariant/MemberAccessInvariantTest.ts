@@ -32,7 +32,7 @@ const programs: string[] = [
     '@asincrono\nfuncion nombre() {\n    devolver " ab "\n}\n\n@asincrono\nfuncion principal() {\n    consola.imprimir(nombre().tiene("a"))\n    consola.imprimir(nombre().limpiar())\n}\n\nprincipal()\n',
     'funcion crear() -> Mapa {\n    devolver nuevo Mapa()\n}\n\nconsola.imprimir(crear().tiene("a"))\nconsola.imprimir(Mates.PI)\nconsola.imprimir(Mates.redondear(1.5))\n',
     'nuevo evento encendido {\n    imprimir(cliente.nombre mas cliente.id)\n}\n',
-    'nuevo comando uno {\n    descripcion "Test";\n\n    enviar mensaje {\n        contenido usuario.nombre\n    }\n}\n'
+    'nuevo comando uno {\n    descripcion "Test"\n\n    enviar mensaje {\n        contenido usuario.nombre\n    }\n}\n'
 ];
 
 /**

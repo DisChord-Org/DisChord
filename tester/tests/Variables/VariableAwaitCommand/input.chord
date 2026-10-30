@@ -2,7 +2,7 @@
 funcion tarea() { devolver 1 }
 
 nuevo comando Uno {
-    descripcion "uno";
+    descripcion "uno"
 
     tarea()
 }

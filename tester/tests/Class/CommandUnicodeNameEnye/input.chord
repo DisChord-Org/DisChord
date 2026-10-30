@@ -1,5 +1,5 @@
 nuevo comando añoNuevo {
-    descripcion "Test";
+    descripcion "Test"
 
     enviar mensaje {
         contenido "hola"

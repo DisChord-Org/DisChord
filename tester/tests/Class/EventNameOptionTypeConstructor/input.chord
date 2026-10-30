@@ -1,5 +1,5 @@
 nuevo comando Prueba {
-    descripcion "Prueba";
+    descripcion "Prueba"
 
     opciones {
         dato {

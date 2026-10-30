@@ -11,7 +11,7 @@ funcion alPulsarMiId (interaccion, cliente, contexto) {
 }
 
 nuevo comando HolaMundo {
-    descripcion "un hola mundo desde DisChord";
+    descripcion "un hola mundo desde DisChord"
 
     var msg es enviar mensaje {
         contenido "hola"

@@ -343,6 +343,12 @@ export class Lexer<T extends string> {
                 }
             }
 
+            if (char === ';') throw new ChordError({
+                phase: ErrorLevel.Lexer,
+                message: "No se usa ';': separa las propiedades y las sentencias con saltos de línea",
+                location: { line: startLine, column: startCol }
+            });
+
             if (SymbolTranslationMap[char]) {
                 this.advance();
                 emit(this.createToken(SymbolTranslationMap[char], char, startLine, startCol));

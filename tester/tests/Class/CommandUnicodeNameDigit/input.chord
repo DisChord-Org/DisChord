@@ -1,5 +1,5 @@
 nuevo comando comando2Nuevo {
-    descripcion "Test";
+    descripcion "Test"
 
     enviar mensaje {
         contenido "hola"

@@ -1,7 +1,7 @@
 var panas es {
-    Ether "está chetado";
-    JustEvil "goat";
-    ZendrYz "wen pibe";
+    Ether "está chetado"
+    JustEvil "goat"
+    ZendrYz "wen pibe"
 
     consola.imprimir(JustEvil) // "goat"
     JustEvil es "la cabra"

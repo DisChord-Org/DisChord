@@ -1,5 +1,5 @@
 nuevo comando Canales {
-    descripcion "gestiona canales";
+    descripcion "gestiona canales"
 
     editar canal {
         canal canal

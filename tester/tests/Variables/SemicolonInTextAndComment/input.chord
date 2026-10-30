@@ -1,0 +1,4 @@
+var texto es "a;b"
+// un comentario; con punto y coma
+/* y otro; de bloque */
+consola.imprimir(texto)

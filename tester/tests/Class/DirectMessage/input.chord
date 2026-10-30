@@ -1,5 +1,5 @@
 nuevo comando Prueba {
-    descripcion "prueba";
+    descripcion "prueba"
 
     var msg es enviar mensaje {
         usuario "123456789"

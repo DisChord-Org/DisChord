@@ -1,5 +1,5 @@
 nuevo comando Punto {
-    descripcion "punto";
+    descripcion "punto"
 
     opciones {
         x {

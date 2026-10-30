@@ -1,5 +1,5 @@
 nuevo comando StringTest {
-    descripcion "Test de Strings";
+    descripcion "Test de Strings"
 
     opciones {
         repetir {

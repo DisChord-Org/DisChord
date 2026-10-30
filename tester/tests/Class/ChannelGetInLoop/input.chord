@@ -1,5 +1,5 @@
 nuevo comando Canales {
-    descripcion "gestiona canales";
+    descripcion "gestiona canales"
 
     para (n en rango(2)) {
         var c es obtener canal { id "123" }

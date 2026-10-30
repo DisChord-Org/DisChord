@@ -60,7 +60,8 @@ export class BDOParser<T extends string, N extends BaseNode<T>> extends SubParse
      * another property does not start the code: properties may be grouped. A word is a property
      * key whatever it is (`si`, `clase`, `tipo`...), so a reserved word can name one.
      *
-     * An optional `;` after a property is accepted and ignored.
+     * Properties and statements are separated by line breaks; a `;` is not written (the lexer rejects it).
+     * The parser itself closes an entry at its line break with a `;` of its own (see `endEntryAtLineBreak`).
      * @param mode - Mode requested by the caller; a block with code is intelligent whatever it was.
      * @returns A constructed ODBNode containing properties (blocks) and logic (body).
      * @throws {ChordError} If code follows the properties without an empty line in between.

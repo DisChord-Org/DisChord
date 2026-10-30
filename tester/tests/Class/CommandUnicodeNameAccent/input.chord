@@ -1,5 +1,5 @@
 nuevo comando canciónPopular {
-    descripcion "Test";
+    descripcion "Test"
 
     enviar mensaje {
         contenido "hola"

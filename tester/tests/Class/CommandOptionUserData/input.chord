@@ -1,5 +1,5 @@
 nuevo comando Avatar {
-    descripcion "Obtener el avatar de un usuario";
+    descripcion "Obtener el avatar de un usuario"
 
     opciones {
         mencion {

@@ -1,5 +1,5 @@
 nuevo comando Canales {
-    descripcion "gestiona canales";
+    descripcion "gestiona canales"
 
     var todos es listar canales { servidor "1" }
     consola.imprimir(todos)
