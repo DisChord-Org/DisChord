@@ -1,0 +1,6 @@
+funcion pasa(n) {
+    devolver n > 1
+}
+
+var numeros tipo numero[] es [1, 2, 3]
+var x tipo texto[] es numeros.filtrar(pasa)

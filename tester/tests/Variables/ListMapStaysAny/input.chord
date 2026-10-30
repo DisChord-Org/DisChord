@@ -1,0 +1,6 @@
+funcion aTexto(n) {
+    devolver "a"
+}
+
+var numeros tipo numero[] es [1, 2, 3]
+var x tipo texto[] es numeros.mapear(aTexto)

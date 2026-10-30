@@ -1,7 +1,7 @@
 // if this file exceeds 500 lines of code, it will be refactored
 
 import { isIdentificatorNode } from "../ast.guards";
-import { AnyDataType, ClassDataType, DataType, PrimitiveDataType, UnionDataType } from "../model/DataType";
+import { AnyDataType, ArrayDataType, ClassDataType, DataType, PrimitiveDataType, UnionDataType } from "../model/DataType";
 import { AccessNode, ASTNode, BaseNode, CallNode, PrimitiveType, TokenType } from "../model/types";
 import { CoreLib, CoreLibClass, ResolvedMember } from "./corelib.types";
 
@@ -62,7 +62,7 @@ export class CoreLibUtils<C extends string = string> {
     }
 
     /**
-     * The type a call to a member evaluates to: a method's `returns`. A property yields no type
+     * The type a call to a member evaluates to: a method's `returns`, or the receiver's own list type for one that `returnsSameList` on a receiver typed as a list. A property yields no type
      * as a call (`texto.longitud()` is not a thing). See {@link findForReturnType} for how the member
      * is found.
      * @param {AccessNode<T, N>} access - The callee of the call.
@@ -72,7 +72,9 @@ export class CoreLibUtils<C extends string = string> {
      */
     resolveCallReturnType<T extends string, N extends BaseNode<T>> (access: AccessNode<T, N>, receiverType?: DataType, declaredByUser: boolean = false): DataType | undefined {
         const found = this.findForReturnType(access, receiverType, declaredByUser);
-        return found && !found.isProperty ? found.member.returns : undefined;
+        if (!found || found.isProperty) return undefined;
+
+        return found.member.returnsSameList && receiverType instanceof ArrayDataType ? receiverType : found.member.returns;
     }
 
     /**

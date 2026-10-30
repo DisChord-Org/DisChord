@@ -30,6 +30,8 @@ export interface CoreLibMember {
     readonly async?: boolean;
     /** Type of the value a call to this member produces, or of the member itself for a property. */
     readonly returns: DataType;
+    /** Whether a call gives back a list of the receiver's own element type: when the receiver's type is a known list, that type is the result instead of `returns`. Omitted means `false`. */
+    readonly returnsSameList?: boolean;
     /**
      * Parameters of a method, in order. An empty list means it takes none; omitted means they have
      * not been written down yet, which says nothing about its arity: the compiler never reads it.
