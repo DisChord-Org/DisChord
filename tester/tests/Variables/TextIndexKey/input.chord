@@ -1,0 +1,2 @@
+var t es "abc"
+var c es t["x"]

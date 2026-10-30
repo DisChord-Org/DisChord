@@ -1,0 +1,6 @@
+var t es "abc"
+var i es 1
+var a es t[0]
+var b es t[i]
+var l es [1, 2]
+var c es l["x"]

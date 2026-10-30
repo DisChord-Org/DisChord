@@ -1,0 +1,3 @@
+para (c en "a👍b") {
+    consola.imprimir(c)
+}

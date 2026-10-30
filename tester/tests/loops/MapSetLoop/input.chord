@@ -1,0 +1,8 @@
+var m es nuevo Mapa()
+var s es nuevo Conjunto()
+para (k en m) {
+    consola.imprimir(k)
+}
+para (e en s) {
+    consola.imprimir(e)
+}

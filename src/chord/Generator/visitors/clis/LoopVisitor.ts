@@ -6,7 +6,7 @@ import { walkAST } from "../../../walkAST";
 /**
  * Atomic SubGenerator compiling Chord loop structures ('bucle').
  * Correctly transforms syntactic 'rango' calls into traditional performance-oriented incremental C-style loops,
- * or fallbacks to standard collections object keys/array sequential iterators.
+ * or falls back to walking a list, a text, a set or a map's keys, or an object's keys.
  * @class LoopVisitor
  * @extends {SubGenerator<T, N>}
  * @template {string} T - Extensible token type string vector.
@@ -53,10 +53,22 @@ export class LoopVisitor<T extends string, N extends BaseNode<T>> extends SubGen
         }
 
         if (this.runsCode(node.iterable)) {
-            return `for (let ${varName} of ((value) => Array.isArray(value) ? value : Object.keys(value))(${iterable})) {\n${body}\n}`;
+            return `for (let ${varName} of ((value) => ${this.sequenceOf('value')})(${iterable})) {\n${body}\n}`;
         }
 
-        return `for (let ${varName} of (Array.isArray(${iterable}) ? ${iterable} : Object.keys(${iterable}))) {\n${body}\n}`;
+        return `for (let ${varName} of (${this.sequenceOf(iterable)})) {\n${body}\n}`;
+    }
+
+    /**
+     * The JavaScript expression of what a loop walks for `iterable`, decided when it runs: a list,
+     * a text (character by character, as `for...of` does, so by UTF-16 code points), a set and a
+     * map's keys are walked as they are, and anything else (an object) by its keys.
+     * @param {string} iterable - Source of the iterated expression, which it evaluates more than once.
+     * @returns {string} A conditional expression.
+     * @private
+     */
+    private sequenceOf(iterable: string): string {
+        return `Array.isArray(${iterable}) || typeof ${iterable} === 'string' || ${iterable} instanceof Set ? ${iterable} : ${iterable} instanceof Map ? ${iterable}.keys() : Object.keys(${iterable})`;
     }
 
     /**
