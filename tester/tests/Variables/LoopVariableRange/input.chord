@@ -1,0 +1,3 @@
+para (i en rango(3)) {
+    var r tipo texto es i
+}

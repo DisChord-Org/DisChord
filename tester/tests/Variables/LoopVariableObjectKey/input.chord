@@ -1,0 +1,6 @@
+var obj es {
+    a 1
+}
+para (k en obj) {
+    var n tipo numero es k
+}

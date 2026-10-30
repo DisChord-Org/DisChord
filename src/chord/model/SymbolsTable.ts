@@ -39,10 +39,10 @@ export class SymbolTable {
     private readonly nodeScopes: WeakMap<object, Scope> = new WeakMap();
 
     /**
-     * Node types that own a scope for their body. Chord's own are classes and functions; a
+     * Node types that own a scope for their body. Chord's own are classes, functions and loops (the variable of a `para` lives in its scope); a
      * dialect adds its own through {@link registerScopeOwner}.
      */
-    private readonly scopeOwnerTypes: Set<string> = new Set([ TokenType.Clase, TokenType.Funcion ]);
+    private readonly scopeOwnerTypes: Set<string> = new Set([ TokenType.Clase, TokenType.Funcion, TokenType.BUCLE ]);
 
     /**
      * The subset of scope owners whose body runs inside an async context, so it may `await`

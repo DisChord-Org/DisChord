@@ -1,5 +1,5 @@
 import { AnalysisRule } from "../AnalysisRule";
-import { ASTNode, BaseNode, IdentificatorNode, LoopNode, ODBMode, ODBNode, SyntaxFunction, TokenType } from "../../model/types";
+import { ASTNode, BaseNode, IdentificatorNode, ODBMode, ODBNode, SyntaxFunction, TokenType } from "../../model/types";
 import { JsGlobals } from "../../corelib/JsGlobals";
 
 /**
@@ -56,11 +56,10 @@ export class ValidateKnownNamesRule<T extends string, N extends BaseNode<T>> ext
     }
 
     /**
-     * The names a node makes visible to what it holds: its loop variable, the keys of an intelligent
+     * The names a node makes visible to what it holds: the keys of an intelligent
      * block, or what the dialect injects in a scope it owns.
      */
     private namesOf (node: ASTNode<T, N>): readonly string[] {
-        if (node.type === TokenType.BUCLE) return [ (node as LoopNode<T, N>).var ];
         if (node.type === TokenType.BDO && (node as ODBNode<T, N>).mode === ODBMode.Intelligent) return Object.keys((node as ODBNode<T, N>).blocks);
 
         return this.context.symbolTable.ownsScope(node) ? this.injectedNames(node) : [];

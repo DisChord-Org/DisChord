@@ -1,0 +1,4 @@
+var l tipo Mapa[] es [ nuevo Mapa() ]
+para (m en l) {
+    consola.imprimir(m.tiene(1))
+}

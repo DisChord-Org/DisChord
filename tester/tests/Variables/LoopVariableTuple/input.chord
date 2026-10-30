@@ -1,0 +1,4 @@
+var t tipo [numero, texto] es [ 1, "a" ]
+para (x en t) {
+    var b tipo booleano es x
+}

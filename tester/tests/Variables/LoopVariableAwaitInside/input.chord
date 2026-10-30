@@ -1,0 +1,9 @@
+@asincrono
+funcion tarea() { devolver 1 }
+
+@asincrono
+funcion principal() {
+    para (i en rango(2)) {
+        tarea()
+    }
+}

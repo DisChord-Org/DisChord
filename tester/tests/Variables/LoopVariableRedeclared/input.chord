@@ -1,0 +1,4 @@
+var l tipo numero[] es [ 1, 2 ]
+para (x en l) {
+    var x es 2
+}

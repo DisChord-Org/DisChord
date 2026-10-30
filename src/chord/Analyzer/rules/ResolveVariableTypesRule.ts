@@ -1,7 +1,7 @@
 import { AnalysisRule } from "../AnalysisRule";
-import { ASTNode, AssignmentNode, BaseNode, ListNode, Symbol, TokenType, VariableNode } from "../../model/types";
+import { ASTNode, AssignmentNode, BaseNode, CallNode, ListNode, LoopNode, PrimitiveType, Symbol, SyntaxFunction, TokenType, VariableNode } from "../../model/types";
 import { isIdentificatorNode } from "../../ast.guards";
-import { AnyDataType, DataType, TupleDataType, VoidDataType } from "../../model/DataType";
+import { AnyDataType, ArrayDataType, DataType, PrimitiveDataType, TupleDataType, UnionDataType, VoidDataType } from "../../model/DataType";
 import { TypeInferrer } from "../TypeInferrer";
 
 /**
@@ -76,6 +76,11 @@ export class ResolveVariableTypesRule<T extends string, N extends BaseNode<T>> e
      * @private
      */
     private declare (node: ASTNode<T, N>): void {
+        if (node.type === TokenType.BUCLE) {
+            this.declareLoopVariable(node as LoopNode<T, N>);
+            return;
+        }
+
         if (node.type !== TokenType.VARIABLE) return;
 
         const variableNode = node as VariableNode<T, N>;
@@ -90,6 +95,39 @@ export class ResolveVariableTypesRule<T extends string, N extends BaseNode<T>> e
         if (symbol) this.unannotated.add(symbol);
 
         symbolTable.setDataType(variableNode.id, symbol && this.degraded.has(symbol) ? AnyDataType.Any : this.typeInferrer.infer(variableNode.value));
+    }
+
+    /**
+     * Types the variable of a `para` after what the loop gives it: the element of a list, a number for
+     * `rango`, a character (a text) for a text, the keys (texts) of a `bdo`, any of the elements of a
+     * tuple. Anything else leaves it without a type. Like any variable without an annotation, a
+     * reassignment of another type degrades it to `cualquiera`.
+     * @private
+     */
+    private declareLoopVariable (loop: LoopNode<T, N>): void {
+        const symbolTable = this.context.symbolTable;
+        const symbol = symbolTable.lookup(loop.var);
+        if (!symbol) return;
+
+        this.unannotated.add(symbol);
+        symbolTable.setDataType(loop.var, this.degraded.has(symbol) ? AnyDataType.Any : this.loopVariableType(loop));
+    }
+
+    private loopVariableType (loop: LoopNode<T, N>): DataType | undefined {
+        const iterable = loop.iterable;
+
+        if (iterable.type === TokenType.LLAMADA) {
+            const callee = (iterable as CallNode<T, N>).object;
+            if (isIdentificatorNode(callee) && callee.value === SyntaxFunction.Rango) return PrimitiveDataType.Numero;
+        }
+
+        const type = this.typeInferrer.infer(iterable);
+
+        if (type instanceof ArrayDataType) return type.element;
+        if (type instanceof TupleDataType) return UnionDataType.ofTypes([ ...type.elements ]);
+        if (type instanceof PrimitiveDataType && (type.name === PrimitiveType.Texto || type.name === PrimitiveType.BDO)) return PrimitiveDataType.Texto;
+
+        return undefined;
     }
 
     /**

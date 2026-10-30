@@ -1,6 +1,6 @@
 import { AnalysisRule } from "../AnalysisRule";
 import { isClassNode, isFunctionNode, isPropertyNode, isVariableNode } from "../../ast.guards";
-import { ASTNode, BaseNode, CompilerMetadataKind, SymbolKind } from "../../model/types";
+import { ASTNode, BaseNode, CompilerMetadataKind, LoopNode, SymbolKind, TokenType } from "../../model/types";
 
 /**
  * Pass 2 of the Analyzer's binding model ("Variables"): walks the complete AST and registers
@@ -57,6 +57,13 @@ export class BindDeclarationsRule<T extends string, N extends BaseNode<T>> exten
                     dataType: node.paramTypes?.[index]
                 }, node.location);
             });
+
+        } else if (node.type === TokenType.BUCLE) {
+            // the variable of a `para` is a symbol of the scope of the loop, which is already entered
+            this.context.symbolTable.register((node as LoopNode<T, N>).var, {
+                name: (node as LoopNode<T, N>).var,
+                kind: SymbolKind.Variable
+            }, node.location);
 
         } else if (isVariableNode(node)) {
             this.context.symbolTable.register(node.id, {

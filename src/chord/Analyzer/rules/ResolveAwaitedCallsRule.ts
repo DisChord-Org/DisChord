@@ -41,10 +41,18 @@ export class ResolveAwaitedCallsRule<T extends string, N extends BaseNode<T>> ex
         this.walkScoped(nodes, current => this.enter(current), current => this.exit(current));
     }
 
+    /**
+     * Whether a node that owns a scope is a body that runs by itself (a function, a class, a command...)
+     * and so decides whether `await` is valid; a loop only scopes a block of the body that holds it.
+     */
+    private opensBody (node: ASTNode<T, N>): boolean {
+        return this.context.symbolTable.ownsScope(node) && node.type !== TokenType.BUCLE;
+    }
+
     private enter (node: ASTNode<T, N>): void {
         const symbolTable = this.context.symbolTable;
 
-        if (symbolTable.ownsScope(node)) {
+        if (this.opensBody(node)) {
             if (node.type === TokenType.Funcion) this.callers.push(!!(node as FunctionNode<T, N>).metadata.isAsync);
             else if (node.type === TokenType.Clase) this.callers.push(false);
             else this.callers.push(symbolTable.hasAsyncBody(node));
@@ -78,7 +86,7 @@ export class ResolveAwaitedCallsRule<T extends string, N extends BaseNode<T>> ex
     }
 
     private exit (node: ASTNode<T, N>): void {
-        if (this.context.symbolTable.ownsScope(node)) this.callers.pop();
+        if (this.opensBody(node)) this.callers.pop();
     }
 
     /**
