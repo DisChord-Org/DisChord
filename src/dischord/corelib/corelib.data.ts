@@ -173,6 +173,7 @@ export const corelib: DisChordCoreLib = {
          * `avatar`/`banner`/`flags` — those three collide with real raw fields.
          */
         [DisChordClassesEnum.Usuario]: {
+            receiver: ClassDataType.of(DisChordClassesEnum.Usuario),
             methods: {},
             properties: {
                 nombre: {

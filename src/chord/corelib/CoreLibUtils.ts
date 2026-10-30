@@ -109,7 +109,7 @@ export class CoreLibUtils<C extends string = string> {
         const staticMember = this.resolveStatic(access);
         if (staticMember) return staticMember;
 
-        if (receiverType && !this.isUnknownReceiver(receiverType)) return this.resolveInstanceOf(access, receiverType);
+        if (receiverType && !this.isUnknownReceiver(receiverType)) return this.resolveInstanceOf(access, receiverType, true);
 
         if (declaredByUser) return undefined;
 
@@ -135,13 +135,14 @@ export class CoreLibUtils<C extends string = string> {
      * Looks a member up in a class, methods first and then properties. Members provided by a runtime module are skipped.
      * @param {C} className - Core library class.
      * @param {string} propName - Member name as written in source code.
+     * @param {boolean} [includeRuntime=false] - Whether to find the members a runtime module provides. They are skipped by default, since they are never rewritten, but they do have a type.
      * @returns {ResolvedMember | undefined} The member, or `undefined` if the class has no such member.
      */
-    findInClass(className: C, propName: string): ResolvedMember | undefined {
+    findInClass(className: C, propName: string, includeRuntime: boolean = false): ResolvedMember | undefined {
         const classEntry: CoreLibClass = this.corelib.classes[className];
         const qualifiedName = `${className}.${propName}`;
 
-        if (this.hasOwn(classEntry.methods, propName) && !classEntry.methods[propName].runtime) {
+        if (this.hasOwn(classEntry.methods, propName) && (includeRuntime || !classEntry.methods[propName].runtime)) {
             return {
                 qualifiedName,
                 member: classEntry.methods[propName],
@@ -149,7 +150,7 @@ export class CoreLibUtils<C extends string = string> {
             };
         }
 
-        if (classEntry.properties && this.hasOwn(classEntry.properties, propName) && !classEntry.properties[propName].runtime) {
+        if (classEntry.properties && this.hasOwn(classEntry.properties, propName) && (includeRuntime || !classEntry.properties[propName].runtime)) {
             return {
                 qualifiedName,
                 member: classEntry.properties[propName],
@@ -288,9 +289,13 @@ export class CoreLibUtils<C extends string = string> {
         return type instanceof AnyDataType || type instanceof UnionDataType;
     }
 
-    private resolveInstanceOf<T extends string, N extends BaseNode<T>> (access: AccessNode<T, N>, receiverType: DataType): ResolvedMember | undefined {
+    /**
+     * @param {boolean} [forType=false] - Whether the member is wanted for its type: then one a runtime module provides counts.
+     * @private
+     */
+    private resolveInstanceOf<T extends string, N extends BaseNode<T>> (access: AccessNode<T, N>, receiverType: DataType, forType: boolean = false): ResolvedMember | undefined {
         const className = this.classOf(receiverType);
-        const found = className && this.findInClass(className, access.property);
+        const found = className && this.findInClass(className, access.property, forType);
 
         return found && !found.member.static ? found : undefined;
     }

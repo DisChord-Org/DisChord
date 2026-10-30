@@ -22,6 +22,5 @@ export default class PruebaCommand extends Command {
         console.log(cliente);
         console.log(usuario);
         console.log(canal);
-        console.log(ctx);
     }
 }

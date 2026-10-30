@@ -17,8 +17,8 @@ import { ValidateChannelActionsRule } from "./rules/ValidateChannelActionsRule";
 import { RequiresUserExtensionsRule } from "./rules/RequiresUserExtensionsRule";
 import { DisChordResolveAwaitedCallsRule } from "./rules/DisChordResolveAwaitedCallsRule";
 import { ResolveAwaitedCallsRule } from "../../chord/Analyzer/rules/ResolveAwaitedCallsRule";
-import { ValidateKnownNamesRule } from "../../chord/Analyzer/rules/ValidateKnownNamesRule";
-import { DisChordValidateKnownNamesRule } from "./rules/DisChordValidateKnownNamesRule";
+import { BindDeclarationsRule } from "../../chord/Analyzer/rules/BindDeclarationsRule";
+import { DisChordBindDeclarationsRule } from "./rules/DisChordBindDeclarationsRule";
 import { ValidateInjectedNamesRule } from "./rules/ValidateInjectedNamesRule";
 
 /**
@@ -42,7 +42,6 @@ export class DisChordAnalyzer extends Analyzer<DisChordNodeType, DisChordNode> {
         ValidateStartBotRule,
         ValidateEventRule,
         ValidateCommandRule,
-        ValidateInjectedNamesRule,
         ValidateCollectorRule,
         ValidateButtonsRule,
         ValidateEmbedsRule,
@@ -68,11 +67,15 @@ export class DisChordAnalyzer extends Analyzer<DisChordNodeType, DisChordNode> {
         // so the context stack is tracked once and not duplicated in a second rule.
         this.rules = this.rules.map(rule => {
             if (rule instanceof ResolveAwaitedCallsRule) return new DisChordResolveAwaitedCallsRule(this.context);
-            // and so is the known-names rule, which also needs to know what a command and an event put in scope
-            if (rule instanceof ValidateKnownNamesRule) return new DisChordValidateKnownNamesRule(this.context);
+            // and so is the one that binds declarations, which also declares what a command and an event put in scope
+            if (rule instanceof BindDeclarationsRule) return new DisChordBindDeclarationsRule(this.context);
 
             return rule;
         });
+
+        // the rejection of declaring a name a command or an event defines only needs the tree, and must run before
+        // the binding, which would otherwise report the redeclaration first with its own, less specific message
+        this.rules.splice(this.rules.findIndex(rule => rule instanceof BindDeclarationsRule), 0, new ValidateInjectedNamesRule(this.context));
 
         DisChordAnalyzer.DisChordRules.forEach(RuleClass => {
             this.rules.push(new RuleClass(this.context));

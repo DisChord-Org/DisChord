@@ -35,7 +35,7 @@ export class ValidateInjectedNamesRule extends AnalysisRule<DisChordNodeType, Di
     private ownerOf (node: DisChordASTNode): { kind: string; name: string; defined: readonly string[] } {
         const isCommand = node.type === DisChordTokenType.CREAR_COMANDO;
 
-        return { kind: isCommand ? 'el comando' : 'el evento', name: isCommand ? (node as CommandNode).value : (node as EventNode).name, defined: InjectedNames.of(node) };
+        return { kind: isCommand ? 'el comando' : 'el evento', name: isCommand ? (node as CommandNode).value : (node as EventNode).name, defined: InjectedNames.namesOf(node) };
     }
 
     private enter (node: DisChordASTNode): void {

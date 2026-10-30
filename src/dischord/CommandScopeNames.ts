@@ -32,6 +32,14 @@ export class CommandScopeNames {
     ]);
 
     /**
+     * @param {string} name - A name of the command's scope.
+     * @returns {boolean} Whether it is for the generated code only (`ctx`): the user's code cannot read it.
+     */
+    public static isHidden (name: string): boolean {
+        return CommandScopeNames.usedByGeneratedCode.includes(name);
+    }
+
+    /**
      * @param {DisChordODBNode} commandBody - The body of a command.
      * @returns {string[]} The names of its options, as written.
      */

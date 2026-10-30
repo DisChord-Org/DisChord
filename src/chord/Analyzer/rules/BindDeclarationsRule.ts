@@ -1,6 +1,7 @@
 import { AnalysisRule } from "../AnalysisRule";
 import { isClassNode, isFunctionNode, isPropertyNode, isVariableNode } from "../../ast.guards";
 import { ASTNode, BaseNode, CompilerMetadataKind, LoopNode, SymbolKind, TokenType } from "../../model/types";
+import { DataType } from "../../model/DataType";
 
 /**
  * Pass 2 of the Analyzer's binding model ("Variables"): walks the complete AST and registers
@@ -23,9 +24,24 @@ export class BindDeclarationsRule<T extends string, N extends BaseNode<T>> exten
         this.walk(nodes, current => this.enter(current), current => this.exit(current));
     }
 
+    /**
+     * The variables the dialect puts in the scope of a node that owns one (the parameters of an event,
+     * what a command receives...), registered as symbols when the scope is entered. Chord has none.
+     * @param {ASTNode<T, N>} _owner - A node that owns a scope.
+     * @returns {{ name: string; dataType?: DataType }[]} Each variable, with its type if it has one.
+     * @protected
+     */
+    protected scopeSymbols (_owner: ASTNode<T, N>): { name: string; dataType?: DataType }[] {
+        return [];
+    }
+
     private enter (node: ASTNode<T, N>): void {
         if (!isClassNode(node) && !isFunctionNode(node) && this.context.symbolTable.ownsScope(node)) {
             this.context.symbolTable.enterScope(node);
+
+            this.scopeSymbols(node).forEach(({ name, dataType }) => {
+                this.context.symbolTable.register(name, { name, kind: SymbolKind.Variable, dataType }, node.location);
+            });
         }
 
         if (isClassNode(node)) {

@@ -18,5 +18,5 @@ export class VariableTypeUnknownMessageVariableTest extends Test {
     /**
      * @type {string}
      */
-    public readonly expectedError: string = "Tipo desconocido 'Mates'. Tipos válidos: texto, numero, booleano, bdo, indefinido, cualquiera, Lista, Mapa, Conjunto, Promesa, Expresion, Fecha o una clase declarada en el archivo; también T[], [A, B] y A|B";
+    public readonly expectedError: string = "Tipo desconocido 'Mates'. Tipos válidos: texto, numero, booleano, bdo, indefinido, cualquiera, Lista, Mapa, Conjunto, Promesa, Expresion, Fecha, Usuario o una clase declarada en el archivo; también T[], [A, B] y A|B";
 }

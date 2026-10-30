@@ -1,0 +1,13 @@
+nuevo comando Prueba {
+    descripcion "prueba"
+
+    opciones {
+        cantidad {
+            tipo "numero"
+            descripcion "una cantidad"
+            requerido falso
+        }
+    }
+
+    var n tipo numero es cantidad
+}

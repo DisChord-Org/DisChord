@@ -11,7 +11,6 @@ import { JsGlobals } from "../../corelib/JsGlobals";
  *     while its body lasts, and the keys of an intelligent block (`@BDOI`) while its body lasts;
  *  3. a class or function of the core library, or `rango`;
  *  4. a JavaScript global of the curated list (`JsGlobals`);
- *  5. a name the dialect puts in scope itself (see {@link injectedNames}).
  * The message suggests a visible name close to the one written (`¿Querías decir 'nadie2'?`). A member
  * (`x.foo`) is not checked, and neither is using a name before declaring it.
  */
@@ -34,17 +33,6 @@ export class ValidateKnownNamesRule<T extends string, N extends BaseNode<T>> ext
         this.walkScoped(nodes, node => this.enter(node), () => this.exit());
     }
 
-    /**
-     * The names the dialect puts in scope inside a node that owns a scope (the parameters of an event,
-     * what a command receives...). Chord has none.
-     * @param {ASTNode<T, N>} _owner - A node that owns a scope.
-     * @returns {readonly string[]} The names.
-     * @protected
-     */
-    protected injectedNames (_owner: ASTNode<T, N>): readonly string[] {
-        return [];
-    }
-
     private enter (node: ASTNode<T, N>): void {
         this.tracked.push(this.namesOf(node));
 
@@ -56,13 +44,10 @@ export class ValidateKnownNamesRule<T extends string, N extends BaseNode<T>> ext
     }
 
     /**
-     * The names a node makes visible to what it holds: the keys of an intelligent
-     * block, or what the dialect injects in a scope it owns.
+     * The names a node makes visible to what it holds: the keys of an intelligent block.
      */
     private namesOf (node: ASTNode<T, N>): readonly string[] {
-        if (node.type === TokenType.BDO && (node as ODBNode<T, N>).mode === ODBMode.Intelligent) return Object.keys((node as ODBNode<T, N>).blocks);
-
-        return this.context.symbolTable.ownsScope(node) ? this.injectedNames(node) : [];
+        return node.type === TokenType.BDO && (node as ODBNode<T, N>).mode === ODBMode.Intelligent ? Object.keys((node as ODBNode<T, N>).blocks) : [];
     }
 
     private isKnown (name: string, node: IdentificatorNode<T>): boolean {

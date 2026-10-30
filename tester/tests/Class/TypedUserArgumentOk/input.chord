@@ -1,0 +1,7 @@
+funcion saluda(u tipo Usuario) {
+    consola.imprimir(u.nombre)
+}
+
+nuevo evento encendido {
+    saluda(usuario)
+}

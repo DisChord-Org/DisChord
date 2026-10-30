@@ -5,5 +5,4 @@ nuevo comando Prueba {
     consola.imprimir(cliente)
     consola.imprimir(usuario)
     consola.imprimir(canal)
-    consola.imprimir(ctx)
 }

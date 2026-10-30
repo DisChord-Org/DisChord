@@ -207,6 +207,32 @@ export const DisChordTypeMap: Record<string, DiscordOptionType> = dictionary({
 } as const);
 
 /**
+ * The type of the values of the names dischord puts in scope, by name, as a class of the core library
+ * (`Usuario`): the ones it is known for. A name left out has no type (`cualquiera`) until its class
+ * exists. Shared by the parameters of the events and the names of a command.
+ *
+ * @type {Readonly<Record<string, string>>}
+ */
+export const InjectedTypes: Record<string, string> = dictionary({
+    "usuario": "Usuario",
+    "miembro": "Usuario"
+});
+
+/**
+ * The type of the value of a command option, by the keyword of its `tipo`: a primitive type
+ * (`texto`, `numero`, `booleano`) or a class of the core library (`Usuario`). A keyword left out gives no type.
+ *
+ * @type {Readonly<Record<string, string>>}
+ */
+export const OptionValueTypes: Record<string, string> = dictionary({
+    "texto": "texto",
+    "entero": "numero",
+    "numero": "numero",
+    "booleano": "booleano",
+    "usuario": "Usuario"
+});
+
+/**
  * Map translating DisChord application installation keywords to `ApplicationIntegrationType` enum values.
  *
  * @type {Readonly<Record<string, ApplicationIntegrationType>>}

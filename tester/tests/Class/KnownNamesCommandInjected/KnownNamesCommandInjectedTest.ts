@@ -2,7 +2,7 @@ import { Test } from "../../../Test";
 
 /**
  * @class KnownNamesCommandInjectedTest
- * @description Validates that the names a command puts in scope (`contexto`, `cliente`, `usuario`, `canal`, `ctx`) are known inside its body.
+ * @description Validates that the names a command puts in scope (`contexto`, `cliente`, `usuario`, `canal`) are known inside its body.
  */
 export class KnownNamesCommandInjectedTest extends Test {
     /**
