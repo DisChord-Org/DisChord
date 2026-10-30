@@ -11,7 +11,6 @@ import { ASTNode, BaseNode, ODBNode, TokenType } from "../chord/model/types";
 export const DisChordTokenType = {
     Comando: 'comando',
     Evento: 'evento',
-    Mensaje: 'mensaje',
     Enviar: 'enviar',
     Recolector: 'recolector',
     Encender: 'encender',

@@ -1,0 +1,5 @@
+nuevo evento mensajeCreado {
+    enviar mensaje {
+        contenido mensaje.contenido
+    }
+}

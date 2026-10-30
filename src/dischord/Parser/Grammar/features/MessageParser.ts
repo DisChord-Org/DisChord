@@ -1,8 +1,9 @@
 import { DisChordNode, DisChordNodeType, DisChordODBNode, DisChordTokenType, MessageNode } from "../../../types";
-import { ODBMode, TokenTypeUnion } from "../../../../chord/model/types";
+import { ODBMode, TokenType, TokenTypeUnion } from "../../../../chord/model/types";
 import { SubParser } from "../../../../chord/Parser/SubParser";
 import { BDOParser } from "../../../../chord/Parser/Grammar/BDOParser";
 import { Parser } from "../../../../chord/Parser/Parser";
+import { ChordError, ErrorLevel } from "../../../../errors/ChordError";
 
 /**
  * The Message Parser.
@@ -19,9 +20,10 @@ export default class MessageParser extends SubParser<DisChordNodeType, DisChordN
     static triggerToken: DisChordNodeType | undefined = DisChordTokenType.Enviar;
 
     /**
-     * Collection of reserved keywords this specific sub-parser registers
+     * Collection of reserved keywords this specific sub-parser registers. Only `enviar`: `mensaje` is
+     * an ordinary word, since it is also the name of the parameter of the message events.
      */
-    static keywords: TokenTypeUnion<DisChordNodeType>[] = [ DisChordTokenType.Enviar, DisChordTokenType.Mensaje ];
+    static keywords: TokenTypeUnion<DisChordNodeType>[] = [ DisChordTokenType.Enviar ];
 
     /**
      * Initializes the MessageParser with the main DisChordParser context for token expression handling.
@@ -38,7 +40,16 @@ export default class MessageParser extends SubParser<DisChordNodeType, DisChordN
      */
     parse (): MessageNode {
         this.consume(DisChordTokenType.Enviar);
-        this.consume(DisChordTokenType.Mensaje);
+
+        const word = this.peek();
+
+        if (word.type !== TokenType.IDENTIFICADOR || word.value.toLowerCase() !== 'mensaje') throw new ChordError({
+            phase: ErrorLevel.Parser,
+            message: `Después de 'enviar' se esperaba 'mensaje'. (En su lugar se encontró '${word.value}')`,
+            location: word.location
+        });
+
+        this.consume(TokenType.IDENTIFICADOR);
 
         const object = this.parent.get(BDOParser).setMode(ODBMode.Simple).parse() as DisChordODBNode;
 
