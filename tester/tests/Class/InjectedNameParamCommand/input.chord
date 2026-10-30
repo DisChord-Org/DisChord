@@ -1,0 +1,7 @@
+nuevo comando Prueba {
+    descripcion "prueba"
+
+    funcion f(usuario) {
+        devolver usuario
+    }
+}

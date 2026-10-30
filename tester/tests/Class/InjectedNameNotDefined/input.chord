@@ -1,0 +1,4 @@
+nuevo evento encendido {
+    var otro es 1
+    consola.imprimir(otro)
+}

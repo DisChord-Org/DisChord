@@ -1,0 +1,7 @@
+nuevo comando Prueba {
+    descripcion "prueba"
+
+    para (usuario en rango(3)) {
+        consola.imprimir(usuario)
+    }
+}

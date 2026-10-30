@@ -1,0 +1,7 @@
+funcion f(usuario) {
+    devolver usuario
+}
+
+nuevo evento encendido {
+    consola.imprimir(f(1))
+}

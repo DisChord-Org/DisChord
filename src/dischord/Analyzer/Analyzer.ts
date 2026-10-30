@@ -19,6 +19,7 @@ import { DisChordResolveAwaitedCallsRule } from "./rules/DisChordResolveAwaitedC
 import { ResolveAwaitedCallsRule } from "../../chord/Analyzer/rules/ResolveAwaitedCallsRule";
 import { ValidateKnownNamesRule } from "../../chord/Analyzer/rules/ValidateKnownNamesRule";
 import { DisChordValidateKnownNamesRule } from "./rules/DisChordValidateKnownNamesRule";
+import { ValidateInjectedNamesRule } from "./rules/ValidateInjectedNamesRule";
 
 /**
  * DisChord's semantic analysis rules, run over a file's complete AST between parsing and
@@ -41,6 +42,7 @@ export class DisChordAnalyzer extends Analyzer<DisChordNodeType, DisChordNode> {
         ValidateStartBotRule,
         ValidateEventRule,
         ValidateCommandRule,
+        ValidateInjectedNamesRule,
         ValidateCollectorRule,
         ValidateButtonsRule,
         ValidateEmbedsRule,

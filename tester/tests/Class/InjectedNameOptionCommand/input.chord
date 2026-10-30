@@ -1,0 +1,13 @@
+nuevo comando Prueba {
+    descripcion "prueba"
+
+    opciones {
+        valor {
+            opcion "texto"
+            descripcion "un valor"
+            requerido verdadero
+        }
+    }
+
+    var valor es 1
+}

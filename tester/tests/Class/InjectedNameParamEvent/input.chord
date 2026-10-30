@@ -1,0 +1,5 @@
+nuevo evento encendido {
+    funcion f(usuario) {
+        devolver usuario
+    }
+}
