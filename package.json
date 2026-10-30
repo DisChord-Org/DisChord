@@ -19,11 +19,11 @@
   "packageManager": "pnpm@10.34.5",
   "dependencies": {
     "commander": "^15.0.0",
-    "tsx": "^4.21.0",
-    "typescript": "^5.9.3"
+    "prettier": "^3.8.1",
+    "tsx": "^4.21.0"
   },
   "devDependencies": {
     "@types/node": "^25.2.3",
-    "prettier": "^3.8.1"
+    "typescript": "^5.9.3"
   }
 }
