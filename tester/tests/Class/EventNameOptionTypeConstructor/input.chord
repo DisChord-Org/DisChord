@@ -3,7 +3,7 @@ nuevo comando Prueba {
 
     opciones {
         dato {
-            opcion "constructor"
+            tipo "constructor"
             descripcion "x"
             requerido verdadero
         }

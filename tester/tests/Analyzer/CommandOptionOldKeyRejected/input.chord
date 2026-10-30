@@ -1,0 +1,11 @@
+nuevo comando Prueba {
+    descripcion "Prueba"
+
+    opciones {
+        dato {
+            opcion "texto"
+            descripcion "x"
+            requerido verdadero
+        }
+    }
+}

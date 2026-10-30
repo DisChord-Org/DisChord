@@ -3,7 +3,7 @@ nuevo comando Canales {
     opciones {
         n {
             descripcion "texto {n}"
-            opcion "texto"
+            tipo "texto"
             requerido verdadero
         }
     }

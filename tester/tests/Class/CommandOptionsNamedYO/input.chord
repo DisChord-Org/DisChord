@@ -4,17 +4,17 @@ nuevo comando Punto {
     opciones {
         x {
             descripcion "x"
-            opcion "numero"
+            tipo "numero"
             requerido verdadero
         }
         y {
             descripcion "y"
-            opcion "numero"
+            tipo "numero"
             requerido verdadero
         }
         o {
             descripcion "o"
-            opcion "numero"
+            tipo "numero"
             requerido verdadero
         }
     }

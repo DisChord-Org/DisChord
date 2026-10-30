@@ -2,7 +2,7 @@ import { Test } from "../../../Test";
 
 /**
  * @class CommandOptionUserDataTest
- * @description Regression test for a real bug: a command option typed `opcion "usuario"` can be
+ * @description Regression test for a real bug: a command option typed `tipo "usuario"` can be
  * bound to any variable name (here `mencion`, not the built-in `usuario`), but the Spanish
  * user-data properties (`.nombre`, `.colorPerfil`, `.avatar`, ...) used to only translate for the
  * literal identifier `usuario` — `mencion.nombre` compiled to itself unchanged and returned

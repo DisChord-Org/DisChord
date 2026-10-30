@@ -3,7 +3,7 @@ nuevo comando Prueba {
 
     opciones {
         texto1 {
-            opcion "texto"
+            tipo "texto"
             descripcion "un texto"
             requerido verdadero
         }

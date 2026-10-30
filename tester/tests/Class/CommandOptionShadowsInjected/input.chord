@@ -3,7 +3,7 @@ nuevo comando Saluda {
 
     opciones {
         usuario {
-            opcion "usuario"
+            tipo "usuario"
             descripcion "a quien saludar"
             requerido verdadero
         }

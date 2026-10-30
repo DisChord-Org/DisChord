@@ -3,7 +3,7 @@ nuevo comando Saluda {
 
     opciones {
         cliente {
-            opcion "texto"
+            tipo "texto"
             descripcion "un valor"
             requerido verdadero
         }

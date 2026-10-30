@@ -3,7 +3,7 @@ nuevo comando Avatar {
 
     opciones {
         mencion {
-            opcion "usuario"
+            tipo "usuario"
             descripcion "El usuario cuyo avatar quieres ver"
             requerido verdadero
         }

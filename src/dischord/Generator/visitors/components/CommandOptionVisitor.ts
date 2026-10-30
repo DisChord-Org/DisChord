@@ -69,7 +69,7 @@ export default class CommandOptionVisitor extends SubGenerator<DisChordNodeType,
                     name: "${optionName}",
                     description: ${resolved['descripcion']},
                     required: ${resolved['requerido']},
-                    type: ${resolved['opcion']}
+                    type: ${resolved['tipo']}
                 }
             `;
         });

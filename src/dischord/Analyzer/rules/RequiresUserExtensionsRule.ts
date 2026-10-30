@@ -10,7 +10,7 @@ import { RequiresPatchedMembersRule } from "./RequiresPatchedMembersRule";
  * `mencion.colorPerfil`, ...), when the file needs them: see `RequiresPatchedMembersRule` for when an
  * access to one of those names counts (and that access by index is not detected).
  *
- * It adds one trigger of its own: any `opcion "usuario"` declaration anywhere in the file. A command
+ * It adds one trigger of its own: any `tipo "usuario"` declaration anywhere in the file. A command
  * option typed this way can be bound to *any* variable name (`mencion`, `objetivo`, ...), so there's no
  * fixed identifier to check by name for that case — presence of the option type itself is the only
  * reliable signal, even at the cost of an unused import on the rare file that declares the option but
@@ -26,8 +26,8 @@ export class RequiresUserExtensionsRule extends RequiresPatchedMembersRule {
     protected override triggers (node: DisChordASTNode): boolean {
         if (node.type !== TokenType.BDO) return false;
 
-        const opcion = (node as unknown as ODBNode<DisChordNodeType, DisChordNode>).blocks['opcion'];
+        const tipo = (node as unknown as ODBNode<DisChordNodeType, DisChordNode>).blocks['tipo'];
 
-        return opcion?.type === TokenType.LITERAL && (opcion as LiteralNode<DisChordNodeType>).value === 'usuario';
+        return tipo?.type === TokenType.LITERAL && (tipo as LiteralNode<DisChordNodeType>).value === 'usuario';
     }
 }

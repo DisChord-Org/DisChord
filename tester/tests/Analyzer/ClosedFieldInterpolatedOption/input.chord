@@ -5,7 +5,7 @@ nuevo comando Prueba {
 
     opciones {
         valor {
-            opcion "{t}"
+            tipo "{t}"
             descripcion "un valor"
             requerido verdadero
         }

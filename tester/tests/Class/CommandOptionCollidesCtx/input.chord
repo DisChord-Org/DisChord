@@ -3,7 +3,7 @@ nuevo comando Saluda {
 
     opciones {
         ctx {
-            opcion "texto"
+            tipo "texto"
             descripcion "un valor"
             requerido verdadero
         }

@@ -3,7 +3,7 @@ nuevo comando StringTest {
 
     opciones {
         repetir {
-            opcion "texto"
+            tipo "texto"
             descripcion "El bot responde con lo que escribas"
             requerido verdadero
         }

@@ -3,7 +3,7 @@ nuevo comando Saluda {
 
     opciones {
         canal {
-            opcion "texto"
+            tipo "texto"
             descripcion "un valor"
             requerido verdadero
         }

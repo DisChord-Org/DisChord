@@ -18,5 +18,5 @@ export class ClosedFieldInterpolatedOptionTest extends Test {
     /**
      * @type {string}
      */
-    public readonly expectedError: string = "no admite expresiones ni texto con llaves en 'opcion': escribe uno de: texto / entero";
+    public readonly expectedError: string = "no admite expresiones ni texto con llaves en 'tipo': escribe uno de: texto / entero";
 }

@@ -22,18 +22,18 @@ import { ChannelTypes, ContextTypes, DisChordTypeMap, IgnoreCommandTypes, Integr
  * fields" model, so `ValidateCollectorRule` validates it by hand instead.
  */
 
-/** `comando`'s own `opciones` entries: `miOpcion { opcion "texto" descripcion "..." requerido si }`. */
+/** `comando`'s own `opciones` entries: `miOpcion { tipo "texto" descripcion "..." requerido si }`. */
 export function OptionSchema (
     optionName: string,
     entry: { blocks: Record<string, ASTNode<DisChordNodeType, DisChordNode>> }
 ): BDOSchema<DisChordNodeType, DisChordNode> {
-    const optionType = (literalStringValue(entry.blocks['opcion']) ?? '').toLowerCase();
+    const optionType = (literalStringValue(entry.blocks['tipo']) ?? '').toLowerCase();
 
     return {
         name: 'opcion',
         fields: [
             {
-                key: 'opcion',
+                key: 'tipo',
                 kind: FieldKind.MappedLiteral,
                 mapping: DisChordTypeMap,
                 required: true,

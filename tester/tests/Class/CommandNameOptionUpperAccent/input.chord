@@ -3,7 +3,7 @@ nuevo comando prueba {
 
     opciones {
         Ángulo {
-            opcion "texto"
+            tipo "texto"
             descripcion "Una opcion"
             requerido verdadero
         }

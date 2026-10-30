@@ -13,7 +13,7 @@ import { channelExtensionsModule } from "../../corelib";
  * Two triggers, as there:
  * - Any channel block (`crear`, `editar`, `borrar`, `obtener canal`, `listar canales`): its result
  *   is a channel, or a list of them, kept in a variable of any name.
- * - Any `opcion "canal"` declaration: a command option typed so can be bound to any variable name.
+ * - Any `tipo "canal"` declaration: a command option typed so can be bound to any variable name.
  *
  * The implicit `canal` identifier does not need it: its members are rewritten at compile time.
  */
@@ -35,8 +35,8 @@ export class RequiresChannelExtensionsRule extends AnalysisRule<DisChordNodeType
             }
 
             if (current.type === TokenType.BDO) {
-                const opcion = (current as unknown as ODBNode<DisChordNodeType, DisChordNode>).blocks['opcion'];
-                if (opcion?.type === TokenType.LITERAL && (opcion as LiteralNode<DisChordNodeType>).value === 'canal') needsExtensions = true;
+                const tipo = (current as unknown as ODBNode<DisChordNodeType, DisChordNode>).blocks['tipo'];
+                if (tipo?.type === TokenType.LITERAL && (tipo as LiteralNode<DisChordNodeType>).value === 'canal') needsExtensions = true;
             }
         });
 

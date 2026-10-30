@@ -2,7 +2,7 @@ import { Test } from "../../../Test";
 
 /**
  * @class CommandOptionsTest
- * @description Validates a command's `opciones { <nombre> { opcion ...; descripcion ...; requerido ...; } }`
+ * @description Validates a command's `opciones { <nombre> { tipo ...; descripcion ...; requerido ...; } }`
  * (from `examples/commandOptionsBot.chord`) compiles to a real Seyfert `options` array, and that
  * the option is destructured from `contexto.options` for use in the command body.
  *
