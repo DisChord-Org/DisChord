@@ -1,0 +1,8 @@
+clase Caja {
+    funcion peso() {
+        devolver 1
+    }
+}
+
+var c es nuevo Caja()
+var s tipo texto es c.peso()

@@ -1,4 +1,3 @@
-import { chordLongitud } from './lib/runtimeHelpers.js';
 import './lib/consoleRuntime.js';
 class Repo {
     async leer(x) {
@@ -6,4 +5,4 @@ class Repo {
     }
 }
 let repo = new Repo();
-console.log(chordLongitud(await repo.leer(3)));
+console.log((await repo.leer(3)).length);

@@ -1,0 +1,4 @@
+funcion f() {
+    devolver 1
+}
+var s tipo texto es f()

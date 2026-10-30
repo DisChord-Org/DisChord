@@ -78,5 +78,6 @@ export interface Symbol {
     signature?: {
         params: (DataType | undefined)[];
         returns?: DataType;
+        inferredReturns?: DataType;
     };
 };

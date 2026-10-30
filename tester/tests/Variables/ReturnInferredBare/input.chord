@@ -1,0 +1,7 @@
+funcion f(x tipo numero) {
+    si (x mayor 1) {
+        devolver 1
+    }
+    devolver
+}
+var s tipo texto es f(1)

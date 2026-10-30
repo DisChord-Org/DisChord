@@ -3,6 +3,7 @@ import { ASTNode, AssignmentNode, BaseNode, CallNode, ListNode, LoopNode, Primit
 import { isIdentificatorNode } from "../../ast.guards";
 import { AnyDataType, ArrayDataType, DataType, PrimitiveDataType, TupleDataType, UnionDataType, VoidDataType } from "../../model/DataType";
 import { TypeInferrer } from "../TypeInferrer";
+import { ReturnTypeInference } from "../ReturnTypeInference";
 
 /**
  * Pass 3 of the Analyzer's binding model ("Tipos"): resolves and validates each variable's
@@ -37,11 +38,24 @@ import { TypeInferrer } from "../TypeInferrer";
  */
 export class ResolveVariableTypesRule<T extends string, N extends BaseNode<T>> extends AnalysisRule<T, N> {
     /**
+     * How many times the walk is repeated because the inferred return type of a function changed; beyond
+     * that the functions that still change (mutually dependent ones) keep an unknown return type.
+     */
+    private static readonly maxReturnPasses = 6;
+
+    /**
      * Delegate for inferring a `DataType` from an expression — see `TypeInferrer`/`SubInferrer`.
      * @private
      * @readonly
      */
     private readonly typeInferrer: TypeInferrer<T, N> = new TypeInferrer(this.context);
+
+    /**
+     * Infers the return type of the functions that declare none, while the walk goes through them.
+     * @private
+     * @readonly
+     */
+    private readonly returns: ReturnTypeInference<T, N> = new ReturnTypeInference(this.context, this.typeInferrer);
 
     /**
      * The variables declared without an annotation, and those among them that a reassignment
@@ -57,15 +71,20 @@ export class ResolveVariableTypesRule<T extends string, N extends BaseNode<T>> e
      */
     check (nodes: ASTNode<T, N>[]): void {
         let changed: boolean;
+        let returnPasses = 0;
 
         do {
-            this.walkScoped(nodes, current => this.declare(current));
+            this.returns.beginPass();
+            this.walkScoped(nodes, current => {
+                this.declare(current);
+                this.returns.enter(current);
+            }, current => this.returns.exit(current));
 
             changed = false;
             this.walkScoped(nodes, current => {
                 if (this.degradeIfReassignedToOtherType(current)) changed = true;
             });
-        } while (changed);
+        } while (changed || (this.returns.changed && ++returnPasses < ResolveVariableTypesRule.maxReturnPasses));
 
         this.walkScoped(nodes, current => this.enter(current));
     }

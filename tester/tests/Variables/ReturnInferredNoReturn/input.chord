@@ -1,0 +1,4 @@
+funcion f() {
+    consola.imprimir(1)
+}
+var s tipo texto es f()

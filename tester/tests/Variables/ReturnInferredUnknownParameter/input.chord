@@ -1,0 +1,4 @@
+funcion f(x) {
+    devolver x
+}
+var s tipo texto es f(1)

@@ -1,10 +1,9 @@
-import { chordLimpiar, chordTiene } from './lib/runtimeHelpers.js';
 import './lib/consoleRuntime.js';
 async function nombre() {
     return ' ab ';
 }
 async function principal() {
-    console.log(chordTiene(await nombre(), 'a'));
-    console.log(chordLimpiar(await nombre()));
+    console.log((await nombre()).includes('a'));
+    console.log((await nombre()).trim());
 }
 await principal();

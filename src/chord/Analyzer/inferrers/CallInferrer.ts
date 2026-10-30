@@ -1,4 +1,4 @@
-import { ASTNode, BaseNode, CallNode, TokenType, TokenTypeUnion } from "../../model/types";
+import { ASTNode, BaseNode, CallNode, Symbol, TokenType, TokenTypeUnion } from "../../model/types";
 import { isAccessNode, isIdentificatorNode } from "../../ast.guards";
 import { DataType } from "../../model/DataType";
 
@@ -18,16 +18,23 @@ import { UserMemberResolver } from "../UserMemberResolver";
 export class CallInferrer<T extends string, N extends BaseNode<T>> extends SubInferrer<T, N> {
     public static triggerToken: TokenTypeUnion<TokenType> | undefined = TokenType.LLAMADA;
 
+    /**
+     * The return type of a function or method: the declared one, or else the one inferred from its body.
+     */
+    private returnsOf (symbol: Symbol | undefined): DataType | undefined {
+        return symbol?.signature?.returns ?? symbol?.signature?.inferredReturns;
+    }
+
     public infer (node: ASTNode<T, N>): DataType | undefined {
         const callee = (node as CallNode<T, N>).object;
         const symbolTable = this.parent.context.symbolTable;
 
-        if (isIdentificatorNode(callee)) return symbolTable.lookup(callee.value)?.signature?.returns;
+        if (isIdentificatorNode(callee)) return this.returnsOf(symbolTable.lookup(callee.value));
         if (!isAccessNode(callee)) return undefined;
 
         const receiverType = this.parent.infer(callee.object);
         const className = new UserMemberResolver(this.parent.context).className(callee, receiverType);
-        if (className !== undefined) return symbolTable.classes.findMember(className, callee.property)?.signature?.returns;
+        if (className !== undefined) return this.returnsOf(symbolTable.classes.findMember(className, callee.property));
 
         return this.parent.context.coreLib.resolveCallReturnType(callee, receiverType, symbolTable.classes.hasMemberNamed(callee.property));
     }

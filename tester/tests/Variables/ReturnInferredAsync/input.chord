@@ -1,0 +1,9 @@
+@asincrono
+funcion f() {
+    devolver "a"
+}
+
+@asincrono
+funcion g() {
+    var n tipo numero es f()
+}
