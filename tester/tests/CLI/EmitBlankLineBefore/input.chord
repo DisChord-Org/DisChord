@@ -1,0 +1,8 @@
+@BDOI
+var c es {
+    a 1
+    b 2
+
+    consola.imprimir(a)
+}
+var x es 1

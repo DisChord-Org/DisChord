@@ -184,7 +184,8 @@ export class CompileCommand {
                     value: token.value,
                     start: token.location as Location,
                     end: token.end,
-                    ...(token.synthetic ? { synthetic: true } : {})
+                    ...(token.synthetic ? { synthetic: true } : {}),
+                    ...(token.blankLineBefore ? { blankLineBefore: true } : {})
                 }));
 
                 return { schema: CompileCommand.emitSchema, emit: kind, file: file.absolutePath, tokens };
