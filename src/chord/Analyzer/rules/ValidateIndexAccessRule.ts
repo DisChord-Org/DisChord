@@ -1,6 +1,6 @@
 import { AnalysisRule } from "../AnalysisRule";
 import { TypeInferrer } from "../TypeInferrer";
-import { AccessNodeByIndex, ASTNode, BaseNode, LiteralNode, TokenType } from "../../model/types";
+import { AccessNodeByIndex, ASTNode, BaseNode, LiteralNode, PrimitiveType, TokenType } from "../../model/types";
 import { DataType, PrimitiveDataType, TupleDataType } from "../../model/DataType";
 
 /**
@@ -39,7 +39,7 @@ export class ValidateIndexAccessRule<T extends string, N extends BaseNode<T>> ex
      * @private
      */
     private validateTextIndex (access: AccessNodeByIndex<T, N>, receiverType: DataType | undefined): void {
-        if (!(receiverType instanceof PrimitiveDataType && receiverType.name === PrimitiveDataType.Texto.name)) return;
+        if (!PrimitiveDataType.is(receiverType, PrimitiveType.Texto)) return;
 
         const literal = access.index.type === TokenType.LITERAL ? (access.index as LiteralNode<T>).value : undefined;
         const invalid = literal !== undefined

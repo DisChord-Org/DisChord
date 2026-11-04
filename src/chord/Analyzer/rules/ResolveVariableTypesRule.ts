@@ -1,6 +1,6 @@
 import { AnalysisRule } from "../AnalysisRule";
-import { ASTNode, AssignmentNode, BaseNode, CallNode, ListNode, LoopNode, PrimitiveType, Symbol, SyntaxFunction, TokenType, VariableNode } from "../../model/types";
-import { isIdentificatorNode } from "../../ast.guards";
+import { ASTNode, AssignmentNode, BaseNode, ListNode, LoopNode, PrimitiveType, Symbol, TokenType, VariableNode } from "../../model/types";
+import { isIdentificatorNode, isRangeCall } from "../../ast.guards";
 import { AnyDataType, ArrayDataType, DataType, PrimitiveDataType, TupleDataType, UnionDataType, VoidDataType } from "../../model/DataType";
 import { TypeInferrer } from "../TypeInferrer";
 import { ReturnTypeInference } from "../ReturnTypeInference";
@@ -22,8 +22,8 @@ import { ReturnTypeInference } from "../ReturnTypeInference";
  *    must be assignable to the declared one (`tipo (texto|numero)` accepts a `numero`-only value
  *    fine — the annotation only needs to cover what's actually possible), or
  *  - left as-is (the explicit annotation, or `undefined`) when the initializer isn't inferrable at
- *    all — a call to a user function, an index access, a component declaration (embed, comando,
- *    ...), or a function's return value (functions have no declared return type yet).
+ *    all — a call to a user function whose return type is neither declared nor inferable, an index
+ *    access of unknown receiver, or a component declaration (embed, comando, ...).
  *
  * A variable declared without an annotation keeps its inferred type only while every reassignment
  * has an inferrable type assignable to it; if one is of another type, or can't be inferred, the
@@ -110,10 +110,19 @@ export class ResolveVariableTypesRule<T extends string, N extends BaseNode<T>> e
             return;
         }
 
-        const symbol = symbolTable.lookup(variableNode.id);
-        if (symbol) this.unannotated.add(symbol);
+        this.declareUnannotated(variableNode.id, () => this.typeInferrer.infer(variableNode.value));
+    }
 
-        symbolTable.setDataType(variableNode.id, symbol && this.degraded.has(symbol) ? AnyDataType.Any : this.typeInferrer.infer(variableNode.value));
+    /**
+     * Gives a name without annotation the type `infer` returns, or `cualquiera` if the name was already degraded.
+     */
+    private declareUnannotated (name: string, infer: () => DataType | undefined): void {
+        const symbolTable = this.context.symbolTable;
+        const symbol = symbolTable.lookup(name);
+        if (!symbol) return;
+
+        this.unannotated.add(symbol);
+        symbolTable.setDataType(name, this.degraded.has(symbol) ? AnyDataType.Any : infer());
     }
 
     /**
@@ -124,27 +133,19 @@ export class ResolveVariableTypesRule<T extends string, N extends BaseNode<T>> e
      * @private
      */
     private declareLoopVariable (loop: LoopNode<T, N>): void {
-        const symbolTable = this.context.symbolTable;
-        const symbol = symbolTable.lookup(loop.var);
-        if (!symbol) return;
-
-        this.unannotated.add(symbol);
-        symbolTable.setDataType(loop.var, this.degraded.has(symbol) ? AnyDataType.Any : this.loopVariableType(loop));
+        this.declareUnannotated(loop.var, () => this.loopVariableType(loop));
     }
 
     private loopVariableType (loop: LoopNode<T, N>): DataType | undefined {
         const iterable = loop.iterable;
 
-        if (iterable.type === TokenType.LLAMADA) {
-            const callee = (iterable as CallNode<T, N>).object;
-            if (isIdentificatorNode(callee) && callee.value === SyntaxFunction.Rango) return PrimitiveDataType.Numero;
-        }
+        if (isRangeCall(iterable)) return PrimitiveDataType.Numero;
 
         const type = this.typeInferrer.infer(iterable);
 
         if (type instanceof ArrayDataType) return type.element;
         if (type instanceof TupleDataType) return UnionDataType.ofTypes([ ...type.elements ]);
-        if (type instanceof PrimitiveDataType && (type.name === PrimitiveType.Texto || type.name === PrimitiveType.BDO)) return PrimitiveDataType.Texto;
+        if (PrimitiveDataType.is(type, PrimitiveType.Texto) || PrimitiveDataType.is(type, PrimitiveType.BDO)) return PrimitiveDataType.Texto;
 
         return undefined;
     }

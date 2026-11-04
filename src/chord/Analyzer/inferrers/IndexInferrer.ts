@@ -19,7 +19,7 @@ export class IndexInferrer<T extends string, N extends BaseNode<T>> extends SubI
 
         if (receiverType instanceof ArrayDataType) return receiverType.element;
         if (receiverType instanceof TupleDataType) return this.elementAt(receiverType, access.index);
-        if (receiverType instanceof PrimitiveDataType && receiverType.name === PrimitiveType.Texto) return PrimitiveDataType.Texto;
+        if (PrimitiveDataType.is(receiverType, PrimitiveType.Texto)) return PrimitiveDataType.Texto;
 
         return undefined;
     }

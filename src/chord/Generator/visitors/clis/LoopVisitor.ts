@@ -1,5 +1,5 @@
-import { LoopNode, BaseNode, SyntaxFunction, TokenType, TokenTypeUnion, ASTNode, CallNode } from "../../../model/types";
-import { isIdentificatorNode } from "../../../ast.guards";
+import { LoopNode, BaseNode, TokenType, TokenTypeUnion, ASTNode } from "../../../model/types";
+import { isRangeCall } from "../../../ast.guards";
 import { SubGenerator } from "../../SubGenerator";
 import { walkAST } from "../../../walkAST";
 
@@ -35,21 +35,17 @@ export class LoopVisitor<T extends string, N extends BaseNode<T>> extends SubGen
             
         const iterable = this.parent.visit(node.iterable);
 
-        if (node.iterable.type === TokenType.LLAMADA) {
-            const callNode = node.iterable as CallNode<T, N>;
+        if (isRangeCall(node.iterable)) {
+            const args = node.iterable.params;
+            let start = "0";
+            let end = this.parent.visit(args[0]);
 
-            if (isIdentificatorNode(callNode.object) && callNode.object.value === SyntaxFunction.Rango) {
-                const args = callNode.params;
-                let start = "0";
-                let end = this.parent.visit(args[0]);
-
-                if (args.length === 2) {
-                    start = this.parent.visit(args[0]);
-                    end = this.parent.visit(args[1]);
-                }
-                
-                return `for (let ${varName} = ${start}; ${varName} < ${end}; ${varName}++) {\n${body}\n}`;
+            if (args.length === 2) {
+                start = this.parent.visit(args[0]);
+                end = this.parent.visit(args[1]);
             }
+
+            return `for (let ${varName} = ${start}; ${varName} < ${end}; ${varName}++) {\n${body}\n}`;
         }
 
         if (this.runsCode(node.iterable)) {

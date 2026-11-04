@@ -25,7 +25,7 @@ export class MarkInterpolatedBooleansRule<T extends string, N extends BaseNode<T
 
             const type = this.typeInferrer.infer((current as ExpressionNode<T, N>).object);
 
-            if (type instanceof PrimitiveDataType && type.name === PrimitiveType.Booleano) {
+            if (PrimitiveDataType.is(type, PrimitiveType.Booleano)) {
                 this.context.symbolTable.marks.markBoolean(current);
             }
         });

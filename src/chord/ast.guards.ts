@@ -1,4 +1,4 @@
-import { AccessNode, ASTNode, BaseNode, CallNode, ClassNode, FunctionNode, IdentificatorNode, ImportNode, PropertyNode, TokenType, VariableNode } from "./model/types";
+import { AccessNode, ASTNode, BaseNode, CallNode, ClassNode, FunctionNode, IdentificatorNode, ImportNode, PropertyNode, SyntaxFunction, TokenType, VariableNode } from "./model/types";
 
 /**
  * Type guards for `ASTNode`. `ASTNode` is a union that ends in the extensible `N`, whose `type`
@@ -20,6 +20,14 @@ export function isAccessNode<T extends string, N extends BaseNode<T>> (node: AST
  */
 export function isCallNode<T extends string, N extends BaseNode<T>> (node: ASTNode<T, N>): node is CallNode<T, N> {
     return node.type === TokenType.LLAMADA;
+}
+
+/**
+ * @param {ASTNode<T, N>} node - Node to check.
+ * @returns {boolean} `true` if the node is a call to `rango` (`rango(5)`), the syntax function that a `para` turns into a counted loop.
+ */
+export function isRangeCall<T extends string, N extends BaseNode<T>> (node: ASTNode<T, N>): node is CallNode<T, N> {
+    return isCallNode(node) && isIdentificatorNode(node.object) && node.object.value === SyntaxFunction.Rango;
 }
 
 /**

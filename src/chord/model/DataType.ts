@@ -116,6 +116,15 @@ export class PrimitiveDataType extends DataType {
     public static readonly BDO = PrimitiveDataType.of(PrimitiveType.BDO);
 
     /**
+     * Whether a type is exactly the primitive `name`.
+     * @param {DataType | undefined} type - The type to check, if there is one.
+     * @param {PrimitiveTypeName} name - The primitive.
+     */
+    public static is (type: DataType | undefined, name: PrimitiveTypeName): boolean {
+        return type instanceof PrimitiveDataType && type.name === name;
+    }
+
+    /**
      * The single canonical correspondence between a native JS `typeof` result and the
      * {@link PrimitiveTypeName} DisChord surfaces for it — the one place this mapping is written,
      * consumed both at compile time (inferring a `var`'s `dataType` from a literal initializer, see
