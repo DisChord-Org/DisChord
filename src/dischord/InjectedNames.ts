@@ -1,7 +1,7 @@
 import { ClassDataType, DataType, PrimitiveDataType, UnionDataType } from "../chord/model/DataType";
 import { ASTNode, LiteralNode, PrimitiveTypeName, TokenType } from "../chord/model/types";
 import { literalStringValue } from "../chord/BDOSchema";
-import { eventsMap, InjectedTypes, OptionValueTypes } from "./Generator/constants/mappings";
+import { DisChordTypeMap, eventsMap, InjectedTypes, OptionValueTypes } from "./Generator/constants/mappings";
 import { CommandScopeNames } from "./CommandScopeNames";
 import { CommandNode, DisChordASTNode, DisChordNode, DisChordNodeType, DisChordODBNode, DisChordTokenType, EventNode } from "./types";
 
@@ -74,7 +74,7 @@ export class InjectedNames {
     private static optionType (options: DisChordODBNode, name: string): DataType | undefined {
         const option = options.blocks[name] as DisChordODBNode;
         const keyword = literalStringValue<DisChordNodeType, DisChordNode>(option.blocks['tipo'] as ASTNode<DisChordNodeType, DisChordNode>)?.toLowerCase();
-        const typeName = keyword ? OptionValueTypes[keyword] : undefined;
+        const typeName = keyword && keyword in DisChordTypeMap ? OptionValueTypes[DisChordTypeMap[keyword]] : undefined;
         if (!typeName) return undefined;
 
         const type = typeName === 'Usuario' ? ClassDataType.of(typeName) : PrimitiveDataType.of(typeName as PrimitiveTypeName);

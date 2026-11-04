@@ -219,18 +219,19 @@ export const InjectedTypes: Record<string, string> = dictionary({
 });
 
 /**
- * The type of the value of a command option, by the keyword of its `tipo`: a primitive type
- * (`texto`, `numero`, `booleano`) or a class of the core library (`Usuario`). A keyword left out gives no type.
+ * The type of the value of a command option, by the Discord option type `DisChordTypeMap` gives its
+ * keyword: a primitive type (`texto`, `numero`, `booleano`) or a class of the core library (`Usuario`).
+ * An option type left out gives no type.
  *
- * @type {Readonly<Record<string, string>>}
+ * @type {Readonly<Partial<Record<DiscordOptionType, string>>>}
  */
-export const OptionValueTypes: Record<string, string> = dictionary({
-    "texto": "texto",
-    "entero": "numero",
-    "numero": "numero",
-    "booleano": "booleano",
-    "usuario": "Usuario"
-});
+export const OptionValueTypes: Partial<Record<DiscordOptionType, string>> = {
+    [DiscordOptionType.String]: "texto",
+    [DiscordOptionType.Integer]: "numero",
+    [DiscordOptionType.Number]: "numero",
+    [DiscordOptionType.Boolean]: "booleano",
+    [DiscordOptionType.User]: "Usuario"
+};
 
 /**
  * Map translating DisChord application installation keywords to `ApplicationIntegrationType` enum values.
