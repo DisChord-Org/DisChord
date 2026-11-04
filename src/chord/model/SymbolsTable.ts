@@ -42,13 +42,24 @@ export class SymbolTable {
      * Node types that own a scope for their body. Chord's own are classes, functions and loops (the variable of a `para` lives in its scope); a
      * dialect adds its own through {@link registerScopeOwner}.
      */
-    private readonly scopeOwnerTypes: Set<string> = new Set([ TokenType.Clase, TokenType.Funcion, TokenType.BUCLE ]);
+    private readonly scopeOwnerTypes: Set<string> = new Set([ TokenType.Clase, TokenType.Funcion ]);
 
     /**
      * The subset of scope owners whose body runs inside an async context, so it may `await`
      * (a function is async only if marked, so it's not listed here).
      */
     private readonly asyncBodyTypes: Set<string> = new Set();
+
+    /**
+     * The scope owners that are a body running by itself (a function, a class, a command), as opposed
+     * to only scoping a block of the body that holds them (a loop), which decides nothing about `await`
+     * (see {@link isCallable}).
+     */
+    private readonly callableTypes: Set<string> = new Set([ TokenType.Clase, TokenType.Funcion ]);
+
+    constructor () {
+        this.registerScopeOwner(TokenType.BUCLE, { callable: false });
+    }
 
     /**
      * The classes declared in the file, so a member can be found from a class name and through inheritance.
@@ -68,11 +79,27 @@ export class SymbolTable {
      * Declares that nodes of `type` own a scope for their body.
      *
      * @param {string} type - The node type string.
-     * @param {boolean} [asyncBody=false] - Whether the body runs in an async context.
+     * @param {boolean | { asyncBody?: boolean; callable?: boolean }} [options] - Whether the body runs in an
+     * async context (`true` is the same as `{ asyncBody: true }`), and whether it is a body that runs by
+     * itself (`callable`, true unless said otherwise) or only a block of the one that holds it.
      */
-    public registerScopeOwner(type: string, asyncBody: boolean = false): void {
+    public registerScopeOwner(type: string, options: boolean | { asyncBody?: boolean; callable?: boolean } = {}): void {
+        const { asyncBody = false, callable = true } = typeof options === 'boolean' ? { asyncBody: options } : options;
+
         this.scopeOwnerTypes.add(type);
         if (asyncBody) this.asyncBodyTypes.add(type);
+        if (callable) this.callableTypes.add(type);
+    }
+
+    /**
+     * Whether `node` owns a scope and is a body that runs by itself (a function, a class, a command...),
+     * not just a block of another body (a loop).
+     *
+     * @param {{ type: string }} node - The AST node to check.
+     * @returns {boolean}
+     */
+    public isCallable(node: { type: string }): boolean {
+        return this.callableTypes.has(node.type);
     }
 
     /**
