@@ -48,7 +48,7 @@ export class CoreLibDispatch<C extends string = string> {
             }
 
             const className = this.utils.classOf(member);
-            const found = className && this.utils.findInClass(className, access.property);
+            const found = className && this.utils.findRewritable(className, access.property);
             if (!found || found.member.static || found.isProperty) return undefined;
 
             transpiles.add(found.member.transpile);

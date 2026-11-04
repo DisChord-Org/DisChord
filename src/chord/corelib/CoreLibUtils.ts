@@ -3,7 +3,13 @@
 import { isIdentificatorNode } from "../ast.guards";
 import { AnyDataType, ArrayDataType, ClassDataType, DataType, PrimitiveDataType, UnionDataType } from "../model/DataType";
 import { AccessNode, ASTNode, BaseNode, CallNode, PrimitiveType, TokenType } from "../model/types";
-import { CoreLib, CoreLibClass, ResolvedMember } from "./corelib.types";
+import { CoreLib, CoreLibClass, CoreLibMember, ResolvedMember } from "./corelib.types";
+
+/** Every member of a class counts: the lookup is made to know its type. */
+const anyMember = (): boolean => true;
+
+/** The members a runtime module provides are skipped: the lookup is made to translate the access. */
+const rewritableMember = (member: CoreLibMember): boolean => !member.runtime;
 
 /**
  * Read-only lookups over a `CoreLib`, so callers pass the raw names they have from the AST and
@@ -29,7 +35,7 @@ export class CoreLibUtils<C extends string = string> {
         const className = access.object.value;
         if (!this.hasOwn(this.corelib.classes, className)) return undefined;
 
-        return this.findInClass(className as C, access.property);
+        return this.findRewritable(className as C, access.property);
     }
 
     /**
@@ -40,7 +46,7 @@ export class CoreLibUtils<C extends string = string> {
      */
     resolveInstance<T extends string, N extends BaseNode<T>> (access: AccessNode<T, N>): ResolvedMember | undefined {
         for (const key of Object.keys(this.corelib.classes)) {
-            const found = this.findInClass(key as C, access.property);
+            const found = this.findRewritable(key as C, access.property);
 
             if (found && !found.member.static) return found;
         }
@@ -57,7 +63,7 @@ export class CoreLibUtils<C extends string = string> {
      */
     resolveInstanceMembers<T extends string, N extends BaseNode<T>> (access: AccessNode<T, N>): ResolvedMember[] {
         return Object.keys(this.corelib.classes)
-            .map(key => this.findInClass(key as C, access.property))
+            .map(key => this.findRewritable(key as C, access.property))
             .filter((found): found is ResolvedMember => found !== undefined && !found.member.static);
     }
 
@@ -132,17 +138,37 @@ export class CoreLibUtils<C extends string = string> {
     }
 
     /**
-     * Looks a member up in a class, methods first and then properties. Members provided by a runtime module are skipped.
+     * Looks a member up in a class to know its type: every member counts, also the ones a runtime
+     * module provides (`usuario.nombre` is a `texto` although it is never rewritten). Methods first and then properties.
      * @param {C} className - Core library class.
      * @param {string} propName - Member name as written in source code.
-     * @param {boolean} [includeRuntime=false] - Whether to find the members a runtime module provides. They are skipped by default, since they are never rewritten, but they do have a type.
      * @returns {ResolvedMember | undefined} The member, or `undefined` if the class has no such member.
      */
-    findInClass(className: C, propName: string, includeRuntime: boolean = false): ResolvedMember | undefined {
+    findMember(className: C, propName: string): ResolvedMember | undefined {
+        return this.lookupMember(className, propName, anyMember);
+    }
+
+    /**
+     * Looks a member up in a class to translate it: the members a runtime module provides are skipped,
+     * since the compiler leaves them as written. Methods first and then properties.
+     * @param {C} className - Core library class.
+     * @param {string} propName - Member name as written in source code.
+     * @returns {ResolvedMember | undefined} The member, or `undefined` if the class has no such member.
+     */
+    findRewritable(className: C, propName: string): ResolvedMember | undefined {
+        return this.lookupMember(className, propName, rewritableMember);
+    }
+
+    /**
+     * The shared core of {@link findMember} and {@link findRewritable}.
+     * @param {(member: CoreLibMember) => boolean} accepts - Whether a member found by that name is the one wanted.
+     * @private
+     */
+    private lookupMember(className: C, propName: string, accepts: (member: CoreLibMember) => boolean): ResolvedMember | undefined {
         const classEntry: CoreLibClass = this.corelib.classes[className];
         const qualifiedName = `${className}.${propName}`;
 
-        if (this.hasOwn(classEntry.methods, propName) && (includeRuntime || !classEntry.methods[propName].runtime)) {
+        if (this.hasOwn(classEntry.methods, propName) && accepts(classEntry.methods[propName])) {
             return {
                 qualifiedName,
                 member: classEntry.methods[propName],
@@ -150,7 +176,7 @@ export class CoreLibUtils<C extends string = string> {
             };
         }
 
-        if (classEntry.properties && this.hasOwn(classEntry.properties, propName) && (includeRuntime || !classEntry.properties[propName].runtime)) {
+        if (classEntry.properties && this.hasOwn(classEntry.properties, propName) && accepts(classEntry.properties[propName])) {
             return {
                 qualifiedName,
                 member: classEntry.properties[propName],
@@ -176,7 +202,7 @@ export class CoreLibUtils<C extends string = string> {
      * @returns {ResolvedMember | undefined} The member, or `undefined` if there is none or the user's declaration wins.
      */
     resolveInstanceMember<T extends string, N extends BaseNode<T>> (access: AccessNode<T, N>, receiverType?: DataType, declaredByUser: boolean = false): ResolvedMember | undefined {
-        if (receiverType && !this.isUnknownReceiver(receiverType)) return this.resolveInstanceOf(access, receiverType);
+        if (receiverType && !this.isUnknownReceiver(receiverType)) return this.resolveInstanceOf(access, receiverType, false);
         if (declaredByUser && !this.resolveStatic(access)) return undefined;
 
         return this.resolveInstance(access);
@@ -290,12 +316,12 @@ export class CoreLibUtils<C extends string = string> {
     }
 
     /**
-     * @param {boolean} [forType=false] - Whether the member is wanted for its type: then one a runtime module provides counts.
+     * @param {boolean} forType - Whether the member is wanted for its type (every member) or to translate it (the rewritable ones).
      * @private
      */
-    private resolveInstanceOf<T extends string, N extends BaseNode<T>> (access: AccessNode<T, N>, receiverType: DataType, forType: boolean = false): ResolvedMember | undefined {
+    private resolveInstanceOf<T extends string, N extends BaseNode<T>> (access: AccessNode<T, N>, receiverType: DataType, forType: boolean): ResolvedMember | undefined {
         const className = this.classOf(receiverType);
-        const found = className && this.findInClass(className, access.property, forType);
+        const found = className && (forType ? this.findMember(className, access.property) : this.findRewritable(className, access.property));
 
         return found && !found.member.static ? found : undefined;
     }
