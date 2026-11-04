@@ -22,6 +22,11 @@ import { RequiresConsoleRuntimeRule } from "./rules/RequiresConsoleRuntimeRule";
 import { RequiresRuntimeHelpersRule } from "./rules/RequiresRuntimeHelpersRule";
 
 /**
+ * The class of a rule, however its constructor is declared: what a rule of the list is looked up by.
+ */
+type RuleTarget<T extends string, N extends BaseNode<T>> = abstract new (...args: never[]) => AnalysisRule<T, N>;
+
+/**
  * Engine for the semantic analysis phase, run once per file between parsing and generation:
  *
  *     const ast = parser.parse();
@@ -129,6 +134,36 @@ export class Analyzer<T extends string, N extends BaseNode<T>> {
         Analyzer.Rules.forEach(RuleClass => {
             this.rules.push(new (RuleClass as unknown as AnalysisRuleClass<T, N>)(this.context));
         });
+    }
+
+    /**
+     * Puts `rule` right before the rule that is an instance of `target`, so it runs first.
+     * @param {RuleTarget<T, N>} target - The class of a rule already in the list.
+     * @param {AnalysisRule<T, N>} rule - The rule to insert.
+     * @throws {Error} If no rule of the list is an instance of `target`: a rule that silently ended up elsewhere would run in the wrong order.
+     * @protected
+     */
+    protected insertRuleBefore (target: RuleTarget<T, N>, rule: AnalysisRule<T, N>): void {
+        this.rules.splice(this.indexOfRule(target), 0, rule);
+    }
+
+    /**
+     * Puts `rule` in the place of the rule that is an instance of `target`.
+     * @param {RuleTarget<T, N>} target - The class of a rule already in the list.
+     * @param {AnalysisRule<T, N>} rule - The rule that takes its place.
+     * @throws {Error} If no rule of the list is an instance of `target`.
+     * @protected
+     */
+    protected replaceRule (target: RuleTarget<T, N>, rule: AnalysisRule<T, N>): void {
+        this.rules[this.indexOfRule(target)] = rule;
+    }
+
+    private indexOfRule (target: RuleTarget<T, N>): number {
+        const index = this.rules.findIndex(rule => rule instanceof target);
+
+        if (index === -1) throw new Error(`No hay ninguna regla ${target.name} entre las del analizador.`);
+
+        return index;
     }
 
     /**

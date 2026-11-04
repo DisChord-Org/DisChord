@@ -65,17 +65,13 @@ export class DisChordAnalyzer extends Analyzer<DisChordNodeType, DisChordNode> {
 
         // Chord's awaited-calls rule is swapped for the dialect's, which also covers `enviar mensaje`,
         // so the context stack is tracked once and not duplicated in a second rule.
-        this.rules = this.rules.map(rule => {
-            if (rule instanceof ResolveAwaitedCallsRule) return new DisChordResolveAwaitedCallsRule(this.context);
-            // and so is the one that binds declarations, which also declares what a command and an event put in scope
-            if (rule instanceof BindDeclarationsRule) return new DisChordBindDeclarationsRule(this.context);
-
-            return rule;
-        });
+        this.replaceRule(ResolveAwaitedCallsRule, new DisChordResolveAwaitedCallsRule(this.context));
+        // and so is the one that binds declarations, which also declares what a command and an event put in scope
+        this.replaceRule(BindDeclarationsRule, new DisChordBindDeclarationsRule(this.context));
 
         // the rejection of declaring a name a command or an event defines only needs the tree, and must run before
         // the binding, which would otherwise report the redeclaration first with its own, less specific message
-        this.rules.splice(this.rules.findIndex(rule => rule instanceof BindDeclarationsRule), 0, new ValidateInjectedNamesRule(this.context));
+        this.insertRuleBefore(BindDeclarationsRule, new ValidateInjectedNamesRule(this.context));
 
         DisChordAnalyzer.DisChordRules.forEach(RuleClass => {
             this.rules.push(new RuleClass(this.context));
