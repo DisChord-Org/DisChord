@@ -16,7 +16,7 @@ interface ReturnFrame {
 
 /**
  * Infers the return type of the functions that declare none, from what their `devolver`s return, and
- * records it in the `inferredReturns` of the function's signature, where `CallInferrer` reads it:
+ * records it in the `returns` of the function's signature, where `CallInferrer` reads it:
  *  - a declared return type always wins, and a constructor has none;
  *  - if any `devolver` returns a value of no inferrable type (a parameter without a type, a call to
  *    something unknown, a recursive call...), the type of the function is unknown;
@@ -85,9 +85,9 @@ export class ReturnTypeInference<T extends string, N extends BaseNode<T>> {
 
         const inferred = frame.unknown || frame.types.length === 0 ? undefined : UnionDataType.ofTypes(frame.types);
 
-        if (signature.inferredReturns?.format() === inferred?.format()) return;
+        if (signature.returns?.format() === inferred?.format()) return;
 
-        signature.inferredReturns = inferred;
+        signature.returns = inferred;
         this.changedInPass = true;
     }
 }

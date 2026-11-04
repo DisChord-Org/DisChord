@@ -19,10 +19,10 @@ export class CallInferrer<T extends string, N extends BaseNode<T>> extends SubIn
     public static triggerToken: TokenTypeUnion<TokenType> | undefined = TokenType.LLAMADA;
 
     /**
-     * The return type of a function or method: the declared one, or else the one inferred from its body.
+     * The return type of a function or method: the declared one, or else the one inferred from its body (see `ReturnTypeInference`).
      */
     private returnsOf (symbol: Symbol | undefined): DataType | undefined {
-        return symbol?.signature?.returns ?? symbol?.signature?.inferredReturns;
+        return symbol?.signature?.returns;
     }
 
     public infer (node: ASTNode<T, N>): DataType | undefined {

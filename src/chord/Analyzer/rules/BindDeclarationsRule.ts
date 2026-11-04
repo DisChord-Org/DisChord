@@ -61,7 +61,11 @@ export class BindDeclarationsRule<T extends string, N extends BaseNode<T>> exten
                 metadata: {
                     isAsync: node.metadata.isAsync
                 },
-                signature: { params: node.params.map((_, index) => node.paramTypes?.[index]), returns: node.returnType }
+                signature: {
+                    params: node.params.map((_, index) => node.paramTypes?.[index]),
+                    returns: node.returnType,
+                    annotated: node.returnType !== undefined || !!node.paramTypes?.some(type => type !== undefined)
+                }
             }, node.location);
 
             this.context.symbolTable.enterScope(node);

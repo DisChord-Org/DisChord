@@ -71,13 +71,14 @@ export interface Symbol {
      */
     dataType?: DataType;
     /**
-     * For a function, the types its signature declares: one entry per parameter (`undefined` for
-     * one written without a type) and the return type, if any. Absent when the signature has no
-     * annotation at all.
+     * For a function: one entry per parameter (`undefined` for one written without a type) and the type
+     * it returns, if known. `annotated` says whether the signature declares any type (a parameter's or
+     * the return's), which is what turns on checking the arguments of a call; `returns` is then the
+     * declared return type if there is one, and otherwise the one inferred from the body of the function.
      */
     signature?: {
         params: (DataType | undefined)[];
         returns?: DataType;
-        inferredReturns?: DataType;
+        annotated: boolean;
     };
 };

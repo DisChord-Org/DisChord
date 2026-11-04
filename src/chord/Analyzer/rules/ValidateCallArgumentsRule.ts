@@ -46,8 +46,7 @@ export class ValidateCallArgumentsRule<T extends string, N extends BaseNode<T>> 
         const signature = resolved?.symbol.signature;
         if (!resolved || !signature) return;
 
-        const isAnnotated = signature.returns !== undefined || signature.params.some(type => type !== undefined);
-        if (!isAnnotated) return;
+        if (!signature.annotated) return;
 
         const { name } = resolved;
         const expected = signature.params.length;
