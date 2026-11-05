@@ -154,10 +154,12 @@ export const channelsModule: SharedModule = {
     };
 
     const consumeQuota = async (cliente, guildId, action) => {
+        // everything that waits goes first: from here to the push nothing can interleave, so actions
+        // started at the same time cannot all read the same count and pass
+        const allowance = BASE_QUOTA[action] * 2 ** await tierOf(cliente);
         const now = Date.now();
         const key = guildId + ':' + action;
         const recent = (usage.get(key) || []).filter(at => now - at < WINDOW_MS);
-        const allowance = BASE_QUOTA[action] * 2 ** await tierOf(cliente);
 
         if (recent.length >= allowance) {
             throw new Error("DisChord Error: No se pudo " + WHAT[action] + ". Se alcanzó el límite de seguridad de " + allowance + " acciones de este tipo cada ${channelQuotaWindowMinutes} minutos en este servidor.");
