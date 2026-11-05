@@ -1,6 +1,6 @@
 import { Test } from "../../../Test";
 import { CorelibCommand, CorelibDocument } from "../../../../src/cli/commands/CorelibCommand";
-import { eventsMap, CommandScope } from "../../../../src/dischord/Generator/constants/mappings";
+import { eventsMap, CommandScope, EmbedColors } from "../../../../src/dischord/Generator/constants/mappings";
 import { CommandSchema, ButtonSchema, StartBotSchema } from "../../../../src/dischord/Generator/constants/schemas";
 import { UnreservedComponentDeclarations } from "../../../../src/dischord/Parser/Grammar/UnreservedComponentDeclarations";
 import { CoreLibCatalog } from "../../../../src/chord/corelib/CoreLibCatalog";
@@ -53,7 +53,7 @@ export class CorelibCatalogTest extends Test {
     private assertLayout (document: CorelibDocument): void {
         if (document.schema !== CoreLibCatalog.schema) throw new Error(`schema is ${document.schema}`);
 
-        for (const key of ['schema', 'compilerVersion', 'keywords', 'classes', 'functions', 'types', 'literals', 'decorators', 'declarations', 'events', 'blocks', 'scopes']) {
+        for (const key of ['schema', 'compilerVersion', 'keywords', 'classes', 'functions', 'types', 'literals', 'decorators', 'declarations', 'events', 'blocks', 'scopes', 'embedColors']) {
             if (!(key in document)) throw new Error(`The document lacks '${key}'`);
         }
 
@@ -247,6 +247,8 @@ export class CorelibCatalogTest extends Test {
         const nested = (blockName: string, key: string) => block(blockName)?.nested.find(candidate => candidate.key === key);
         if (nested('comando', 'opciones')?.block !== 'opcion' || nested('comando', 'opciones')?.shape !== 'entries') throw new Error('comando.opciones is not described');
         if (nested('embed', 'campos')?.block !== 'campo' || nested('embed', 'campos')?.shape !== 'items') throw new Error('embed.campos is not described');
+        if (nested('embed', 'autor')?.block !== 'autor' || nested('embed', 'autor')?.shape !== 'single') throw new Error('embed.autor is not described');
+        if (!field('embed', 'hora')) throw new Error('embed.hora is not described');
         if (nested('embed', 'pie')?.block !== 'pie' || nested('embed', 'pie')?.shape !== 'single') throw new Error('embed.pie is not described');
 
         const names = new Set(document.blocks.map(candidate => candidate.name));
@@ -256,6 +258,8 @@ export class CorelibCatalogTest extends Test {
         document.declarations.forEach(entry => {
             if (entry.block !== null && !names.has(entry.block)) throw new Error(`The declaration '${entry.keyword}' points to the missing block '${entry.block}'`);
         });
+
+        if (document.embedColors.join() !== Object.keys(EmbedColors).join()) throw new Error('The embed colors differ from EmbedColors');
 
         // What a command finds in scope: its parameter and every shortcut the generator declares
         const scope = document.scopes.find(entry => entry.construct === 'comando');

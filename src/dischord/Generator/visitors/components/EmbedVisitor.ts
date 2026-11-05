@@ -5,7 +5,7 @@ import { SubGenerator } from "../../../../chord/Generator/SubGenerator";
 import { BDOResolver } from "../../../../chord/Generator/BDOResolver";
 import { TokenType, TokenTypeUnion } from "../../../../chord/model/types";
 import { BDOVisitor } from "../../../../chord/Generator/visitors/expressions/BDOVisitor";
-import { EmbedFieldSchema, EmbedFooterSchema, EmbedSchema } from "../../constants/schemas";
+import { EmbedAuthorSchema, EmbedFieldSchema, EmbedFooterSchema, EmbedSchema } from "../../constants/schemas";
 
 /**
  * Generator class responsible for generating code related to message embeds in DisChord.
@@ -73,13 +73,12 @@ export default class EmbedVisitor extends SubGenerator<DisChordNodeType, DisChor
      * `new Embed()`. Shared by `visit()` (the anonymous inline form) and `EmbedDeclarationVisitor`
      * (the named, reusable `embed <Nombre> { ... }` form), so both produce identical output.
      *
-     * The simple pass-through fields (`titulo`, `descripcion`, `imagen`, `cartel`, and `color`'s
+     * The simple pass-through fields (`titulo`, `descripcion`, `imagen`, `cartel`, `hora`, and `color`'s
      * raw value before its named-color lookup) come straight out of {@link EmbedSchema} via
      * `BDOResolver` in one call — the same schema the Analyzer's `ValidateEmbedsRule` already
-     * validated `node` against (which also covers `campos`/`pie`'s own requirements, resolved here
-     * by hand since their output shape — a list of objects, a nested `setFooter` call — doesn't
-     * reduce to a single value the way the others do). `autor` (two sub-properties plus a default)
-     * and `hora` (presence alone, no value at all) don't fit that shape either.
+     * validated `node` against (which also covers `autor`/`campos`/`pie`'s own requirements, resolved here
+     * by hand since their output shape — a nested `setAuthor` call, a list of objects — doesn't
+     * reduce to a single value the way the others do).
      * @param node The AST node (must be of type 'BDO') containing embed definitions.
      * @throws Error if the node is not a BDO.
      * @returns The `.setX(...)` method chain, without the `new Embed()` prefix.
@@ -98,7 +97,7 @@ export default class EmbedVisitor extends SubGenerator<DisChordNodeType, DisChor
         const ResolvedTitle = fields['titulo'] ? `.setTitle(${fields['titulo']})` : '';
         const ResolvedAuthor = this.resolveAuthor(node);
         const ResolvedDescription = fields['descripcion'] ? `.setDescription(${fields['descripcion']})` : '';
-        const ResolvedTimestamp = node.blocks['hora'] ? '.setTimestamp()' : '';
+        const ResolvedTimestamp = fields['hora'] ? '.setTimestamp()' : '';
         const ResolvedImage = fields['imagen'] ? `.setImage(${fields['imagen']})` : '';
         const ResolvedThumbnail = fields['cartel'] ? `.setThumbnail(${fields['cartel']})` : '';
         const ResolvedFields = this.resolveFields(node);
@@ -140,7 +139,9 @@ export default class EmbedVisitor extends SubGenerator<DisChordNodeType, DisChor
     }
 
     /**
-     * Resolves the 'autor' block, including nested 'nombre' and 'icono' properties.
+     * Resolves the 'autor' block against {@link EmbedAuthorSchema} — the same schema the Analyzer's
+     * `ValidateEmbedsRule` already validated it against. An `autor` that is not a block of its own
+     * (`autor verdadero`) takes the defaults.
      * @private
      * @returns The generated setAuthor call or an empty string if the author is not defined.
      */
@@ -149,15 +150,10 @@ export default class EmbedVisitor extends SubGenerator<DisChordNodeType, DisChor
 
         if (!author) return '';
 
-        const name = this.parent.visitIfExists(
-            this.parent.get(BDOVisitor).getODBProperty(node, 'nombre')
-        ) || 'usuario.username';
+        const resolver = new BDOResolver<DisChordNodeType, DisChordNode>(expression => this.parent.visit(expression));
+        const resolved = resolver.resolve(author.type === TokenType.BDO ? author as DisChordODBNode : { blocks: {} } as DisChordODBNode, EmbedAuthorSchema);
 
-        const iconUrl = this.parent.visitIfExists(
-            this.parent.get(BDOVisitor).getODBProperty(node, 'icono')
-        );
-
-        return `.setAuthor({ text: ${name}, iconUrl: ${iconUrl} })`
+        return `.setAuthor({ text: ${resolved['nombre']}, iconUrl: ${resolved['icono']} })`;
     }
 
     /**

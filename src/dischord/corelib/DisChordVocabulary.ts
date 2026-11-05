@@ -1,7 +1,7 @@
 import { BDOSchema, fieldKeys, FieldSpec } from "../../chord/BDOSchema";
-import { CommandContextParameter, CommandScope, eventsMap } from "../Generator/constants/mappings";
+import { CommandContextParameter, CommandScope, EmbedColors, eventsMap } from "../Generator/constants/mappings";
 import {
-    ButtonSchema, CollectorSchema, CommandSchema, CreateChannelSchema, DeleteChannelSchema, EditChannelSchema, GetChannelSchema, ListChannelsSchema, EmbedFieldSchema, EmbedFooterSchema, EmbedSchema, MessageSchema, OptionSchema, StartBotSchema
+    ButtonSchema, CollectorSchema, CommandSchema, CreateChannelSchema, DeleteChannelSchema, EditChannelSchema, GetChannelSchema, ListChannelsSchema, EmbedAuthorSchema, EmbedFieldSchema, EmbedFooterSchema, EmbedSchema, MessageSchema, OptionSchema, StartBotSchema
 } from "../Generator/constants/schemas";
 import { UnreservedComponentDeclarations } from "../Parser/Grammar/UnreservedComponentDeclarations";
 import { DisChordNode, DisChordNodeType } from "../types";
@@ -58,6 +58,8 @@ export interface DisChordVocabularyDescription {
     readonly events: EventDescription[];
     readonly blocks: BlockDescription[];
     readonly scopes: ScopeDescription[];
+    /** The names `color` of an `embed` accepts as a text (`color "Verde"`); any other value is passed through as it is. */
+    readonly embedColors: string[];
 }
 
 /**
@@ -78,6 +80,7 @@ export class DisChordVocabulary {
         'opcion': OptionSchema('', { blocks: {} }),
         'boton': ButtonSchema,
         'embed': EmbedSchema,
+        'autor': EmbedAuthorSchema,
         'campo': EmbedFieldSchema,
         'pie': EmbedFooterSchema,
         'recolector': CollectorSchema,
@@ -104,7 +107,8 @@ export class DisChordVocabulary {
             blocks: blocks.map(([name, schema]) => this.describeBlock(name, schema)),
             scopes: [
                 { construct: 'comando', identifiers: [CommandContextParameter, ...Object.keys(CommandScope)] }
-            ]
+            ],
+            embedColors: Object.keys(EmbedColors)
         };
     }
 

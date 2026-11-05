@@ -1,0 +1,19 @@
+nuevo comando Prueba {
+    descripcion "prueba"
+
+    enviar mensaje {
+        embed {
+            titulo "Hola"
+            autor {
+                nombre "Yo"
+                icono "https://x.y/i.png"
+            }
+            hora verdadero
+        }
+    }
+}
+
+embed Plano {
+    autor {}
+    hora verdadero
+}
