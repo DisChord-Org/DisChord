@@ -43,6 +43,17 @@ Before submitting a Pull Request, please ensure:
 - You've added a test under `tester/tests/` covering the new feature.
 - Your code builds successfully (`npm run build`).
 - Documentation (like `README.md` or comments) has been updated if applicable.
+- No file you touched goes over the length limits (see [Keeping Files Short](#keeping-files-short)).
+
+---
+
+## Keeping Files Short
+
+Source files under `src/` are kept short, and `tester/tests/Structure/FileLength` enforces it:
+
+- **From 300 lines** the test prints a `[WARNING]` for the file. It does not fail: either justify the length or split the file.
+- **From 400 lines** the test fails. Split the file by responsibility (not by moving lines around).
+- **There are no exceptions.** Not for data tables, not for declarations: a file over the limit is split.
 
 ---
 
