@@ -1,0 +1,10 @@
+nuevo comando Canales {
+    descripcion "gestiona canales"
+
+    var c es obtener canal {
+        nombre "general"
+        tipo "texto"
+        categoria "9"
+    }
+    consola.imprimir(c.nombre)
+}

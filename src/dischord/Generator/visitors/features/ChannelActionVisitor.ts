@@ -36,7 +36,7 @@ export default class ChannelActionVisitor extends SubGenerator<DisChordNodeType,
             case ChannelAction.Borrar:
                 return `await ${helper}(ctx, ${properties[ChannelProperty.Canal]}, ${properties[ChannelProperty.Razon]}, ${node.guild})`;
             case ChannelAction.Obtener:
-                return `await ${helper}(ctx, ${properties[ChannelProperty.Id]}, ${node.guild})`;
+                return `await ${helper}(ctx, ${properties[ChannelProperty.Id]}, ${this.guild(node, properties)}${this.nameSearch(node, properties)})`;
             case ChannelAction.Listar:
                 return `await ${helper}(ctx, ${this.guild(node, properties)}, ${this.body(node, properties)})`;
         }
@@ -48,6 +48,15 @@ export default class ChannelActionVisitor extends SubGenerator<DisChordNodeType,
      */
     private guild (node: ChannelActionNode, properties: Record<string, string>): string {
         return node.object.blocks[ChannelProperty.Servidor] ? properties[ChannelProperty.Servidor] : node.guild!;
+    }
+
+    /**
+     * The arguments that go after the server in `obtener canal` when it searches by name: the name
+     * and the filters that narrow it. Nothing when it reads by id, so that call is the one it always was.
+     * @private
+     */
+    private nameSearch (node: ChannelActionNode, properties: Record<string, string>): string {
+        return node.object.blocks[ChannelProperty.Nombre] ? `, ${properties[ChannelProperty.Nombre]}, ${this.body(node, properties)}` : '';
     }
 
     /**

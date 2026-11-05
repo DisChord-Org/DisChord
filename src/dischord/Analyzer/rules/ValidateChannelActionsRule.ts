@@ -16,9 +16,12 @@ import { CommandGuildSource, EventGuildSources, EventSelfTriggers, eventsMap } f
  *    none in the event it triggers itself (`crear canal` in `canalCreado` would create channels
  *    forever).
  *  - That `editar canal` changes something.
+ *  - That `obtener canal` names its channel by `id` or by `nombre`, one of them, and that `tipo` and
+ *    `categoria`, which narrow a search by name, come with a `nombre`.
  *  - The server of the context, written on the node as `guild`: the command's own, or the one
  *    carried by the event's first parameter that has one. `crear canal` without `servidor` needs
- *    it; the other two use it to check that the channel belongs to that server.
+ *    it, and so does `obtener canal` by `nombre`, which searches that server; the other two use it
+ *    to check that the channel belongs to that server.
  */
 export class ValidateChannelActionsRule extends AnalysisRule<DisChordNodeType, DisChordNode> {
     private readonly validator = this.createBDOValidator();
@@ -78,10 +81,12 @@ export class ValidateChannelActionsRule extends AnalysisRule<DisChordNodeType, D
         }
 
         if (node.action === ChannelAction.Editar) this.assertChangesSomething(node);
+        if (node.action === ChannelAction.Obtener) this.assertNamesOneChannel(node);
 
         node.guild = this.guildOf(context);
 
-        const needsOwnServer = node.action === ChannelAction.Crear || node.action === ChannelAction.Listar;
+        const searchesByName = node.action === ChannelAction.Obtener && node.object.blocks[ChannelProperty.Nombre] !== undefined;
+        const needsOwnServer = node.action === ChannelAction.Crear || node.action === ChannelAction.Listar || searchesByName;
 
         if (needsOwnServer && !node.object.blocks[ChannelProperty.Servidor] && node.guild === undefined) this.fail(
             `El evento '${(context as EventNode).name}' no trae un servidor: indica 'servidor' en '${name}'`,
@@ -117,6 +122,28 @@ export class ValidateChannelActionsRule extends AnalysisRule<DisChordNodeType, D
             `'editar canal' necesita al menos una propiedad que cambiar: ${changes.join(' / ')}.`,
             node.location
         );
+    }
+
+    /**
+     * `obtener canal` reads one channel: by `id` or by `nombre`, never both nor neither. `tipo` and
+     * `categoria` only narrow a search by name, so with an `id` they mean nothing.
+     * @private
+     */
+    private assertNamesOneChannel (node: ChannelActionNode): void {
+        const blocks = node.object.blocks;
+        const byId = blocks[ChannelProperty.Id] !== undefined;
+        const byName = blocks[ChannelProperty.Nombre] !== undefined;
+
+        if (!byId && !byName) this.fail(`En 'obtener canal' se esperaba '${ChannelProperty.Id}' o '${ChannelProperty.Nombre}'.`, node.location);
+
+        if (byId && byName) this.fail(`En 'obtener canal' no se pueden dar '${ChannelProperty.Id}' y '${ChannelProperty.Nombre}' a la vez.`, node.location);
+
+        const narrowing = ChannelActionSchemas[node.action].fields
+            .filter(field => field.output !== undefined)
+            .flatMap(field => fieldKeys(field.key))
+            .find(key => blocks[key] !== undefined);
+
+        if (!byName && narrowing !== undefined) this.fail(`En 'obtener canal', '${narrowing}' solo se usa junto a '${ChannelProperty.Nombre}'.`, node.location);
     }
 
     /**

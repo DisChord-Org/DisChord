@@ -74,7 +74,9 @@ export const channelQuotaMaxTier = 3;
  * Which server a `crear canal` or a `listar canales` defaults to is decided at compile time and
  * arrives here resolved. Reading (`obtener`, `listar`) has no quota: it changes nothing. It does
  * check that the channel belongs to the server of the context and, inside a command, that whoever
- * ran it can see it, so the bot does not read for them what they could not.
+ * ran it can see it, so the bot does not read for them what they could not. `obtener canal` by
+ * `nombre` searches the server and fails unless exactly one channel of that name is left, counting
+ * only the ones whoever ran the command can see.
  *
  * The module opens with a notice for whoever, human or AI agent, is about to edit the generated
  * file: it is rewritten on every compilation and holds the barriers against raiding. Kept in
@@ -225,9 +227,70 @@ export const channelsModule: SharedModule = {
         return await cliente.channels.delete(channelId, { reason });
     };
 
-    export const ${channelHelperNames.obtener} = async (ctx, channel, guild) => {
+    // the channels of a list that pass the filters of listar canales (or the ones that narrow a search by name)
+    const narrow = async (channels, filters) => {
+        if (!filters) return channels;
+
+        if (filters.type !== undefined) channels = channels.filter(channel => channel.type === filters.type);
+
+        if (filters.${ChannelPayload.Parent} !== undefined) {
+            const parentId = await idOf(filters.${ChannelPayload.Parent});
+            channels = channels.filter(channel => channel.parentId === parentId);
+        }
+
+        // names are compared whole or by a part of them, ignoring case and nothing else
+        if (filters.name !== undefined) {
+            const wanted = String(await filters.name).toLowerCase();
+            channels = channels.filter(channel => String(channel.name).toLowerCase() === wanted);
+        }
+
+        if (filters.nameContains !== undefined) {
+            const part = String(await filters.nameContains).toLowerCase();
+            channels = channels.filter(channel => String(channel.name).toLowerCase().includes(part));
+        }
+
+        return channels;
+    };
+
+    // inside a command, only what whoever ran it can see
+    const visibleTo = async (ctx, channels) => {
+        if (!ctx.contexto) return channels;
+
+        const visible = await Promise.all(channels.map(channel => canSee(ctx.contexto, channel)));
+
+        return channels.filter((_, index) => visible[index]);
+    };
+
+    // obtener canal { nombre ... }: the one channel of the server with that name. What whoever ran the
+    // command can not see is left out BEFORE counting, so neither "none" nor "there are N" says that
+    // a channel they can not see exists.
+    const findByName = async (ctx, cliente, guild, name, filters, action) => {
+        const guildId = await requireId(guild, '${ChannelProperty.Servidor}', action);
+
+        // the permissions are those of the invoker in the server the command runs in
+        if (ctx.contexto && ctx.contexto.guildId !== guildId) {
+            throw new Error("DisChord Error: No se pudo " + WHAT[action] + ". El canal no pertenece al servidor del contexto.");
+        }
+
+        const wanted = await name;
+        const channels = await visibleTo(ctx, await narrow(await cliente.guilds.channels.list(guildId), { ...filters, name: wanted }));
+
+        if (channels.length === 0) {
+            throw new Error("DisChord Error: No se pudo " + WHAT[action] + ". No hay ningún canal llamado '" + wanted + "'.");
+        }
+
+        if (channels.length > 1) {
+            throw new Error("DisChord Error: No se pudo " + WHAT[action] + ". Hay " + channels.length + " canales llamados '" + wanted + "'; precisa con 'categoria' o 'tipo'.");
+        }
+
+        return channels[0];
+    };
+
+    export const ${channelHelperNames.obtener} = async (ctx, channel, guild, name, filters) => {
         const action = '${ChannelAction.Obtener}';
         const cliente = requireClient(ctx, action);
+
+        if (name !== undefined) return await findByName(ctx, cliente, guild, name, filters, action);
 
         const channelId = await requireId(channel, '${ChannelProperty.Id}', action);
         const found = await cliente.channels.fetch(channelId);
@@ -249,22 +312,10 @@ export const channelsModule: SharedModule = {
         const cliente = requireClient(ctx, action);
 
         const guildId = await requireId(guild, '${ChannelProperty.Servidor}', action);
-        let channels = await cliente.guilds.channels.list(guildId);
-
-        if (filters && filters.type !== undefined) channels = channels.filter(channel => channel.type === filters.type);
-
-        if (filters && filters.${ChannelPayload.Parent} !== undefined) {
-            const parentId = await idOf(filters.${ChannelPayload.Parent});
-            channels = channels.filter(channel => channel.parentId === parentId);
-        }
+        const channels = await narrow(await cliente.guilds.channels.list(guildId), filters);
 
         // a command lists only what whoever ran it can see
-        if (ctx.contexto) {
-            const visible = await Promise.all(channels.map(channel => canSee(ctx.contexto, channel)));
-            channels = channels.filter((_, index) => visible[index]);
-        }
-
-        return channels;
+        return await visibleTo(ctx, channels);
     };
 `
 };

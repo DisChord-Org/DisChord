@@ -99,6 +99,12 @@ no channel action inside a loop, none in the event it triggers, a reason for eve
 of whoever runs the command, the channel belonging to the server of the context, and a quota per server that
 grows with the number of servers the bot is in.
 
+Reading a channel is held to the same rules. `obtener canal { nombre "general" }` (optionally narrowed with `tipo` and
+`categoria`) fails when no channel or more than one has that name, and only counts the channels whoever runs the command
+can see, so the answer never reveals one they cannot. Inside a command it searches the server the command runs in.
+`listar canales` also filters by `nombre` and `nombreContiene`.
+
+
 ---
 
 ## Project Structure

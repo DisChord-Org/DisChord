@@ -1,0 +1,11 @@
+nuevo comando Canales {
+    descripcion "gestiona canales"
+
+    var iguales es listar canales { nombre "general" }
+    var tickets es listar canales {
+        nombreContiene "ticket-"
+        tipo "texto"
+    }
+    consola.imprimir(iguales)
+    consola.imprimir(tickets)
+}

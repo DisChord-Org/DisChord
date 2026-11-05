@@ -350,7 +350,7 @@ export const MessageSchema: BDOSchema<DisChordNodeType, DisChordNode> = {
  * optional here; each action's schema decides which are required.
  */
 const ChannelNameField = {
-    key: 'nombre',
+    key: ChannelProperty.Nombre,
     kind: FieldKind.Value,
     default: JSFallback.Undefined,
     output: 'name'
@@ -475,20 +475,36 @@ export const DeleteChannelSchema: BDOSchema<DisChordNodeType, DisChordNode> = {
     ]
 };
 
-/** `obtener canal { ... }`: only the id of the channel to read. */
+/**
+ * `obtener canal { ... }`: the channel to read, by `id` or by `nombre` (exactly one of them, which
+ * `ValidateChannelActionsRule` checks). `tipo` and `categoria` narrow a search by name, and
+ * `servidor` is the server it searches in (the context's by default). `nombre` has no `output`:
+ * it travels apart from the filters.
+ */
 export const GetChannelSchema: BDOSchema<DisChordNodeType, DisChordNode> = {
     name: 'obtener canal',
     fields: [
         {
             key: ChannelProperty.Id,
             kind: FieldKind.Value,
-            required: true,
-            missingMessage: `En 'obtener canal' se esperaba '${ChannelProperty.Id}'.`
+            default: JSFallback.Undefined
+        },
+        {
+            key: ChannelNameField.key,
+            kind: FieldKind.Value,
+            default: JSFallback.Undefined
+        },
+        ChannelKindField,
+        ChannelCategoryField,
+        {
+            key: ChannelProperty.Servidor,
+            kind: FieldKind.Value,
+            default: JSFallback.Undefined
         }
     ]
 };
 
-/** `listar canales { ... }`: the server (the context's by default) and what to filter by. */
+/** `listar canales { ... }`: the server (the context's by default) and what to filter by: `tipo`, `categoria`, `nombre` (the whole name) and `nombreContiene` (part of it). */
 export const ListChannelsSchema: BDOSchema<DisChordNodeType, DisChordNode> = {
     name: 'listar canales',
     fields: [
@@ -498,7 +514,14 @@ export const ListChannelsSchema: BDOSchema<DisChordNodeType, DisChordNode> = {
             default: JSFallback.Undefined
         },
         ChannelKindField,
-        ChannelCategoryField
+        ChannelCategoryField,
+        ChannelNameField,
+        {
+            key: 'nombreContiene',
+            kind: FieldKind.Value,
+            default: JSFallback.Undefined,
+            output: 'nameContains'
+        }
     ]
 };
 

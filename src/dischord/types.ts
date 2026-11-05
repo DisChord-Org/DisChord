@@ -148,13 +148,14 @@ export const ChannelWriteActions: readonly ChannelAction[] = [ ChannelAction.Cre
 
 /**
  * The properties naming a channel or a server, or qualifying an action on one, that are read by
- * name outside the schemas: the target channel (also the one a message is sent to), the id of the
+ * name outside the schemas: the target channel (also the one a message is sent to), the id and the name of the
  * channel to obtain, the server to create in and the audit log reason. `Canal` is the same word as the object of a channel action.
  * @type {const}
  */
 export const ChannelProperty = {
     Canal: DisChordTokenType.Canal,
     Id: 'id',
+    Nombre: 'nombre',
     Servidor: 'servidor',
     Razon: 'razon'
 } as const;

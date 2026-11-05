@@ -18,5 +18,5 @@ export class ChannelGetMissingIdTest extends Test {
     /**
      * @type {string}
      */
-    public readonly expectedError: string = "En 'obtener canal' se esperaba 'id'";
+    public readonly expectedError: string = "En 'obtener canal' se esperaba 'id' o 'nombre'.";
 }
