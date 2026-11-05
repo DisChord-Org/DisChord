@@ -1,0 +1,4 @@
+nuevo evento mensajeCreado {
+    var enlaces tipo texto[] es mensaje.adjuntos
+    var mencionados tipo Usuario[] es mensaje.menciones
+}

@@ -1,3 +1,4 @@
+import './lib/messageExtensions.js';
 import { createMessage } from './lib/createMessage.js';
 
 import { createEvent, Embed, ActionRow, Button } from 'seyfert';

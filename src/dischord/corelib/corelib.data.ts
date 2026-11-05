@@ -1,6 +1,7 @@
 import { ClassesEnum, corelib as chordCorelib } from "../../chord/corelib/corelib.data";
-import { AnyDataType, ClassDataType, PrimitiveDataType, UnionDataType, VoidDataType } from "../../chord/model/DataType";
+import { AnyDataType, ArrayDataType, ClassDataType, PrimitiveDataType, UnionDataType, VoidDataType } from "../../chord/model/DataType";
 import { PrimitiveType } from "../../chord/model/types";
+import { CoreLibMember } from "../../chord/corelib/corelib.types";
 import { DisChordCoreLib } from "./corelib.types";
 
 /**
@@ -10,6 +11,8 @@ export enum DisChordClassesEnum {
     cliente = 'cliente',
     canal = 'canal',
     Usuario = 'Usuario',
+    Miembro = 'Miembro',
+    Mensaje = 'Mensaje',
     Canal = 'Canal'
 }
 
@@ -22,6 +25,81 @@ export enum DisChordClassesEnum {
  * @type {string}
  */
 const imprimirCallee = "(typeof cliente !== 'undefined' && cliente.logger ? cliente.logger : { info: console.log }).info";
+
+/**
+ * The data of a Seyfert `User` under Spanish names. `GuildMember` has none of its own: the runtime module
+ * patches it with these same getters, delegating to its `user`, so `Usuario` and `Miembro` share them.
+ * Every member is `runtime` (see the note on `Usuario`).
+ * @type {Record<string, CoreLibMember>}
+ */
+const userData: Record<string, CoreLibMember> = {
+        nombre: {
+            transpile: 'username',
+            returns: PrimitiveDataType.Texto,
+            runtime: true,
+            doc: 'Nombre de usuario.'
+        },
+        nombreGlobal: {
+            transpile: 'globalName',
+            returns: UnionDataType.of([PrimitiveType.Texto, PrimitiveType.Indefinido]),
+            runtime: true,
+            doc: 'Nombre visible global del usuario, si lo tiene.'
+        },
+        etiqueta: {
+            transpile: 'tag',
+            returns: PrimitiveDataType.Texto,
+            runtime: true,
+            doc: 'Etiqueta completa del usuario.'
+        },
+        discriminador: {
+            transpile: 'discriminator',
+            returns: PrimitiveDataType.Texto,
+            runtime: true,
+            doc: 'Discriminador del usuario.'
+        },
+        insignias: {
+            transpile: 'publicFlags',
+            returns: UnionDataType.of([PrimitiveType.Numero, PrimitiveType.Indefinido]),
+            runtime: true,
+            doc: 'Insignias públicas del usuario, como número de banderas.'
+        },
+        esBot: {
+            transpile: 'bot',
+            returns: UnionDataType.of([PrimitiveType.Booleano, PrimitiveType.Indefinido]),
+            runtime: true,
+            doc: 'Indica si el usuario es un bot.'
+        },
+        esSistema: {
+            transpile: 'system',
+            returns: UnionDataType.of([PrimitiveType.Booleano, PrimitiveType.Indefinido]),
+            runtime: true,
+            doc: 'Indica si el usuario es del sistema de Discord.'
+        },
+        avatarUrl: {
+            transpile: 'avatarURL()',
+            returns: PrimitiveDataType.Texto,
+            runtime: true,
+            doc: 'URL del avatar del usuario.'
+        },
+        bannerUrl: {
+            transpile: 'bannerURL()',
+            returns: UnionDataType.of([PrimitiveType.Texto, PrimitiveType.Indefinido]),
+            runtime: true,
+            doc: 'URL del banner del usuario, si tiene.'
+        },
+        colorPerfil: {
+            transpile: 'accentColor',
+            returns: UnionDataType.of([PrimitiveType.Numero, PrimitiveType.Indefinido]),
+            runtime: true,
+            doc: 'Color del perfil del usuario, si lo tiene.'
+        },
+        tipoPremium: {
+            transpile: 'premiumType',
+            returns: UnionDataType.of([PrimitiveType.Numero, PrimitiveType.Indefinido]),
+            runtime: true,
+            doc: 'Tipo de suscripción premium del usuario, si la tiene.'
+        }
+    };
 
 /**
  * Core library definition: chord's table plus DisChord's own classes and functions, so a single
@@ -175,72 +253,82 @@ export const corelib: DisChordCoreLib = {
         [DisChordClassesEnum.Usuario]: {
             receiver: ClassDataType.of(DisChordClassesEnum.Usuario),
             methods: {},
+            properties: userData
+        },
+        /**
+         * A server member (Seyfert `GuildMember`): the member of a server event or of an option typed
+         * `opcion "miembro"`, or the one who wrote a message. Seyfert's `GuildMember` wraps a `User` by
+         * composition, and the runtime module gives it the getters of `Usuario` that read its `user`,
+         * so it has the same members and no others.
+         */
+        [DisChordClassesEnum.Miembro]: {
+            receiver: ClassDataType.of(DisChordClassesEnum.Miembro),
+            methods: {},
+            properties: userData
+        },
+        /**
+         * Seyfert message data under Spanish names, for the message of an event or of a reply
+         * (`Message` and `WebhookMessage`, which share `BaseMessage`). Like `Usuario`, patched at runtime
+         * onto the real class (every member is `runtime`); `transpile` is the expression each getter reads.
+         * `fecha` is left out (the language has no date type to give it), and so are the embeds and the methods.
+         */
+        [DisChordClassesEnum.Mensaje]: {
+            receiver: ClassDataType.of(DisChordClassesEnum.Mensaje),
+            methods: {},
             properties: {
-                nombre: {
-                    transpile: 'username',
+                contenido: {
+                    transpile: 'content',
                     returns: PrimitiveDataType.Texto,
                     runtime: true,
-                    doc: 'Nombre de usuario.'
+                    doc: 'Texto del mensaje.'
                 },
-                nombreGlobal: {
-                    transpile: 'globalName',
+                autor: {
+                    transpile: 'author',
+                    returns: ClassDataType.of(DisChordClassesEnum.Usuario),
+                    runtime: true,
+                    doc: 'Usuario que escribió el mensaje.'
+                },
+                miembro: {
+                    transpile: 'member',
+                    returns: UnionDataType.ofTypes([ClassDataType.of(DisChordClassesEnum.Miembro), PrimitiveDataType.Indefinido]),
+                    runtime: true,
+                    doc: 'Miembro del servidor que escribió el mensaje, si lo hay.'
+                },
+                canalId: {
+                    transpile: 'channelId',
+                    returns: PrimitiveDataType.Texto,
+                    runtime: true,
+                    doc: 'Identificador del canal del mensaje.'
+                },
+                servidorId: {
+                    transpile: 'guildId',
                     returns: UnionDataType.of([PrimitiveType.Texto, PrimitiveType.Indefinido]),
                     runtime: true,
-                    doc: 'Nombre visible global del usuario, si lo tiene.'
+                    doc: 'Identificador del servidor del mensaje, si lo tiene.'
                 },
-                etiqueta: {
-                    transpile: 'tag',
+                enlace: {
+                    transpile: 'url',
                     returns: PrimitiveDataType.Texto,
                     runtime: true,
-                    doc: 'Etiqueta completa del usuario.'
+                    doc: 'Enlace al mensaje.'
                 },
-                discriminador: {
-                    transpile: 'discriminator',
-                    returns: PrimitiveDataType.Texto,
+                fijado: {
+                    transpile: 'pinned',
+                    returns: PrimitiveDataType.Booleano,
                     runtime: true,
-                    doc: 'Discriminador del usuario.'
+                    doc: 'Indica si el mensaje está fijado.'
                 },
-                insignias: {
-                    transpile: 'publicFlags',
-                    returns: UnionDataType.of([PrimitiveType.Numero, PrimitiveType.Indefinido]),
+                adjuntos: {
+                    transpile: 'attachments.map(adjunto => adjunto.url)',
+                    returns: ArrayDataType.of(PrimitiveDataType.Texto),
                     runtime: true,
-                    doc: 'Insignias públicas del usuario, como número de banderas.'
+                    doc: 'Enlaces de los archivos adjuntos del mensaje.'
                 },
-                esBot: {
-                    transpile: 'bot',
-                    returns: UnionDataType.of([PrimitiveType.Booleano, PrimitiveType.Indefinido]),
+                menciones: {
+                    transpile: 'mentions.users',
+                    returns: ArrayDataType.of(ClassDataType.of(DisChordClassesEnum.Usuario)),
                     runtime: true,
-                    doc: 'Indica si el usuario es un bot.'
-                },
-                esSistema: {
-                    transpile: 'system',
-                    returns: UnionDataType.of([PrimitiveType.Booleano, PrimitiveType.Indefinido]),
-                    runtime: true,
-                    doc: 'Indica si el usuario es del sistema de Discord.'
-                },
-                avatarUrl: {
-                    transpile: 'avatarURL()',
-                    returns: PrimitiveDataType.Texto,
-                    runtime: true,
-                    doc: 'URL del avatar del usuario.'
-                },
-                bannerUrl: {
-                    transpile: 'bannerURL()',
-                    returns: UnionDataType.of([PrimitiveType.Texto, PrimitiveType.Indefinido]),
-                    runtime: true,
-                    doc: 'URL del banner del usuario, si tiene.'
-                },
-                colorPerfil: {
-                    transpile: 'accentColor',
-                    returns: UnionDataType.of([PrimitiveType.Numero, PrimitiveType.Indefinido]),
-                    runtime: true,
-                    doc: 'Color del perfil del usuario, si lo tiene.'
-                },
-                tipoPremium: {
-                    transpile: 'premiumType',
-                    returns: UnionDataType.of([PrimitiveType.Numero, PrimitiveType.Indefinido]),
-                    runtime: true,
-                    doc: 'Tipo de suscripción premium del usuario, si la tiene.'
+                    doc: 'Usuarios mencionados en el mensaje.'
                 }
             }
         },

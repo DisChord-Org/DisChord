@@ -261,7 +261,9 @@ export type InjectedType = { readonly className: string; readonly optional?: boo
  */
 export const InjectedTypes: Record<string, InjectedType> = dictionary({
     "usuario": { className: "Usuario" },
-    "miembro": { className: "Usuario" },
+    "miembro": { className: "Miembro" },
+    "mensaje": { className: "Mensaje" },
+    "mensajeAnterior": { className: "Mensaje", optional: true },
     "servidorId": { primitive: "texto" }
 });
 

@@ -1,0 +1,4 @@
+nuevo evento mensajeCreado {
+    var t tipo texto es mensaje.contenido
+    var autor tipo texto es mensaje.autor.nombre
+}

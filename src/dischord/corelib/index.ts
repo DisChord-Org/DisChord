@@ -5,3 +5,4 @@ export * from "./createMessage";
 export * from "./userExtensions";
 export * from "./channels";
 export * from "./channelExtensions";
+export * from "./messageExtensions";

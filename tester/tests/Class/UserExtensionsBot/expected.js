@@ -1,3 +1,4 @@
+import './lib/messageExtensions.js';
 import './lib/userExtensions.js';
 
 import { Client } from 'seyfert';

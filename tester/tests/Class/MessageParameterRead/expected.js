@@ -1,3 +1,4 @@
+import './lib/messageExtensions.js';
 import './lib/consoleRuntime.js';
 
 import { createEvent, Embed, ActionRow, Button } from 'seyfert';
