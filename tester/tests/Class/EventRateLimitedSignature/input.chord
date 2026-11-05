@@ -1,0 +1,4 @@
+nuevo evento limitado {
+    consola.imprimir(ratelimit)
+    consola.imprimir(cliente.nombre)
+}

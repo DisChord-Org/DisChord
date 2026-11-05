@@ -1,7 +1,7 @@
 import { ClassDataType, DataType, PrimitiveDataType, UnionDataType } from "../chord/model/DataType";
 import { ASTNode, LiteralNode, PrimitiveTypeName, TokenType } from "../chord/model/types";
 import { literalStringValue } from "../chord/BDOSchema";
-import { DisChordTypeMap, eventsMap, InjectedTypes, OptionValueTypes } from "./Generator/constants/mappings";
+import { DisChordTypeMap, eventParamNames, eventsMap, InjectedTypes, OptionValueTypes } from "./Generator/constants/mappings";
 import { CommandScopeNames } from "./CommandScopeNames";
 import { CommandNode, DisChordASTNode, DisChordNode, DisChordNodeType, DisChordODBNode, DisChordTokenType, EventNode } from "./types";
 
@@ -60,7 +60,13 @@ export class InjectedNames {
      * @private
      */
     private static typeOf (name: string): DataType | undefined {
-        return InjectedTypes[name] ? ClassDataType.of(InjectedTypes[name]) : undefined;
+        const injected = InjectedTypes[name];
+        if (!injected) return undefined;
+        if ('primitive' in injected) return PrimitiveDataType.of(injected.primitive);
+
+        const type = ClassDataType.of(injected.className);
+
+        return injected.optional ? UnionDataType.ofTypes([ type, PrimitiveDataType.Indefinido ]) : type;
     }
 
     /**
@@ -97,7 +103,7 @@ export class InjectedNames {
             }));
         }
 
-        if (owner.type === DisChordTokenType.EVENTO) return (eventsMap[(owner as EventNode).name]?.params ?? []).map(name => ({ name, dataType: InjectedNames.typeOf(name) }));
+        if (owner.type === DisChordTokenType.EVENTO) return (eventsMap[(owner as EventNode).name] ? eventParamNames(eventsMap[(owner as EventNode).name]) : []).map(name => ({ name, dataType: InjectedNames.typeOf(name) }));
 
         return [];
     }

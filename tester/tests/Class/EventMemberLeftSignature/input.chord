@@ -1,0 +1,4 @@
+nuevo evento idaMiembro {
+    consola.imprimir(usuario.nombre)
+    consola.imprimir(servidorId)
+}

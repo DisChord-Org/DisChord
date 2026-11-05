@@ -1,0 +1,4 @@
+nuevo evento canalEditado {
+    consola.imprimir(canal.id)
+    consola.imprimir(canalAnterior)
+}

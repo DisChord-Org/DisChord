@@ -3,7 +3,7 @@ import { fieldKeys } from "../../../chord/BDOSchema";
 import { TokenType } from "../../../chord/model/types";
 import { ChannelAction, ChannelActionNode, ChannelActionObject, ChannelProperty, ChannelWriteActions, CommandNode, DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType, EventNode } from "../../types";
 import { ChannelActionSchemas } from "../../Generator/constants/schemas";
-import { CommandGuildSource, EventGuildSources, EventSelfTriggers, eventsMap } from "../../Generator/constants/mappings";
+import { CommandGuildSource, EventSelfTriggers, eventGuildSource } from "../../Generator/constants/mappings";
 
 /**
  * Validates every `crear canal`, `editar canal` and `borrar canal` block, and settles what the
@@ -153,9 +153,6 @@ export class ValidateChannelActionsRule extends AnalysisRule<DisChordNodeType, D
     private guildOf (context: CommandNode | EventNode): string | undefined {
         if (context.type === DisChordTokenType.CREAR_COMANDO) return CommandGuildSource;
 
-        const event = eventsMap[(context as EventNode).name];
-        const source = event?.params.find(param => EventGuildSources[param] !== undefined);
-
-        return source === undefined ? undefined : EventGuildSources[source];
+        return eventGuildSource((context as EventNode).name);
     }
 }

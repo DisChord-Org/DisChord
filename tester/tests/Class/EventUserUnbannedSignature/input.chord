@@ -1,0 +1,4 @@
+nuevo evento usuarioDesbaneado {
+    consola.imprimir(usuario.nombre)
+    consola.imprimir(servidorId)
+}

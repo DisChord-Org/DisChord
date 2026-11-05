@@ -1,0 +1,4 @@
+nuevo evento rolEditado {
+    consola.imprimir(rol.id)
+    consola.imprimir(rolAnterior)
+}

@@ -1,0 +1,4 @@
+nuevo evento mensajeEditado {
+    consola.imprimir(mensaje.id)
+    consola.imprimir(mensajeAnterior)
+}

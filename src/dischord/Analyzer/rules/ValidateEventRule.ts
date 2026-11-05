@@ -1,6 +1,6 @@
 import { AnalysisRule } from "../../../chord/Analyzer/AnalysisRule";
 import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType, EventNode } from "../../types";
-import { eventsMap } from "../../Generator/constants/mappings";
+import { eventsMap, RenamedEvents } from "../../Generator/constants/mappings";
 
 /**
  * Validates that an `evento <nombre>` names an event `eventsMap` recognizes. Moved out of
@@ -16,7 +16,11 @@ export class ValidateEventRule extends AnalysisRule<DisChordNodeType, DisChordNo
             if (current.type !== DisChordTokenType.EVENTO) return;
 
             const eventNode = current as EventNode;
-            if (!eventsMap[eventNode.name]) this.failAt(eventNode, `El evento '${eventNode.name}' no existe`);
+            if (eventsMap[eventNode.name]) return;
+
+            const renamed = RenamedEvents[eventNode.name];
+
+            this.failAt(eventNode, renamed ? `El evento '${eventNode.name}' ahora se llama '${renamed}'.` : `El evento '${eventNode.name}' no existe`);
         });
     }
 }

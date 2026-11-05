@@ -1,13 +1,52 @@
+import { PrimitiveTypeName } from "../../../chord/model/types";
 import { ApplicationIntegrationType, ChannelAction, DiscordOptionType, IgnoreCommandType, InteractionContextType } from "../../types";
+
+/**
+ * A parameter of an event handler: a name; several names taken from the array Seyfert passes as
+ * that argument (`messageUpdate` gives `[new, old]`), which the handler destructures; or names taken
+ * from the fields of the object it passes (`guildBanAdd` gives `{ guildId, user }`): each field with
+ * the name it has in the handler.
+ */
+export type EventParam = string | { readonly destructure: readonly string[] } | { readonly fields: Readonly<Record<string, string>> };
 
 /**
  * @interface EventType
  * @property {string} name - The internal or low-level Discord event name.
- * @property {string[]} params - The list of parameters injected into the event handler callback.
+ * @property {EventParam[]} params - The parameters of the event handler callback, in the order Seyfert passes its arguments.
+ * @property {string} [guard] - A condition under which the handler returns before running the program (`servidor.unavailable`): the events it is no use to.
+ * @property {Record<string, string>} [derived] - Names the handler declares from its parameters, each with the expression it is initialized with (`servidorId` of `servidor.id`).
  */
 interface EventType {
     name: string;
-    params: string[];
+    params: EventParam[];
+    guard?: string;
+    derived?: Record<string, string>;
+}
+
+/**
+ * @param {EventType} event - An entry of `eventsMap`.
+ * @returns {string[]} The names its handler finds in scope: its parameters, the destructured ones in place, and the ones it derives from them.
+ */
+export function eventParamNames (event: EventType): string[] {
+    return [ ...event.params.flatMap(param => {
+        if (typeof param === 'string') return [ param ];
+
+        return 'destructure' in param ? [ ...param.destructure ] : Object.values(param.fields);
+    }), ...Object.keys(event.derived ?? {}) ];
+}
+
+/**
+ * @param {EventType} event - An entry of `eventsMap`.
+ * @returns {string} The parameter list of its handler as written in the generated code (`[mensaje, mensajeAnterior], cliente`).
+ */
+export function eventParamSignature (event: EventType): string {
+    return event.params.map(param => {
+        if (typeof param === 'string') return param;
+
+        return 'destructure' in param
+            ? `[${param.destructure.join(', ')}]`
+            : `{ ${Object.entries(param.fields).map(([ field, name ]) => field === name ? field : `${field}: ${name}`).join(', ')} }`;
+    }).join(', ');
 }
 
 /**
@@ -55,11 +94,11 @@ export const eventsMap: Record<string, EventType> = dictionary({
     },
     'mensajeBorrado': {
         'name': 'messageDelete',
-        'params': [ 'mensaje', 'mensajeBorrado', 'cliente' ]
+        'params': [ 'mensaje', 'cliente' ]
     },
     'mensajeEditado': {
         'name': 'messageUpdate',
-        'params': [ 'mensaje', 'mensajeEditado', 'cliente' ]
+        'params': [ { destructure: [ 'mensaje', 'mensajeAnterior' ] }, 'cliente' ]
     },
     'canalCreado': {
         'name': 'channelCreate',
@@ -71,15 +110,15 @@ export const eventsMap: Record<string, EventType> = dictionary({
     },
     'canalEditado': {
         'name': 'channelUpdate',
-        'params': [ 'canal', 'cliente' ]
+        'params': [ { destructure: [ 'canal', 'canalAnterior' ] }, 'cliente' ]
     },
-    'ban': {
+    'usuarioBaneado': {
         'name': 'guildBanAdd',
-        'params': [ 'miembro', 'cliente' ]
+        'params': [ { fields: { user: 'usuario', guildId: 'servidorId' } }, 'cliente' ]
     },
-    'unban': {
+    'usuarioDesbaneado': {
         'name': 'guildBanRemove',
-        'params': [ 'miembro', 'cliente' ]
+        'params': [ { fields: { user: 'usuario', guildId: 'servidorId' } }, 'cliente' ]
     },
     'invitado': {
         'name': 'guildCreate',
@@ -87,7 +126,9 @@ export const eventsMap: Record<string, EventType> = dictionary({
     },
     'expulsado': {
         'name': 'guildDelete',
-        'params': [ 'servidor', 'cliente' ]
+        'params': [ 'servidor', 'cliente' ],
+        'guard': 'servidor.unavailable',
+        'derived': { 'servidorId': 'servidor.id' }
     },
     'entradaMiembro': {
         'name': 'guildMemberAdd',
@@ -95,7 +136,7 @@ export const eventsMap: Record<string, EventType> = dictionary({
     },
     'idaMiembro': {
         'name': 'guildMemberRemove',
-        'params': [ 'miembro', 'cliente' ]
+        'params': [ { fields: { user: 'usuario', guildId: 'servidorId' } }, 'cliente' ]
     },
     'rolCreado': {
         'name': 'guildRoleCreate',
@@ -107,11 +148,11 @@ export const eventsMap: Record<string, EventType> = dictionary({
     },
     'rolEditado': {
         'name': 'guildRoleUpdate',
-        'params': [ 'rol', 'cliente' ]
+        'params': [ { destructure: [ 'rol', 'rolAnterior' ] }, 'cliente' ]
     },
     'limitado': {
         'name': 'rateLimited',
-        'params': [ 'ratelimit' ]
+        'params': [ 'ratelimit', 'cliente' ]
     },
     'interaccion': {
         'name': 'interactionCreate',
@@ -207,15 +248,21 @@ export const DisChordTypeMap: Record<string, DiscordOptionType> = dictionary({
 } as const);
 
 /**
- * The type of the values of the names dischord puts in scope, by name, as a class of the core library
- * (`Usuario`): the ones it is known for. A name left out has no type (`cualquiera`) until its class
- * exists. Shared by the parameters of the events and the names of a command.
- *
- * @type {Readonly<Record<string, string>>}
+ * The type of an injected name: a class of the core library, and with `indefinido` too if the name
+ * may not carry a value (the previous message of an edit is only there if it was cached), or a primitive type.
  */
-export const InjectedTypes: Record<string, string> = dictionary({
-    "usuario": "Usuario",
-    "miembro": "Usuario"
+export type InjectedType = { readonly className: string; readonly optional?: boolean } | { readonly primitive: PrimitiveTypeName };
+
+/**
+ * The type of the values of the names dischord puts in scope, by name: the ones it is known for. A
+ * name left out has no type (`cualquiera`). Shared by the parameters of the events and the names of a command.
+ *
+ * @type {Readonly<Record<string, InjectedType>>}
+ */
+export const InjectedTypes: Record<string, InjectedType> = dictionary({
+    "usuario": { className: "Usuario" },
+    "miembro": { className: "Usuario" },
+    "servidorId": { primitive: "texto" }
 });
 
 /**
@@ -281,6 +328,16 @@ export const ChannelTypes: Record<string, number> = dictionary({
 } as const);
 
 /**
+ * The events that were renamed, by their old name, so that using one says what it is called now.
+ *
+ * @type {Readonly<Record<string, string>>}
+ */
+export const RenamedEvents: Record<string, string> = dictionary({
+    "ban": "usuarioBaneado",
+    "unban": "usuarioDesbaneado"
+} as const);
+
+/**
  * Where an event's parameter holds the id of the server the event happened in, by parameter name.
  * The first parameter of an event found here gives the server a channel action defaults to; an
  * event with none (`encendido`, `limitado`) has no server to default to.
@@ -293,6 +350,7 @@ export const EventGuildSources: Record<string, string> = dictionary({
     "miembro": "miembro.guildId",
     "rol": "rol.guildId",
     "servidor": "servidor.id",
+    "servidorId": "servidorId",
     "interaccion": "interaccion.guildId"
 } as const);
 
@@ -313,3 +371,16 @@ export const EventSelfTriggers: Record<string, ChannelAction> = dictionary({
     "canalEditado": ChannelAction.Editar,
     "canalBorrado": ChannelAction.Borrar
 } as const);
+
+/**
+ * The server the event of that name carries, as the expression its handler reads it from: the one of
+ * the first parameter that has a source (`EventGuildSources`).
+ * @param {string} eventName - The name of an event, as written.
+ * @returns {string | undefined} The expression, or `undefined` if the event carries no server.
+ */
+export function eventGuildSource (eventName: string): string | undefined {
+    const event = eventsMap[eventName];
+    const source = (event ? eventParamNames(event) : []).find(param => EventGuildSources[param] !== undefined);
+
+    return source === undefined ? undefined : EventGuildSources[source];
+}

@@ -1,7 +1,7 @@
 import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType, EventNode } from "../../../types";
 import { SubGenerator } from '../../../../chord/Generator/SubGenerator';
 import { TokenTypeUnion } from '../../../../chord/model/types';
-import { eventsMap } from '../../constants/mappings';
+import { eventParamNames, eventParamSignature, eventsMap } from '../../constants/mappings';
 
 /**
  * Generator class responsible for generating code related to listeners in DisChord.
@@ -32,7 +32,11 @@ export default class EventVisitor extends SubGenerator<DisChordNodeType, DisChor
 
         this.parent.context.symbolTable.exitScope();
 
-        const ctxParams = eventsMap[node.name].params.filter(param => param === 'cliente' || param === 'mensaje');
+        const event = eventsMap[node.name];
+        const guard = event.guard ? `if (${event.guard}) return;` : '';
+        const derived = Object.entries(event.derived ?? {}).map(([ name, expression ]) => `const ${name} = ${expression};`).join('\n');
+
+        const ctxParams = eventParamNames(event).filter(param => param === 'cliente' || param === 'mensaje');
         const ctxDeclaration = `const ctx = { ${ctxParams.join(', ')} };`;
 
         const eventBody: string = `
@@ -40,7 +44,9 @@ export default class EventVisitor extends SubGenerator<DisChordNodeType, DisChor
 
             export default createEvent({
                 data: { name: '${eventName}' },
-                async run(${eventsMap[node.name].params.join(', ')}) {
+                async run(${eventParamSignature(event)}) {
+                ${guard}
+                ${derived}
                 ${ctxDeclaration}
                 ${body}
                 }

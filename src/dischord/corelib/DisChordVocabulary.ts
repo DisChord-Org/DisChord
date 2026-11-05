@@ -1,5 +1,5 @@
 import { BDOSchema, fieldKeys, FieldSpec } from "../../chord/BDOSchema";
-import { CommandContextParameter, CommandScope, EmbedColors, eventsMap } from "../Generator/constants/mappings";
+import { CommandContextParameter, CommandScope, EmbedColors, eventParamNames, eventsMap } from "../Generator/constants/mappings";
 import {
     ButtonSchema, CollectorSchema, CommandSchema, CreateChannelSchema, DeleteChannelSchema, EditChannelSchema, GetChannelSchema, ListChannelsSchema, EmbedAuthorSchema, EmbedFieldSchema, EmbedFooterSchema, EmbedSchema, MessageSchema, OptionSchema, StartBotSchema
 } from "../Generator/constants/schemas";
@@ -103,7 +103,7 @@ export class DisChordVocabulary {
                 keyword: declaration.keyword,
                 block: this.blockOf(declaration.keyword)
             })),
-            events: Object.entries(eventsMap).map(([name, event]) => ({ name, params: [...event.params] })),
+            events: Object.entries(eventsMap).map(([name, event]) => ({ name, params: eventParamNames(event) })),
             blocks: blocks.map(([name, schema]) => this.describeBlock(name, schema)),
             scopes: [
                 { construct: 'comando', identifiers: [CommandContextParameter, ...Object.keys(CommandScope)] }
