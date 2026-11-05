@@ -1,9 +1,6 @@
+import { chordIterable } from './lib/runtimeHelpers.js';
 let l = [1, 2];
-for (let x of Array.isArray(l) || typeof l === 'string' || l instanceof Set
-    ? l
-    : l instanceof Map
-      ? l.keys()
-      : Object.keys(l)) {
+for (let x of chordIterable(l)) {
     x = 'a';
     let r = x;
 }

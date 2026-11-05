@@ -1,13 +1,14 @@
 import { AnalysisRule } from "../AnalysisRule";
-import { ASTNode, BaseNode, ImportNode } from "../../model/types";
+import { ASTNode, BaseNode, ImportNode, LoopNode, TokenType } from "../../model/types";
 import { runtimeHelperNames, runtimeHelpersModule } from "../../corelib";
-import { isAccessNode, isCallNode } from "../../ast.guards";
+import { isAccessNode, isCallNode, isRangeCall } from "../../ast.guards";
 import { SharedModuleImporter } from "../SharedModuleImporter";
 
 /**
  * Detects, over the *complete* AST, which runtime helpers the file uses (a core library member or
  * function whose `transpile` is one `runtimeHelperNames` exports, e.g. `Mates.limitar` or
- * `esperar`), or that a call on a receiver of union type was decided to be dispatched through (`chordTiene`).
+ * `esperar`), that a call on a receiver of union type was decided to be dispatched through (`chordTiene`),
+ * or a `para` that is not over a `rango` (it walks `chordIterable(...)`).
  * If any, inserts a synthetic `ImportNode` for the shared helpers module at the front
  * of `nodes`, importing only the ones used, and registers the module's content in
  * `context.extraFiles` — the same lowering `RequiresConsoleRuntimeRule` does for the console
@@ -35,6 +36,8 @@ export class RequiresRuntimeHelpersRule<T extends string, N extends BaseNode<T>>
      * @private
      */
     private helperOf (node: ASTNode<T, N>): string | undefined {
+        if (node.type === TokenType.BUCLE) return isRangeCall((node as LoopNode<T, N>).iterable) ? undefined : 'chordIterable';
+
         const dispatch = isCallNode(node) ? this.context.symbolTable.marks.dispatchOf(node) : undefined;
         const memberHelper = isAccessNode(node) ? this.context.symbolTable.marks.memberHelperOf(node) : undefined;
         const transpiled = memberHelper ?? (dispatch

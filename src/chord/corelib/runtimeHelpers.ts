@@ -17,7 +17,8 @@ export const runtimeHelperNames: ReadonlySet<string> = new Set([
     'chordLimpiar',
     'chordAgregar',
     'chordLongitud',
-    'chordTamano'
+    'chordTamano',
+    'chordIterable'
 ]);
 
 /**
@@ -34,7 +35,8 @@ export const asyncRuntimeHelperNames: ReadonlySet<string> = new Set([ 'chordEspe
  * Raw JavaScript string content for the shared helpers that have no one-to-one JavaScript
  * equivalent (`esperar`, `Aleatorio.*`, `Mates.limitar`) and the three that dispatch on the receiver at
  * run time (`chordTiene`, `chordLimpiar`, `chordAgregar`, see `CoreLibDispatch.resolveUnionDispatch`; and
- * `chordLongitud`/`chordTamano` for reading `longitud`/`tamano`, see `CoreLibDispatch.resolveUnknownPropertyDispatch`), each
+ * `chordLongitud`/`chordTamano` for reading `longitud`/`tamano`, see `CoreLibDispatch.resolveUnknownPropertyDispatch`; and
+ * `chordIterable`, which picks what a `para` walks, see `LoopVisitor`), each
  * falling back, when the receiver is neither a core library value nor a list/string, to its own method
  * of the original name if it has one, and else to the native JavaScript member the name has always
  * been emitted as (`includes`, `trim`, `push`). Written once to
@@ -110,6 +112,13 @@ export const runtimeHelpersModule: SharedModule = {
         if (typeof receiver === 'object' && receiver !== null && 'tamano' in receiver) return receiver.tamano;
 
         return receiver.size;
+    }
+
+    export function chordIterable(value) {
+        if (Array.isArray(value) || typeof value === 'string' || value instanceof Set) return value;
+        if (value instanceof Map) return value.keys();
+
+        return Object.keys(value);
     }
 
     export function chordLimitar(value, min, max) {

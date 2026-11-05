@@ -1,7 +1,6 @@
 import { LoopNode, BaseNode, TokenType, TokenTypeUnion, ASTNode } from "../../../model/types";
 import { isRangeCall } from "../../../ast.guards";
 import { SubGenerator } from "../../SubGenerator";
-import { walkAST } from "../../../walkAST";
 
 /**
  * Atomic SubGenerator compiling Chord loop structures ('bucle').
@@ -48,37 +47,6 @@ export class LoopVisitor<T extends string, N extends BaseNode<T>> extends SubGen
             return `for (let ${varName} = ${start}; ${varName} < ${end}; ${varName}++) {\n${body}\n}`;
         }
 
-        if (this.runsCode(node.iterable)) {
-            return `for (let ${varName} of ((value) => ${this.sequenceOf('value')})(${iterable})) {\n${body}\n}`;
-        }
-
-        return `for (let ${varName} of (${this.sequenceOf(iterable)})) {\n${body}\n}`;
-    }
-
-    /**
-     * The JavaScript expression of what a loop walks for `iterable`, decided when it runs: a list,
-     * a text (character by character, as `for...of` does, so by UTF-16 code points), a set and a
-     * map's keys are walked as they are, and anything else (an object) by its keys.
-     * @param {string} iterable - Source of the iterated expression, which it evaluates more than once.
-     * @returns {string} A conditional expression.
-     * @private
-     */
-    private sequenceOf(iterable: string): string {
-        return `Array.isArray(${iterable}) || typeof ${iterable} === 'string' || ${iterable} instanceof Set ? ${iterable} : ${iterable} instanceof Map ? ${iterable}.keys() : Object.keys(${iterable})`;
-    }
-
-    /**
-     * @param {ASTNode<T, N>} node - An expression.
-     * @returns {boolean} Whether evaluating it can run code, so evaluating it twice is not safe.
-     * @private
-     */
-    private runsCode(node: ASTNode<T, N>): boolean {
-        let runs = false;
-
-        walkAST<T, N>(node, current => {
-            if (current.type === TokenType.LLAMADA || current.type === TokenType.Nuevo) runs = true;
-        });
-
-        return runs;
+        return `for (let ${varName} of chordIterable(${iterable})) {\n${body}\n}`;
     }
 }

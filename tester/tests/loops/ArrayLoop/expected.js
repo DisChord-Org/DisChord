@@ -1,9 +1,6 @@
+import { chordIterable } from './lib/runtimeHelpers.js';
 import './lib/consoleRuntime.js';
 let milista = ['uno', 'dos', 'tres'];
-for (let item of Array.isArray(milista) || typeof milista === 'string' || milista instanceof Set
-    ? milista
-    : milista instanceof Map
-      ? milista.keys()
-      : Object.keys(milista)) {
+for (let item of chordIterable(milista)) {
     console.log(item);
 }
