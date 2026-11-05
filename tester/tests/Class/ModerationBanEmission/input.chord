@@ -1,0 +1,17 @@
+nuevo comando Castiga {
+    descripcion "castiga"
+
+    opciones {
+        objetivo {
+            tipo "usuario"
+            descripcion "a quien"
+            requerido verdadero
+        }
+    }
+
+    banear miembro {
+        usuario objetivo
+        razon "spam"
+        borrarMensajes 3600
+    }
+}

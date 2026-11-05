@@ -26,6 +26,7 @@ export const DisChordTokenType = {
     CREAR_COMANDO: 'CrearComando',
     CREAR_MENSAJE: 'CrearMensaje',
     ACCION_CANAL: 'AccionCanal',
+    ACCION_MODERACION: 'AccionModeracion',
     CREAR_RECOLECTOR: 'CrearRecolector',
     CREAR_EMBED: 'CrearEmbed',
     CREAR_BOTON: 'CrearBoton'
@@ -46,6 +47,7 @@ export type DisChordNode =
     | CommandNode
     | MessageNode
     | ChannelActionNode
+    | ModerationActionNode
     | CollectorNode
     | EmbedDeclarationNode
     | ButtonDeclarationNode;
@@ -147,6 +149,46 @@ export const ChannelActionObject: Readonly<Record<ChannelAction, string>> = {
 export const ChannelWriteActions: readonly ChannelAction[] = [ ChannelAction.Crear, ChannelAction.Editar, ChannelAction.Borrar ];
 
 /**
+ * The verbs a moderation block is written with: `banear miembro`, `desbanear usuario` and
+ * `expulsar miembro`. Unreserved words, like the channel ones, told apart by the object word that follows.
+ * @type {const}
+ */
+export const ModerationAction = {
+    Banear: 'banear',
+    Desbanear: 'desbanear',
+    Expulsar: 'expulsar'
+} as const;
+
+/** The action a `ModerationActionNode` performs. */
+export type ModerationAction = typeof ModerationAction[keyof typeof ModerationAction];
+
+/**
+ * The word that follows each verb: a `miembro` is banned or kicked, a `usuario` (who may have left
+ * the server) is unbanned.
+ * @type {Readonly<Record<ModerationAction, string>>}
+ */
+export const ModerationActionObject: Readonly<Record<ModerationAction, string>> = {
+    [ModerationAction.Banear]: 'miembro',
+    [ModerationAction.Desbanear]: 'usuario',
+    [ModerationAction.Expulsar]: 'miembro'
+};
+
+/**
+ * The properties of a moderation block that are read by name outside the schemas: the user it is
+ * about, the audit log reason, the server, and the seconds of messages `banear` deletes.
+ * @type {const}
+ */
+export const ModerationProperty = {
+    Usuario: 'usuario',
+    Razon: 'razon',
+    Servidor: 'servidor',
+    BorrarMensajes: 'borrarMensajes'
+} as const;
+
+/** The range of seconds of messages a ban can delete (0 to 7 days), as Discord accepts it. */
+export const BanDeleteMessageSeconds = { Min: 0, Max: 604800 } as const;
+
+/**
  * The properties naming a channel or a server, or qualifying an action on one, that are read by
  * name outside the schemas: the target channel (also the one a message is sent to), the id and the name of the
  * channel to obtain, the server to create in and the audit log reason. `Canal` is the same word as the object of a channel action.
@@ -180,6 +222,20 @@ export const ChannelPayload = {
 export interface ChannelActionNode extends BaseNode<DisChordNodeType> {
     type: typeof DisChordTokenType.ACCION_CANAL;
     action: ChannelAction;
+    object: DisChordODBNode;
+    guild?: string;
+}
+
+/**
+ * Syntactic node for `banear miembro { ... }`, `desbanear usuario { ... }` and `expulsar miembro { ... }`:
+ * one node for the three, which differ only in the schema their block is checked against and the
+ * call generated.
+ * @interface ModerationActionNode
+ * @extends BaseNode<DisChordNodeType>
+ */
+export interface ModerationActionNode extends BaseNode<DisChordNodeType> {
+    type: typeof DisChordTokenType.ACCION_MODERACION;
+    action: ModerationAction;
     object: DisChordODBNode;
     guild?: string;
 }

@@ -1,6 +1,7 @@
 import { SubParserClass } from "../../../chord/Parser/SubParser";
-import { ChannelAction, ChannelActionObject, DisChordNode, DisChordNodeType } from "../../types";
+import { ChannelAction, ChannelActionObject, DisChordNode, DisChordNodeType, ModerationAction, ModerationActionObject } from "../../types";
 import ChannelActionParser from "./features/ChannelActionParser";
+import ModerationActionParser from "./features/ModerationActionParser";
 
 /**
  * A single unreserved-keyword action: the verbs that start it, the word that must follow, and the
@@ -23,5 +24,10 @@ export const UnreservedActions: UnreservedAction[] = [
         verbs: Object.values<string>(ChannelAction).filter(verb => ChannelActionObject[verb as ChannelAction] === object),
         object,
         ParserClass: ChannelActionParser
+    })),
+    ...Object.values(ModerationAction).map(verb => ({
+        verbs: [ verb ],
+        object: ModerationActionObject[verb],
+        ParserClass: ModerationActionParser
     }))
 ];

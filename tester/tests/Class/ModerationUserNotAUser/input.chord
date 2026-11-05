@@ -1,0 +1,6 @@
+nuevo evento usuarioBaneado {
+    banear miembro {
+        usuario 5
+        razon "spam"
+    }
+}

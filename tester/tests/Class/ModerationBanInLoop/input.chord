@@ -1,0 +1,8 @@
+nuevo evento entradaMiembro {
+    para (i en [1, 2]) {
+        banear miembro {
+            usuario miembro
+            razon "spam"
+        }
+    }
+}

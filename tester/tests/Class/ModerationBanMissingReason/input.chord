@@ -1,0 +1,5 @@
+nuevo evento entradaMiembro {
+    banear miembro {
+        usuario miembro
+    }
+}

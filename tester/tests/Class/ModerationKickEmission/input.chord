@@ -1,0 +1,6 @@
+nuevo evento mensajeCreado {
+    expulsar miembro {
+        usuario mensaje.autor
+        razon "spam"
+    }
+}

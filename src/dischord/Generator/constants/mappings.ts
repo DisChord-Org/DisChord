@@ -1,5 +1,5 @@
 import { PrimitiveTypeName } from "../../../chord/model/types";
-import { ApplicationIntegrationType, ChannelAction, DiscordOptionType, IgnoreCommandType, InteractionContextType } from "../../types";
+import { ApplicationIntegrationType, ChannelAction, DiscordOptionType, IgnoreCommandType, InteractionContextType, ModerationAction } from "../../types";
 
 /**
  * A parameter of an event handler: a name; several names taken from the array Seyfert passes as
@@ -363,15 +363,20 @@ export const EventGuildSources: Record<string, string> = dictionary({
 export const CommandGuildSource = `${CommandContextParameter}.guildId`;
 
 /**
- * The channel action each channel event is triggered by. An event that performs it would trigger
- * itself over and over, so the analyzer rejects it there.
+ * The actions each event can be set off by, and that it must therefore not perform. An event that
+ * performs one would trigger itself over and over, so the analyzer rejects it there: a channel
+ * action in its own channel event, and the pairs of moderation events that undo each other (`desbanear`
+ * in `usuarioBaneado` bans again, and the other way round; `expulsar` in `entradaMiembro` kicks whoever just joined).
  *
- * @type {Readonly<Record<string, ChannelAction>>}
+ * @type {Readonly<Record<string, readonly (ChannelAction | ModerationAction)[]>>}
  */
-export const EventSelfTriggers: Record<string, ChannelAction> = dictionary({
-    "canalCreado": ChannelAction.Crear,
-    "canalEditado": ChannelAction.Editar,
-    "canalBorrado": ChannelAction.Borrar
+export const EventSelfTriggers: Record<string, readonly (ChannelAction | ModerationAction)[]> = dictionary({
+    "canalCreado": [ ChannelAction.Crear ],
+    "canalEditado": [ ChannelAction.Editar ],
+    "canalBorrado": [ ChannelAction.Borrar ],
+    "usuarioBaneado": [ ModerationAction.Desbanear ],
+    "usuarioDesbaneado": [ ModerationAction.Banear ],
+    "entradaMiembro": [ ModerationAction.Expulsar ]
 } as const);
 
 /**

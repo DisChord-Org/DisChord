@@ -1,0 +1,8 @@
+@asincrono
+funcion f() {
+    expulsar miembro {
+        usuario "1"
+        razon "spam"
+        servidor "2"
+    }
+}

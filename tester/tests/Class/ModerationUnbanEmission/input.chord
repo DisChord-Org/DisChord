@@ -1,0 +1,9 @@
+nuevo comando Perdona {
+    descripcion "perdona"
+
+    desbanear usuario {
+        usuario "123456789"
+        razon "apelacion aceptada"
+        servidor "987654321"
+    }
+}

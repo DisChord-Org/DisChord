@@ -16,6 +16,7 @@ import EmbedDeclarationVisitor from "./visitors/components/EmbedDeclarationVisit
 import CollectorVisitor from "./visitors/features/CollectorVisitor";
 import MessageVisitor from "./visitors/features/MessageVisitor";
 import ChannelActionVisitor from "./visitors/features/ChannelActionVisitor";
+import ModerationActionVisitor from "./visitors/features/ModerationActionVisitor";
 
 /**
  * Main generator class for DisChord.
@@ -30,7 +31,7 @@ export class DisChordGenerator extends Generator<DisChordNodeType, DisChordNode>
         ClientInitVisitor, CommandVisitor, EventVisitor,
         ButtonVisitor, ButtonDeclarationVisitor, ActionRowVisitor,
         CommandOptionVisitor, EmbedVisitor, EmbedDeclarationVisitor,
-        CollectorVisitor, MessageVisitor, ChannelActionVisitor
+        CollectorVisitor, MessageVisitor, ChannelActionVisitor, ModerationActionVisitor
     ];
 
     /**

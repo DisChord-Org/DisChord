@@ -1,0 +1,6 @@
+nuevo evento entradaMiembro {
+    expulsar miembro {
+        usuario miembro
+        razon "spam"
+    }
+}

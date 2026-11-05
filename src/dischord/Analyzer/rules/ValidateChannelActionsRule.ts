@@ -103,7 +103,7 @@ export class ValidateChannelActionsRule extends AnalysisRule<DisChordNodeType, D
 
         const event = (context as EventNode).name;
 
-        if (EventSelfTriggers[event] === node.action) this.fail(
+        if (EventSelfTriggers[event]?.includes(node.action)) this.fail(
             `'${node.action} canal' dentro del evento '${event}' lo dispararía a sí mismo una y otra vez`,
             node.location
         );

@@ -1,0 +1,7 @@
+nuevo evento entradaMiembro {
+    banear miembro {
+        usuario miembro
+        razon "spam"
+        borrarMensajes 604801
+    }
+}

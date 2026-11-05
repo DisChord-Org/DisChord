@@ -12,8 +12,10 @@ import { ValidateEmbedsRule } from "./rules/ValidateEmbedsRule";
 import { RequiresMessageHelperRule } from "./rules/RequiresMessageHelperRule";
 import { ValidateMessagesRule } from "./rules/ValidateMessagesRule";
 import { RequiresChannelHelperRule } from "./rules/RequiresChannelHelperRule";
+import { RequiresModerationHelperRule } from "./rules/RequiresModerationHelperRule";
 import { RequiresChannelExtensionsRule } from "./rules/RequiresChannelExtensionsRule";
 import { ValidateChannelActionsRule } from "./rules/ValidateChannelActionsRule";
+import { ValidateModerationActionsRule } from "./rules/ValidateModerationActionsRule";
 import { RequiresUserExtensionsRule } from "./rules/RequiresUserExtensionsRule";
 import { RequiresMessageExtensionsRule } from "./rules/RequiresMessageExtensionsRule";
 import { DisChordResolveAwaitedCallsRule } from "./rules/DisChordResolveAwaitedCallsRule";
@@ -48,8 +50,10 @@ export class DisChordAnalyzer extends Analyzer<DisChordNodeType, DisChordNode> {
         ValidateEmbedsRule,
         ValidateMessagesRule,
         ValidateChannelActionsRule,
+        ValidateModerationActionsRule,
         RequiresMessageHelperRule,
         RequiresChannelHelperRule,
+        RequiresModerationHelperRule,
         RequiresChannelExtensionsRule,
         RequiresUserExtensionsRule,
         RequiresMessageExtensionsRule

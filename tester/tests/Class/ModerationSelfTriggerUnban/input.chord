@@ -1,0 +1,6 @@
+nuevo evento usuarioBaneado {
+    desbanear usuario {
+        usuario usuario
+        razon "apelacion"
+    }
+}
