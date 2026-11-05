@@ -22,7 +22,7 @@ interface ReturnFrame {
  *    something unknown, a recursive call...), the type of the function is unknown;
  *  - otherwise it is the type of its values, or the union of them if they differ;
  *  - a `devolver` without a value returns `indefinido`;
- *  - a function with no `devolver` at all is unknown;
+ *  - a function with no `devolver` at all returns `nada`, so using its value is an error;
  *  - an async function gives the type of the value it resolves to, not a promise.
  * The walk of the tree calls {@link enter} and {@link exit}; what a call to a function infers depends on
  * the others, so the walk is repeated while {@link changed} says a type did.
@@ -83,7 +83,7 @@ export class ReturnTypeInference<T extends string, N extends BaseNode<T>> {
         const signature = this.context.symbolTable.lookup(frame.name)?.signature;
         if (!signature) return;
 
-        const inferred = frame.unknown || frame.types.length === 0 ? undefined : UnionDataType.ofTypes(frame.types);
+        const inferred = frame.unknown ? undefined : frame.types.length === 0 ? VoidDataType.Void : UnionDataType.ofTypes(frame.types);
 
         if (signature.returns?.format() === inferred?.format()) return;
 
