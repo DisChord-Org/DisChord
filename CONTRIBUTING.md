@@ -45,7 +45,8 @@ When proposing a new syntax/keyword, ensure it follows our **Natural Operator** 
 Before submitting a Pull Request, please ensure:
 
 - Your code follows existing formatting and style.
-- You've added a test under `tester/tests/` covering the new feature: a folder with an `input.chord` and its `expected.js` and `expected.ast.json`, or a test class that checks an error or a behavior. Review the diff of any snapshot you regenerate: it should change only what you meant to.
+- Your commit messages are one line, in English, and start with `add:`, `modify:`, `fix:`, `refactor:` or `delete:`. `pnpm install` installs a `commit-msg` hook (`scripts/prepare.js`) that rejects any other message.
+- You've added a test under `tester/tests/` covering the new feature: a folder with an `input.chord` and its `expected.js` and `expected.ast.json`, or a test class that checks an error or a behavior. Review the diff of any snapshot you regenerate: it should change only what you meant to. `pnpm test:update` regenerates the snapshots of every test, so use it only for a change that is meant to alter the generated output, and read the whole diff afterwards: a refactor must never need it.
 - `pnpm typecheck` (`tsc --noEmit`) reports no errors and `pnpm test` passes.
 - Documentation (like `README.md` or comments) has been updated if applicable.
 - No file you touched goes over the length limits (see [Keeping Files Short](#keeping-files-short)).
@@ -58,7 +59,7 @@ Source files under `src/` are kept short, and `tester/tests/Structure/FileLength
 
 - **From 300 lines** the test prints a `[WARNING]` for the file. It does not fail: either justify the length or split the file.
 - **From 400 lines** the test fails. Split the file by responsibility (not by moving lines around).
-- **There are no exceptions.** Not for data tables, not for declarations: a file over the limit is split.
+- **The one exception** is the class schemas of the core library (`corelib/classes/` in `src/chord` and `src/dischord`): each class lives in a single file however many methods it has, because they are tables of data and splitting one by line count only scatters its methods. Everything else is split.
 
 ---
 
