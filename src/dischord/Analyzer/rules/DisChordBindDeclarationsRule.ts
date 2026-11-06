@@ -1,7 +1,8 @@
 import { BindDeclarationsRule } from "../../../chord/Analyzer/rules/BindDeclarationsRule";
 import { DataType } from "../../../chord/model/DataType";
 import { InjectedNames } from "../../InjectedNames";
-import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType } from "../../types";
+import { DisChordASTNode, DisChordNode, DisChordNodeType } from "../../types";
+import { NodePredicates } from "../NodePredicates";
 
 /**
  * Chord's `BindDeclarationsRule` plus the variables dischord puts in the scope of a command or an event
@@ -17,7 +18,7 @@ export class DisChordBindDeclarationsRule extends BindDeclarationsRule<DisChordN
      * @override
      */
     protected override scopeSymbols (owner: DisChordASTNode): { name: string; dataType?: DataType }[] {
-        if (owner.type !== DisChordTokenType.CREAR_COMANDO && owner.type !== DisChordTokenType.EVENTO) return [];
+        if (!NodePredicates.isScopeOwner(owner)) return [];
 
         const seen = new Set<string>();
 

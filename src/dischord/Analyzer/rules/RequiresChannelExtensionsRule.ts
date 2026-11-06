@@ -1,8 +1,8 @@
 import { AnalysisRule } from "../../../chord/Analyzer/AnalysisRule";
 import { SharedModuleImporter } from "../../../chord/Analyzer/SharedModuleImporter";
-import { LiteralNode, ODBNode, TokenType } from "../../../chord/model/types";
 import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType } from "../../types";
 import { channelExtensionsModule } from "../../corelib";
+import { NodePredicates } from "../NodePredicates";
 
 /**
  * Detects, over the complete AST, whether the file can receive a channel object whose Spanish
@@ -34,10 +34,7 @@ export class RequiresChannelExtensionsRule extends AnalysisRule<DisChordNodeType
                 return;
             }
 
-            if (current.type === TokenType.BDO) {
-                const tipo = (current as unknown as ODBNode<DisChordNodeType, DisChordNode>).blocks['tipo'];
-                if (tipo?.type === TokenType.LITERAL && (tipo as LiteralNode<DisChordNodeType>).value === 'canal') needsExtensions = true;
-            }
+            if (NodePredicates.declaresOptionType(current, 'canal')) needsExtensions = true;
         });
 
         if (!needsExtensions) return;

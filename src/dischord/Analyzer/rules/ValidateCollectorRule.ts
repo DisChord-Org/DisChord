@@ -13,9 +13,7 @@ import { CollectorSchema } from "../../Generator/constants/schemas";
  * itself declares no `required`/`mapping` fields today, so this is currently a no-op for those —
  * wired up anyway so a future constraint on `filtro`/`tiempo`/`alFinalizar` is enforced for free,
  * the same way `ButtonSchema`'s `emoji` or `EmbedFieldSchema`'s `descripcion`/`lineado` already are
- * (added straight to schemas the Analyzer already validates). Moved out of `CollectorVisitor`,
- * which used to discover `alPulsarId`'s problem mid-generation — see `ValidateCallTargetsRule` for
- * the full rationale behind the split.
+ * (added straight to schemas the Analyzer already validates).
  *
  * It also checks that each id in `alPulsarId` is the id of a button of the message the collector is
  * attached to (`recolector m`, with `m` a `var m es enviar mensaje {...}` of the same body), but only when

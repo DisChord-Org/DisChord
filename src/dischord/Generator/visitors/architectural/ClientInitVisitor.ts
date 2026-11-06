@@ -1,7 +1,7 @@
 import path from "node:path";
 
 import { DisChordNode, DisChordNodeType, DisChordTokenType, StartBotNode } from "../../../types";
-import { intentsMap } from "../../constants/mappings";
+import { intentsMap, SeyfertLocations } from "../../constants/mappings";
 import { SubGenerator } from "../../../../chord/Generator/SubGenerator";
 import { IdentificatorNode, ImportNode, TokenType, TokenTypeUnion } from "../../../../chord/model/types";
 import { walkAST } from "../../../../chord/walkAST";
@@ -9,9 +9,9 @@ import { ImportSpecifier } from "../../../../utils/ImportSpecifier";
 import { ImportVisitor } from "../../../../chord/Generator/visitors/modularity/ImportVisitor";
 
 /**
- * Generator class responsible for generating code related to starting the bot and setting up the client in DisChrod.
+ * Generator class responsible for generating code related to starting the bot and setting up the client in DisChord.
  */
-export default class ClietInitVisitor extends SubGenerator<DisChordNodeType, DisChordNode> {
+export default class ClientInitVisitor extends SubGenerator<DisChordNodeType, DisChordNode> {
     /**
      * The node type string that triggers the activation of this specific sub-generator.
      * @public
@@ -31,26 +31,30 @@ export default class ClietInitVisitor extends SubGenerator<DisChordNodeType, Dis
 
         const prefix = this.parent.visit(prefixNode);
         const isArray = prefixNode.type === TokenType.LISTA;
-
-        let includeSlash = false;
-        if (isArray) {
-            includeSlash = prefixNode.body.some(
-                (p) => p.type === TokenType.LITERAL && p.value === '/'
-            );
-        } else if (prefixNode.type === TokenType.LITERAL) {
-            includeSlash = prefixNode.value === '/';
-        }
+        const prefixes = prefixNode.type === TokenType.LISTA ? prefixNode.body : [ prefixNode ];
+        const includeSlash = prefixes.some(p => p.type === TokenType.LITERAL && p.value === '/');
 
         const seyfertConfig = this.generateSeyfertConfig(node);
         this.parent.context.extraFiles.set(this.parent.context.projectRoot.resolve('seyfert.config.mjs'), seyfertConfig);
 
         this.requireOutputDirectories();
 
+        return this.clientTemplate(isArray ? prefix : `[${prefix}]`, includeSlash);
+    }
+
+    /**
+     * The code that creates and starts the client.
+     * @param prefixes The generated array of command prefixes.
+     * @param includeSlash Whether the slash commands must be uploaded once the client is up.
+     * @returns The generated client code.
+     * @private
+     */
+    private clientTemplate (prefixes: string, includeSlash: boolean): string {
         return `
             import { Client } from "seyfert";
             const client = new Client({
                 commands: {
-                    prefix: () => ${isArray ? prefix : `[${prefix}]`},
+                    prefix: () => ${prefixes},
                     reply: () => true
                 }
             });
@@ -86,9 +90,9 @@ export default class ClietInitVisitor extends SubGenerator<DisChordNodeType, Dis
         let intents = "[]";
 
         if (intentsNode && intentsNode.type === TokenType.LISTA) {
-            const list = intentsNode.body.map((item: any) => {
-                const val = item.value?.toString().replace(/"/g, '');
-                const mapped = intentsMap[val];
+            const list = intentsNode.body.map(item => {
+                const val = (item as { value?: { toString(): string } }).value?.toString().replace(/"/g, '');
+                const mapped = intentsMap[val as string];
                 return `"${mapped}"`;
             });
             intents = `[ ${list.join(',')} ]`;
@@ -104,9 +108,9 @@ export default class ClietInitVisitor extends SubGenerator<DisChordNodeType, Dis
                 intents: ${intents},
                 locations: {
                     base: "dist",
-                    commands: "comandos",
-                    events: "eventos",
-                    components: "componentes"
+                    commands: "${SeyfertLocations.commands}",
+                    events: "${SeyfertLocations.events}",
+                    components: "${SeyfertLocations.components}"
                 }
             });
         `;
@@ -157,7 +161,7 @@ export default class ClietInitVisitor extends SubGenerator<DisChordNodeType, Dis
 
         let absoluteTarget: string;
 
-        if (cleanPath.startsWith('lib:')) {
+        if (ImportSpecifier.isLibrary(cleanPath)) {
             const libName = cleanPath.split(':')[1];
             absoluteTarget = projectRoot.resolve('lib', libName, 'src', 'index.js');
         } else {
@@ -174,7 +178,7 @@ export default class ClietInitVisitor extends SubGenerator<DisChordNodeType, Dis
      * knows the compile succeeded and isn't just a check.
      */
     private requireOutputDirectories() {
-        [ 'comandos', 'eventos', 'componentes' ].forEach(dir => {
+        Object.values(SeyfertLocations).forEach(dir => {
             this.parent.context.extraDirectories.add(path.join(this.parent.context.distDir, dir));
         });
     }

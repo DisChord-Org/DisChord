@@ -4,6 +4,7 @@ import { SharedModule } from "../../../chord/model/SharedModule";
 import { Symbol, TokenType } from "../../../chord/model/types";
 import { isAccessNode, isIdentificatorNode, isVariableNode } from "../../../chord/ast.guards";
 import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType } from "../../types";
+import { NodePredicates } from "../NodePredicates";
 
 /**
  * Base of the rules that import a shared module patching Seyfert's classes with Spanish-named members
@@ -44,7 +45,7 @@ export abstract class RequiresPatchedMembersRule extends AnalysisRule<DisChordNo
      * @returns {boolean}
      * @protected
      */
-    protected triggers (node: DisChordASTNode): boolean {
+    protected triggers (_node: DisChordASTNode): boolean {
         return false;
     }
 
@@ -66,7 +67,7 @@ export abstract class RequiresPatchedMembersRule extends AnalysisRule<DisChordNo
         this.walkScoped(nodes, node => {
             if (always) return;
 
-            if (node.type === DisChordTokenType.CREAR_COMANDO || node.type === DisChordTokenType.EVENTO) hasDiscordContext = true;
+            if (NodePredicates.isScopeOwner(node)) hasDiscordContext = true;
             if (node.type === DisChordTokenType.ENCENDER_BOT || this.triggers(node)) always = true;
 
             if (isVariableNode(node) && node.value.type === DisChordTokenType.ACCION_CANAL) {

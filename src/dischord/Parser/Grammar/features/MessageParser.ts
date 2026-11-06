@@ -2,7 +2,6 @@ import { DisChordNode, DisChordNodeType, DisChordODBNode, DisChordTokenType, Mes
 import { ODBMode, TokenType, TokenTypeUnion } from "../../../../chord/model/types";
 import { SubParser } from "../../../../chord/Parser/SubParser";
 import { BDOParser } from "../../../../chord/Parser/Grammar/BDOParser";
-import { Parser } from "../../../../chord/Parser/Parser";
 import { ChordError, ErrorLevel } from "../../../../errors/ChordError";
 
 /**
@@ -24,14 +23,6 @@ export default class MessageParser extends SubParser<DisChordNodeType, DisChordN
      * an ordinary word, since it is also the name of the parameter of the message events.
      */
     static keywords: TokenTypeUnion<DisChordNodeType>[] = [ DisChordTokenType.Enviar ];
-
-    /**
-     * Initializes the MessageParser with the main DisChordParser context for token expression handling.
-     * @param parent - The main Parser context for token expression handling
-     */
-    constructor (protected parent: Parser<DisChordNodeType, DisChordNode>) {
-        super(parent);
-    }
 
     /**
      * Parses a message creation block.

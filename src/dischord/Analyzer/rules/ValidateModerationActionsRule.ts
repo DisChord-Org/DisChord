@@ -1,6 +1,6 @@
 import { AnalysisRule } from "../../../chord/Analyzer/AnalysisRule";
 import { TypeInferrer } from "../../../chord/Analyzer/TypeInferrer";
-import { ArrayDataType, ClassDataType, PrimitiveDataType, TupleDataType, UnionDataType } from "../../../chord/model/DataType";
+import { ArrayDataType, PrimitiveDataType, TupleDataType, UnionDataType } from "../../../chord/model/DataType";
 import { LiteralNode, TokenType } from "../../../chord/model/types";
 import { BanDeleteMessageSeconds, CommandNode, DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType, EventNode, ModerationAction, ModerationActionNode, ModerationActionObject, ModerationProperty } from "../../types";
 import { ModerationActionSchemas } from "../../Generator/constants/schemas";

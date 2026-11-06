@@ -7,9 +7,7 @@ import { EmbedSchema } from "../../Generator/constants/schemas";
  * Validates every embed DisChord can reach at generation time against {@link EmbedSchema} — the
  * same schema `EmbedVisitor` reads to generate an embed: a named `embed <Nombre> { ... }`
  * declaration, and any inline BDO reached through an `enviar mensaje { embed ... }` property (a
- * single embed, or a list of them). Moved out of `EmbedVisitor`, which used to discover the same
- * problems mid-generation — see `ValidateCallTargetsRule` for the full rationale behind the split.
- * The `embed` property's own single-vs-list discovery has no schema equivalent — it's a shape
+ * single embed, or a list of them). The `embed` property's own single-vs-list discovery has no schema equivalent — it's a shape
  * specific to how that property nests, not a single field's presence/vocabulary — but every embed
  * BDO it finds is validated the same way, against the one shared schema (whose `nested` entries
  * already cover `campos`/`pie`).
@@ -36,13 +34,10 @@ export class ValidateEmbedsRule extends AnalysisRule<DisChordNodeType, DisChordN
     private validateEmbedProperty (embed: DisChordASTNode | undefined): void {
         if (!embed) return;
 
-        if (embed.type === TokenType.LISTA) {
-            embed.body.forEach(item => {
-                if (item.type === TokenType.BDO) this.validator.validate(item as DisChordODBNode, EmbedSchema);
-            });
-            return;
-        }
+        const embeds = embed.type === TokenType.LISTA ? embed.body : [ embed ];
 
-        if (embed.type === TokenType.BDO) this.validator.validate(embed as DisChordODBNode, EmbedSchema);
+        embeds
+            .filter(item => item.type === TokenType.BDO)
+            .forEach(item => this.validator.validate(item as DisChordODBNode, EmbedSchema));
     }
 }

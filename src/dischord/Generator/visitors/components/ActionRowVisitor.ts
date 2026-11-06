@@ -2,6 +2,7 @@ import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType } fr
 import { SubGenerator } from "../../../../chord/Generator/SubGenerator";
 import { ListNode, TokenType, TokenTypeUnion } from "../../../../chord/model/types";
 import ButtonVisitor from "./ButtonVisitor";
+import { ButtonRows } from "../../../ButtonRows";
 
 /**
  * Generator class responsible for grouping button expressions into `new ActionRow()...` calls —
@@ -17,24 +18,16 @@ export default class ActionRowVisitor extends SubGenerator<DisChordNodeType, Dis
     public static triggerToken: TokenTypeUnion<DisChordTokenType> | undefined = undefined;
 
     /**
-     * Discord's maximum number of components (buttons) allowed in a single ActionRow.
-     * @private
-     * @static
-     * @readonly
-     */
-    private static readonly MAX_PER_ROW = 5;
-
-    /**
      * Builds one or more `new ActionRow().setComponents([...])` calls from a 'boton' property's
      * value, which can be:
      * - a single button (a BDO or a reference) — one row, one button;
      * - a flat list of buttons (`boton [ A B C ]`) — automatically split into rows of up to
-     *   {@link MAX_PER_ROW}, in order;
+     *   {@link ButtonRows.MAX_PER_ROW}, in order;
      * - a list of lists (`boton [ [A] [B C] ]`) — each inner list is taken as an explicit,
      *   manually-laid-out row instead of being auto-chunked, for layouts auto-splitting can't
      *   express (e.g. a deliberate single-button row).
      * @param button The parsed value of the message's 'boton' property.
-     * @throws {DisChordError} If an explicit manual row exceeds {@link MAX_PER_ROW} buttons.
+     * @throws {DisChordError} If an explicit manual row exceeds {@link ButtonRows.MAX_PER_ROW} buttons.
      * @returns The comma-separated `new ActionRow()...` calls, ready to sit inside `components: [ ... ]`.
      */
     visit (button: DisChordASTNode): string {
@@ -44,9 +37,7 @@ export default class ActionRowVisitor extends SubGenerator<DisChordNodeType, Dis
 
         const list = button as unknown as ListNode<DisChordNodeType, DisChordNode>;
 
-        const isManualLayout = list.body.length > 0 && list.body.every(item => item.type === TokenType.LISTA);
-
-        if (isManualLayout) {
+        if (ButtonRows.isManualLayout(list)) {
             return list.body
                 .map(row => this.buildRow((row as unknown as ListNode<DisChordNodeType, DisChordNode>).body))
                 .join(', ');
@@ -56,14 +47,14 @@ export default class ActionRowVisitor extends SubGenerator<DisChordNodeType, Dis
     }
 
     /**
-     * Splits a flat list of buttons into consecutive rows of up to {@link MAX_PER_ROW}.
+     * Splits a flat list of buttons into consecutive rows of up to {@link ButtonRows.MAX_PER_ROW}.
      * @private
      */
     private buildAutoRows (buttons: DisChordASTNode[]): string {
         const rows: DisChordASTNode[][] = [];
 
-        for (let i = 0; i < buttons.length; i += ActionRowVisitor.MAX_PER_ROW) {
-            rows.push(buttons.slice(i, i + ActionRowVisitor.MAX_PER_ROW));
+        for (let i = 0; i < buttons.length; i += ButtonRows.MAX_PER_ROW) {
+            rows.push(buttons.slice(i, i + ButtonRows.MAX_PER_ROW));
         }
 
         return rows.map(row => this.buildRow(row)).join(', ');
@@ -71,7 +62,7 @@ export default class ActionRowVisitor extends SubGenerator<DisChordNodeType, Dis
 
     /**
      * Builds a single `new ActionRow().setComponents([...])` call from its buttons. An explicit
-     * manual row exceeding {@link MAX_PER_ROW} is already rejected by the Analyzer's
+     * manual row exceeding {@link ButtonRows.MAX_PER_ROW} is already rejected by the Analyzer's
      * `ValidateButtonsRule` before generation runs.
      * @private
      */

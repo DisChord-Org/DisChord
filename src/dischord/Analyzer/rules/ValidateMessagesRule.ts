@@ -1,6 +1,7 @@
 import { AnalysisRule } from "../../../chord/Analyzer/AnalysisRule";
 import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType, MessageNode } from "../../types";
 import { MessageSchema } from "../../Generator/constants/schemas";
+import { NodePredicates } from "../NodePredicates";
 
 /**
  * Validates every `enviar mensaje { ... }` block:
@@ -24,21 +25,13 @@ export class ValidateMessagesRule extends AnalysisRule<DisChordNodeType, DisChor
      */
     check (nodes: DisChordASTNode[]): void {
         this.walk(nodes, current => {
-                if (this.opensContext(current)) this.enclosing++;
+                if (NodePredicates.isScopeOwner(current)) this.enclosing++;
                 if (current.type === DisChordTokenType.CREAR_MENSAJE) this.validate(current as MessageNode);
             },
             current => {
-                if (this.opensContext(current)) this.enclosing--;
+                if (NodePredicates.isScopeOwner(current)) this.enclosing--;
             }
         );
-    }
-
-    /**
-     * Whether a node is a command or an event, the two places that declare `ctx`.
-     * @private
-     */
-    private opensContext (node: DisChordASTNode): boolean {
-        return node.type === DisChordTokenType.CREAR_COMANDO || node.type === DisChordTokenType.EVENTO;
     }
 
     /**

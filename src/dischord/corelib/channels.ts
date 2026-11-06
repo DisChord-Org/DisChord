@@ -1,57 +1,9 @@
 import { ChannelAction, ChannelPayload, ChannelProperty } from "../types";
 import { SharedModule } from "../../chord/model/SharedModule";
+import { QuotaRuntime } from "./QuotaRuntime";
+import { channelHelperNames, channelActionPhrases, channelQuota, channelQuotaWindowMinutes, channelQuotaMaxTier } from "./channelsPolicy";
 
-/**
- * The name of the helper of the shared `channels` module that performs each channel action.
- * The one place the names are written: the module below is built from them, `ChannelActionVisitor`
- * emits the call to them and `RequiresChannelHelperRule` imports them.
- * @type {Readonly<Record<ChannelAction, string>>}
- */
-export const channelHelperNames: Readonly<Record<ChannelAction, string>> = {
-    [ChannelAction.Crear]: 'createChannel',
-    [ChannelAction.Editar]: 'editChannel',
-    [ChannelAction.Borrar]: 'deleteChannel',
-    [ChannelAction.Obtener]: 'getChannel',
-    [ChannelAction.Listar]: 'listChannels'
-};
-
-/**
- * What each action is called in the message of an error: "No se pudo <esto>.".
- * @type {Readonly<Record<ChannelAction, string>>}
- */
-export const channelActionPhrases: Readonly<Record<ChannelAction, string>> = {
-    [ChannelAction.Crear]: 'crear el canal',
-    [ChannelAction.Editar]: 'editar el canal',
-    [ChannelAction.Borrar]: 'borrar el canal',
-    [ChannelAction.Obtener]: 'obtener el canal',
-    [ChannelAction.Listar]: 'listar los canales'
-};
-
-/**
- * How many channel actions of each kind a server allows inside one window, for a bot in fewer than
- * ten servers. Deliberately not configurable by whoever writes the bot: a barrier its author can
- * lift is not one. A bigger bot gets more room (see `channelQuotaMaxTier`).
- * @type {Readonly<Record<'crear' | 'editar' | 'borrar', number>>}
- */
-export const channelQuota: Readonly<Record<'crear' | 'editar' | 'borrar', number>> = {
-    [ChannelAction.Crear]: 10,
-    [ChannelAction.Editar]: 10,
-    [ChannelAction.Borrar]: 5
-};
-
-/**
- * Length of the window the quota counts in, in minutes.
- * @type {number}
- */
-export const channelQuotaWindowMinutes = 10;
-
-/**
- * The quota doubles for every order of magnitude of servers the bot is in: ×1 under ten servers,
- * ×2 from ten, ×4 from a hundred, ×8 from a thousand. It stops there, so no bot, however big,
- * has an unbounded allowance. A bot with few servers is the likeliest to be a throwaway one.
- * @type {number}
- */
-export const channelQuotaMaxTier = 3;
+export * from "./channelsPolicy";
 
 /**
  * A shared module: its `path`, relative to the project's `dist` directory, where `CompileCommand` writes it,
@@ -149,27 +101,7 @@ export const channelsModule: SharedModule = {
         }
     };
 
-    // one order of magnitude of servers doubles the allowance, up to MAX_TIER
-    const tierOf = async (cliente) => {
-        const guilds = cliente.cache && cliente.cache.guilds ? await cliente.cache.guilds.count() : 0;
-        return Math.min(MAX_TIER, Math.max(0, Math.floor(Math.log10(Math.max(guilds, 1)))));
-    };
-
-    const consumeQuota = async (cliente, guildId, action) => {
-        // everything that waits goes first: from here to the push nothing can interleave, so actions
-        // started at the same time cannot all read the same count and pass
-        const allowance = BASE_QUOTA[action] * 2 ** await tierOf(cliente);
-        const now = Date.now();
-        const key = guildId + ':' + action;
-        const recent = (usage.get(key) || []).filter(at => now - at < WINDOW_MS);
-
-        if (recent.length >= allowance) {
-            throw new Error("DisChord Error: No se pudo " + WHAT[action] + ". Se alcanzó el límite de seguridad de " + allowance + " acciones de este tipo cada ${channelQuotaWindowMinutes} minutos en este servidor.");
-        }
-
-        recent.push(now);
-        usage.set(key, recent);
-    };
+${QuotaRuntime.render(channelQuotaWindowMinutes, limit => `throw new Error("DisChord Error: No se pudo " + WHAT[action] + ". ${limit}");`)}
 
     // the channel has to belong to the server of the context, when the context has one
     const requireSameGuild = async (cliente, channelId, expectedGuildId, action) => {

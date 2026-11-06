@@ -3,9 +3,7 @@ import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType, Eve
 import { eventsMap, RenamedEvents } from "../../Generator/constants/mappings";
 
 /**
- * Validates that an `evento <nombre>` names an event `eventsMap` recognizes. Moved out of
- * `EventVisitor`, which used to discover the same problem mid-generation — see
- * `ValidateCallTargetsRule` for the full rationale behind the split.
+ * Validates that an `evento <nombre>` names an event `eventsMap` recognizes.
  */
 export class ValidateEventRule extends AnalysisRule<DisChordNodeType, DisChordNode> {
     /**

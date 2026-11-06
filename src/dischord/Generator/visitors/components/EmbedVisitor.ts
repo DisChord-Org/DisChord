@@ -2,7 +2,7 @@ import { DisChordError, ErrorLevel } from "../../../../errors/ChordError";
 import { EmbedColors } from "../../constants/mappings";
 import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordODBNode, DisChordTokenType } from "../../../types";
 import { SubGenerator } from "../../../../chord/Generator/SubGenerator";
-import { BDOResolver } from "../../../../chord/Generator/BDOResolver";
+import { VisitorHelpers } from "../VisitorHelpers";
 import { TokenType, TokenTypeUnion } from "../../../../chord/model/types";
 import { BDOVisitor } from "../../../../chord/Generator/visitors/expressions/BDOVisitor";
 import { EmbedAuthorSchema, EmbedFieldSchema, EmbedFooterSchema, EmbedSchema } from "../../constants/schemas";
@@ -70,8 +70,9 @@ export default class EmbedVisitor extends SubGenerator<DisChordNodeType, DisChor
 
     /**
      * Resolves a BDO's properties into the `.setX(...)` method chain alone, without the leading
-     * `new Embed()`. Shared by `visit()` (the anonymous inline form) and `EmbedDeclarationVisitor`
-     * (the named, reusable `embed <Nombre> { ... }` form), so both produce identical output.
+     * `new Embed()`. Called only by `visit()`, which serves both the anonymous inline form and,
+     * through `EmbedDeclarationVisitor`, the named, reusable `embed <Nombre> { ... }` form, so both
+     * produce identical output.
      *
      * The simple pass-through fields (`titulo`, `descripcion`, `imagen`, `cartel`, `hora`, and `color`'s
      * raw value before its named-color lookup) come straight out of {@link EmbedSchema} via
@@ -83,36 +84,36 @@ export default class EmbedVisitor extends SubGenerator<DisChordNodeType, DisChor
      * @throws Error if the node is not a BDO.
      * @returns The `.setX(...)` method chain, without the `new Embed()` prefix.
      */
-    buildChain (node: DisChordASTNode): string {
-        if (node.type != 'BDO') throw new DisChordError({
-            phase: ErrorLevel.Parser,
+    private buildChain (node: DisChordASTNode): string {
+        if (node.type !== TokenType.BDO) throw new DisChordError({
+            phase: ErrorLevel.Compiler,
             message: `Se esperaba un BDO, se recibió '${node.type}'`,
             location: node.location
         });
 
-        const resolver = new BDOResolver<DisChordNodeType, DisChordNode>(expression => this.parent.visit(expression));
+        const resolver = VisitorHelpers.resolverFor(this.parent);
         const fields = resolver.resolve(node, EmbedSchema);
 
-        const ResolvedColor = this.resolveColor(fields['color']);
-        const ResolvedTitle = fields['titulo'] ? `.setTitle(${fields['titulo']})` : '';
-        const ResolvedAuthor = this.resolveAuthor(node);
-        const ResolvedDescription = fields['descripcion'] ? `.setDescription(${fields['descripcion']})` : '';
-        const ResolvedTimestamp = fields['hora'] ? '.setTimestamp()' : '';
-        const ResolvedImage = fields['imagen'] ? `.setImage(${fields['imagen']})` : '';
-        const ResolvedThumbnail = fields['cartel'] ? `.setThumbnail(${fields['cartel']})` : '';
-        const ResolvedFields = this.resolveFields(node);
-        const ResolvedFooter = this.resolveFooter(node);
+        const resolvedColor = this.resolveColor(fields['color']);
+        const resolvedTitle = fields['titulo'] ? `.setTitle(${fields['titulo']})` : '';
+        const resolvedAuthor = this.resolveAuthor(node);
+        const resolvedDescription = fields['descripcion'] ? `.setDescription(${fields['descripcion']})` : '';
+        const resolvedTimestamp = fields['hora'] ? '.setTimestamp()' : '';
+        const resolvedImage = fields['imagen'] ? `.setImage(${fields['imagen']})` : '';
+        const resolvedThumbnail = fields['cartel'] ? `.setThumbnail(${fields['cartel']})` : '';
+        const resolvedFields = this.resolveFields(node);
+        const resolvedFooter = this.resolveFooter(node);
 
         return `
-            ${ResolvedColor}
-            ${ResolvedTitle}
-            ${ResolvedAuthor}
-            ${ResolvedDescription}
-            ${ResolvedTimestamp}
-            ${ResolvedImage}
-            ${ResolvedThumbnail}
-            ${ResolvedFields}
-            ${ResolvedFooter}
+            ${resolvedColor}
+            ${resolvedTitle}
+            ${resolvedAuthor}
+            ${resolvedDescription}
+            ${resolvedTimestamp}
+            ${resolvedImage}
+            ${resolvedThumbnail}
+            ${resolvedFields}
+            ${resolvedFooter}
         `;
     }
 
@@ -131,11 +132,11 @@ export default class EmbedVisitor extends SubGenerator<DisChordNodeType, DisChor
         const isStringLiteral = color.startsWith('"') && color.endsWith('"');
         if (!isStringLiteral) return `.setColor(${color})`;
 
-        const RawColor = color.slice(1, -1);
+        const rawColor = color.slice(1, -1);
 
-        if (!Object.keys(EmbedColors).includes(RawColor)) return '';
+        if (!Object.keys(EmbedColors).includes(rawColor)) return '';
 
-        return `.setColor("${EmbedColors[RawColor]}")`;
+        return `.setColor("${EmbedColors[rawColor]}")`;
     }
 
     /**
@@ -150,7 +151,7 @@ export default class EmbedVisitor extends SubGenerator<DisChordNodeType, DisChor
 
         if (!author) return '';
 
-        const resolver = new BDOResolver<DisChordNodeType, DisChordNode>(expression => this.parent.visit(expression));
+        const resolver = VisitorHelpers.resolverFor(this.parent);
         const resolved = resolver.resolve(author.type === TokenType.BDO ? author as DisChordODBNode : { blocks: {} } as DisChordODBNode, EmbedAuthorSchema);
 
         return `.setAuthor({ text: ${resolved['nombre']}, iconUrl: ${resolved['icono']} })`;
@@ -166,17 +167,17 @@ export default class EmbedVisitor extends SubGenerator<DisChordNodeType, DisChor
     private resolveFields (node: DisChordODBNode): string {
         const fields = this.parent.get(BDOVisitor).getODBProperty(node, 'campos');
 
-        if (!fields || fields.type != 'Lista' || fields.body.length < 1) return '';
+        if (!fields || fields.type !== TokenType.LISTA || fields.body.length < 1) return '';
 
-        const resolver = new BDOResolver<DisChordNodeType, DisChordNode>(expression => this.parent.visit(expression));
+        const resolver = VisitorHelpers.resolverFor(this.parent);
 
-        const FieldsResolved: string = fields.body.map((Field: DisChordASTNode): string => {
-            const field = resolver.resolve(Field as DisChordODBNode, EmbedFieldSchema);
+        const fieldsResolved: string = fields.body.map((fieldNode: DisChordASTNode): string => {
+            const field = resolver.resolve(fieldNode as DisChordODBNode, EmbedFieldSchema);
 
             return `{ name: ${field['titulo']}, value: ${field['descripcion']}, inline: ${field['lineado']} }`;
         }).join(',\n');
 
-        return `.addFields(${FieldsResolved})`;
+        return `.addFields(${fieldsResolved})`;
     }
 
     /**
@@ -188,9 +189,9 @@ export default class EmbedVisitor extends SubGenerator<DisChordNodeType, DisChor
     private resolveFooter (node: DisChordODBNode): string {
         const footer = this.parent.get(BDOVisitor).getODBProperty(node, 'pie');
 
-        if (!footer || footer.type != 'BDO') return '';
+        if (!footer || footer.type !== TokenType.BDO) return '';
 
-        const resolver = new BDOResolver<DisChordNodeType, DisChordNode>(expression => this.parent.visit(expression));
+        const resolver = VisitorHelpers.resolverFor(this.parent);
         const resolved = resolver.resolve(footer, EmbedFooterSchema);
 
         return `.setFooter({ text: ${resolved['texto']}, iconUrl: ${resolved['icono']} })`;

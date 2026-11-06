@@ -1,6 +1,9 @@
 import { ResolveAwaitedCallsRule } from "../../../chord/Analyzer/rules/ResolveAwaitedCallsRule";
 import { ChannelActionObject, ModerationActionObject, DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType } from "../../types";
 
+/** Why a dischord construct that is emitted as an `await` can only go where an await can. */
+const awaitedWhere = "espera una respuesta y solo puede usarse en un comando, un evento, una función @asincrono o a nivel superior";
+
 /**
  * Chord's `ResolveAwaitedCallsRule` plus dischord's own awaiting construct: `enviar mensaje` is
  * emitted as an `await`, so it follows the rule an awaited call does — fine in a command, an
@@ -13,15 +16,15 @@ export class DisChordResolveAwaitedCallsRule extends ResolveAwaitedCallsRule<Dis
      */
     protected override awaitingConstruct (node: DisChordASTNode): string | undefined {
         if (node.type === DisChordTokenType.CREAR_MENSAJE) {
-            return "'enviar mensaje' espera una respuesta y solo puede usarse en un comando, un evento, una función @asincrono o a nivel superior";
+            return `'enviar mensaje' ${awaitedWhere}`;
         }
 
         if (node.type === DisChordTokenType.ACCION_CANAL) {
-            return `'${node.action} ${ChannelActionObject[node.action]}' espera una respuesta y solo puede usarse en un comando, un evento, una función @asincrono o a nivel superior`;
+            return `'${node.action} ${ChannelActionObject[node.action]}' ${awaitedWhere}`;
         }
 
         if (node.type === DisChordTokenType.ACCION_MODERACION) {
-            return `'${node.action} ${ModerationActionObject[node.action]}' espera una respuesta y solo puede usarse en un comando, un evento, una función @asincrono o a nivel superior`;
+            return `'${node.action} ${ModerationActionObject[node.action]}' ${awaitedWhere}`;
         }
 
         return undefined;

@@ -1,7 +1,7 @@
-import { BDOSchema, fieldKeys, FieldSpec } from "../../chord/BDOSchema";
+import { BDOSchema, fieldKeys, FieldSpec, NestedSpec } from "../../chord/BDOSchema";
 import { CommandContextParameter, CommandScope, EmbedColors, eventParamNames, eventsMap } from "../Generator/constants/mappings";
 import {
-    ButtonSchema, CollectorSchema, CommandSchema, CreateChannelSchema, DeleteChannelSchema, EditChannelSchema, GetChannelSchema, ListChannelsSchema, EmbedAuthorSchema, EmbedFieldSchema, EmbedFooterSchema, EmbedSchema, MessageSchema, OptionSchema, StartBotSchema
+    BanMemberSchema, ButtonSchema, CollectorSchema, CommandSchema, KickMemberSchema, UnbanUserSchema, CreateChannelSchema, DeleteChannelSchema, EditChannelSchema, GetChannelSchema, ListChannelsSchema, EmbedAuthorSchema, EmbedFieldSchema, EmbedFooterSchema, EmbedSchema, MessageSchema, OptionSchema, StartBotSchema
 } from "../Generator/constants/schemas";
 import { UnreservedComponentDeclarations } from "../Parser/Grammar/UnreservedComponentDeclarations";
 import { DisChordNode, DisChordNodeType } from "../types";
@@ -89,7 +89,10 @@ export class DisChordVocabulary {
         'editar canal': EditChannelSchema,
         'borrar canal': DeleteChannelSchema,
         'obtener canal': GetChannelSchema,
-        'listar canales': ListChannelsSchema
+        'listar canales': ListChannelsSchema,
+        'banear miembro': BanMemberSchema,
+        'desbanear usuario': UnbanUserSchema,
+        'expulsar miembro': KickMemberSchema
     };
 
     /**
@@ -126,9 +129,18 @@ export class DisChordVocabulary {
             nested: (schema.nested ?? []).map(nested => ({
                 key: nested.key,
                 block: this.nameOf(nested.schema) ?? 'opcion',
-                shape: nested.forEachEntry ? 'entries' : nested.forEachItem ? 'items' : 'single'
+                shape: this.shapeOf(nested)
             }))
         };
+    }
+
+    /**
+     * @returns How a nested block repeats: once per entry of a block, once per item of a list, or just once.
+     */
+    private shapeOf(nested: NestedSpec<DisChordNodeType, DisChordNode>): 'entries' | 'items' | 'single' {
+        if (nested.forEachEntry) return 'entries';
+
+        return nested.forEachItem ? 'items' : 'single';
     }
 
     private describeField(field: FieldSpec): BlockFieldDescription {

@@ -1,7 +1,7 @@
 import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordODBNode, DisChordTokenType } from "../../../types";
 import { SubGenerator } from "../../../../chord/Generator/SubGenerator";
-import { BDOResolver } from "../../../../chord/Generator/BDOResolver";
-import { TokenTypeUnion } from "../../../../chord/model/types";
+import { VisitorHelpers } from "../VisitorHelpers";
+import { TokenType, TokenTypeUnion } from "../../../../chord/model/types";
 import { BDOVisitor } from "../../../../chord/Generator/visitors/expressions/BDOVisitor";
 import { OptionSchema } from "../../constants/schemas";
 import { CommandScopeNames } from "../../../CommandScopeNames";
@@ -37,7 +37,7 @@ export default class CommandOptionVisitor extends SubGenerator<DisChordNodeType,
     public visitIfNodeExists (node: DisChordODBNode): CommandOptionsOutput {
         const optionsBlock = this.parent.get(BDOVisitor).getODBProperty(node, 'opciones');
 
-        if (!optionsBlock || optionsBlock.type !== 'BDO') return {
+        if (!optionsBlock || optionsBlock.type !== TokenType.BDO) return {
             options: '',
             variables: ''
         };
@@ -59,7 +59,7 @@ export default class CommandOptionVisitor extends SubGenerator<DisChordNodeType,
      */
     public visit (node: DisChordASTNode): string {
         const optionsNode = node as DisChordODBNode;
-        const resolver = new BDOResolver<DisChordNodeType, DisChordNode>(expression => this.parent.visit(expression));
+        const resolver = VisitorHelpers.resolverFor(this.parent);
 
         const results = Object.entries(optionsNode.blocks).map(([ optionName, optionNode ]) => {
             const resolved = resolver.resolve(optionNode as DisChordODBNode, OptionSchema(optionName, optionNode as DisChordODBNode));
@@ -82,7 +82,7 @@ export default class CommandOptionVisitor extends SubGenerator<DisChordNodeType,
      * @param {string[]} optionNames - The names of the command's options.
      * @returns {string} The formatted JS destructured constant code.
      */
-    public generateVariables (optionNames: string[]): string {
+    private generateVariables (optionNames: string[]): string {
         if (optionNames.length === 0) return '';
 
         return `const { ${optionNames.join(', ')} } = contexto.options;`;

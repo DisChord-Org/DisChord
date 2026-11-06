@@ -7,9 +7,7 @@ import { discordNameProblem, slugifyCommandName } from "../../Generator/constant
 
 /**
  * Validates a `comando`'s own properties against {@link CommandSchema} — the same schema
- * `CommandVisitor`/`CommandOptionVisitor` read to generate its flags and options. Moved out of
- * those visitors, which used to discover the same problems mid-generation — see
- * `ValidateCallTargetsRule` for the full rationale behind the split.
+ * `CommandVisitor`/`CommandOptionVisitor` read to generate its flags and options.
  */
 export class ValidateCommandRule extends AnalysisRule<DisChordNodeType, DisChordNode> {
     /**

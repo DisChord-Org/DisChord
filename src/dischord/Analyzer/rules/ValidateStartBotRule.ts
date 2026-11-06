@@ -3,9 +3,7 @@ import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType, Sta
 import { StartBotSchema } from "../../Generator/constants/schemas";
 
 /**
- * Validates `encender bot { ... }` against {@link StartBotSchema}. Moved out of `ClientInitVisitor`,
- * which used to discover the same problems mid-generation — see `ValidateCallTargetsRule` for the
- * full rationale behind the split.
+ * Validates `encender bot { ... }` against {@link StartBotSchema}.
  */
 export class ValidateStartBotRule extends AnalysisRule<DisChordNodeType, DisChordNode> {
     private readonly validator = this.createBDOValidator();

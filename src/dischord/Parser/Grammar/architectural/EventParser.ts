@@ -2,7 +2,6 @@ import { DisChordDeclarationKind, DisChordNode, DisChordNodeType, DisChordTokenT
 import { SubParser } from "../../../../chord/Parser/SubParser";
 import { TokenType, TokenTypeUnion } from "../../../../chord/model/types";
 import { BlockParser } from "../../../../chord/Parser/Grammar/BlockParser";
-import { Parser } from "../../../../chord/Parser/Parser";
 
 /**
  * The Event Parser.
@@ -15,14 +14,7 @@ export default class EventParser extends SubParser<DisChordNodeType, DisChordNod
     /**
      * Collection of reserved keywords this specific sub-parser registers
      */
-    static keywords: TokenTypeUnion<string>[] = [ DisChordTokenType.Evento ];
-
-    /**
-     * @param parent - The main Parser context for token expression handling
-     */
-    constructor (protected parent: Parser<DisChordNodeType, DisChordNode>) {
-        super(parent);
-    }
+    static keywords: TokenTypeUnion<DisChordNodeType>[] = [ DisChordTokenType.Evento ];
 
     /**
      * Parses an event definition.

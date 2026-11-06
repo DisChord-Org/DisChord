@@ -1,5 +1,6 @@
 import { ChannelTypes } from "../Generator/constants/mappings";
-import { corelib, DisChordClassesEnum } from "./corelib.data";
+import { DisChordClassesEnum } from "./corelib.data";
+import { ExtensionModules } from "./ExtensionModules";
 import { SharedModule } from "../../chord/model/SharedModule";
 
 /**
@@ -9,16 +10,14 @@ import { SharedModule } from "../../chord/model/SharedModule";
  * scans for the same keys.
  * @type {Readonly<Record<string, string>>}
  */
-export const channelPropertyNames: Readonly<Record<string, string>> = Object.fromEntries(
-    Object.entries(corelib.classes[DisChordClassesEnum.Canal].properties ?? {}).map(([spanish, member]) => [spanish, member.transpile])
-);
+export const channelPropertyNames: Readonly<Record<string, string>> = ExtensionModules.propertyNamesOf(DisChordClassesEnum.Canal);
 
 /**
  * The Spanish name of each channel kind by its number (`2` is `voz`): the inverse of `ChannelTypes`,
  * the table `tipo` is written with in a `crear canal`.
  * @type {Readonly<Record<number, string>>}
  */
-export const channelKindNames: Readonly<Record<number, string>> = Object.fromEntries(
+const channelKindNames: Readonly<Record<number, string>> = Object.fromEntries(
     Object.entries(ChannelTypes).map(([name, type]) => [type, name])
 );
 
@@ -37,21 +36,12 @@ export const channelKindNames: Readonly<Record<number, string>> = Object.fromEnt
  * word the `tipo` of a `crear canal` is written with.
  * @type {SharedModule}
  */
-export const channelExtensionsModule: SharedModule = {
+export const channelExtensionsModule: SharedModule = ExtensionModules.create({
     path: 'lib/channelExtensions.js',
-    content: `
-    import { BaseNoEditableChannel } from 'seyfert';
-
-    const KINDS = ${JSON.stringify(channelKindNames)};
-
-    const channelAccessors = new Map([
-${Object.entries(channelPropertyNames).map(([spanish, real]) => `        ['${spanish}', (c) => c.${real}]`).join(',\n')}
-    ]);
-
-    channelAccessors.set('tipo', (c) => KINDS[c.type]);
-
-    for (const [name, resolve] of channelAccessors) {
-        Object.defineProperty(BaseNoEditableChannel.prototype, name, { get() { return resolve(this); }, configurable: true });
-    }
-`
-};
+    targets: [ { className: 'BaseNoEditableChannel', receiver: 'this' } ],
+    mapName: 'channelAccessors',
+    receiver: 'c',
+    names: channelPropertyNames,
+    before: `    const KINDS = ${JSON.stringify(channelKindNames)};`,
+    after: `    channelAccessors.set('tipo', (c) => KINDS[c.type]);`
+});

@@ -2,7 +2,6 @@ import { CommandNode, DisChordDeclarationKind, DisChordNode, DisChordNodeType, D
 import { ODBMode, TokenType, TokenTypeUnion } from "../../../../chord/model/types";
 import { SubParser } from "../../../../chord/Parser/SubParser";
 import { BDOParser } from "../../../../chord/Parser/Grammar/BDOParser";
-import { Parser } from "../../../../chord/Parser/Parser";
 
 /**
  * The Commands Parser.
@@ -16,13 +15,6 @@ export default class CommandParser extends SubParser<DisChordNodeType, DisChordN
      * Collection of reserved keywords this specific sub-parser registers
      */
     static keywords: TokenTypeUnion<DisChordNodeType>[] = [ DisChordTokenType.Comando ];
-
-    /**
-     * @param parent - The main Parser context for token expression handling
-     */
-    constructor (protected parent: Parser<DisChordNodeType, DisChordNode>) {
-        super(parent);
-    }
 
     /**
      * Parses a command creation block.

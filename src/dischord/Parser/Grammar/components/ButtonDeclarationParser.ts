@@ -2,7 +2,6 @@ import { DisChordDeclarationKind, DisChordNode, DisChordNodeType, DisChordODBNod
 import { ODBMode, TokenType, TokenTypeUnion } from "../../../../chord/model/types";
 import { SubParser } from "../../../../chord/Parser/SubParser";
 import { BDOParser } from "../../../../chord/Parser/Grammar/BDOParser";
-import { Parser } from "../../../../chord/Parser/Parser";
 
 /**
  * The Button Declaration Parser.
@@ -17,7 +16,7 @@ import { Parser } from "../../../../chord/Parser/Parser";
  */
 export default class ButtonDeclarationParser extends SubParser<DisChordNodeType, DisChordNode> {
     /**
-     * The node type string that triggers the activation of this specific sub-generator.
+     * The node type string that triggers the activation of this specific sub-parser.
      * @public
      * @static
      */
@@ -27,13 +26,6 @@ export default class ButtonDeclarationParser extends SubParser<DisChordNodeType,
      * Collection of reserved keywords this specific sub-parser registers
      */
     static keywords: TokenTypeUnion<DisChordNodeType>[] = [];
-
-    /**
-     * @param parent - The main Parser context for token expression handling
-     */
-    constructor (protected parent: Parser<DisChordNodeType, DisChordNode>) {
-        super(parent);
-    }
 
     /**
      * Parses a button value.

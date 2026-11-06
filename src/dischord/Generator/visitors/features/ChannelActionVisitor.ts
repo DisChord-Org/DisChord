@@ -1,6 +1,6 @@
 import { ChannelAction, ChannelActionNode, ChannelProperty, DisChordNode, DisChordNodeType, DisChordTokenType } from "../../../types";
 import { SubGenerator } from "../../../../chord/Generator/SubGenerator";
-import { BDOResolver } from "../../../../chord/Generator/BDOResolver";
+import { VisitorHelpers } from "../VisitorHelpers";
 import { fieldKeys, JSFallback } from "../../../../chord/BDOSchema";
 import { TokenTypeUnion } from "../../../../chord/model/types";
 import { ChannelActionSchemas } from "../../constants/schemas";
@@ -24,7 +24,7 @@ export default class ChannelActionVisitor extends SubGenerator<DisChordNodeType,
      * @returns The generated `await` expression.
      */
     visit (node: ChannelActionNode): string {
-        const resolver = new BDOResolver<DisChordNodeType, DisChordNode>(expression => this.parent.visit(expression));
+        const resolver = VisitorHelpers.resolverFor(this.parent);
         const properties = resolver.resolve(node.object, ChannelActionSchemas[node.action]);
         const helper = channelHelperNames[node.action];
 

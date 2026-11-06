@@ -1,4 +1,5 @@
-import { corelib, DisChordClassesEnum } from "./corelib.data";
+import { DisChordClassesEnum } from "./corelib.data";
+import { ExtensionModules } from "./ExtensionModules";
 import { SharedModule } from "../../chord/model/SharedModule";
 
 /**
@@ -8,9 +9,7 @@ import { SharedModule } from "../../chord/model/SharedModule";
  * scans for these same keys to decide whether a file needs the import.
  * @type {Readonly<Record<string, string>>}
  */
-export const messagePropertyNames: Readonly<Record<string, string>> = Object.fromEntries(
-    Object.entries(corelib.classes[DisChordClassesEnum.Mensaje].properties ?? {}).map(([spanish, member]) => [spanish, member.transpile])
-);
+export const messagePropertyNames: Readonly<Record<string, string>> = ExtensionModules.propertyNamesOf(DisChordClassesEnum.Mensaje);
 
 /**
  * A shared module: its `path`, relative to the project's `dist` directory, where `CompileCommand` writes it,
@@ -23,17 +22,10 @@ export const messagePropertyNames: Readonly<Record<string, string>> = Object.fro
  * interaction gives back) both extend `BaseMessage`, so patching it covers both.
  * @type {SharedModule}
  */
-export const messageExtensionsModule: SharedModule = {
+export const messageExtensionsModule: SharedModule = ExtensionModules.create({
     path: 'lib/messageExtensions.js',
-    content: `
-    import { BaseMessage } from 'seyfert';
-
-    const messageAccessors = new Map([
-${Object.entries(messagePropertyNames).map(([spanish, real]) => `        ['${spanish}', (m) => m.${real}]`).join(',\n')}
-    ]);
-
-    for (const [name, resolve] of messageAccessors) {
-        Object.defineProperty(BaseMessage.prototype, name, { get() { return resolve(this); }, configurable: true });
-    }
-`
-};
+    targets: [ { className: 'BaseMessage', receiver: 'this' } ],
+    mapName: 'messageAccessors',
+    receiver: 'm',
+    names: messagePropertyNames
+});

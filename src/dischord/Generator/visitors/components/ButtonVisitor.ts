@@ -1,7 +1,7 @@
 import { DisChordError, ErrorLevel } from "../../../../errors/ChordError";
 import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordODBNode, DisChordTokenType } from "../../../types";
 import { SubGenerator } from "../../../../chord/Generator/SubGenerator";
-import { BDOResolver } from "../../../../chord/Generator/BDOResolver";
+import { VisitorHelpers } from "../VisitorHelpers";
 import { TokenType, TokenTypeUnion } from "../../../../chord/model/types";
 import { BDOVisitor } from "../../../../chord/Generator/visitors/expressions/BDOVisitor";
 import ActionRowVisitor from "./ActionRowVisitor";
@@ -48,8 +48,7 @@ export default class ButtonVisitor extends SubGenerator<DisChordNodeType, DisCho
      * @param node The ODBNode containing button definitions.
      * @throws {DisChordError} If the node is not a BDO (an internal consistency assertion — every
      * caller of `visit` already confirmed this itself, so a malformed `.chord` file can never
-     * reach this check; see `ValidateCallTargetsRule` for why this kind of check stays here rather
-     * than moving to the Analyzer).
+     * reach this check).
      * @returns A string representing the instantiation and configuration of a new Button.
      */
     visit (node: DisChordASTNode): string {
@@ -59,16 +58,16 @@ export default class ButtonVisitor extends SubGenerator<DisChordNodeType, DisCho
             location: node.location
         });
 
-        const resolver = new BDOResolver<DisChordNodeType, DisChordNode>(expression => this.parent.visit(expression));
+        const resolver = VisitorHelpers.resolverFor(this.parent);
         const button = resolver.resolve(node, ButtonSchema);
-        const ResolvedEmoji = button['emoji'] ? `.setEmoji(${button['emoji']})` : '';
+        const resolvedEmoji = button['emoji'] ? `.setEmoji(${button['emoji']})` : '';
 
         return `
             new Button()
                 .setCustomId(${button['id']})
                 .setLabel(${button['etiqueta']})
                 .setStyle(${button['estilo']})
-                ${ResolvedEmoji}
+                ${resolvedEmoji}
         `;
     }
 }

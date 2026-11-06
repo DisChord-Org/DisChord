@@ -1,6 +1,7 @@
-import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType, EventNode } from "../../../types";
+import { DisChordNode, DisChordNodeType, DisChordTokenType, EventNode } from "../../../types";
 import { SubGenerator } from '../../../../chord/Generator/SubGenerator';
 import { TokenTypeUnion } from '../../../../chord/model/types';
+import { VisitorHelpers } from "../VisitorHelpers";
 import { eventParamNames, eventParamSignature, eventsMap } from '../../constants/mappings';
 
 /**
@@ -21,18 +22,15 @@ export default class EventVisitor extends SubGenerator<DisChordNodeType, DisChor
      * @returns The generated code for the listener.
      */
     visit (node: EventNode): string {
-        const eventName = eventsMap[node.name].name;
+        const event = eventsMap[node.name];
 
         // reopening the scope the analyzer bound to this event
         this.parent.context.symbolTable.enterScope(node);
 
-        const body = node.body
-            .map((n: DisChordASTNode): string => "    " + this.parent.visit(n) + ";")
-            .join('\n');
+        const body = VisitorHelpers.renderStatements(this.parent, node.body);
 
         this.parent.context.symbolTable.exitScope();
 
-        const event = eventsMap[node.name];
         const guard = event.guard ? `if (${event.guard}) return;` : '';
         const derived = Object.entries(event.derived ?? {}).map(([ name, expression ]) => `const ${name} = ${expression};`).join('\n');
 
@@ -43,7 +41,7 @@ export default class EventVisitor extends SubGenerator<DisChordNodeType, DisChor
             import { createEvent, Embed, ActionRow, Button } from 'seyfert';
 
             export default createEvent({
-                data: { name: '${eventName}' },
+                data: { name: '${event.name}' },
                 async run(${eventParamSignature(event)}) {
                 ${guard}
                 ${derived}

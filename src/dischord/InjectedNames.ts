@@ -91,6 +91,11 @@ export class InjectedNames {
             : type;
     }
 
+    /**
+     * @param {DisChordASTNode} owner - A command or an event.
+     * @returns {readonly InjectedName[]} The names its body finds in scope, in the order they are declared.
+     * @private
+     */
     private static compute (owner: DisChordASTNode): readonly InjectedName[] {
         if (owner.type === DisChordTokenType.CREAR_COMANDO) {
             const body = (owner as CommandNode).body;
@@ -103,7 +108,11 @@ export class InjectedNames {
             }));
         }
 
-        if (owner.type === DisChordTokenType.EVENTO) return (eventsMap[(owner as EventNode).name] ? eventParamNames(eventsMap[(owner as EventNode).name]) : []).map(name => ({ name, dataType: InjectedNames.typeOf(name) }));
+        if (owner.type === DisChordTokenType.EVENTO) {
+            const event = eventsMap[(owner as EventNode).name];
+
+            return (event ? eventParamNames(event) : []).map(name => ({ name, dataType: InjectedNames.typeOf(name) }));
+        }
 
         return [];
     }

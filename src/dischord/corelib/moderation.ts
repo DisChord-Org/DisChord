@@ -1,70 +1,9 @@
 import { ModerationAction, BanDeleteMessageSeconds } from "../types";
 import { SharedModule } from "../../chord/model/SharedModule";
+import { QuotaRuntime } from "./QuotaRuntime";
+import { moderationHelperNames, moderationActionPhrases, moderationPermissions, moderationQuota, moderationQuotaWindowMinutes, moderationQuotaMaxTier, auditReasonMaxLength } from "./moderationPolicy";
 
-/**
- * The name of the helper of the shared `moderation` module that performs each moderation action.
- * The one place the names are written: the module below is built from them, `ModerationActionVisitor`
- * emits the call to them and `RequiresModerationHelperRule` imports them.
- * @type {Readonly<Record<ModerationAction, string>>}
- */
-export const moderationHelperNames: Readonly<Record<ModerationAction, string>> = {
-    [ModerationAction.Banear]: 'banMember',
-    [ModerationAction.Desbanear]: 'unbanMember',
-    [ModerationAction.Expulsar]: 'kickMember'
-};
-
-/**
- * What each action is called in the message of an error: "No se pudo <esto>.".
- * @type {Readonly<Record<ModerationAction, string>>}
- */
-export const moderationActionPhrases: Readonly<Record<ModerationAction, string>> = {
-    [ModerationAction.Banear]: 'banear al usuario',
-    [ModerationAction.Desbanear]: 'desbanear al usuario',
-    [ModerationAction.Expulsar]: 'expulsar al miembro'
-};
-
-/**
- * The permission whoever runs a command needs for each action: the bot acts with its own
- * permissions, not theirs. Unbanning needs the same one as banning.
- * @type {Readonly<Record<ModerationAction, { flag: string; name: string }>>}
- */
-export const moderationPermissions: Readonly<Record<ModerationAction, { flag: string; name: string }>> = {
-    [ModerationAction.Banear]: { flag: 'BanMembers', name: 'Banear miembros' },
-    [ModerationAction.Desbanear]: { flag: 'BanMembers', name: 'Banear miembros' },
-    [ModerationAction.Expulsar]: { flag: 'KickMembers', name: 'Expulsar miembros' }
-};
-
-/**
- * How many moderation actions of each kind a server allows inside one window, for a bot in fewer
- * than ten servers. Deliberately not configurable by whoever writes the bot: a barrier its author can
- * lift is not one. A bigger bot gets more room (see `moderationQuotaMaxTier`).
- * @type {Readonly<Record<ModerationAction, number>>}
- */
-export const moderationQuota: Readonly<Record<ModerationAction, number>> = {
-    [ModerationAction.Banear]: 3,
-    [ModerationAction.Desbanear]: 5,
-    [ModerationAction.Expulsar]: 5
-};
-
-/**
- * Length of the window the quota counts in, in minutes.
- * @type {number}
- */
-export const moderationQuotaWindowMinutes = 10;
-
-/**
- * The quota doubles for every order of magnitude of servers the bot is in: ×1 under ten servers,
- * ×2 from ten, ×4 from a hundred, ×8 from a thousand. It stops there, so no bot, however big,
- * has an unbounded allowance.
- * @type {number}
- */
-export const moderationQuotaMaxTier = 3;
-
-/**
- * The most characters Discord keeps of an audit log reason.
- * @type {number}
- */
-export const auditReasonMaxLength = 512;
+export * from "./moderationPolicy";
 
 /**
  * A shared module: its `path`, relative to the project's `dist` directory, where `CompileCommand` writes it,
@@ -191,27 +130,7 @@ export const moderationModule: SharedModule = {
         return (prefix + reason).slice(0, REASON_MAX);
     };
 
-    // one order of magnitude of servers doubles the allowance, up to MAX_TIER
-    const tierOf = async (cliente) => {
-        const guilds = cliente.cache && cliente.cache.guilds ? await cliente.cache.guilds.count() : 0;
-        return Math.min(MAX_TIER, Math.max(0, Math.floor(Math.log10(Math.max(guilds, 1)))));
-    };
-
-    const consumeQuota = async (cliente, guildId, action) => {
-        // everything that waits goes first: from here to the push nothing can interleave, so actions
-        // started at the same time cannot all read the same count and pass
-        const allowance = BASE_QUOTA[action] * 2 ** await tierOf(cliente);
-        const now = Date.now();
-        const key = guildId + ':' + action;
-        const recent = (usage.get(key) || []).filter(at => now - at < WINDOW_MS);
-
-        if (recent.length >= allowance) {
-            fail(action, "Se alcanzó el límite de seguridad de " + allowance + " acciones de este tipo cada ${moderationQuotaWindowMinutes} minutos en este servidor.");
-        }
-
-        recent.push(now);
-        usage.set(key, recent);
-    };
+${QuotaRuntime.render(moderationQuotaWindowMinutes, limit => `fail(action, "${limit}");`)}
 
     // the bot, the owner and whoever ran the command can never be the target
     const requireAllowedTarget = async (cliente, guildId, targetId, invoker, action) => {

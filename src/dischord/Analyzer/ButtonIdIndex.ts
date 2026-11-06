@@ -49,7 +49,7 @@ export class ButtonIdIndex {
      * @param {MessageNode} message - A message being created.
      * @returns {DisChordODBNode[] | undefined} The BDO of each of its buttons (none if it has no `boton`), or `undefined` if some button can't be resolved.
      */
-    public buttonsOf (message: MessageNode): DisChordODBNode[] | undefined {
+    private buttonsOf (message: MessageNode): DisChordODBNode[] | undefined {
         const buttons = message.object.blocks['boton'];
 
         return buttons ? this.resolve(buttons) : [];

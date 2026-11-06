@@ -2,7 +2,15 @@ import { AnalysisRule } from "../../../chord/Analyzer/AnalysisRule";
 import { LoopNode, TokenType } from "../../../chord/model/types";
 import { isFunctionNode, isVariableNode } from "../../../chord/ast.guards";
 import { InjectedNames } from "../../InjectedNames";
+import { NodePredicates } from "../NodePredicates";
 import { CommandNode, DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType, EventNode } from "../../types";
+
+/** A command or event being walked: how to name it in a message, and the names it defines for its body. */
+interface InjectedOwner {
+    kind: string;
+    name: string;
+    defined: readonly string[];
+}
 
 /**
  * Rejects declaring, inside a command or an event, a name the construct already defines for its body
@@ -17,29 +25,25 @@ export class ValidateInjectedNamesRule extends AnalysisRule<DisChordNodeType, Di
     /**
      * The commands and events being walked, innermost last, each with the names it defines.
      */
-    private readonly owners: { kind: string; name: string; defined: readonly string[] }[] = [];
+    private readonly owners: InjectedOwner[] = [];
 
     /**
      * @override
      */
     check (nodes: DisChordASTNode[]): void {
         this.walk(nodes, node => this.enter(node), node => {
-            if (this.isOwner(node)) this.owners.pop();
+            if (NodePredicates.isScopeOwner(node)) this.owners.pop();
         });
     }
 
-    private isOwner (node: DisChordASTNode): boolean {
-        return node.type === DisChordTokenType.CREAR_COMANDO || node.type === DisChordTokenType.EVENTO;
-    }
-
-    private ownerOf (node: DisChordASTNode): { kind: string; name: string; defined: readonly string[] } {
+    private ownerOf (node: DisChordASTNode): InjectedOwner {
         const isCommand = node.type === DisChordTokenType.CREAR_COMANDO;
 
         return { kind: isCommand ? 'el comando' : 'el evento', name: isCommand ? (node as CommandNode).value : (node as EventNode).name, defined: InjectedNames.namesOf(node) };
     }
 
     private enter (node: DisChordASTNode): void {
-        if (this.isOwner(node)) this.owners.push(this.ownerOf(node));
+        if (NodePredicates.isScopeOwner(node)) this.owners.push(this.ownerOf(node));
 
         if (isVariableNode(node)) this.reject(node.id, node);
         if (node.type === TokenType.BUCLE) this.reject((node as LoopNode<DisChordNodeType, DisChordNode>).var, node);

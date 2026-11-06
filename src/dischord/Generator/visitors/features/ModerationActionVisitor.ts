@@ -1,6 +1,6 @@
 import { ModerationAction, ModerationActionNode, ModerationProperty, DisChordNode, DisChordNodeType, DisChordTokenType } from "../../../types";
 import { SubGenerator } from "../../../../chord/Generator/SubGenerator";
-import { BDOResolver } from "../../../../chord/Generator/BDOResolver";
+import { VisitorHelpers } from "../VisitorHelpers";
 import { TokenTypeUnion } from "../../../../chord/model/types";
 import { ModerationActionSchemas } from "../../constants/schemas";
 import { moderationHelperNames } from "../../../corelib";
@@ -23,7 +23,7 @@ export default class ModerationActionVisitor extends SubGenerator<DisChordNodeTy
      * @returns The generated `await` expression.
      */
     visit (node: ModerationActionNode): string {
-        const resolver = new BDOResolver<DisChordNodeType, DisChordNode>(expression => this.parent.visit(expression));
+        const resolver = VisitorHelpers.resolverFor(this.parent);
         const properties = resolver.resolve(node.object, ModerationActionSchemas[node.action]);
         const helper = moderationHelperNames[node.action];
         const guild = node.object.blocks[ModerationProperty.Servidor] ? properties[ModerationProperty.Servidor] : node.guild!;

@@ -17,7 +17,7 @@ import { UnreservedActions } from './Grammar/UnreservedActions';
 
 /**
  * Main Orchestrator for DisChord's syntactic analysis.
- * * This class extends the base Parser and delegates the responsibility of parsing 
+ * This class extends the base Parser and delegates the responsibility of parsing 
  * specific structures (Messages, Commands, Events, etc.) to specialized sub-parsers 
  * using a composition-by-delegation pattern.
  */
@@ -86,6 +86,15 @@ export class DisChordParser extends Parser<DisChordNodeType, DisChordNode> {
     }
 
     /**
+     * @private
+     * @returns {boolean} Whether the token after the next one opens a block (`{`): the tail of the
+     * `<word> <word> {` shape both unreserved forms share.
+     */
+    private isBlockAfterTwoWords (): boolean {
+        return this.peek(this.cursor + 2)?.type === TokenType.L_BRACE;
+    }
+
+    /**
      * Detects and parses an unreserved-keyword component declaration: `<keyword> <Nombre> { ... }`
      * — for keywords a dialect deliberately keeps as ordinary identifiers instead of registering
      * them as real reserved tokens (so the same word still works as an ordinary property key
@@ -104,7 +113,7 @@ export class DisChordParser extends Parser<DisChordNodeType, DisChordNode> {
 
         const isDeclarationShape = token.type === TokenType.IDENTIFICADOR
             && this.peek('next').type === TokenType.IDENTIFICADOR
-            && this.peek(this.cursor + 2)?.type === TokenType.L_BRACE;
+            && this.isBlockAfterTwoWords();
 
         if (!isDeclarationShape) return null;
 
@@ -135,7 +144,7 @@ export class DisChordParser extends Parser<DisChordNodeType, DisChordNode> {
 
         const isActionShape = verb.type === TokenType.IDENTIFICADOR
             && object.type === TokenType.IDENTIFICADOR
-            && this.peek(this.cursor + 2)?.type === TokenType.L_BRACE
+            && this.isBlockAfterTwoWords()
             && this.peek('prev').type !== TokenType.Nuevo;
 
         if (!isActionShape) return null;
@@ -161,14 +170,9 @@ export class DisChordParser extends Parser<DisChordNodeType, DisChordNode> {
         const action = this.tryParseUnreservedAction(UnreservedActions);
         if (action) return action;
 
-        const ParserClass = DisChordParser.DisChordSubParsers.find(SubParser =>
-            SubParser.triggerToken !== undefined &&
-            SubParser.triggerToken === token.type
-        );
+        const ParserClass = DisChordParser.DisChordSubParsers.find(SubParser => SubParser.triggerToken === token.type);
 
-        if (ParserClass) return new ParserClass(this).parse();
-
-        return null;
+        return ParserClass ? new ParserClass(this).parse() : null;
     }
 
     /**

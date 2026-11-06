@@ -9,15 +9,12 @@ import { SharedModule } from "../../chord/model/SharedModule";
  * compiled file actually needs it) and imported by any command/event file that calls it,
  * instead of every generated file duplicating the whole helper inline.
  *
- * This function evaluates channel availability, component interaction status,
- * command context, or raw message event context to properly deliver or reply to messages.
+ * The module exports `createMessage(channel, options, interactionContext, ctx, user)`. It sends to
+ * the direct message of `user` (and to `channel` too, when both are given), else to `channel`, else
+ * replies in the component interaction, the command or the message of the event it runs in, and
+ * throws if there is none of those. `ctx` carries the injected `cliente`, `contexto` and `mensaje`.
  *
- * @param {unknown} channel - Target channel object or identifier where the message should be dispatched.
- * @param {unknown} options - Content payload, embeddings, or parameters defining the message body.
- * @param {unknown} [interactionContext=null] - Execution context when triggered from interactive components.
- * @returns {Promise<unknown>} Resolves with the dispatched message outcome or interaction response.
- * @throws {Error} Throws an error if no valid target channel or messaging execution context is available.
- * * @type {SharedModule}
+ * @type {SharedModule}
  */
 export const createMessageModule: SharedModule = {
     path: 'lib/createMessage.js',

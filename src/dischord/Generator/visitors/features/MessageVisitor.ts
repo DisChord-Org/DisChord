@@ -1,6 +1,6 @@
 import { ChannelProperty, DisChordNode, DisChordNodeType, DisChordTokenType, MessageNode } from "../../../types";
 import { SubGenerator } from "../../../../chord/Generator/SubGenerator";
-import { BDOResolver } from "../../../../chord/Generator/BDOResolver";
+import { VisitorHelpers } from "../VisitorHelpers";
 import { CompilerMetadataKind, TokenTypeUnion } from "../../../../chord/model/types";
 import ButtonVisitor from "../components/ButtonVisitor";
 import EmbedVisitor from "../components/EmbedVisitor";
@@ -24,17 +24,17 @@ export default class MessageVisitor extends SubGenerator<DisChordNodeType, DisCh
      * @returns The generated code for message body.
      */
     visit (node: MessageNode): string {
-        const resolver = new BDOResolver<DisChordNodeType, DisChordNode>(expression => this.parent.visit(expression));
+        const resolver = VisitorHelpers.resolverFor(this.parent);
         const properties = resolver.resolve(node.object, MessageSchema);
 
-        const Button = this.parent.get(ButtonVisitor).visitIfNodeExists(node.object);
-        const Embed = this.parent.get(EmbedVisitor).visitIfNodeExists(node.object);
+        const buttons = this.parent.get(ButtonVisitor).visitIfNodeExists(node.object);
+        const embeds = this.parent.get(EmbedVisitor).visitIfNodeExists(node.object);
 
-        const ComponentsData = [ Button, Embed ].join('');
+        const componentsData = [ buttons, embeds ].join('');
         const interactionContext: string = this.parent.context.symbolTable.getMetadata<boolean>(CompilerMetadataKind.IsInteraction)? 'interaccion' : 'null';
 
         const user = properties['usuario'] === JSFallback.Undefined ? '' : `, ${properties['usuario']}`;
 
-        return `await createMessage(${properties[ChannelProperty.Canal]}, { content: ${properties['contenido']} ${ComponentsData} }, ${interactionContext}, ctx${user})`;
+        return `await createMessage(${properties[ChannelProperty.Canal]}, { content: ${properties['contenido']} ${componentsData} }, ${interactionContext}, ctx${user})`;
     }
 }

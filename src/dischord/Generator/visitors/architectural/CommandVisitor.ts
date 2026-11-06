@@ -1,6 +1,6 @@
-import { CommandNode, DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType } from "../../../types";
+import { CommandNode, DisChordNode, DisChordNodeType, DisChordTokenType } from "../../../types";
 import { SubGenerator } from '../../../../chord/Generator/SubGenerator';
-import { BDOResolver } from '../../../../chord/Generator/BDOResolver';
+import { VisitorHelpers } from "../VisitorHelpers";
 import { CompilerMetadataKind, TokenTypeUnion } from '../../../../chord/model/types';
 import CommandOptionVisitor from '../components/CommandOptionVisitor';
 import { CommandSchema } from '../../constants/schemas';
@@ -28,16 +28,17 @@ export default class CommandVisitor extends SubGenerator<DisChordNodeType, DisCh
         // reopening the scope the analyzer bound to this command
         this.parent.context.symbolTable.enterScope(node);
         // adding interaction context
-        this.parent.context.symbolTable.setMetadata(CompilerMetadataKind.IsInteraction, false); // is this necccessary yet? I need to check it
+        // read by MessageVisitor to pick the interaction argument of createMessage
+        this.parent.context.symbolTable.setMetadata(CompilerMetadataKind.IsInteraction, false);
 
         // generating command flags & body
-        const CommandName = this.getCommandName(node);
-        const CommandFlags = this.generateCommandFlags(node);
+        const commandName = node.value;
+        const commandFlags = this.generateCommandFlags(node);
 
-        const CommandOptionVisitorData = this.parent.get(CommandOptionVisitor).visitIfNodeExists(node.body)
-        const OptionsData = CommandOptionVisitorData.options;
-        const OptionsConstDeclaration: string = OptionsData.length > 0? 'options = options;' : '';
-        const OptionsConstExtraction: string = CommandOptionVisitorData.variables;
+        const optionData = this.parent.get(CommandOptionVisitor).visitIfNodeExists(node.body);
+        const optionsData = optionData.options;
+        const optionsConstDeclaration: string = optionsData.length > 0? 'options = options;' : '';
+        const optionsConstExtraction: string = optionData.variables;
 
         // an option named like an injected name wins: it is declared with the other options below, and
         // declaring both in the same scope would be a SyntaxError
@@ -45,24 +46,22 @@ export default class CommandVisitor extends SubGenerator<DisChordNodeType, DisCh
             .map(name => `const ${name} = ${CommandScope[name]};`)
             .join('\n');
 
-        const body = node.body.body
-            .map((n: DisChordASTNode): string => "    " + this.parent.visit(n) + ";")
-            .join('\n');
+        const body = VisitorHelpers.renderStatements(this.parent, node.body.body);
 
         const commandBody: string = `
             import { Command, IgnoreCommand, Embed, ActionRow, Button, createStringOption } from 'seyfert';
 
-            ${OptionsData}
+            ${optionsData}
 
-            export default class ${CommandName}Command extends Command {
-                ${CommandFlags}
+            export default class ${commandName}Command extends Command {
+                ${commandFlags}
 
-                ${OptionsConstDeclaration}
+                ${optionsConstDeclaration}
 
                 async run(${CommandContextParameter}) {
                     ${scopeDeclarations}
 
-                    ${OptionsConstExtraction}
+                    ${optionsConstExtraction}
 
                     ${body}
                 }
@@ -85,13 +84,13 @@ export default class CommandVisitor extends SubGenerator<DisChordNodeType, DisCh
      * @returns {string} Processed source code defining class flags (name, description, nsfw, etc.).
      */
     private generateCommandFlags(node: CommandNode): string {
-        const CommandName = slugifyCommandName(this.getCommandName(node));
+        const commandName = slugifyCommandName(node.value);
 
-        const resolver = new BDOResolver<DisChordNodeType, DisChordNode>(expression => this.parent.visit(expression));
+        const resolver = VisitorHelpers.resolverFor(this.parent);
         const flags = resolver.resolve(node.body, CommandSchema);
 
         return `
-            name = "${CommandName /* slugified */}";
+            name = "${commandName /* slugified */}";
             description = ${flags['descripcion']};
             nsfw = ${flags['nsfw']};
             integrationTypes = ${flags['integraciones']};
@@ -100,16 +99,5 @@ export default class CommandVisitor extends SubGenerator<DisChordNodeType, DisCh
             ignore = ${flags['ignorar']};
             aliases = ${flags['alias']};
         `;
-    }
-
-    /**
-     * Extracts the identifier name of the command from the AST node.
-     *
-     * @private
-     * @param {CommandNode} node - The target command AST node.
-     * @returns {string} The name of the command.
-     */
-    private getCommandName (node: CommandNode): string {
-        return node.value;
     }
 }

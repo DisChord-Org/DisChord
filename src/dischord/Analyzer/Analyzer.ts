@@ -16,8 +16,7 @@ import { RequiresModerationHelperRule } from "./rules/RequiresModerationHelperRu
 import { RequiresChannelExtensionsRule } from "./rules/RequiresChannelExtensionsRule";
 import { ValidateChannelActionsRule } from "./rules/ValidateChannelActionsRule";
 import { ValidateModerationActionsRule } from "./rules/ValidateModerationActionsRule";
-import { RequiresUserExtensionsRule } from "./rules/RequiresUserExtensionsRule";
-import { RequiresMessageExtensionsRule } from "./rules/RequiresMessageExtensionsRule";
+import { PatchedMembersRules } from "./rules/PatchedMembersRules";
 import { DisChordResolveAwaitedCallsRule } from "./rules/DisChordResolveAwaitedCallsRule";
 import { ResolveAwaitedCallsRule } from "../../chord/Analyzer/rules/ResolveAwaitedCallsRule";
 import { BindDeclarationsRule } from "../../chord/Analyzer/rules/BindDeclarationsRule";
@@ -55,8 +54,7 @@ export class DisChordAnalyzer extends Analyzer<DisChordNodeType, DisChordNode> {
         RequiresChannelHelperRule,
         RequiresModerationHelperRule,
         RequiresChannelExtensionsRule,
-        RequiresUserExtensionsRule,
-        RequiresMessageExtensionsRule
+        ...PatchedMembersRules.build()
     ];
 
     /**

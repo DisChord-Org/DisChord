@@ -1,4 +1,5 @@
-import { corelib, DisChordClassesEnum } from "./corelib.data";
+import { DisChordClassesEnum } from "./corelib.data";
+import { ExtensionModules } from "./ExtensionModules";
 import { SharedModule } from "../../chord/model/SharedModule";
 
 /**
@@ -8,9 +9,7 @@ import { SharedModule } from "../../chord/model/SharedModule";
  * scans for these same keys to decide whether a file needs the import.
  * @type {Readonly<Record<string, string>>}
  */
-export const userPropertyNames: Readonly<Record<string, string>> = Object.fromEntries(
-    Object.entries(corelib.classes[DisChordClassesEnum.Usuario].properties ?? {}).map(([spanish, member]) => [spanish, member.transpile])
-);
+export const userPropertyNames: Readonly<Record<string, string>> = ExtensionModules.propertyNamesOf(DisChordClassesEnum.Usuario);
 
 /**
  * A shared module: its `path`, relative to the project's `dist` directory, where `CompileCommand` writes it,
@@ -32,18 +31,13 @@ export const userPropertyNames: Readonly<Record<string, string>> = Object.fromEn
  * `"usuario"` option or event/command's `usuario` parameter can actually take.
  * @type {SharedModule}
  */
-export const userExtensionsModule: SharedModule = {
+export const userExtensionsModule: SharedModule = ExtensionModules.create({
     path: 'lib/userExtensions.js',
-    content: `
-    import { User, GuildMember } from 'seyfert';
-
-    const userAccessors = new Map([
-${Object.entries(userPropertyNames).map(([spanish, real]) => `        ['${spanish}', (u) => u.${real}]`).join(',\n')}
-    ]);
-
-    for (const [name, resolve] of userAccessors) {
-        Object.defineProperty(User.prototype, name, { get() { return resolve(this); }, configurable: true });
-        Object.defineProperty(GuildMember.prototype, name, { get() { return resolve(this.user); }, configurable: true });
-    }
-`
-};
+    targets: [
+        { className: 'User', receiver: 'this' },
+        { className: 'GuildMember', receiver: 'this.user' }
+    ],
+    mapName: 'userAccessors',
+    receiver: 'u',
+    names: userPropertyNames
+});

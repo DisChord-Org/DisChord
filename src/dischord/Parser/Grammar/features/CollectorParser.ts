@@ -3,7 +3,6 @@ import { ODBMode, TokenTypeUnion } from "../../../../chord/model/types";
 import { SubParser } from "../../../../chord/Parser/SubParser";
 import { PrimaryParser } from "../../../../chord/Parser/Grammar/PrimaryParser/PrimaryParser";
 import { BDOParser } from "../../../../chord/Parser/Grammar/BDOParser";
-import { Parser } from "../../../../chord/Parser/Parser";
 
 /**
  * The Collector Parser.
@@ -20,18 +19,9 @@ export default class CollectorParser extends SubParser<DisChordNodeType, DisChor
     static keywords: TokenTypeUnion<DisChordNodeType>[] = [ DisChordTokenType.Recolector ];
 
     /**
-     * @param parent - The main Parser context for token expression handling
-     */
-    constructor (protected parent: Parser<DisChordNodeType, DisChordNode>) {
-        super(parent);
-    }
-
-    /**
      * Parses a collector attachment block.
      * Expected structure: `recolector <variable> {...}`. Unlike every other DisChord `nuevo X Y
-     * {}` form, this never declares a new name — it attaches behavior to an existing variable —
-     * so it's rejected when preceded by `nuevo` (see `DisChordStatementParser`) to avoid reading
-     * like the unrelated class-inheritance shorthand.
+     * {}` form, this never declares a new name — it attaches behavior to an existing variable.
      * @returns The parsed collector node.
      */
     parse (): CollectorNode {

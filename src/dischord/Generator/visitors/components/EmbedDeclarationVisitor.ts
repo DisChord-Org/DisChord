@@ -26,8 +26,6 @@ export default class EmbedDeclarationVisitor extends SubGenerator<DisChordNodeTy
      * @returns The generated `new Embed()...` expression.
      */
     visit (node: EmbedDeclarationNode): string {
-        const chain = this.parent.get(EmbedVisitor).buildChain(node.body);
-
-        return `new Embed()${chain}`;
+        return this.parent.get(EmbedVisitor).visit(node.body);
     }
 }

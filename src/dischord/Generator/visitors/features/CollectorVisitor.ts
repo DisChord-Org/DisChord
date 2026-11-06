@@ -1,6 +1,6 @@
 import { CollectorNode, DisChordNode, DisChordNodeType, DisChordODBNode, DisChordTokenType } from "../../../types";
 import { SubGenerator } from "../../../../chord/Generator/SubGenerator";
-import { BDOResolver } from "../../../../chord/Generator/BDOResolver";
+import { VisitorHelpers } from "../VisitorHelpers";
 import { TokenTypeUnion } from "../../../../chord/model/types";
 import { BDOVisitor } from "../../../../chord/Generator/visitors/expressions/BDOVisitor";
 import { CollectorSchema } from "../../constants/schemas";
@@ -21,7 +21,7 @@ interface CollectorConfig {
  * BDO property takes a value (`memear bruh`), so a collector reads as plain data binding named
  * callbacks, not as a block of code disguised as a property.
  *
- * Unlike the old inline body, a referenced callback is compiled as a standalone function and
+ * A referenced callback is compiled as a standalone function and
  * can't close over the command's `run(contexto)` preamble — so it loses `contexto`, `cliente`,
  * `usuario`, etc. for free. `cliente` specifically also backs `imprimir` (`corelib.functions.imprimir ===
  * 'cliente.logger.info'`), a plain compile-time text substitution that assumes a variable
@@ -47,7 +47,7 @@ export default class CollectorVisitor extends SubGenerator<DisChordNodeType, Dis
         const variable = this.parent.visit(node.variable);
         const bdo = this.parent.get(BDOVisitor);
 
-        const resolver = new BDOResolver<DisChordNodeType, DisChordNode>(expression => this.parent.visit(expression));
+        const resolver = VisitorHelpers.resolverFor(this.parent);
         const properties = resolver.resolve(node.methods, CollectorSchema);
 
         const filter = properties['filtro']
@@ -60,14 +60,14 @@ export default class CollectorVisitor extends SubGenerator<DisChordNodeType, Dis
             ? `(razon, reiniciar) => ${properties['alFinalizar']}(razon, reiniciar, cliente, contexto)`
             : undefined;
 
-        // 'alPulsarId', when present, is already guaranteed to be a BDO by the Analyzer's
+        // 'alPulsarId', when present, is already guaranteed to be a BDO by the Analyzer's ValidateCollectorRule
         const body = this.visitPulseIdMethod(bdo.getODBProperty(node.methods, 'alPulsarId') as DisChordODBNode | undefined);
 
         return this.generateCollector({ variable, filter, idle, onStop }, body);
     }
 
     /**
-     * Generates the base collector initialization with a default author filter and 60s idle timeout.
+     * Generates the base collector initialization, which by default only listens to the author of the command (and, per `CollectorSchema`, goes idle after 60s).
      * @private
      * @param config The resolved collector configuration (variable, filter, idle, onStop).
      * @param body The generated event listener methods.

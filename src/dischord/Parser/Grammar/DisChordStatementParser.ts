@@ -1,11 +1,9 @@
 import { NewNode, TokenType, TokenTypeUnion, VariableNode } from '../../../chord/model/types';
 import { SubParser } from '../../../chord/Parser/SubParser';
-import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType } from '../../types';
-import { Parser } from '../../../chord/Parser/Parser';
+import { DisChordASTNode, DisChordNode, DisChordNodeType } from '../../types';
 import { StatementParser } from '../../../chord/Parser/Grammar/StatementParser/StatementParser';
 import { AccessParser } from '../../../chord/Parser/Grammar/Expressions/AccessParser';
 import { UnreservedComponentDeclarations } from './UnreservedComponentDeclarations';
-import { DisChordError, ErrorLevel } from '../../../errors/ChordError';
 
 /**
  * @class DisChordStatementParser
@@ -21,13 +19,6 @@ export default class DisChordStatementParser extends SubParser<DisChordNodeType,
      * Collection of reserved keywords this specific sub-parser registers
      */
     static keywords: TokenTypeUnion<DisChordNodeType>[] = [];
-
-    /**
-     * @param parent - The main Parser context for token expression handling
-     */
-    constructor (protected parent: Parser<DisChordNodeType, DisChordNode>) {
-        super(parent);
-    };
 
     /**
      * Executes the syntactic analysis for the statement.
@@ -80,4 +71,4 @@ export default class DisChordStatementParser extends SubParser<DisChordNodeType,
             value: node
         });
     }
-}
+}

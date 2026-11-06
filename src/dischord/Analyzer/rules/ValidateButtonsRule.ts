@@ -2,23 +2,19 @@ import { AnalysisRule } from "../../../chord/Analyzer/AnalysisRule";
 import { TokenType } from "../../../chord/model/types";
 import { ButtonDeclarationNode, DisChordASTNode, DisChordNode, DisChordNodeType, DisChordODBNode, DisChordTokenType, MessageNode } from "../../types";
 import { ButtonSchema } from "../../Generator/constants/schemas";
+import { ButtonRows } from "../../ButtonRows";
 
 /**
  * Validates every button DisChord can reach at generation time against {@link ButtonSchema} — the
  * same schema `ButtonVisitor` reads to generate a button: a named `boton <Nombre> { ... }`
  * declaration, and any inline BDO reached through an `enviar mensaje { boton ... }` property (a
  * single button, a flat list auto-split into rows of up to 5, or a list of lists laying out
- * explicit rows — mirroring `ActionRowVisitor`'s own discovery of those shapes). Moved out of
- * `ButtonVisitor`/`ActionRowVisitor`, which used to discover the same problems mid-generation — see
- * `ValidateCallTargetsRule` for the full rationale behind the split. The row-layout discovery
+ * explicit rows — mirroring `ActionRowVisitor`'s own discovery of those shapes). The row-layout discovery
  * itself has no schema equivalent — it's a shape specific to how `boton` values nest, not a single
  * field's presence/vocabulary — but every button BDO it finds is validated the same way, against
  * the one shared schema.
  */
 export class ValidateButtonsRule extends AnalysisRule<DisChordNodeType, DisChordNode> {
-    /** Discord's maximum number of components (buttons) allowed in a single ActionRow. */
-    private static readonly MAX_PER_ROW = 5;
-
     private readonly validator = this.createBDOValidator();
 
     /**
@@ -45,9 +41,7 @@ export class ValidateButtonsRule extends AnalysisRule<DisChordNodeType, DisChord
             return;
         }
 
-        const isManualLayout = button.body.length > 0 && button.body.every(item => item.type === TokenType.LISTA);
-
-        if (!isManualLayout) {
+        if (!ButtonRows.isManualLayout(button)) {
             button.body.forEach(item => this.validateButtonElement(item));
             return;
         }
@@ -55,8 +49,8 @@ export class ValidateButtonsRule extends AnalysisRule<DisChordNodeType, DisChord
         button.body.forEach(row => {
             if (row.type !== TokenType.LISTA) return;
 
-            if (row.body.length > ValidateButtonsRule.MAX_PER_ROW) this.fail(
-                `Una fila de botones admite como máximo ${ValidateButtonsRule.MAX_PER_ROW}, se han especificado ${row.body.length}.`,
+            if (row.body.length > ButtonRows.MAX_PER_ROW) this.fail(
+                `Una fila de botones admite como máximo ${ButtonRows.MAX_PER_ROW}, se han especificado ${row.body.length}.`,
                 row.body[0].location
             );
 
