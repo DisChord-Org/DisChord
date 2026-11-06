@@ -19,7 +19,7 @@ export interface CompilerConfig {
 export class FileSystem {
     /**
      * Initializes the compiler configuration by analyzing the input path.
-     * * @param rawInput - The raw string path received from the CLI.
+     * @param rawInput - The raw string path received from the CLI.
      * @returns A validated CompilerConfig object.
      * @throws Will throw an error if the path does not exist.
      */

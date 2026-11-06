@@ -3,6 +3,9 @@ import { Program } from './cli/Program';
 import { ExitCode } from './cli/ExitCode';
 import { BaseChordError } from './errors/ChordError';
 
+/** Red tag every unexpected failure is printed with. */
+const FATAL_PREFIX = '\x1b[31m[Fatal Error]\x1b[0m';
+
 /**
  * Execution Bootstrapper
  * 
@@ -29,11 +32,11 @@ new Program()
             const { code, path } = error as NodeJS.ErrnoException;
             const message = code === 'ENOENT' && path ? `No existe la ruta: ${path}` : error.message;
 
-            console.error(`\x1b[31m[Fatal Error]\x1b[0m ${message}`);
+            console.error(`${FATAL_PREFIX} ${message}`);
             if (error.stack && wantsTrace) console.error(error.stack);
 
         } else {
-            console.error('\x1b[31m[Fatal Error]\x1b[0m Ha ocurrido un error desconocido:', error);
+            console.error(`${FATAL_PREFIX} Ha ocurrido un error desconocido:`, error);
         
         }
 

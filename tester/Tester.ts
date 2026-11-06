@@ -2,6 +2,8 @@ import { pathToFileURL } from "node:url";
 
 import { Test } from "./Test";
 import { Directory } from "../src/utils/Directory";
+import { File } from "../src/utils/File";
+import { ExitCode } from "../src/cli/ExitCode";
 
 /**
  * Interface representing a discovered test entry with its file system location.
@@ -99,31 +101,44 @@ export class Tester {
 
         for (const entry of directory.entries()) {
             if (entry instanceof Directory) {
-                const nestedClasses = await this.discoverTestClasses(entry.absolutePath);
-                testClasses.push(...nestedClasses);
-                continue;
-            }
-
-            const isTestFile = (entry.hasExtension(".ts") || entry.hasExtension(".js")) && !entry.name.startsWith("expected.");
-            const isDeclarationFile = entry.name.endsWith(".d.ts");
-
-            if (isTestFile && !isDeclarationFile) {
-                const importedModule = await import(pathToFileURL(entry.absolutePath).href);
-
-                for (const exportKey of Object.keys(importedModule)) {
-                    const exportedItem = importedModule[exportKey];
-
-                    if (typeof exportedItem === "function" && exportedItem.prototype instanceof Test && exportedItem !== Test) {
-                        testClasses.push({
-                            TestClass: exportedItem as new () => Test,
-                            directory: entry.directory
-                        });
-                    }
-                }
+                testClasses.push(...await this.discoverTestClasses(entry.absolutePath));
+            } else if (Tester.isTestFile(entry)) {
+                testClasses.push(...await this.testClassesOf(entry));
             }
         }
 
         return testClasses;
+    }
+
+    /**
+     * Whether a file may hold test classes: a script that is neither a snapshot nor a declaration file.
+     *
+     * @method isTestFile
+     * @param {File} file - File found while scanning.
+     * @returns {boolean}
+     * @private
+     */
+    private static isTestFile(file: File): boolean {
+        const isScript = file.hasExtension(".ts") || file.hasExtension(".js");
+
+        return isScript && !file.name.startsWith("expected.") && !file.name.endsWith(".d.ts");
+    }
+
+    /**
+     * Imports a source file and collects the `Test` subclasses it exports.
+     *
+     * @method testClassesOf
+     * @param {File} file - The test source file.
+     * @returns {Promise<Array<DiscoveredTest>>} One entry per exported test class.
+     * @private
+     */
+    private async testClassesOf(file: File): Promise<Array<DiscoveredTest>> {
+        const importedModule = await import(pathToFileURL(file.absolutePath).href);
+
+        return Object.values<unknown>(importedModule)
+            .filter((exported): exported is new () => Test =>
+                typeof exported === "function" && exported.prototype instanceof Test && exported !== Test)
+            .map(TestClass => ({ TestClass, directory: file.directory }));
     }
 
     /**
@@ -143,7 +158,6 @@ export class Tester {
         console.log(`Passed       : ${passed}`);
         console.log(`Failed       : ${failed}`);
 
-        if (failed > 0) process.exit(1);
-        else process.exit(0);
+        process.exit(failed > 0 ? ExitCode.CodeErrors : ExitCode.Success);
     }
 }

@@ -1,15 +1,16 @@
 import path from 'path';
 
-import { EmitKind, GlobalCLIOptions } from '../Program';
+import { GlobalCLIOptions } from '../Program';
 import { CompilerConfig, FileSystem } from '../../utils/FileSystem';
 import Prettifier from '../../utils/Prettifier';
 import { BaseChordError, Diagnostic } from '../../errors/ChordError';
+import { ErrorMessage } from '../../errors/ErrorMessage';
 import { File } from '../../utils/File';
 import { Stdin } from '../../utils/Stdin';
 import { Directory } from '../../utils/Directory';
 import { ExitCode } from '../ExitCode';
 import { FileCompiler, FileCompilation } from './FileCompiler';
-import { Location } from '../../chord/model/types';
+import { EmitPhase } from './EmitPhase';
 import { RunCommand } from './RunCommand';
 
 /**
@@ -18,18 +19,8 @@ import { RunCommand } from './RunCommand';
  * @class CompileCommand
  */
 export class CompileCommand {
-    /** Resolved filesystem and output paths configuration */
-    private config: CompilerConfig | null = null;
-
     /** Absolute paths of every file written during the current compile, see `removeStaleOutputs` */
     private emitted = new Set<string>();
-
-    /**
-     * Version of the document `--emit` prints. Adding keys does not change it; renaming or
-     * removing one, or changing what it means, does. The shape of the nodes of an `ast` is the
-     * compiler's own and is not covered by it.
-     */
-    public static readonly emitSchema = 1;
 
     /**
      * Executes the main compilation process and optionally runs the generated code. With `--json`
@@ -74,38 +65,53 @@ export class CompileCommand {
 
         if (stdinFile) options = { ...options, check: true };
 
-        this.config = stdinFile ? FileSystem.layoutOf(stdinFile) : FileSystem.configure(rawPath);
+        const config = stdinFile ? FileSystem.layoutOf(stdinFile) : FileSystem.configure(rawPath);
         this.emitted.clear();
 
-        if (options.emit) return this.emit(stdinFile ?? this.singleFile(this.config), options.emit, options);
+        if (options.emit) return EmitPhase.run(stdinFile ?? this.singleFile(config), options.emit, config, options);
 
-        FileSystem.assertEsmProject(this.config.projectRoot);
+        FileSystem.assertEsmProject(config.projectRoot);
 
-        const files = stdinFile ? [stdinFile] : FileSystem.getChordFiles(this.config.input);
+        const files = stdinFile ? [stdinFile] : FileSystem.getChordFiles(config.input);
 
-        this.log(options, `Compilando proyecto: ${this.config.projectRoot}`);
+        this.log(options, `Compilando proyecto: ${config.projectRoot}`);
 
-        const extraFiles = new Map<string, string>();
-        const extraDirectories = new Set<string>();
-
-        for (const file of files) {
-            const compiled = await this.compileFile(file, options);
-            compiled.extraFiles.forEach((content, absolutePath) => extraFiles.set(absolutePath, content));
-            compiled.extraDirectories.forEach(directory => extraDirectories.add(directory));
-        }
+        const { extraFiles, extraDirectories } = await this.compileAll(files, config, options);
 
         if (options.check) return undefined;
 
         await this.writeExtraFiles(extraFiles);
 
-        this.removeStaleOutputs(options);
+        this.removeStaleOutputs(config, options);
 
         // after the cleanup, which also drops directories left empty
         extraDirectories.forEach(directory => Directory.create(directory));
 
-        if (options.run) await this.executeTarget();
+        if (options.run) await this.executeTarget(config);
 
         return undefined;
+    }
+
+    /**
+     * Compiles every file of the project and gathers the extra files and directories they asked for.
+     *
+     * @private
+     * @param {File[]} files - The .chord files of the project.
+     * @param {CompilerConfig} config - Layout of the project.
+     * @param {GlobalCLIOptions} options - Parsed Commander options.
+     * @returns {Promise<Omit<FileCompilation, 'output'>>} The merged extra files and directories.
+     */
+    private async compileAll(files: File[], config: CompilerConfig, options: GlobalCLIOptions): Promise<Omit<FileCompilation, 'output'>> {
+        const extraFiles = new Map<string, string>();
+        const extraDirectories = new Set<string>();
+
+        for (const file of files) {
+            const compiled = await this.compileFile(file, config, options);
+            compiled.extraFiles.forEach((content, absolutePath) => extraFiles.set(absolutePath, content));
+            compiled.extraDirectories.forEach(directory => extraDirectories.add(directory));
+        }
+
+        return { extraFiles, extraDirectories };
     }
 
     /**
@@ -114,29 +120,27 @@ export class CompileCommand {
      *
      * @private
      * @param {File} file - The .chord file.
+     * @param {CompilerConfig} config - Layout of the project the file belongs to.
      * @param {GlobalCLIOptions} options - CLI flags for debugging and output control.
      * @returns {Promise<FileCompilation>} What the compilation produced, including the extra files
      * and directories (shared runtime modules, project-level config files, ...) any phase
      * determined it needs — see `CompilationContext.extraFiles`.
      */
-    private async compileFile(file: File, options: GlobalCLIOptions): Promise<FileCompilation> {
-        if (!this.config) return { output: '', extraFiles: new Map(), extraDirectories: new Set() };
-
-        const relativeFile = file.relativeTo(this.config.projectRoot.absolutePath);
+    private async compileFile(file: File, config: CompilerConfig, options: GlobalCLIOptions): Promise<FileCompilation> {
+        const relativeFile = file.relativeTo(config.projectRoot.absolutePath);
         this.log(options, `Compilando: ${relativeFile}`);
 
-        const relativePath = path.relative(this.config.projectRoot.resolve('src'), file.absolutePath);
+        const relativePath = path.relative(config.projectRoot.resolve('src'), file.absolutePath);
         const targetDir = options.outDir
             ? path.resolve(options.outDir)
-            : path.join(this.config.distDir, path.dirname(relativePath));
+            : path.join(config.distDir, path.dirname(relativePath));
 
         let compiled;
 
         try {
-            compiled = new FileCompiler(options).compile(file, this.config, targetDir);
+            compiled = new FileCompiler(options).compile(file, config, targetDir);
         } catch (error) {
-            if (error instanceof BaseChordError) error.file = file;
-            throw error;
+            throw BaseChordError.attachFile(error, file);
         }
 
         if (options.check) return compiled;
@@ -161,45 +165,6 @@ export class CompileCommand {
         }
 
         return config.input;
-    }
-
-    /**
-     * Runs only the phase `--emit` asks for over a file and describes what it produced. Nothing
-     * is analyzed, generated or written.
-     *
-     * @private
-     * @param {File} file - The file to emit.
-     * @param {EmitKind} kind - The phase to stop at.
-     * @param {GlobalCLIOptions} options - Parsed Commander options.
-     * @returns {object} The keys the document gains.
-     */
-    private emit(file: File, kind: EmitKind, options: GlobalCLIOptions): object {
-        const config = this.config!;
-        const compiler = new FileCompiler(options);
-
-        try {
-            if (kind === 'tokens') {
-                const tokens = compiler.tokenize(file, config, config.distDir).map(token => ({
-                    type: token.type,
-                    value: token.value,
-                    start: token.location as Location,
-                    end: token.end,
-                    ...(token.synthetic ? { synthetic: true } : {}),
-                    ...(token.blankLineBefore ? { blankLineBefore: true } : {})
-                }));
-
-                return { schema: CompileCommand.emitSchema, emit: kind, file: file.absolutePath, tokens };
-            }
-
-            return {
-                schema: CompileCommand.emitSchema,
-                emit: kind, file: file.absolutePath,
-                ...compiler.parseTree(file, config, config.distDir)
-            };
-        } catch (error) {
-            if (error instanceof BaseChordError) error.file = file;
-            throw error;
-        }
     }
 
     /**
@@ -250,13 +215,14 @@ export class CompileCommand {
      * of files that belong there.
      *
      * @private
+     * @param {CompilerConfig} config - Layout of the project.
      * @param {GlobalCLIOptions} options - CLI flags; `outDir` disables cleanup.
      */
-    private removeStaleOutputs(options: GlobalCLIOptions): void {
-        if (!this.config || options.outDir) return;
-        if (!FileSystem.isProjectCompile(this.config.input)) return;
+    private removeStaleOutputs(config: CompilerConfig, options: GlobalCLIOptions): void {
+        if (options.outDir) return;
+        if (!FileSystem.isProjectCompile(config.input)) return;
 
-        const { projectRoot, distDir } = this.config;
+        const { projectRoot, distDir } = config;
         const removed = Directory.tryOf(distDir)?.removeFilesExcept('.js', this.emitted) ?? [];
 
         removed.forEach(file => this.log(options, `Eliminado (sin fuente): ${path.relative(projectRoot.absolutePath, file)}`));
@@ -266,12 +232,11 @@ export class CompileCommand {
      * Triggers the execution of the output bundle via Runner.
      *
      * @private
+     * @param {CompilerConfig} config - Layout of the project.
      * @returns {Promise<void>}
      */
-    private async executeTarget(): Promise<void> {
-        if (!this.config) return;
-
-        const { input, distDir, projectRoot } = this.config;
+    private async executeTarget(config: CompilerConfig): Promise<void> {
+        const { input, distDir, projectRoot } = config;
         const runTarget = path.join(distDir, input instanceof Directory ? 'index.js' : `${input.baseName}.js`);
 
         const runner = new RunCommand();
@@ -292,7 +257,7 @@ export class CompileCommand {
         return {
             phase: 'Interno',
             severity: 'error',
-            message: error instanceof Error ? error.message : String(error)
+            message: ErrorMessage.of(error)
         };
     }
 

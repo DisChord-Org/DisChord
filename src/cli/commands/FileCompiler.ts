@@ -43,6 +43,21 @@ export class FileCompiler {
      * @returns {FileCompilation} The generated code and the extra files it needs.
      */
     public compile(file: File, config: CompilerConfig, outputDir: string): FileCompilation {
+        const { ast, ...compilation } = this.compileWithTree(file, config, outputDir);
+
+        return compilation;
+    }
+
+    /**
+     * Compiles a single source file like `compile`, and also hands back the syntax tree the
+     * generator was fed (after the analyzer has annotated it).
+     *
+     * @param {File} file - The .chord file.
+     * @param {CompilerConfig} config - Layout of the project the file belongs to.
+     * @param {string} outputDir - Directory its output will be written to.
+     * @returns {FileCompilation & { ast: DisChordASTNode[] }} The generated code, the extra files it needs and the tree.
+     */
+    public compileWithTree(file: File, config: CompilerConfig, outputDir: string): FileCompilation & { ast: DisChordASTNode[] } {
         const context = this.createContext(file, config, outputDir);
 
         const tokens = this.lex(context);
@@ -53,7 +68,7 @@ export class FileCompiler {
         const output = new DisChordGenerator(context, ast).generate();
         this.logDebug(DebugFlags.Generator, output);
 
-        return { output, extraFiles: context.extraFiles, extraDirectories: context.extraDirectories };
+        return { ast, output, extraFiles: context.extraFiles, extraDirectories: context.extraDirectories };
     }
 
     /**
@@ -106,6 +121,13 @@ export class FileCompiler {
         return context;
     }
 
+    /**
+     * Runs the lexer over the code loaded in the context.
+     *
+     * @private
+     * @param {CompilationContext<DisChordNodeType>} context - Context with the code loaded.
+     * @returns {Token<DisChordTokenType>[]}
+     */
     private lex(context: CompilationContext<DisChordNodeType>): Token<DisChordTokenType>[] {
         const tokens = new Lexer<DisChordTokenType>(context).tokenize();
         this.logDebug(DebugFlags.Lexer, tokens);
@@ -113,6 +135,14 @@ export class FileCompiler {
         return tokens;
     }
 
+    /**
+     * Runs the parser over the tokens of a file.
+     *
+     * @private
+     * @param {CompilationContext<DisChordNodeType>} context - Context the tokens were produced in.
+     * @param {Token<DisChordTokenType>[]} tokens - The tokens.
+     * @returns {DisChordASTNode[]}
+     */
     private parse(context: CompilationContext<DisChordNodeType>, tokens: Token<DisChordTokenType>[]): DisChordASTNode[] {
         const ast: DisChordASTNode[] = new DisChordParser(tokens, context).parse();
         this.logDebug(DebugFlags.Parser, ast);

@@ -17,14 +17,14 @@ export enum DebugFlags {
     All
 }
 
+/** What `--emit` prints in place of compiling. */
+export type EmitKind = 'tokens' | 'ast';
+
 /**
  * Interface representing the global CLI options parsed by Commander.
  *
  * @interface GlobalCLIOptions
  */
-/** What `--emit` prints in place of compiling. */
-export type EmitKind = 'tokens' | 'ast';
-
 export interface GlobalCLIOptions {
     /** Disables automatic execution after compilation */
     run: boolean;
@@ -81,40 +81,24 @@ export class Program {
             .description('Compilador para el entorno DisChord')
             .version(`v${pkg.version}`, '-v, --version', 'Muestra la versión actual de DisChord');
 
+        this.declareCompile();
+        this.declareRun();
+        this.declareCorelib();
+        this.declareTest();
+    }
+
+    /** Declares the root command, which compiles a project or a file. */
+    private declareCompile(): void {
         this.program
             .argument('[entry]', 'Ruta al archivo .chord o directorio del proyecto', '.')
             .option('--no-run', 'Compila el proyecto sin ejecutar el bot resultante')
             .option('--check', 'Comprueba el proyecto (análisis y generación) sin escribir archivos ni ejecutar')
             .option('--stdin', 'Lee el código de un archivo desde la entrada estándar, en lugar del disco (solo comprueba, no escribe)')
             .option('--stdin-filepath <ruta>', 'Archivo .chord al que corresponde el código de --stdin (puede no existir aún, pero su directorio sí)')
-            .option(
-                '--emit <fase>',
-                'Imprime los tokens o el árbol sintáctico de un archivo como JSON, sin compilar (tokens | ast)',
-                (value: string): EmitKind => {
-                    if (value !== 'tokens' && value !== 'ast') {
-                        throw new Error(`Fase no válida para --emit: '${value}'. Opciones: tokens, ast`);
-                    }
-
-                    return value;
-                }
-            )
+            .option('--emit <fase>', 'Imprime los tokens o el árbol sintáctico de un archivo como JSON, sin compilar (tokens | ast)', Program.parseEmit)
             .option('--json', 'Imprime el resultado como JSON (diagnósticos) y omite los mensajes de progreso')
             .option('-o, --out-dir <directorio>', 'Directorio de salida para los archivos compilados')
-            .option(
-                '-d, --debug <fase>',
-                'Muestra información de depuración (lexer | parser | generator | all)',
-                (value: string): DebugFlags => {
-                    const key = Object.keys(DebugFlags).find(
-                        (key) => key.toLowerCase() === value.toLowerCase() && isNaN(Number(key))
-                    );
-
-                    if (key === undefined) {
-                        throw new Error(`Fase de depuración no válida: '${value}'. Opciones: lexer, parser, generator, all`);
-                    }
-
-                    return DebugFlags[key as keyof typeof DebugFlags];
-                }
-            )
+            .option('-d, --debug <fase>', 'Muestra información de depuración (lexer | parser | generator | all)', Program.parseDebug)
             .option(
                 '-D, --depth <nivel>',
                 'Profundidad de inspección en la salida del compilador',
@@ -123,7 +107,10 @@ export class Program {
             .action(async (entry: string, options: GlobalCLIOptions) => {
                 await new CompileCommand().execute(entry, options);
             });
-        
+    }
+
+    /** Declares `run`, which executes code that was compiled earlier. */
+    private declareRun(): void {
         this.program
             .command('run')
             .argument('<file>', 'Ruta al archivo JavaScript (.js) compilado')
@@ -131,7 +118,10 @@ export class Program {
             .action(async (file: string) => {
                 await new RunCommand().execute(file);
             });
+    }
 
+    /** Declares `corelib`, which lists the reserved words and the base library. */
+    private declareCorelib(): void {
         this.program
             .command('corelib')
             .description('Muestra las palabras reservadas y la librería base del lenguaje')
@@ -139,13 +129,52 @@ export class Program {
             .action((options: { json?: boolean }) => {
                 new CorelibCommand().execute(options);
             });
+    }
 
+    /** Declares `test`, which runs the compiler's own test suite. */
+    private declareTest(): void {
         this.program
             .command('test')
             .description('Ejecuta la suite de pruebas internas del compilador')
             .action(async () => {
                 await new TestCommand().execute();
             });
+    }
+
+    /**
+     * Validates the value of `--emit`.
+     *
+     * @private
+     * @param {string} value - What the user wrote.
+     * @returns {EmitKind}
+     * @throws {Error} If it is not a phase `--emit` knows.
+     */
+    private static parseEmit(value: string): EmitKind {
+        if (value !== 'tokens' && value !== 'ast') {
+            throw new Error(`Fase no válida para --emit: '${value}'. Opciones: tokens, ast`);
+        }
+
+        return value;
+    }
+
+    /**
+     * Resolves the value of `--debug` to its flag, ignoring case.
+     *
+     * @private
+     * @param {string} value - What the user wrote.
+     * @returns {DebugFlags}
+     * @throws {Error} If it is not a phase that can be debugged.
+     */
+    private static parseDebug(value: string): DebugFlags {
+        const key = Object.keys(DebugFlags).find(
+            (key) => key.toLowerCase() === value.toLowerCase() && isNaN(Number(key))
+        );
+
+        if (key === undefined) {
+            throw new Error(`Fase de depuración no válida: '${value}'. Opciones: lexer, parser, generator, all`);
+        }
+
+        return DebugFlags[key as keyof typeof DebugFlags];
     }
 
     /**

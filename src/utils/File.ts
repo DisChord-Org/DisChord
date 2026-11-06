@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import path from 'path';
+import { PosixPath } from './PosixPath';
 
 /**
  * A file on disk. Holding one means the path was checked when it was built: it is absolute and,
@@ -37,17 +38,13 @@ export class File {
      * @throws {Error} If nothing exists at the path, or what exists is not a regular file.
      */
     public static of(rawPath: string): File {
+        const file = File.tryOf(rawPath);
+
+        if (file) return file;
+
         const absolutePath = path.resolve(rawPath);
 
-        if (!fs.existsSync(absolutePath)) {
-            throw new Error(`El archivo no existe: ${absolutePath}`);
-        }
-
-        if (!fs.statSync(absolutePath).isFile()) {
-            throw new Error(`La ruta no es un archivo: ${absolutePath}`);
-        }
-
-        return new File(absolutePath);
+        throw new Error(fs.existsSync(absolutePath) ? `La ruta no es un archivo: ${absolutePath}` : `El archivo no existe: ${absolutePath}`);
     }
 
     /**
@@ -140,7 +137,7 @@ export class File {
      * @param {string} base - Directory to be relative to.
      */
     public relativeTo(base: string): string {
-        return path.relative(base, this.absolutePath).split(path.sep).join('/');
+        return PosixPath.of(path.relative(base, this.absolutePath));
     }
 
     /**

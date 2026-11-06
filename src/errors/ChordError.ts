@@ -11,7 +11,7 @@ export enum ErrorLevel {
 }
 
 /** Error severity: ERROR (recoverable) or FATAL (halts the process). */
-export enum ErrorType {
+enum ErrorType {
     Error = 'ERROR',
     Fatal = 'FATAL'
 }
@@ -20,7 +20,7 @@ export enum ErrorType {
  * Named payload structure to initialize any compiler lifecycle exception.
  * @interface ErrorPayload
  */
-export interface ErrorPayload<P> {
+interface ErrorPayload<P> {
     phase: P;
     message: string;
     location?: Location;
@@ -47,10 +47,8 @@ export abstract class BaseChordError extends Error {
     public file?: File;
 
     /**
-     * @param phase Lifecycle phase where the error occurred.
-     * @param message Description of the error.
      * @param type Severity level.
-     * @param location Source code coordinates (line/column).
+     * @param payload Lifecycle phase, message, source coordinates (line/column) and file of the error.
      */
     constructor(type: ErrorType, payload: ErrorPayload<ErrorLevel>) {
         super(payload.message);
@@ -58,6 +56,20 @@ export abstract class BaseChordError extends Error {
         this.phase = payload.phase;
         this.location = payload.location;
         this.file = payload.file;
+    }
+
+    /**
+     * Tags a compiler error with the file it belongs to; anything else is returned as it came.
+     * Meant for `throw BaseChordError.attachFile(error, file)` in a `catch`.
+     *
+     * @param {unknown} error - The caught value.
+     * @param {File} file - The file that was being compiled.
+     * @returns {unknown} The same value.
+     */
+    public static attachFile(error: unknown, file: File): unknown {
+        if (error instanceof BaseChordError) error.file = file;
+
+        return error;
     }
 
     /** Converts the error into its `--json` representation. */

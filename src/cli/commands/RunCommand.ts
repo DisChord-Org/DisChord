@@ -1,5 +1,6 @@
 import { pathToFileURL } from 'url';
 import { DisChordError, ErrorLevel } from '../../errors/ChordError';
+import { ErrorMessage } from '../../errors/ErrorMessage';
 import { File } from '../../utils/File';
 import { Directory } from '../../utils/Directory';
 
@@ -8,7 +9,7 @@ import { Directory } from '../../utils/Directory';
  * 
  * @interface RunCommandOptions
  */
-export interface RunCommandOptions {
+interface RunCommandOptions {
     /** Root directory of the project to set as working directory */
     projectRoot?: Directory;
 }
@@ -20,9 +21,9 @@ export interface RunCommandOptions {
  */
 export class RunCommand {
     /**
-     * Dynamically imports and executes a compiled JavaScript file (.mjs).
-     * 
-     * @param {string} targetPath - Relative or absolute path to the target .mjs file.
+     * Dynamically imports and executes a compiled JavaScript file (.js).
+     *
+     * @param {string} targetPath - Relative or absolute path to the target .js file.
      * @param {RunCommandOptions} [options={}] - Execution options including the working directory context.
      * @returns {Promise<unknown>} Resolves with the imported module exports.
      * @throws {DisChordError} Wrapped execution error if module import or execution fails.
@@ -41,7 +42,7 @@ export class RunCommand {
         } catch (error) {
             throw new DisChordError({
                 phase: ErrorLevel.Execution,
-                message: error instanceof Error ? error.message : String(error),
+                message: ErrorMessage.of(error),
                 location: error instanceof Error && error.stack ? { line: 0, column: 0 } : undefined
             });
         }

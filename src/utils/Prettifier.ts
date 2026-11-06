@@ -6,6 +6,15 @@ import prettier from 'prettier';
  * Utility class to format and save generated source code.
  */
 export default class Prettifier {
+    /** The formatting rules every generated file goes through. */
+    private static readonly PRETTIFIER_OPTIONS: prettier.Options = {
+        parser: 'babel',
+        semi: true,
+        singleQuote: true,
+        tabWidth: 4,
+        trailingComma: 'all',
+        printWidth: 120
+    };
 
     /**
      * Formats a raw string of code using predefined Prettier rules.
@@ -14,15 +23,8 @@ export default class Prettifier {
      */
     static async prettify (code: string): Promise<string> {
         try {
-            code = await prettier.format(code, {
-                parser: 'babel',
-                semi: true,
-                singleQuote: true,
-                tabWidth: 4,
-                trailingComma: "all",
-                printWidth: 120
-            });
-        } catch (error) {
+            code = await prettier.format(code, this.PRETTIFIER_OPTIONS);
+        } catch {
             console.warn("Aviso: No se pudo formatear el código, se guardará en bruto.");
         }
     

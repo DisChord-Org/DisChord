@@ -26,17 +26,13 @@ export class Directory {
      * @throws {Error} If nothing exists at the path, or what exists is not a directory.
      */
     public static of(rawPath: string): Directory {
+        const directory = Directory.tryOf(rawPath);
+
+        if (directory) return directory;
+
         const absolutePath = path.resolve(rawPath);
 
-        if (!fs.existsSync(absolutePath)) {
-            throw new Error(`El directorio no existe: ${absolutePath}`);
-        }
-
-        if (!fs.statSync(absolutePath).isDirectory()) {
-            throw new Error(`La ruta no es un directorio: ${absolutePath}`);
-        }
-
-        return new Directory(absolutePath);
+        throw new Error(fs.existsSync(absolutePath) ? `La ruta no es un directorio: ${absolutePath}` : `El directorio no existe: ${absolutePath}`);
     }
 
     /**
@@ -94,9 +90,7 @@ export class Directory {
      * @param {string} name - File name.
      */
     public hasFile(name: string): boolean {
-        const candidate = this.resolve(name);
-
-        return fs.existsSync(candidate) && fs.statSync(candidate).isFile();
+        return File.tryOf(this.resolve(name)) !== undefined;
     }
 
     /**
@@ -117,7 +111,7 @@ export class Directory {
      * @returns {(File | Directory)[]}
      */
     public entries(): (File | Directory)[] {
-        return fs.readdirSync(this.absolutePath, { withFileTypes: true }).flatMap((entry): (File | Directory)[] => {
+        return Directory.dirents(this.absolutePath).flatMap((entry): (File | Directory)[] => {
             const entryPath = this.resolve(entry.name);
 
             if (entry.isDirectory()) return [Directory.of(entryPath)];
@@ -136,7 +130,7 @@ export class Directory {
      * @returns {File[]}
      */
     public files(extension?: string): File[] {
-        return fs.readdirSync(this.absolutePath, { withFileTypes: true }).flatMap(entry => {
+        return Directory.dirents(this.absolutePath).flatMap(entry => {
             const entryPath = this.resolve(entry.name);
 
             if (entry.isDirectory()) return Directory.of(entryPath).files(extension);
@@ -158,7 +152,7 @@ export class Directory {
         const removed: string[] = [];
 
         const walk = (dir: string): void => {
-            for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+            for (const entry of Directory.dirents(dir)) {
                 const entryPath = path.join(dir, entry.name);
 
                 if (entry.isDirectory()) walk(entryPath);
@@ -174,6 +168,17 @@ export class Directory {
         walk(this.absolutePath);
 
         return removed;
+    }
+
+    /**
+     * What lives directly in a directory, with its type, as the file system lists it.
+     *
+     * @private
+     * @param {string} absolutePath - Absolute path of the directory to list.
+     * @returns {fs.Dirent[]}
+     */
+    private static dirents(absolutePath: string): fs.Dirent[] {
+        return fs.readdirSync(absolutePath, { withFileTypes: true });
     }
 
     public toString(): string {
