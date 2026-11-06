@@ -3,7 +3,7 @@ import { SubGenerator } from "../../SubGenerator";
 
 /**
  * Atomic SubGenerator compiling conditional logical bifurcations.
- * Strictly mirrors the legacy core layout routing logic and indentation structures.
+ * Branches are indented by four spaces.
  * @class ConditionVisitor
  * @extends {SubGenerator<T, N>}
  * @template {string} T - Extensible token type string vector.
@@ -18,7 +18,7 @@ export class ConditionVisitor<T extends string, N extends BaseNode<T>> extends S
     public static triggerToken: TokenTypeUnion<TokenType> | undefined = TokenType.CONDICION;
 
     /**
-     * Transpiles conditional syntactic nodes matching the legacy generator behavior.
+     * Transpiles conditional syntactic nodes.
      * @param {ConditionNode<T, N>} node - The target analytical logical condition tree node.
      * @returns {string} The formatted output runnable native JavaScript 'if/else' instruction block string.
      * @public
@@ -26,19 +26,15 @@ export class ConditionVisitor<T extends string, N extends BaseNode<T>> extends S
     public visit(node: ConditionNode<T, N>): string {
         const test = this.parent.visit(node.test);
         
-        const consequent = node.consequent
-            .map((n: ASTNode<T, N>) => "    " + this.parent.visitStatement(n) + ";")
-            .join('\n');
+        const consequent = this.renderBlock(node.consequent);
         
         let result = `if (${test}) {\n${consequent}\n}`;
 
         if (node.alternate) {
-            if (!Array.isArray(node.alternate) && node.alternate.type === 'Condicion') {
+            if (!Array.isArray(node.alternate) && node.alternate.type === TokenType.CONDICION) {
                 result += ` else ${this.parent.visit(node.alternate as unknown as ASTNode<T, N>)}`;
             } else {
-                const alternate = (node.alternate as ASTNode<T, N>[])
-                    .map((n: ASTNode<T, N>) => "    " + this.parent.visitStatement(n) + ";")
-                    .join('\n');
+                const alternate = this.renderBlock(node.alternate as ASTNode<T, N>[]);
                 result += ` else {\n${alternate}\n}`;
             }
         }

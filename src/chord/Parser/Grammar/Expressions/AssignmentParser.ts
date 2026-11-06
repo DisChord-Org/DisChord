@@ -1,5 +1,4 @@
 import { AssignmentNode, ASTNode, BaseNode, TokenType, TokenTypeUnion } from "../../../model/types";
-import { Parser } from "../../Parser";
 import { SubParser } from "../../SubParser";
 import { LogicalParser } from "./LogicalParser";
 
@@ -11,13 +10,6 @@ export class AssignmentParser<T extends string, N extends BaseNode<T>> extends S
      * Collection of reserved keywords this specific sub-parser registers
      */
     static keywords: TokenTypeUnion<string>[] = [ TokenType.Es ];
-
-    /**
-     * @param parent - Reference to the main Parser orchestrator.
-     */
-    constructor (protected parent: Parser<T, N>) {
-        super(parent);
-    }
 
     /**
      * Entry point for the SubParser.

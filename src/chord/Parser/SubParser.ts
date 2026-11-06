@@ -1,5 +1,4 @@
-import { ASTNode, BaseNode, PeekType, Token, TokenType, TokenTypeUnion } from "../model/types";
-import { SymbolTable } from "../model/SymbolsTable";
+import { ASTNode, BaseNode, LiteralNode, PeekType, Token, TokenType, TokenTypeUnion } from "../model/types";
 import { Parser } from "./Parser";
 
 /**
@@ -79,11 +78,36 @@ export abstract class SubParser<T extends string, N extends BaseNode<T>> {
     }
 
     /**
-     * Attempts to parse a custom statement by delegating back to the parent's orchestrator.
-     * @returns The parsed AST or null.
+     * Parses a `{ ... }` block and answers its statements.
+     * @returns The statements of the block.
      */
-    protected parseCustomStatement(): ASTNode<T, N> | null {
-        return this.parent.parseCustomStatement();
+    protected parseBlockBody(): ASTNode<T, N>[] {
+        return this.parent.parseBlockBody();
+    }
+
+    /**
+     * Parses `item` until `closer` is next, skipping the optional commas between items. The closer
+     * is not consumed.
+     * @param closer - The token type that ends the list.
+     * @param item - Parses one item; it has to consume at least a token.
+     * @param stopAtEnd - Whether the end of the file also ends the list (the closer is then missing).
+     */
+    protected parseDelimited(closer: string, item: () => void, stopAtEnd: boolean = false): void {
+        while (this.peek().type !== closer && !(stopAtEnd && this.isAtEnd())) {
+            item();
+            this.match(TokenType.COMA);
+        }
+    }
+
+    /**
+     * The `indefinido` literal a declaration holds when it is not given a value (`var x`, `prop x`).
+     */
+    protected createUndefinedLiteral(): LiteralNode<T> {
+        return this.createNode<LiteralNode<T>>({
+            type: TokenType.LITERAL,
+            value: undefined,
+            raw: TokenType.Indefinido
+        });
     }
 
     /**
@@ -98,10 +122,6 @@ export abstract class SubParser<T extends string, N extends BaseNode<T>> {
 
     public get cursor (): number {
         return this.parent.cursor;
-    }
-    
-    public get SymbolTable (): SymbolTable {
-        return this.parent.SymbolTable;
     }
 
     public isAtEnd (): boolean {

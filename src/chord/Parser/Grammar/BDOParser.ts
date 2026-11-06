@@ -1,6 +1,5 @@
 import { ChordError, ErrorLevel } from "../../../errors/ChordError";
-import { ASTNode, BaseNode, BinaryOperators, LiteralTokens, ODBMode, ODBNode, TokenType, TokenTypeUnion } from "../../model/types";
-import { Parser } from "../Parser";
+import { ASTNode, BaseNode, isBinaryOperator, isLiteralToken, ODBMode, ODBNode, TokenType, TokenTypeUnion } from "../../model/types";
 import { SubParser } from "../SubParser";
 import { ExpressionParser } from "./Expressions/ExpressionParser";
 
@@ -16,18 +15,18 @@ export class BDOParser<T extends string, N extends BaseNode<T>> extends SubParse
      */
     static keywords: TokenTypeUnion<string>[] = [];
 
+    /** The brackets that close a nested value, and the ones that open it. */
+    private static readonly CLOSERS: readonly string[] = [ TokenType.R_PAREN, TokenType.R_SQUARE, TokenType.R_BRACE ];
+    private static readonly OPENERS: readonly string[] = [ TokenType.L_PAREN, TokenType.L_SQUARE, TokenType.L_BRACE ];
+
+    /** Statement starters `StatementParser` handles by context and `PrimaryParser` (`nuevo`), which no sub-parser is triggered by. */
+    private static readonly STATEMENTS_BY_CONTEXT: readonly string[] = [ TokenType.Funcion, TokenType.Prop, TokenType.Decorador, TokenType.Nuevo ];
+
     /**
      * Stores the mode for the next parsing operation. 
      * Defaults to Simple but can be upgraded to Intelligent via decorators.
      */
     private nextMode: ODBMode = ODBMode.Simple;
-
-    /**
-     * @param parent - Reference to the main Parser orchestrator.
-     */
-    constructor (protected parent: Parser<T, N>) {
-        super(parent);
-    }
 
     /**
      * Configures the behavior mode for the upcoming ODB parsing.
@@ -74,13 +73,7 @@ export class BDOParser<T extends string, N extends BaseNode<T>> extends SubParse
         let inProperties = true;
 
         while (this.peek().type !== TokenType.R_BRACE) {
-            if (this.peek().type === TokenType.EOF) {
-                throw new ChordError({
-                    phase: ErrorLevel.Parser,
-                    message: "Falta '}' para cerrar el bloque",
-                    location: this.peek().location
-                });
-            }
+            this.assertNotAtEndOfFile();
 
             if (inProperties) {
                 if (this.looksLikeProperty()) {
@@ -88,14 +81,7 @@ export class BDOParser<T extends string, N extends BaseNode<T>> extends SubParse
                     continue;
                 }
 
-                const token = this.peek();
-
-                if (Object.keys(blocks).length > 0 && !token.blankLineBefore) throw new ChordError({
-                    phase: ErrorLevel.Parser,
-                    message: 'Separa el código de las propiedades con una línea en blanco',
-                    location: token.location
-                });
-
+                this.assertBlankLineBeforeCode(blocks);
                 inProperties = false;
             }
 
@@ -110,6 +96,28 @@ export class BDOParser<T extends string, N extends BaseNode<T>> extends SubParse
             mode: mode === ODBMode.Intelligent || body.length > 0 ? ODBMode.Intelligent : ODBMode.Simple,
             blocks,
             body
+        });
+    }
+
+    /** @throws {ChordError} If the file ends before the block is closed. */
+    private assertNotAtEndOfFile (): void {
+        if (this.peek().type !== TokenType.EOF) return;
+
+        throw new ChordError({
+            phase: ErrorLevel.Parser,
+            message: "Falta '}' para cerrar el bloque",
+            location: this.peek().location
+        });
+    }
+
+    /** @throws {ChordError} If the block has properties and the code that follows them is not set apart by an empty line. */
+    private assertBlankLineBeforeCode (blocks: Record<string, ASTNode<T, N>>): void {
+        const token = this.peek();
+
+        if (Object.keys(blocks).length > 0 && !token.blankLineBefore) throw new ChordError({
+            phase: ErrorLevel.Parser,
+            message: 'Separa el código de las propiedades con una línea en blanco',
+            location: token.location
         });
     }
 
@@ -146,15 +154,13 @@ export class BDOParser<T extends string, N extends BaseNode<T>> extends SubParse
      */
     private endEntryAtLineBreak (): void {
         const start = this.parent.cursor;
-        const closers: string[] = [ TokenType.R_PAREN, TokenType.R_SQUARE, TokenType.R_BRACE ];
-        const openers: string[] = [ TokenType.L_PAREN, TokenType.L_SQUARE, TokenType.L_BRACE ];
         let depth = 0;
 
         for (let index = start; ; index++) {
             const token = this.parent.peek(index);
             if (!token || token.type === TokenType.EOF) return;
 
-            const closes = closers.includes(token.type);
+            const closes = BDOParser.CLOSERS.includes(token.type);
 
             // a bracket that closes the block, or a separator already written: the entry ends there
             if (depth === 0 && (closes || token.type === TokenType.SEPARADOR)) return;
@@ -169,7 +175,7 @@ export class BDOParser<T extends string, N extends BaseNode<T>> extends SubParse
                 }
             }
 
-            if (openers.includes(token.type)) depth++;
+            if (BDOParser.OPENERS.includes(token.type)) depth++;
             if (closes) depth--;
         }
     }
@@ -180,7 +186,7 @@ export class BDOParser<T extends string, N extends BaseNode<T>> extends SubParse
      * @private
      */
     private asksForMore (type: string): boolean {
-        return (BinaryOperators as string[]).includes(type) || type === TokenType.COMA || type === TokenType.Punto;
+        return isBinaryOperator(type) || type === TokenType.COMA || type === TokenType.Punto;
     }
 
     /**
@@ -199,7 +205,7 @@ export class BDOParser<T extends string, N extends BaseNode<T>> extends SubParse
         if (!this.isWord(word)) return false;
         if (next.type === TokenType.R_BRACE || next.type === TokenType.EOF) return false;
         if (next.type === TokenType.Punto || next.type === TokenType.Es) return false;
-        if ((BinaryOperators as string[]).includes(next.type)) return false;
+        if (isBinaryOperator(next.type)) return false;
 
         if (this.isWord(next) && this.peek(this.parent.cursor + 2).type === TokenType.L_BRACE) return false;
 
@@ -218,9 +224,7 @@ export class BDOParser<T extends string, N extends BaseNode<T>> extends SubParse
      * @private
      */
     private startsStatement (type: string): boolean {
-        const byContext: string[] = [ TokenType.Funcion, TokenType.Prop, TokenType.Decorador, TokenType.Nuevo ];
-
-        return byContext.includes(type) || this.parent.getChordSubParserByToken(type as TokenTypeUnion<T>) !== undefined;
+        return BDOParser.STATEMENTS_BY_CONTEXT.includes(type) || this.parent.getChordSubParserByToken(type as TokenTypeUnion<T>) !== undefined;
     }
 
     /**
@@ -229,7 +233,7 @@ export class BDOParser<T extends string, N extends BaseNode<T>> extends SubParse
      * @private
      */
     private isPlainValue (type: string): boolean {
-        return (LiteralTokens as string[]).includes(type) || type === TokenType.L_SQUARE || type === TokenType.L_BRACE;
+        return isLiteralToken(type) || type === TokenType.L_SQUARE || type === TokenType.L_BRACE;
     }
 
     /**
@@ -237,6 +241,6 @@ export class BDOParser<T extends string, N extends BaseNode<T>> extends SubParse
      * @private
      */
     private isWord (token: { type: string; value: string }): boolean {
-        return !(LiteralTokens as string[]).includes(token.type) && /^\p{L}/u.test(token.value);
+        return !isLiteralToken(token.type) && /^\p{L}/u.test(token.value);
     }
 }

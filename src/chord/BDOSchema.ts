@@ -1,4 +1,4 @@
-import { ASTNode, BaseNode, LiteralNode, TokenType } from "./model/types";
+import { ASTNode, BaseNode, LiteralNode, ODBNode, TokenType } from "./model/types";
 
 /**
  * @file BDOSchema.ts
@@ -108,7 +108,7 @@ export interface NestedSpec<T extends string, N extends BaseNode<T>> {
     /** Like `schema`, but built per entry — needed when a message must name the specific entry
      * (e.g. `"Tipo de opción no reconocido en '${optionName}'"`). Only meaningful with
      * `forEachEntry`; receives the entry's own key and its BDO. */
-    schemaFor?: (entryKey: string, entry: ODBNodeLike<T, N>) => BDOSchema<T, N>;
+    schemaFor?: (entryKey: string, entry: ODBNode<T, N>) => BDOSchema<T, N>;
     /** The field's value is itself a BDO whose own `blocks` are each a nested BDO to validate
      * (e.g. `opciones { miOpcion { ... } otraOpcion { ... } } }`). */
     forEachEntry?: boolean;
@@ -119,10 +119,6 @@ export interface NestedSpec<T extends string, N extends BaseNode<T>> {
      * actual node type. */
     typeMismatchMessage?: (foundType: string) => string;
 }
-
-/** Local alias avoiding a circular import with `types.ts` for {@link NestedSpec.schemaFor}'s
- * parameter type — structurally identical to `ODBNode<T, N>`. */
-type ODBNodeLike<T extends string, N extends BaseNode<T>> = { blocks: Record<string, ASTNode<T, N>> };
 
 /**
  * The complete declarative shape of one BDO — every dischord construct (`comando`, `boton`,

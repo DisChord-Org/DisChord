@@ -1,6 +1,5 @@
-import { ASTNode, AccessNode, AccessNodeByIndex, BaseNode, CallNode, IdentificatorNode, TokenType, TokenTypeUnion } from "../../../model/types";
+import { ASTNode, AccessNode, AccessNodeByIndex, BaseNode, CallNode, TokenType, TokenTypeUnion } from "../../../model/types";
 import { AssignmentParser } from "./AssignmentParser";
-import { Parser } from "../../Parser";
 import { SubParser } from "../../SubParser";
 import { PrimaryParser } from "../PrimaryParser/PrimaryParser";
 
@@ -13,13 +12,6 @@ export class AccessParser<T extends string, N extends BaseNode<T>> extends SubPa
      */
     static keywords: TokenTypeUnion<string>[] = [];
 
-    /**
-     * @param parent - Reference to the main Parser orchestrator.
-     */
-    constructor (protected parent: Parser<T, N>) {
-        super(parent);
-    }
-    
     public parse(startNode?: ASTNode<T, N>): ASTNode<T, N> {
         let node = startNode || this.parent.get(PrimaryParser).parse();
 
@@ -56,10 +48,7 @@ export class AccessParser<T extends string, N extends BaseNode<T>> extends SubPa
                 this.consume(TokenType.L_PAREN);
                 const args: ASTNode<T, N>[] = [];
                 
-                while (this.peek().type !== TokenType.R_PAREN) {
-                    args.push(this.parent.get(AssignmentParser).parse());
-                    if (this.peek().type === TokenType.COMA) this.consume(TokenType.COMA);
-                }
+                this.parseDelimited(TokenType.R_PAREN, () => args.push(this.parent.get(AssignmentParser).parse()));
                 
                 this.consume(TokenType.R_PAREN);
                 node = this.createNode<CallNode<T, N>>({
@@ -75,4 +64,4 @@ export class AccessParser<T extends string, N extends BaseNode<T>> extends SubPa
 
         return node;
     }
-}
+}

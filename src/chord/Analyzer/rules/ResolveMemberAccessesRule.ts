@@ -1,5 +1,4 @@
 import { AnalysisRule } from "../AnalysisRule";
-import { TypeInferrer } from "../TypeInferrer";
 import { ASTNode, AccessNode, AssignmentNode, BaseNode, CallNode, TokenType } from "../../model/types";
 import { isAccessNode, isIdentificatorNode } from "../../ast.guards";
 import { AnyDataType, DataType, UnionDataType } from "../../model/DataType";
@@ -32,8 +31,6 @@ enum AccessRole {
  * earlier passes.
  */
 export class ResolveMemberAccessesRule<T extends string, N extends BaseNode<T>> extends AnalysisRule<T, N> {
-    private readonly typeInferrer: TypeInferrer<T, N> = new TypeInferrer(this.context);
-
     /**
      * Accesses seen as the callee of a call or as the target of an assignment, by the time the walk
      * reaches them.
@@ -49,6 +46,17 @@ export class ResolveMemberAccessesRule<T extends string, N extends BaseNode<T>> 
     }
 
     private enter (node: ASTNode<T, N>): void {
+        this.trackRole(node);
+
+        if (isAccessNode(node)) this.resolveAccess(node);
+    }
+
+    /**
+     * Remembers the access that `node` (a call or an assignment) uses as its callee or target, so it
+     * is known by the time the walk reaches it.
+     * @private
+     */
+    private trackRole (node: ASTNode<T, N>): void {
         if (node.type === TokenType.LLAMADA) {
             const callee = (node as CallNode<T, N>).object;
             if (isAccessNode(callee)) this.callees.add(callee);
@@ -56,9 +64,19 @@ export class ResolveMemberAccessesRule<T extends string, N extends BaseNode<T>> 
             const target = (node as AssignmentNode<T, N>).left;
             if (isAccessNode(target)) this.targets.add(target);
         }
+    }
 
-        if (!isAccessNode(node)) return;
+    private roleOf (access: AccessNode<T, N>): AccessRole {
+        if (this.callees.has(access)) return AccessRole.Callee;
 
+        return this.targets.has(access) ? AccessRole.Assignment : AccessRole.Read;
+    }
+
+    /**
+     * Validates the use of a core library member and marks the access with the name it is emitted as.
+     * @private
+     */
+    private resolveAccess (node: AccessNode<T, N>): void {
         const symbolTable = this.context.symbolTable;
         const staticMember = this.context.coreLib.resolveStatic(node);
 
@@ -67,21 +85,29 @@ export class ResolveMemberAccessesRule<T extends string, N extends BaseNode<T>> 
             return;
         }
 
-        const receiverType = this.typeInferrer.infer(node.object);
+        const receiverType = this.inferrer.infer(node.object);
         const declaredByUser = symbolTable.classes.hasMemberNamed(node.property);
         const resolved = this.context.coreLib.resolveInstanceMember(node, receiverType, declaredByUser);
 
-        const role = this.callees.has(node) ? AccessRole.Callee : this.targets.has(node) ? AccessRole.Assignment : AccessRole.Read;
+        const role = this.roleOf(node);
         if (resolved && receiverType && !declaredByUser) this.checkUse(node, resolved, receiverType, role);
         const isUnknownReceiver = !receiverType || receiverType instanceof AnyDataType;
         const isFieldUse = resolved && isUnknownReceiver && (resolved.isProperty ? role !== AccessRole.Read : role !== AccessRole.Callee);
 
-        symbolTable.marks.markMember(node, resolved && !isFieldUse ? resolved.member.transpile : node.property);
+        symbolTable.marks.members.set(node, resolved && !isFieldUse ? resolved.member.transpile : node.property);
 
         if (resolved?.isProperty && isUnknownReceiver && role === AccessRole.Read) {
             const dispatch = this.context.coreLibDispatch.resolveUnknownPropertyDispatch(node);
-            if (dispatch && 'helper' in dispatch) symbolTable.marks.markMemberHelper(node, dispatch.helper);
+            if (dispatch && 'helper' in dispatch) symbolTable.marks.memberHelpers.set(node, dispatch.helper);
         }
+    }
+
+    /**
+     * @returns {string} The class a core library member belongs to, from its qualified name.
+     * @private
+     */
+    private static classNameOf (member: ResolvedMember): string {
+        return member.qualifiedName.split('.')[0];
     }
 
     /**
@@ -95,7 +121,7 @@ export class ResolveMemberAccessesRule<T extends string, N extends BaseNode<T>> 
     private checkUse (access: AccessNode<T, N>, resolved: ResolvedMember, receiverType: DataType, role: AccessRole): void {
         if (receiverType instanceof AnyDataType || receiverType instanceof UnionDataType) return;
 
-        const className = resolved.qualifiedName.split('.')[0];
+        const className = ResolveMemberAccessesRule.classNameOf(resolved);
 
         if (!resolved.isProperty && role === AccessRole.Read) this.failAt(access, `'${access.property}' es un método de ${className}: llámalo con paréntesis, ${access.property}()`);
         if (resolved.isProperty && role === AccessRole.Callee) this.failAt(access, `'${access.property}' es una propiedad de ${className}, no un método`);
@@ -111,7 +137,7 @@ export class ResolveMemberAccessesRule<T extends string, N extends BaseNode<T>> 
     private checkInstanceMemberOnClass (access: AccessNode<T, N>, member: ResolvedMember): void {
         if (member.member.static || (isIdentificatorNode(access.object) && this.context.symbolTable.lookup(access.object.value))) return;
 
-        const className = member.qualifiedName.split('.')[0];
+        const className = ResolveMemberAccessesRule.classNameOf(member);
         const kind = member.isProperty ? 'una propiedad' : 'un método';
 
         this.failAt(access, `'${access.property}' es ${kind} de instancia de ${className}, no se puede usar sobre la clase`);

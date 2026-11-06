@@ -1,6 +1,5 @@
 import { DecoratorProcessor } from "../../../DecoratorProcessor";
 import { ASTNode, BaseNode, Decorator, TokenType, TokenTypeUnion } from "../../../model/types";
-import { Parser } from "../../Parser";
 import { SubParser } from "../../SubParser";
 import { ExpressionParser } from "../Expressions/ExpressionParser";
 import { FunctionParser } from "./FunctionParser";
@@ -21,13 +20,6 @@ export class StatementParser<T extends string, N extends BaseNode<T>> extends Su
      * Collection of reserved keywords this specific sub-parser registers
      */
     static keywords: TokenTypeUnion<string>[] = [];
-
-    /**
-     * @param parent - Reference to the main Parser orchestrator.
-     */
-    constructor (protected parent: Parser<T, N>) {
-        super(parent);
-    }
 
     public parse(classContext?: string): ASTNode<T, N> {
         const token = this.peek();

@@ -1,10 +1,5 @@
-// if this file exceeds 500 lines of code, it will be refactored
-
-/*
-    before, only Claude and I knew what this file did, now only Claude knows. good luck
-*/
-
-import { Location, Symbol, SymbolKind, CompilerMetadataKind, TokenType } from "./types";
+import { Location, Symbol, SymbolKind, CompilerMetadataKind } from "./types";
+import { ScopeOwnerRegistry, ScopeOwnerOptions } from "./ScopeOwnerRegistry";
 import { DataType } from "./DataType";
 import { ClassRegistry } from "./ClassRegistry";
 import { CompilationMarks } from "./CompilationMarks";
@@ -38,28 +33,8 @@ export class SymbolTable {
      */
     private readonly nodeScopes: WeakMap<object, Scope> = new WeakMap();
 
-    /**
-     * Node types that own a scope for their body. Chord's own are classes, functions and loops (the variable of a `para` lives in its scope); a
-     * dialect adds its own through {@link registerScopeOwner}.
-     */
-    private readonly scopeOwnerTypes: Set<string> = new Set([ TokenType.Clase, TokenType.Funcion ]);
-
-    /**
-     * The subset of scope owners whose body runs inside an async context, so it may `await`
-     * (a function is async only if marked, so it's not listed here).
-     */
-    private readonly asyncBodyTypes: Set<string> = new Set();
-
-    /**
-     * The scope owners that are a body running by itself (a function, a class, a command), as opposed
-     * to only scoping a block of the body that holds them (a loop), which decides nothing about `await`
-     * (see {@link isCallable}).
-     */
-    private readonly callableTypes: Set<string> = new Set([ TokenType.Clase, TokenType.Funcion ]);
-
-    constructor () {
-        this.registerScopeOwner(TokenType.BUCLE, { callable: false });
-    }
+    /** Which node types own a scope for their body, and how that body runs. */
+    private readonly scopeOwners: ScopeOwnerRegistry = new ScopeOwnerRegistry();
 
     /**
      * The classes declared in the file, so a member can be found from a class name and through inheritance.
@@ -76,19 +51,14 @@ export class SymbolTable {
     }
 
     /**
-     * Declares that nodes of `type` own a scope for their body.
+     * Declares that nodes of `type` own a scope for their body (see {@link ScopeOwnerRegistry.register}).
      *
      * @param {string} type - The node type string.
-     * @param {boolean | { asyncBody?: boolean; callable?: boolean }} [options] - Whether the body runs in an
-     * async context (`true` is the same as `{ asyncBody: true }`), and whether it is a body that runs by
-     * itself (`callable`, true unless said otherwise) or only a block of the one that holds it.
+     * @param {ScopeOwnerOptions} [options] - Whether the body runs in an async context and whether it
+     * runs by itself or is only a block of the one that holds it.
      */
-    public registerScopeOwner(type: string, options: boolean | { asyncBody?: boolean; callable?: boolean } = {}): void {
-        const { asyncBody = false, callable = true } = typeof options === 'boolean' ? { asyncBody: options } : options;
-
-        this.scopeOwnerTypes.add(type);
-        if (asyncBody) this.asyncBodyTypes.add(type);
-        if (callable) this.callableTypes.add(type);
+    public registerScopeOwner(type: string, options: ScopeOwnerOptions = {}): void {
+        this.scopeOwners.register(type, options);
     }
 
     /**
@@ -99,7 +69,7 @@ export class SymbolTable {
      * @returns {boolean}
      */
     public isCallable(node: { type: string }): boolean {
-        return this.callableTypes.has(node.type);
+        return this.scopeOwners.isCallable(node.type);
     }
 
     /**
@@ -109,7 +79,7 @@ export class SymbolTable {
      * @returns {boolean}
      */
     public hasAsyncBody(node: { type: string }): boolean {
-        return this.asyncBodyTypes.has(node.type);
+        return this.scopeOwners.hasAsyncBody(node.type);
     }
 
     /**
@@ -128,7 +98,7 @@ export class SymbolTable {
      * @returns {boolean}
      */
     public ownsScope(node: { type: string }): boolean {
-        return this.scopeOwnerTypes.has(node.type);
+        return this.scopeOwners.owns(node.type);
     }
 
     /**
@@ -184,7 +154,6 @@ export class SymbolTable {
             kind: info.kind || SymbolKind.Variable,
             metadata: {
                 isAsync: info.metadata?.isAsync || false,
-                isExported: info.metadata?.isExported || false,
                 isStatic: info.metadata?.isStatic || false
             },
             dataType: info.dataType,
@@ -206,14 +175,9 @@ export class SymbolTable {
      * @returns {void} Silently does nothing if no symbol with that name is currently in scope.
      */
     public setDataType(name: string, dataType: DataType | undefined): void {
-        for (let i = this.scopes.length - 1; i >= 0; i--) {
-            const symbol = this.scopes[i].symbols.get(name);
+        const symbol = this.lookup(name);
 
-            if (symbol) {
-                symbol.dataType = dataType;
-                return;
-            }
-        }
+        if (symbol) symbol.dataType = dataType;
     }
 
     /**
@@ -225,10 +189,10 @@ export class SymbolTable {
      */
     public lookup(name: string): Symbol | undefined {
         for (let i = this.scopes.length - 1; i >= 0; i--) {
-            if (this.scopes[i].symbols.has(name)) {
-                return this.scopes[i].symbols.get(name);
-            }
+            const symbol = this.scopes[i].symbols.get(name);
+            if (symbol) return symbol;
         }
+
         return undefined;
     }
 
@@ -258,10 +222,17 @@ export class SymbolTable {
      * @returns {T | undefined} The metadata value cast to generic type T if found, otherwise undefined.
      */
     public getMetadata<T>(key: CompilerMetadataKind): T | undefined {
-        for(let i = this.scopes.length - 1; i >= 0; i--) {
-            if (this.scopes[i].metadata.has(key)) return this.scopes[i].metadata.get(key) as T;
+        return this.findScope(scope => scope.metadata.has(key))?.metadata.get(key) as T | undefined;
+    }
+
+    /**
+     * The innermost scope, searching bottom-up from the current one to the global one, that satisfies `matches`.
+     */
+    private findScope(matches: (scope: Scope) => boolean): Scope | undefined {
+        for (let i = this.scopes.length - 1; i >= 0; i--) {
+            if (matches(this.scopes[i])) return this.scopes[i];
         }
 
         return undefined;
     }
-}
+}

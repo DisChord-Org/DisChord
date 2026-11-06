@@ -31,30 +31,33 @@ export class CallVisitor<T extends string, N extends BaseNode<T>> extends SubGen
      */
     public visit(node: CallNode<T, N>): string {
         const args: string = node.params.map(arg => this.parent.visit(arg)).join(', ');
-        let translation: string;
-        let isAsyncCall = false;
+        const marks = this.parent.context.symbolTable.marks;
 
         if (isAccessNode(node.object)) {
-            isAsyncCall = this.parent.context.symbolTable.marks.isAwaited(node);
+            const isAwaited = marks.awaited.has(node);
 
-            const dispatch = this.parent.context.symbolTable.marks.dispatchOf(node);
-            if (dispatch) return this.visitDispatched(node, node.object, dispatch, args, isAsyncCall);
+            const dispatch = marks.dispatches.get(node);
+            if (dispatch) return this.visitDispatched(node.object, dispatch, args, isAwaited);
 
-            translation = this.parent.visit(node.object);
-        } else if (isIdentificatorNode(node.object)) {
-            const name = node.object.value;
-            translation = this.parent.context.coreLib.resolveFunction(node.object, this.parent.context.symbolTable) ?? name;
-            isAsyncCall = asyncRuntimeHelperNames.has(translation);
-
-            if (this.parent.context.symbolTable.marks.isAwaited(node)) {
-                isAsyncCall = true;
-            }
-        } else {
-            translation = this.parent.visit(node.object);
+            return `${CallVisitor.awaitPrefix(isAwaited)}${this.parent.visit(node.object)}(${args})`;
         }
 
-        const awaitPrefix = isAsyncCall ? 'await ' : '';
-        return `${awaitPrefix}${translation}(${args})`;
+        if (isIdentificatorNode(node.object)) {
+            const translation = this.parent.context.coreLib.resolveFunction(node.object, this.parent.context.symbolTable) ?? node.object.value;
+            const isAsyncCall = asyncRuntimeHelperNames.has(translation) || marks.awaited.has(node);
+
+            return `${CallVisitor.awaitPrefix(isAsyncCall)}${translation}(${args})`;
+        }
+
+        return `${this.parent.visit(node.object)}(${args})`;
+    }
+
+    /**
+     * @returns {string} The keyword that makes the call wait for its result, if it must.
+     * @private
+     */
+    private static awaitPrefix(isAsyncCall: boolean): string {
+        return isAsyncCall ? 'await ' : '';
     }
 
     /**
@@ -63,8 +66,8 @@ export class CallVisitor<T extends string, N extends BaseNode<T>> extends SubGen
      * its first argument.
      * @private
      */
-    private visitDispatched(node: CallNode<T, N>, access: AccessNode<T, N>, dispatch: CallDispatch, args: string, isAsyncCall: boolean): string {
-        const awaitPrefix = isAsyncCall ? 'await ' : '';
+    private visitDispatched(access: AccessNode<T, N>, dispatch: CallDispatch, args: string, isAsyncCall: boolean): string {
+        const awaitPrefix = CallVisitor.awaitPrefix(isAsyncCall);
         const receiver = this.parent.visit(access.object);
 
         if ('member' in dispatch) return `${awaitPrefix}${receiver}.${dispatch.member}(${args})`;

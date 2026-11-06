@@ -43,21 +43,34 @@ export class ClassRegistry {
      * @returns {Symbol | undefined} The member, or `undefined` if it isn't found in the chain.
      */
     public findMember(className: string, member: string): Symbol | undefined {
+        for (const current of this.chainOf(className)) {
+            const symbol = this.classes.get(current)!.members.get(member);
+            if (symbol) return symbol;
+        }
+
+        return undefined;
+    }
+
+    /**
+     * The class and then each class it extends in turn, as long as they are classes of this file: a
+     * parent that isn't one ends the chain, and so does a cycle (a class is never yielded twice).
+     *
+     * @param {string} className - A class name.
+     * @yields {string} A user class name, starting with `className` itself.
+     */
+    public *chainOf(className: string): Generator<string> {
         const seen = new Set<string>();
         let current: string | undefined = className;
 
         while (current !== undefined && !seen.has(current)) {
-            seen.add(current);
             const entry = this.classes.get(current);
-            if (!entry) return undefined;
+            if (!entry) return;
 
-            const symbol = entry.members.get(member);
-            if (symbol) return symbol;
+            seen.add(current);
+            yield current;
 
             current = entry.superClass;
         }
-
-        return undefined;
     }
 
     /**

@@ -1,25 +1,9 @@
 import { SharedModule } from "../model/SharedModule";
 
 /**
- * Names `runtimeHelpersModule` exports. The core library's `transpile` of a helper-backed
- * member (or function) is one of these, so `RequiresRuntimeHelpersRule` knows which ones a file
- * uses and imports only those. They carry a `chord` prefix so they can't collide with a name the
- * user declares (a program is free to define its own `limitar`).
- * @type {ReadonlySet<string>}
+ * The helper a `para` that is not over a `rango` walks through (see `LoopVisitor`).
  */
-export const runtimeHelperNames: ReadonlySet<string> = new Set([
-    'chordEsperar',
-    'chordElegir',
-    'chordMezclar',
-    'chordEntre',
-    'chordLimitar',
-    'chordTiene',
-    'chordLimpiar',
-    'chordAgregar',
-    'chordLongitud',
-    'chordTamano',
-    'chordIterable'
-]);
+export const iterableHelper = 'chordIterable';
 
 /**
  * Subset of {@link runtimeHelperNames} that return a promise. Like a call to a user function
@@ -29,10 +13,7 @@ export const runtimeHelperNames: ReadonlySet<string> = new Set([
 export const asyncRuntimeHelperNames: ReadonlySet<string> = new Set([ 'chordEsperar' ]);
 
 /**
- * A shared module: its `path`, relative to the project's `dist` directory, where `CompileCommand` writes it,
- * and its `content`.
- *
- * Raw JavaScript string content for the shared helpers that have no one-to-one JavaScript
+ * The shared runtime helpers module: raw JavaScript for the helpers that have no one-to-one JavaScript
  * equivalent (`esperar`, `Aleatorio.*`, `Mates.limitar`) and the three that dispatch on the receiver at
  * run time (`chordTiene`, `chordLimpiar`, `chordAgregar`, see `CoreLibDispatch.resolveUnionDispatch`; and
  * `chordLongitud`/`chordTamano` for reading `longitud`/`tamano`, see `CoreLibDispatch.resolveUnknownPropertyDispatch`; and
@@ -126,3 +107,15 @@ export const runtimeHelpersModule: SharedModule = {
     }
 `
 };
+
+/**
+ * Names `runtimeHelpersModule` exports, read from its source, so adding a helper is writing its
+ * function there. The core library's `transpile` of a helper-backed member (or function) is one
+ * of these, so `RequiresRuntimeHelpersRule` knows which ones a file uses and imports only those.
+ * They carry a `chord` prefix so they can't collide with a name the user declares (a program is
+ * free to define its own `limitar`).
+ * @type {ReadonlySet<string>}
+ */
+export const runtimeHelperNames: ReadonlySet<string> = new Set(
+    [ ...runtimeHelpersModule.content.matchAll(/export function (\w+)/g) ].map(match => match[1])
+);

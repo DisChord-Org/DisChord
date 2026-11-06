@@ -1,6 +1,7 @@
-import { LoopNode, BaseNode, TokenType, TokenTypeUnion, ASTNode } from "../../../model/types";
+import { LoopNode, BaseNode, TokenType, TokenTypeUnion } from "../../../model/types";
 import { isRangeCall } from "../../../ast.guards";
 import { SubGenerator } from "../../SubGenerator";
+import { iterableHelper } from "../../../corelib";
 
 /**
  * Atomic SubGenerator compiling Chord loop structures ('bucle').
@@ -28,9 +29,7 @@ export class LoopVisitor<T extends string, N extends BaseNode<T>> extends SubGen
     public visit(node: LoopNode<T, N>): string {
         const varName = node.var;
         
-        const body = node.body
-            .map((n: ASTNode<T, N>) => "    " + this.parent.visitStatement(n) + ";")
-            .join('\n');
+        const body = this.renderBlock(node.body);
             
         const iterable = this.parent.visit(node.iterable);
 
@@ -47,6 +46,6 @@ export class LoopVisitor<T extends string, N extends BaseNode<T>> extends SubGen
             return `for (let ${varName} = ${start}; ${varName} < ${end}; ${varName}++) {\n${body}\n}`;
         }
 
-        return `for (let ${varName} of chordIterable(${iterable})) {\n${body}\n}`;
+        return `for (let ${varName} of ${iterableHelper}(${iterable})) {\n${body}\n}`;
     }
 }

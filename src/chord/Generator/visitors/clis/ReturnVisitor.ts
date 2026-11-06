@@ -20,7 +20,7 @@ export class ReturnVisitor<T extends string, N extends BaseNode<T>> extends SubG
 
     /**
      * Transpiles a return directive checking if an evaluation sub-expression object is present.
-     * @param {N} node - The generic operational syntax tree node instance.
+     * @param {ReturnNode<T, N>} node - The return syntax tree node.
      * @returns {string} The compiled native JavaScript return statement instruction.
      * @public
      */

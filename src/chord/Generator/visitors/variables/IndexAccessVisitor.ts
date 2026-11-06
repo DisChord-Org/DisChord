@@ -24,6 +24,6 @@ export class IndexAccessVisitor<T extends string, N extends BaseNode<T>> extends
      */
     public visit(node: AccessNodeByIndex<T, N>): string {
         const receiver = this.parent.visit(node.object);
-        return `${receiver.startsWith('await ') ? `(${receiver})` : receiver}[${this.parent.visit(node.index)}]`;
+        return `${this.parenthesizeAwait(receiver)}[${this.parent.visit(node.index)}]`;
     }
 }

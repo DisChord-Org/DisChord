@@ -1,4 +1,3 @@
-import { Parser } from "../../Parser";
 import { ASTNode, BaseNode, NoUnaryNode, TokenType, TokenTypeUnion, UnaryNode } from "../../../model/types";
 import { SubParser } from "../../SubParser";
 import { AccessParser } from "./AccessParser";
@@ -11,13 +10,6 @@ export class UnaryParser<T extends string, N extends BaseNode<T>> extends SubPar
      * Collection of reserved keywords this specific sub-parser registers
      */
     static keywords: TokenTypeUnion<string>[] = [ TokenType.No, TokenType.TIPO ];
-
-    /**
-     * @param parent - Reference to the main Parser orchestrator.
-     */
-    constructor (protected parent: Parser<T, N>) {
-        super(parent);
-    }
 
     /**
      * Entry point for the SubParser.

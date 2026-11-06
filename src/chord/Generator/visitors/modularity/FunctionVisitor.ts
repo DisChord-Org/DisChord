@@ -1,4 +1,4 @@
-import { FunctionNode, BaseNode, TokenType, TokenTypeUnion, ASTNode } from "../../../model/types";
+import { FunctionNode, BaseNode, TokenType, TokenTypeUnion } from "../../../model/types";
 import { SubGenerator } from "../../SubGenerator";
 
 /**
@@ -28,9 +28,7 @@ export class FunctionVisitor<T extends string, N extends BaseNode<T>> extends Su
         // reopening the scope the analyzer bound to this node lets lookups see the function's locals.
         this.parent.context.symbolTable.enterScope(node);
 
-        const body = node.body
-            .map((n: ASTNode<T, N>) => '    ' + this.parent.visitStatement(n) + ";")
-            .join('\n');
+        const body = this.renderBlock(node.body);
 
         this.parent.context.symbolTable.exitScope();
 

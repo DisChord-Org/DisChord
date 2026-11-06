@@ -1,5 +1,4 @@
 import { AnalysisRule } from "../AnalysisRule";
-import { TypeInferrer } from "../TypeInferrer";
 import { ASTNode, AccessNode, BaseNode, CallNode, TokenType } from "../../model/types";
 import { isCallNode, isAccessNode } from "../../ast.guards";
 import { AnyDataType, DataType, UnionDataType } from "../../model/DataType";
@@ -18,8 +17,6 @@ import { AnyDataType, DataType, UnionDataType } from "../../model/DataType";
  * earlier passes, and before `RequiresRuntimeHelpersRule`, which imports the helpers it picks.
  */
 export class ResolveDispatchedCallsRule<T extends string, N extends BaseNode<T>> extends AnalysisRule<T, N> {
-    private readonly typeInferrer: TypeInferrer<T, N> = new TypeInferrer(this.context);
-
     /**
      * @override
      */
@@ -46,7 +43,7 @@ export class ResolveDispatchedCallsRule<T extends string, N extends BaseNode<T>>
         const callee = call.object;
         if (!isAccessNode(callee)) return;
 
-        const receiverType = this.typeInferrer.infer(callee.object);
+        const receiverType = this.inferrer.infer(callee.object);
         const symbolTable = this.context.symbolTable;
         let dispatch;
 
@@ -56,6 +53,6 @@ export class ResolveDispatchedCallsRule<T extends string, N extends BaseNode<T>>
             dispatch = this.context.coreLibDispatch.resolveUnknownDispatch(callee);
         }
 
-        if (dispatch) symbolTable.marks.markDispatched(call, dispatch);
+        if (dispatch) symbolTable.marks.dispatches.set(call, dispatch);
     }
 }

@@ -1,5 +1,4 @@
 import { AnalysisRule } from "../AnalysisRule";
-import { TypeInferrer } from "../TypeInferrer";
 import { ASTNode, BaseNode, FunctionNode, ReturnNode, TokenType } from "../../model/types";
 import { isFunctionNode } from "../../ast.guards";
 import { DataType, VoidDataType } from "../../model/DataType";
@@ -16,8 +15,6 @@ import { DataType, VoidDataType } from "../../model/DataType";
  * uses have their types resolved.
  */
 export class ValidateReturnTypesRule<T extends string, N extends BaseNode<T>> extends AnalysisRule<T, N> {
-    private readonly typeInferrer: TypeInferrer<T, N> = new TypeInferrer(this.context);
-
     /**
      * The functions enclosing the node being visited (innermost last), each with whether a
      * `devolver` of its own has been seen.
@@ -67,7 +64,7 @@ export class ValidateReturnTypesRule<T extends string, N extends BaseNode<T>> ex
             return;
         }
 
-        const valueType: DataType | undefined = this.typeInferrer.infer(node.object);
+        const valueType: DataType | undefined = this.inferrer.infer(node.object);
 
         if (valueType && !declared.isAssignableFrom(valueType)) this.failAt(node,
             `La función '${name}' declara retorno '${declared.format()}' pero devuelve un valor de tipo '${valueType.format()}'`);

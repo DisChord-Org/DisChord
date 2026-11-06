@@ -1,6 +1,5 @@
 import { SubParser } from "../../../SubParser";
 import { BaseNode, DeclarationKind, ImportNode, TokenType, TokenTypeUnion } from "../../../../model/types";
-import { Parser } from "../../../Parser";
 
 /*
 importar { foo, bar } desde "./module.chord"
@@ -20,13 +19,6 @@ export class ImportParser<T extends string, N extends BaseNode<T>> extends SubPa
      */
     static keywords: TokenTypeUnion<string>[] = [ TokenType.Importar, TokenType.Desde ];
 
-    /**
-     * @param parent - Reference to the main Parser orchestrator.
-     */
-    constructor (protected parent: Parser<T, N>) {
-        super(parent);
-    }
-
     public parse(): ImportNode<T> {
         this.consume(TokenType.Importar);
 
@@ -34,10 +26,9 @@ export class ImportParser<T extends string, N extends BaseNode<T>> extends SubPa
         const isDestructured = this.match(TokenType.L_BRACE);
 
         if (isDestructured) {
-            while (this.peek().type !== TokenType.R_BRACE && !this.isAtEnd()) {
+            this.parseDelimited(TokenType.R_BRACE, () => {
                 identificators.push(this.declare(DeclarationKind.Import, this.consume(TokenType.IDENTIFICADOR, "Se esperaba un nombre para importar")));
-                this.match(TokenType.COMA);
-            }
+            }, true);
             this.consume(TokenType.R_BRACE);
         } else {
             identificators.push(this.declare(DeclarationKind.Import, this.consume(TokenType.IDENTIFICADOR, "Se esperaba un nombre tras 'importar'")));

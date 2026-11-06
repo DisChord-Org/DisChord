@@ -1,6 +1,5 @@
 import { SubParser } from "../../SubParser";
-import { PropertyNode, LiteralNode, ASTNode, BaseNode, DeclarationKind, TokenType, TokenTypeUnion } from "../../../model/types";
-import { Parser } from "../../Parser";
+import { PropertyNode, ASTNode, BaseNode, DeclarationKind, TokenType, TokenTypeUnion } from "../../../model/types";
 import { ExpressionParser } from "../Expressions/ExpressionParser";
 import { DecoratorProcessor } from "../../../DecoratorProcessor";
 
@@ -12,13 +11,6 @@ export class PropertyParser<T extends string, N extends BaseNode<T>> extends Sub
      * Collection of reserved keywords this specific sub-parser registers
      */
     static keywords: TokenTypeUnion<string>[] = [ TokenType.Prop ];
-
-    /**
-     * @param parent - Reference to the main Parser orchestrator.
-     */
-    constructor (protected parent: Parser<T, N>) {
-        super(parent);
-    }
 
     private isClassMember: boolean = false;
 
@@ -41,11 +33,7 @@ export class PropertyParser<T extends string, N extends BaseNode<T>> extends Sub
         const nameType = isClassMember && this.isReservedMemberName(nextToken) ? nextToken.type : TokenType.IDENTIFICADOR;
         const id = this.declare(DeclarationKind.Property, this.consume(nameType, "Se esperaba el nombre de la propiedad"));
         
-        let value: ASTNode<T, N> = this.createNode<LiteralNode<T>>({
-            type: TokenType.LITERAL,
-            value: undefined,
-            raw: TokenType.Indefinido
-        });
+        let value: ASTNode<T, N> = this.createUndefinedLiteral();
 
         if (this.match(TokenType.Es)) {
             value = this.parent.get(ExpressionParser).parse();

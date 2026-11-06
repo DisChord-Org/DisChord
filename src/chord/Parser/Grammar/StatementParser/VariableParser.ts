@@ -1,5 +1,4 @@
-import { ASTNode, BaseNode, DeclarationKind, LiteralNode, TokenType, TokenTypeUnion, VariableNode } from "../../../model/types";
-import { Parser } from "../../Parser";
+import { ASTNode, BaseNode, DeclarationKind, TokenType, TokenTypeUnion, VariableNode } from "../../../model/types";
 import { SubParser } from "../../SubParser";
 import { ExpressionParser } from "../Expressions/ExpressionParser";
 import { TypeAnnotationParser } from "./TypeAnnotationParser";
@@ -27,13 +26,6 @@ export class VariableParser<T extends string, N extends BaseNode<T>> extends Sub
     static keywords: TokenTypeUnion<string>[] = [ TokenType.Var ];
 
     /**
-     * @param parent - Reference to the main Parser orchestrator.
-     */
-    constructor (protected parent: Parser<T, N>) {
-        super(parent);
-    }
-
-    /**
      * Entry point for the SubParser. Consumes `var`, the variable's name, its optional `tipo`
      * annotation (delegated to `TypeAnnotationParser`), and — if followed by `es` — its
      * initializer expression.
@@ -46,11 +38,7 @@ export class VariableParser<T extends string, N extends BaseNode<T>> extends Sub
 
         const dataType = new TypeAnnotationParser(this.parent).parse();
 
-        let value: ASTNode<T, N> = this.createNode<LiteralNode<T>>({
-            type: TokenType.LITERAL,
-            value: undefined,
-            raw: TokenType.Indefinido
-        });
+        let value: ASTNode<T, N> = this.createUndefinedLiteral();
 
         if (this.match(TokenType.Es)) {
             value = this.parent.get(ExpressionParser).parse();

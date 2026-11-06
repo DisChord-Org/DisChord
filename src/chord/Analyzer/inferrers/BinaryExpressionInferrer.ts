@@ -1,4 +1,4 @@
-import { ASTNode, BaseNode, BinaryExpressionNode, ComparisonOperators, NumericOperators, PrimitiveType, TokenType, TokenTypeUnion } from "../../model/types";
+import { ASTNode, BaseNode, BinaryExpressionNode, isComparisonOperator, isNumericOperator, TokenType, TokenTypeUnion } from "../../model/types";
 import { AnyDataType, DataType, PrimitiveDataType } from "../../model/DataType";
 import { SubInferrer } from "../SubInferrer";
 
@@ -14,8 +14,8 @@ export class BinaryExpressionInferrer<T extends string, N extends BaseNode<T>> e
     public infer (node: ASTNode<T, N>): DataType | undefined {
         const binaryNode = node as BinaryExpressionNode<T, N>;
 
-        if ((NumericOperators as readonly string[]).includes(binaryNode.operator)) return PrimitiveDataType.Numero;
-        if ((ComparisonOperators as readonly string[]).includes(binaryNode.operator)) return PrimitiveDataType.Booleano;
+        if (isNumericOperator(binaryNode.operator)) return PrimitiveDataType.Numero;
+        if (isComparisonOperator(binaryNode.operator)) return PrimitiveDataType.Booleano;
 
         if (binaryNode.operator === TokenType.Mas) {
             const left = this.parent.infer(binaryNode.left);

@@ -1,44 +1,20 @@
-import { Parser } from "../../Parser";
-import { ASTNode, BaseNode, BinaryExpressionNode, TokenType, TokenTypeUnion } from "../../../model/types";
-import { SubParser } from "../../SubParser";
+import { ASTNode, BaseNode, TokenType, TokenTypeUnion } from "../../../model/types";
+import { BinaryLevelParser } from "./BinaryLevelParser";
 import { ComparisionParser } from "./ComparisionParser";
 
-export class LogicalParser<T extends string, N extends BaseNode<T>> extends SubParser<T, N> {
+export class LogicalParser<T extends string, N extends BaseNode<T>> extends BinaryLevelParser<T, N> {
     /** To identify when this parser should be used */
     static triggerToken: TokenType | undefined;
 
-   /**
+    /**
      * Collection of reserved keywords this specific sub-parser registers
      */
     static keywords: TokenTypeUnion<string>[] = [ TokenType.Y, TokenType.O ];
 
-    /**
-     * @param parent - Reference to the main Parser orchestrator.
-     */
-    constructor (protected parent: Parser<T, N>) {
-        super(parent);
-    }
+    protected readonly operators = LogicalParser.keywords;
 
-    /**
-     * Entry point for the SubParser.
-     * Consumes Y / O statements.
-     */
-    public parse(): ASTNode<T, N> {
-        let left = this.parent.get(ComparisionParser).parse();
-
-        while (LogicalParser.keywords.includes(this.peek().type as TokenType)) {
-            const operator = this.consume(this.peek().type);
-            
-            const right = this.parent.get(ComparisionParser).parse();
-            
-            left = this.createNode<BinaryExpressionNode<T, N>>({
-                type: TokenType.EXPRESION_BINARIA,
-                left,
-                operator: operator.type,
-                right
-            });
-        }
-
-        return left;
+    /** Parses one operand: the level below, ComparisionParser. */
+    protected operand(): ASTNode<T, N> {
+        return this.parent.get(ComparisionParser).parse();
     }
 }

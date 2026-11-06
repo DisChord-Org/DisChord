@@ -1,7 +1,5 @@
 import { SubParser } from "../../SubParser";
 import { LoopNode, BaseNode, DeclarationKind, TokenType, TokenTypeUnion } from "../../../model/types";
-import { BlockParser } from "../BlockParser";
-import { Parser } from "../../Parser";
 import { ExpressionParser } from "../Expressions/ExpressionParser";
 
 export class LoopParser<T extends string, N extends BaseNode<T>> extends SubParser<T, N> {
@@ -13,13 +11,6 @@ export class LoopParser<T extends string, N extends BaseNode<T>> extends SubPars
      */
     static keywords: TokenTypeUnion<string>[] = [ TokenType.Para, TokenType.En ];
 
-    /**
-     * @param parent - Reference to the main Parser orchestrator.
-     */
-    constructor (protected parent: Parser<T, N>) {
-        super(parent);
-    }
-    
     public parse(): LoopNode<T, N> {
         this.consume(TokenType.Para);
         this.consume(TokenType.L_PAREN, "Después de 'para' se debe abrir una expresión con '(' para definir la variable y el iterable del bucle.");
@@ -30,7 +21,7 @@ export class LoopParser<T extends string, N extends BaseNode<T>> extends SubPars
         const iterable = this.parent.get(ExpressionParser).parse();
         this.consume(TokenType.R_PAREN);
 
-        const body = (this.parent.get(BlockParser) as BlockParser<T, N>).parse().body;
+        const body = this.parseBlockBody();
 
         return this.createNode<LoopNode<T, N>>({
             type: TokenType.BUCLE,

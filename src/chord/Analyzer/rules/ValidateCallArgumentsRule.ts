@@ -1,10 +1,8 @@
 import { AnalysisRule } from "../AnalysisRule";
-import { TypeInferrer } from "../TypeInferrer";
 import { UserMemberResolver } from "../UserMemberResolver";
 import { ASTNode, BaseNode, CallNode, CompilerMetadataKind, Symbol, SymbolKind, TokenType } from "../../model/types";
 import { isAccessNode, isIdentificatorNode } from "../../ast.guards";
 import { PrimitiveDataType } from "../../model/DataType";
-import { PrimitiveType } from "../../model/types";
 
 /**
  * Checks the arguments of a call against the signature of the function, method or constructor it
@@ -23,7 +21,6 @@ import { PrimitiveType } from "../../model/types";
  * arguments are resolved.
  */
 export class ValidateCallArgumentsRule<T extends string, N extends BaseNode<T>> extends AnalysisRule<T, N> {
-    private readonly typeInferrer: TypeInferrer<T, N> = new TypeInferrer(this.context);
     private readonly members: UserMemberResolver<T> = new UserMemberResolver(this.context);
 
     /**
@@ -53,13 +50,13 @@ export class ValidateCallArgumentsRule<T extends string, N extends BaseNode<T>> 
 
         call.params.forEach((argument, index) => {
             const parameterType = signature.params[index];
-            const argumentType = this.typeInferrer.infer(argument);
+            const argumentType = this.inferrer.infer(argument);
 
             if (parameterType && argumentType && !parameterType.isAssignableFrom(argumentType)) this.failAt(argument,
                 `El argumento ${index + 1} de '${name}' es de tipo '${argumentType.format()}', se esperaba '${parameterType.format()}'`);
         });
 
-        const missing = signature.params.slice(call.params.length).some(type => type && !type.isAssignableFrom(PrimitiveDataType.of(PrimitiveType.Indefinido)));
+        const missing = signature.params.slice(call.params.length).some(type => type && !type.isAssignableFrom(PrimitiveDataType.Indefinido));
 
         if (call.params.length > expected || missing) this.failAt(call,
             `'${name}' espera ${expected} argumento(s) pero se le pasaron ${call.params.length}`);
@@ -92,7 +89,7 @@ export class ValidateCallArgumentsRule<T extends string, N extends BaseNode<T>> 
 
         if (!isAccessNode(callee)) return undefined;
 
-        const symbol = this.members.resolve(callee, this.typeInferrer.infer(callee.object));
+        const symbol = this.members.resolve(callee, this.inferrer.infer(callee.object));
         return symbol?.kind === SymbolKind.Function ? { symbol, name: callee.property } : undefined;
     }
 
@@ -104,17 +101,11 @@ export class ValidateCallArgumentsRule<T extends string, N extends BaseNode<T>> 
      * @returns {Symbol | undefined} The constructor, or `undefined` if no class of the chain declares one.
      */
     private constructorOf (className: string): Symbol | undefined {
-        const symbolTable = this.context.symbolTable;
-        const seen = new Set<string>();
-        let current: string | undefined = className;
+        const classes = this.context.symbolTable.classes;
 
-        while (current !== undefined && !seen.has(current) && symbolTable.classes.isUserClass(current)) {
-            seen.add(current);
-
-            const own = symbolTable.classes.findMember(current, current);
+        for (const current of classes.chainOf(className)) {
+            const own = classes.findMember(current, current);
             if (own?.kind === SymbolKind.Function) return own;
-
-            current = symbolTable.classes.superClassOf(current);
         }
 
         return undefined;

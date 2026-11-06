@@ -30,12 +30,12 @@ export class AccessVisitor<T extends string, N extends BaseNode<T>> extends SubG
 
         const marks = this.parent.context.symbolTable.marks;
 
-        const helper = marks.memberHelperOf(node);
+        const helper = marks.memberHelpers.get(node);
         if (helper) return `${helper}(${this.parent.visit(node.object)})`;
 
-        const property = marks.memberOf(node) ?? node.property;
+        const property = marks.members.get(node) ?? node.property;
 
         const receiver = this.parent.visit(node.object);
-        return `${receiver.startsWith('await ') ? `(${receiver})` : receiver}.${property}`;
+        return `${this.parenthesizeAwait(receiver)}.${property}`;
     }
 }

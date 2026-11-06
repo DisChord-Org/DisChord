@@ -1,6 +1,5 @@
-import { ASTNode, AccessNodeByIndex, BaseNode, LiteralNode, TokenType, TokenTypeUnion } from "../../model/types";
+import { ASTNode, AccessNodeByIndex, BaseNode, LiteralNode, PrimitiveType, TokenType, TokenTypeUnion } from "../../model/types";
 import { ArrayDataType, DataType, PrimitiveDataType, TupleDataType } from "../../model/DataType";
-import { PrimitiveType } from "../../model/types";
 import { SubInferrer } from "../SubInferrer";
 
 /**

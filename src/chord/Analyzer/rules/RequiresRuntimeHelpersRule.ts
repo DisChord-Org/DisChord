@@ -1,6 +1,6 @@
 import { AnalysisRule } from "../AnalysisRule";
-import { ASTNode, BaseNode, ImportNode, LoopNode, TokenType } from "../../model/types";
-import { runtimeHelperNames, runtimeHelpersModule } from "../../corelib";
+import { ASTNode, BaseNode, LoopNode, TokenType } from "../../model/types";
+import { iterableHelper, runtimeHelperNames, runtimeHelpersModule } from "../../corelib";
 import { isAccessNode, isCallNode, isRangeCall } from "../../ast.guards";
 import { SharedModuleImporter } from "../SharedModuleImporter";
 
@@ -24,7 +24,8 @@ export class RequiresRuntimeHelpersRule<T extends string, N extends BaseNode<T>>
         const helpers = this.collectHelpers(nodes);
         if (helpers.size === 0) return;
 
-        this.insertImport(nodes, helpers);
+        // the import of the helpers (sorted) goes at the front of the file, and the module's content is an extra file to write
+        this.sharedModules.insert(nodes, runtimeHelpersModule, [ ...helpers ].sort());
     }
 
     /**
@@ -36,17 +37,28 @@ export class RequiresRuntimeHelpersRule<T extends string, N extends BaseNode<T>>
      * @private
      */
     private helperOf (node: ASTNode<T, N>): string | undefined {
-        if (node.type === TokenType.BUCLE) return isRangeCall((node as LoopNode<T, N>).iterable) ? undefined : 'chordIterable';
+        if (node.type === TokenType.BUCLE) return isRangeCall((node as LoopNode<T, N>).iterable) ? undefined : iterableHelper;
 
-        const dispatch = isCallNode(node) ? this.context.symbolTable.marks.dispatchOf(node) : undefined;
-        const memberHelper = isAccessNode(node) ? this.context.symbolTable.marks.memberHelperOf(node) : undefined;
-        const transpiled = memberHelper ?? (dispatch
-            ? ('helper' in dispatch ? dispatch.helper : undefined)
-            : isAccessNode(node)
-                ? this.context.coreLib.resolveStatic(node)?.member.transpile
-                : isCallNode(node) ? this.context.coreLib.resolveFunction(node.object, this.context.symbolTable) : undefined);
+        const transpiled = this.transpiledAs(node);
 
         return transpiled !== undefined && runtimeHelperNames.has(transpiled) ? transpiled : undefined;
+    }
+
+    /**
+     * What an access or a call is emitted as, when something other than the plain name decides it.
+     * @private
+     */
+    private transpiledAs (node: ASTNode<T, N>): string | undefined {
+        const marks = this.context.symbolTable.marks;
+
+        if (isAccessNode(node)) return marks.memberHelpers.get(node) ?? this.context.coreLib.resolveStatic(node)?.member.transpile;
+
+        if (!isCallNode(node)) return undefined;
+
+        const dispatch = marks.dispatches.get(node);
+        if (dispatch) return 'helper' in dispatch ? dispatch.helper : undefined;
+
+        return this.context.coreLib.resolveFunction(node.object, this.context.symbolTable);
     }
 
     /**
@@ -64,14 +76,5 @@ export class RequiresRuntimeHelpersRule<T extends string, N extends BaseNode<T>>
         });
 
         return helpers;
-    }
-
-    /**
-     * Puts the import of `helpers` (sorted) at the front of the file and registers the module's
-     * content as an extra file to write.
-     * @private
-     */
-    private insertImport (nodes: ASTNode<T, N>[], helpers: Set<string>): void {
-        this.sharedModules.insert(nodes, runtimeHelpersModule, [ ...helpers ].sort());
     }
 }

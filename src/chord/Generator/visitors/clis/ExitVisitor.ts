@@ -3,7 +3,7 @@ import { SubGenerator } from "../../SubGenerator";
 
 /**
  * Atomic SubGenerator compiling structured loop breaking operations ('Salir').
- * @class BreakVisitor
+ * @class ExitVisitor
  * @extends {SubGenerator<T, N>}
  * @template {string} T - Extensible token type string vector.
  * @template {BaseNode<T>} N - Extensible abstract syntax tree node layout structure.

@@ -28,7 +28,7 @@ export class ExpressionVisitor<T extends string, N extends BaseNode<T>> extends 
         const inner = this.parent.visit(node.object);
 
         // a boolean in an interpolated text is written with the words of the language
-        if (this.parent.context.symbolTable.marks.isBoolean(node)) return `(${inner} ? "verdadero" : "falso")`;
+        if (this.parent.context.symbolTable.marks.booleans.has(node)) return `(${inner} ? "verdadero" : "falso")`;
 
         return `(${inner})`;
     }

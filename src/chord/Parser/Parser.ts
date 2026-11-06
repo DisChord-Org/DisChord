@@ -1,7 +1,6 @@
-import { SUGGESTIONS } from "./ParserErrorSuggestions";
+import { TokenStream } from "./TokenStream";
 import { ASTNode, Token, TokenType, BaseNode, PeekType, Location, TokenTypeUnion } from "../model/types";
 
-import { ChordError, ErrorLevel } from "../../errors/ChordError";
 import { CompilationContext } from "../model/CompilationContext";
 import { DeclarationLog } from "../model/DeclarationLog";
 import { ParserContext } from "./ParserContext";
@@ -61,6 +60,9 @@ export class Parser<T extends string, N extends BaseNode<T>> extends ParserConte
      */
     public readonly declarations: DeclarationLog<T> = new DeclarationLog<T>();
     
+    /** The tokens being parsed and the cursor over them. */
+    private readonly stream: TokenStream<T>;
+
     /**
      * Creates an instance of the Parser orchestrator.
      *
@@ -70,11 +72,13 @@ export class Parser<T extends string, N extends BaseNode<T>> extends ParserConte
      * @param {CompilationContext<T>} context - Global compilation context holding compiler utilities like Symbols Table.
      */
     constructor(
-        private tokens: Token<T>[],
-        private current: number = 0,
+        tokens: Token<T>[],
+        current: number = 0,
         private context: CompilationContext<T>
     ) {
         super();
+
+        this.stream = new TokenStream(tokens, current);
 
         this.setOwner(this);
         this.registerInstances();
@@ -157,29 +161,6 @@ export class Parser<T extends string, N extends BaseNode<T>> extends ParserConte
     }
 
     /**
-     * Inserts a token into the stream ahead of the cursor. A sub-parser uses it to close, with a
-     * separator, an entry the grammar would otherwise run on into the next one.
-     * @public
-     * @param {number} index - Where the token goes; has to be past the cursor.
-     * @param {Token<T>} token - The token to insert.
-     */
-    public insertToken (index: number, token: Token<T>): void {
-        if (index <= this.current) throw new Error('A token can only be inserted ahead of the cursor');
-
-        this.tokens.splice(index, 0, token);
-    }
-
-    /**
-     * Gets the current stream iteration cursor index.
-     * * @public
-     * @readonly
-     * @type {number}
-     */
-    public get cursor (): number {
-        return this.current;
-    }
-
-    /**
      * Accessor to get the global compilation Symbols Table mapping.
      * * @public
      * @readonly
@@ -187,16 +168,6 @@ export class Parser<T extends string, N extends BaseNode<T>> extends ParserConte
      */
     public get SymbolTable (): SymbolTable {
         return this.context.symbolTable;
-    }
-
-    /**
-     * Accessor to retrieve the keywords manager instance.
-     * * @public
-     * @readonly
-     * @type {KeyWords<T>}
-     */
-    public get KeywordsManager (): KeyWords<T> {
-        return this.context.keywordsManager;
     }
 
     /**
@@ -209,107 +180,34 @@ export class Parser<T extends string, N extends BaseNode<T>> extends ParserConte
         return this.context.coreLib;
     }
 
-    /**
-     * Performs an observation lookahead on the token stream relative to the cursor position without consuming tokens.
-     *
-     * @public
-     * @param {PeekType} [type='this'] - The offset instruction ('this', 'next', 'prev' or raw index integer).
-     * @returns {Token<T>} The inspected token at the target relative position.
-     */
+    /** Inserts a token into the stream ahead of the cursor, to close with a separator an entry the grammar would otherwise run on into the next one. */
+    public insertToken (index: number, token: Token<T>): void {
+        this.stream.insertToken(index, token);
+    }
+
+    /** The current index of the cursor over the token stream. */
+    public get cursor (): number {
+        return this.stream.cursor;
+    }
+
+    /** Looks at a token relative to the cursor without consuming it. */
     public peek(type: PeekType = 'this'): Token<T> {
-        if (typeof type == 'number') return this.tokens[type];
-
-        let targetIndex = this.cursor;
-
-        if (type === 'next') targetIndex = this.cursor + 1;
-        if (type === 'prev') targetIndex = this.cursor - 1;
-
-        if (targetIndex < 0) {
-            return {
-                type: TokenType.SOF,
-                value: '',
-                location: {
-                    line: 1,
-                    column: 1
-                },
-                end: {
-                    line: 1,
-                    column: 1
-                }
-            } as Token<T>;
-        }
-
-        if (targetIndex >= this.tokens.length) {
-            return {
-                type: TokenType.EOF,
-                value: '',
-                location: this.tokens[this.tokens.length - 1]?.location || { line: 1, column: 1 },
-                end: this.tokens[this.tokens.length - 1]?.end || { line: 1, column: 1 }
-            } as Token<T>;
-        }
-
-        return this.tokens[targetIndex];
+        return this.stream.peek(type);
     }
 
-    /**
-     * Verifies if the parsing iteration has reached the end of the token stream or hit EOF.
-     *
-     * @public
-     * @returns {boolean} True if no further tokens are available to parse.
-     */
+    /** Whether the cursor has reached the end of the token stream. */
     public isAtEnd (): boolean {
-        return this.peek().type === TokenType.EOF || this.current >= this.tokens.length;
+        return this.stream.isAtEnd();
     }
 
-    /**
-     * @method match
-     * @description Checks if the current token matches any of the provided types.
-     * If it matches, it consumes the token and returns true.
-     * @param {string | string[]} types - The token type(s) to check against.
-     * @returns {boolean} True if the token was matched and consumed.
-     */
+    /** Consumes the current token and returns true if it is one of the given types. */
     public match(types: string | string[]): boolean {
-        const expected = Array.isArray(types) ? types : [types];
-        const currentToken = this.peek();
-
-        if (expected.includes(currentToken.type)) {
-            this.consume(currentToken.type);
-            return true;
-        }
-
-        return false;
+        return this.stream.match(types);
     }
 
-    /**
-     * Guarantees the presence of a specific token type next in the stream. Consumes it if valid.
-     * Throws a formatted diagnostic error containing localized user-friendly hints if validation fails.
-     *
-     * @public
-     * @param {string | string[]} expectedTypes - Token types expected to be at the cursor.
-     * @param {string} [message] - Optional override message for the parsing mismatch.
-     * @throws {ChordError} If the current token does not match any of the expected types.
-     * @returns {Token<T>} The matched and consumed token.
-     */
+    /** Consumes the expected token, or throws a diagnostic with a hint if the current one is another. */
     public consume(expectedTypes: string | string[], message?: string): Token<T> {
-        const token = this.peek();
-        const expected = Array.isArray(expectedTypes) ? expectedTypes : [expectedTypes];
-
-        if (expected.includes(token.type)) return this.tokens[this.current++];
-
-        let customMessage = message;
-        
-        if (!customMessage) {
-            const hint = SUGGESTIONS[expected[0]];
-            customMessage = hint
-                ? hint
-                : `Esperaba un elemento de tipo '${expected.join(' o ')}'`;
-        }
-
-        throw new ChordError({
-            phase: ErrorLevel.Parser,
-            message: `${customMessage}. (En su lugar se encontró '${token.value}')`,
-            location: token.location
-        });
+        return this.stream.consume(expectedTypes, message);
     }
 
     /**
@@ -331,25 +229,15 @@ export class Parser<T extends string, N extends BaseNode<T>> extends ParserConte
 
     /**
      * Detects and parses the beginner-friendly class declaration shorthand, expected to be
-     * called right after an already-consumed `nuevo` token: `nuevo <ClaseBase> <Nombre> { ... }`,
-     * equivalent to `clase <Nombre> extiende <ClaseBase> { ... }`.
-     *
-     * Disambiguates from a regular instantiation expression (`nuevo Perro("Rex")`) by requiring
-     * two consecutive identifiers followed directly by `{`, a shape a call/access expression can
-     * never produce.
+     * called right after an already-consumed `nuevo` token: `nuevo <ClaseBase> <Nombre> { ... }`.
+     * The grammar lives in {@link ClassParser.tryParseShorthand}; the dialects call it from here.
      *
      * @public
      * @returns {ASTNode<T, N> | null} The parsed class declaration, or null if the upcoming tokens
      * don't match the shorthand shape (in which case nothing is consumed).
      */
     public tryParseClassShorthand (): ASTNode<T, N> | null {
-        const isShorthand = this.peek().type === TokenType.IDENTIFICADOR
-            && this.peek('next').type === TokenType.IDENTIFICADOR
-            && this.peek(this.cursor + 2)?.type === TokenType.L_BRACE;
-
-        if (!isShorthand) return null;
-
-        return this.get(ClassParser).parseShorthand();
+        return this.get(ClassParser).tryParseShorthand();
     }
 
     /**
@@ -376,4 +264,13 @@ export class Parser<T extends string, N extends BaseNode<T>> extends ParserConte
     public parseStatement (): ASTNode<T, N> {
         return this.get(StatementParser).parse();
     }
-}
+
+    /**
+     * Parses a `{ ... }` block and answers its statements.
+     *
+     * @public
+     */
+    public parseBlockBody (): ASTNode<T, N>[] {
+        return this.get(BlockParser).parse().body;
+    }
+}

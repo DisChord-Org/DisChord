@@ -1,6 +1,6 @@
 import { AnalysisRule } from "../AnalysisRule";
 import { isClassNode, isFunctionNode, isPropertyNode, isVariableNode } from "../../ast.guards";
-import { ASTNode, BaseNode, CompilerMetadataKind, LoopNode, SymbolKind, TokenType } from "../../model/types";
+import { ASTNode, BaseNode, ClassNode, CompilerMetadataKind, FunctionNode, Location, LoopNode, SymbolKind, TokenType } from "../../model/types";
 import { DataType } from "../../model/DataType";
 
 /**
@@ -8,8 +8,7 @@ import { DataType } from "../../model/DataType";
  * every chord-level declaration (classes, functions, variables, properties) into the
  * `SymbolTable`, regardless of where in the file it appears. Since this runs over the whole tree
  * before anything validates references against it, declarations are visible to each other
- * independently of source order — unlike the old parser-time registration, which only saw
- * whatever had already been parsed earlier in the same left-to-right pass.
+ * independently of source order.
  *
  * Classes and functions (and whatever else the dialect declares through `SymbolTable.registerScopeOwner`)
  * get their own lexical scope for their body, bound to their node and entered/exited by its own
@@ -36,67 +35,83 @@ export class BindDeclarationsRule<T extends string, N extends BaseNode<T>> exten
     }
 
     private enter (node: ASTNode<T, N>): void {
-        if (!isClassNode(node) && !isFunctionNode(node) && this.context.symbolTable.ownsScope(node)) {
-            this.context.symbolTable.enterScope(node);
+        const table = this.context.symbolTable;
 
-            this.scopeSymbols(node).forEach(({ name, dataType }) => {
-                this.context.symbolTable.register(name, { name, kind: SymbolKind.Variable, dataType }, node.location);
-            });
+        if (!isClassNode(node) && !isFunctionNode(node) && table.ownsScope(node)) {
+            this.bindScopeOwner(node);
         }
 
-        if (isClassNode(node)) {
-            this.context.symbolTable.register(node.id, {
-                name: node.id,
-                kind: SymbolKind.Class
+        if (isClassNode(node)) this.bindClass(node);
+        else if (isFunctionNode(node)) this.bindFunction(node);
+        else if (node.type === TokenType.BUCLE) this.bindLoopVariable(node as LoopNode<T, N>);
+        else if (isVariableNode(node)) this.declare(node.id, SymbolKind.Variable, node.location);
+        else if (isPropertyNode(node)) this.declare(node.id, SymbolKind.Property, node.location);
+    }
+
+    /**
+     * Registers a symbol with nothing but a name and a kind in the current scope.
+     * @private
+     */
+    private declare (name: string, kind: SymbolKind, location: Location): void {
+        this.context.symbolTable.register(name, { name, kind }, location);
+    }
+
+    /**
+     * Enters the scope of a node that owns one, other than a class or a function (a loop, an event...),
+     * and registers the variables the dialect puts in it.
+     * @private
+     */
+    private bindScopeOwner (node: ASTNode<T, N>): void {
+        const table = this.context.symbolTable;
+        table.enterScope(node);
+
+        this.scopeSymbols(node).forEach(({ name, dataType }) => {
+            table.register(name, { name, kind: SymbolKind.Variable, dataType }, node.location);
+        });
+    }
+
+    private bindClass (node: ClassNode<T, N>): void {
+        const table = this.context.symbolTable;
+        this.declare(node.id, SymbolKind.Class, node.location);
+
+        table.enterScope(node);
+        table.classes.register(node.id, table.currentMembers, node.superClass);
+        table.setMetadata(CompilerMetadataKind.CurrentClass, node.id);
+    }
+
+    private bindFunction (node: FunctionNode<T, N>): void {
+        const table = this.context.symbolTable;
+
+        table.register(node.id, {
+            name: node.id,
+            kind: SymbolKind.Function,
+            metadata: {
+                isAsync: node.metadata.isAsync
+            },
+            signature: {
+                params: node.params.map((_, index) => node.paramTypes?.[index]),
+                returns: node.returnType,
+                annotated: node.returnType !== undefined || !!node.paramTypes?.some(type => type !== undefined)
+            }
+        }, node.location);
+
+        table.enterScope(node);
+
+        node.params.forEach((param, index) => {
+            table.register(param, {
+                name: param,
+                kind: SymbolKind.Variable,
+                dataType: node.paramTypes?.[index]
             }, node.location);
+        });
+    }
 
-            this.context.symbolTable.enterScope(node);
-            this.context.symbolTable.classes.register(node.id, this.context.symbolTable.currentMembers, node.superClass);
-            this.context.symbolTable.setMetadata(CompilerMetadataKind.CurrentClass, node.id);
-
-        } else if (isFunctionNode(node)) {
-            this.context.symbolTable.register(node.id, {
-                name: node.id,
-                kind: SymbolKind.Function,
-                metadata: {
-                    isAsync: node.metadata.isAsync
-                },
-                signature: {
-                    params: node.params.map((_, index) => node.paramTypes?.[index]),
-                    returns: node.returnType,
-                    annotated: node.returnType !== undefined || !!node.paramTypes?.some(type => type !== undefined)
-                }
-            }, node.location);
-
-            this.context.symbolTable.enterScope(node);
-
-            node.params.forEach((param, index) => {
-                this.context.symbolTable.register(param, {
-                    name: param,
-                    kind: SymbolKind.Variable,
-                    dataType: node.paramTypes?.[index]
-                }, node.location);
-            });
-
-        } else if (node.type === TokenType.BUCLE) {
-            // the variable of a `para` is a symbol of the scope of the loop, which is already entered
-            this.context.symbolTable.register((node as LoopNode<T, N>).var, {
-                name: (node as LoopNode<T, N>).var,
-                kind: SymbolKind.Variable
-            }, node.location);
-
-        } else if (isVariableNode(node)) {
-            this.context.symbolTable.register(node.id, {
-                name: node.id,
-                kind: SymbolKind.Variable
-            }, node.location);
-        
-        } else if (isPropertyNode(node)) {
-            this.context.symbolTable.register(node.id, {
-                name: node.id,
-                kind: SymbolKind.Property
-            }, node.location);
-        }
+    /**
+     * The variable of a `para` is a symbol of the scope of the loop, which is already entered.
+     * @private
+     */
+    private bindLoopVariable (node: LoopNode<T, N>): void {
+        this.declare(node.var, SymbolKind.Variable, node.location);
     }
 
     private exit (node: ASTNode<T, N>): void {

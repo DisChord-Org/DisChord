@@ -1,8 +1,7 @@
 import { AnalysisRule } from "../AnalysisRule";
-import { ASTNode, AssignmentNode, BaseNode, ListNode, LoopNode, PrimitiveType, Symbol, TokenType, VariableNode } from "../../model/types";
-import { isIdentificatorNode, isRangeCall } from "../../ast.guards";
-import { AnyDataType, ArrayDataType, DataType, PrimitiveDataType, TupleDataType, UnionDataType, VoidDataType } from "../../model/DataType";
-import { TypeInferrer } from "../TypeInferrer";
+import { ASTNode, AssignmentNode, BaseNode, ListNode, LoopNode, Symbol, TokenType, VariableNode } from "../../model/types";
+import { isIdentificatorNode } from "../../ast.guards";
+import { AnyDataType, DataType, TupleDataType, VoidDataType } from "../../model/DataType";
 import { ReturnTypeInference } from "../ReturnTypeInference";
 
 /**
@@ -44,18 +43,11 @@ export class ResolveVariableTypesRule<T extends string, N extends BaseNode<T>> e
     private static readonly maxReturnPasses = 6;
 
     /**
-     * Delegate for inferring a `DataType` from an expression — see `TypeInferrer`/`SubInferrer`.
-     * @private
-     * @readonly
-     */
-    private readonly typeInferrer: TypeInferrer<T, N> = new TypeInferrer(this.context);
-
-    /**
      * Infers the return type of the functions that declare none, while the walk goes through them.
      * @private
      * @readonly
      */
-    private readonly returns: ReturnTypeInference<T, N> = new ReturnTypeInference(this.context, this.typeInferrer);
+    private readonly returns: ReturnTypeInference<T, N> = new ReturnTypeInference(this.context, this.inferrer);
 
     /**
      * The variables declared without an annotation, and those among them that a reassignment
@@ -110,7 +102,7 @@ export class ResolveVariableTypesRule<T extends string, N extends BaseNode<T>> e
             return;
         }
 
-        this.declareUnannotated(variableNode.id, () => this.typeInferrer.infer(variableNode.value));
+        this.declareUnannotated(variableNode.id, () => this.inferrer.infer(variableNode.value));
     }
 
     /**
@@ -133,21 +125,7 @@ export class ResolveVariableTypesRule<T extends string, N extends BaseNode<T>> e
      * @private
      */
     private declareLoopVariable (loop: LoopNode<T, N>): void {
-        this.declareUnannotated(loop.var, () => this.loopVariableType(loop));
-    }
-
-    private loopVariableType (loop: LoopNode<T, N>): DataType | undefined {
-        const iterable = loop.iterable;
-
-        if (isRangeCall(iterable)) return PrimitiveDataType.Numero;
-
-        const type = this.typeInferrer.infer(iterable);
-
-        if (type instanceof ArrayDataType) return type.element;
-        if (type instanceof TupleDataType) return UnionDataType.ofTypes([ ...type.elements ]);
-        if (PrimitiveDataType.is(type, PrimitiveType.Texto) || PrimitiveDataType.is(type, PrimitiveType.BDO)) return PrimitiveDataType.Texto;
-
-        return undefined;
+        this.declareUnannotated(loop.var, () => this.inferrer.inferLoopVariable(loop));
     }
 
     /**
@@ -166,7 +144,7 @@ export class ResolveVariableTypesRule<T extends string, N extends BaseNode<T>> e
         const symbol = this.context.symbolTable.lookup(target.value);
         if (!symbol || !this.unannotated.has(symbol) || this.degraded.has(symbol) || !symbol.dataType) return false;
 
-        const assignedType = this.typeInferrer.infer((node as AssignmentNode<T, N>).assignment);
+        const assignedType = this.inferrer.infer((node as AssignmentNode<T, N>).assignment);
         if (assignedType && symbol.dataType.isAssignableFrom(assignedType)) return false;
 
         this.degraded.add(symbol);
@@ -178,13 +156,10 @@ export class ResolveVariableTypesRule<T extends string, N extends BaseNode<T>> e
      * @private
      */
     private enter (node: ASTNode<T, N>): void {
-        switch (node.type) {
-            case TokenType.VARIABLE:
-                const variableNode = node as VariableNode<T, N>;
-                const dataType = this.resolveDataType(variableNode);
-                this.context.symbolTable.setDataType(variableNode.id, dataType);
-                break;
-        }
+        if (node.type !== TokenType.VARIABLE) return;
+
+        const variableNode = node as VariableNode<T, N>;
+        this.context.symbolTable.setDataType(variableNode.id, this.resolveDataType(variableNode));
     }
 
     /**
@@ -211,7 +186,7 @@ export class ResolveVariableTypesRule<T extends string, N extends BaseNode<T>> e
             return variableNode.dataType;
         }
 
-        const inferredType = this.typeInferrer.infer(variableNode.value);
+        const inferredType = this.inferrer.infer(variableNode.value);
 
         if (inferredType instanceof VoidDataType) this.failAt(variableNode, `La variable '${variableNode.id}' se inicializó con una llamada que no devuelve ningún valor`);
 
@@ -242,7 +217,7 @@ export class ResolveVariableTypesRule<T extends string, N extends BaseNode<T>> e
         if (listNode.body.length !== tupleType.elements.length) this.failAt(listNode, `La variable '${id}' se declaró como tupla de ${tupleType.elements.length} elemento(s) pero se le asignó una lista de ${listNode.body.length}`);
 
         listNode.body.forEach((element, index) => {
-            const elementType = this.typeInferrer.infer(element);
+            const elementType = this.inferrer.infer(element);
             const expectedType = tupleType.elements[index];
 
             if (elementType && !expectedType.isAssignableFrom(elementType)) this.failAt(element, `La variable '${id}' se declaró con tipo '${tupleType.format()}', pero el elemento ${index} es de tipo '${elementType.format()}', se esperaba '${expectedType.format()}'`);

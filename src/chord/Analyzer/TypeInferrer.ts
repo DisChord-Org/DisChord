@@ -1,5 +1,6 @@
-import { ASTNode, BaseNode, TokenType } from "../model/types";
-import { DataType } from "../model/DataType";
+import { ASTNode, BaseNode, LoopNode, PrimitiveType, TokenType } from "../model/types";
+import { isRangeCall } from "../ast.guards";
+import { ArrayDataType, DataType, PrimitiveDataType, TupleDataType, UnionDataType } from "../model/DataType";
 import { CompilationContext } from "../model/CompilationContext";
 import { SubInferrerClass } from "./SubInferrer";
 import { LiteralInferrer } from "./inferrers/LiteralInferrer";
@@ -63,5 +64,25 @@ export class TypeInferrer<T extends string, N extends BaseNode<T>> {
         if (!InferrerClass) return undefined;
 
         return new (InferrerClass as unknown as SubInferrerClass<T, N>)(this).infer(node);
+    }
+
+    /**
+     * The type a `para` gives its variable: the element of a list, a number for `rango`, a character
+     * (a text) for a text, the keys (texts) of a `bdo`, any of the elements of a tuple.
+     * @param {LoopNode<T, N>} loop - The loop.
+     * @returns {DataType | undefined} The type, or `undefined` if the iterable gives none.
+     */
+    public inferLoopVariable (loop: LoopNode<T, N>): DataType | undefined {
+        const iterable = loop.iterable;
+
+        if (isRangeCall(iterable)) return PrimitiveDataType.Numero;
+
+        const type = this.infer(iterable);
+
+        if (type instanceof ArrayDataType) return type.element;
+        if (type instanceof TupleDataType) return UnionDataType.ofTypes([ ...type.elements ]);
+        if (PrimitiveDataType.is(type, PrimitiveType.Texto) || PrimitiveDataType.is(type, PrimitiveType.BDO)) return PrimitiveDataType.Texto;
+
+        return undefined;
     }
 }

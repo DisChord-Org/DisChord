@@ -1,5 +1,4 @@
 import { AnalysisRule } from "../AnalysisRule";
-import { TypeInferrer } from "../TypeInferrer";
 import { AccessNodeByIndex, ASTNode, BaseNode, LiteralNode, PrimitiveType, TokenType } from "../../model/types";
 import { DataType, PrimitiveDataType, TupleDataType } from "../../model/DataType";
 
@@ -17,8 +16,6 @@ import { DataType, PrimitiveDataType, TupleDataType } from "../../model/DataType
  * passes.
  */
 export class ValidateIndexAccessRule<T extends string, N extends BaseNode<T>> extends AnalysisRule<T, N> {
-    private readonly typeInferrer: TypeInferrer<T, N> = new TypeInferrer(this.context);
-
     /**
      * @override
      */
@@ -26,7 +23,7 @@ export class ValidateIndexAccessRule<T extends string, N extends BaseNode<T>> ex
         this.walkScoped(nodes, current => {
             if (current.type === TokenType.ACCESO_POR_INDICE) {
                 const access = current as AccessNodeByIndex<T, N>;
-                const receiverType = this.typeInferrer.infer(access.object);
+                const receiverType = this.inferrer.infer(access.object);
 
                 this.validateTupleIndex(access, receiverType);
                 this.validateTextIndex(access, receiverType);
@@ -54,7 +51,7 @@ export class ValidateIndexAccessRule<T extends string, N extends BaseNode<T>> ex
      * @private
      */
     private isKnownNonNumber (access: AccessNodeByIndex<T, N>): boolean {
-        const indexType = this.typeInferrer.infer(access.index);
+        const indexType = this.inferrer.infer(access.index);
 
         return indexType !== undefined && !PrimitiveDataType.Numero.isAssignableFrom(indexType);
     }

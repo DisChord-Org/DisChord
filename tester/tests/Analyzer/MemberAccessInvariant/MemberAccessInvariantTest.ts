@@ -37,7 +37,7 @@ const programs: string[] = [
 
 /**
  * @class MemberAccessInvariantTest
- * @description Validates that the analyzer decides the name of every non-static member access (`CompilationMarks.memberOf` is set for it) and leaves every static core library access unmarked, over programs that use all kinds of access. A table the analyzer never ran on must fail the same check, so the check can't pass by looking at nothing.
+ * @description Validates that the analyzer decides the name of every non-static member access (`CompilationMarks.members` has a name for it) and leaves every static core library access unmarked, over programs that use all kinds of access. A table the analyzer never ran on must fail the same check, so the check can't pass by looking at nothing.
  */
 export class MemberAccessInvariantTest extends Test {
     /**
@@ -105,7 +105,7 @@ export class MemberAccessInvariantTest extends Test {
             if (!isAccessNode(current)) return;
 
             const isStatic = disChordCoreLibUtils.resolveStatic(current) !== undefined;
-            const decided = symbolTable.marks.memberOf(current) !== undefined;
+            const decided = symbolTable.marks.members.get(current) !== undefined;
 
             if (isStatic) staticCount++;
             else memberCount++;

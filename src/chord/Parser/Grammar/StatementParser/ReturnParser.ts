@@ -1,6 +1,5 @@
 import { SubParser } from "../../SubParser";
 import { ASTNode, BaseNode, ReturnNode, TokenType, TokenTypeUnion } from "../../../model/types";
-import { Parser } from "../../Parser";
 import { ExpressionParser } from "../Expressions/ExpressionParser";
 
 export class ReturnParser<T extends string, N extends BaseNode<T>> extends SubParser<T, N> {
@@ -12,22 +11,16 @@ export class ReturnParser<T extends string, N extends BaseNode<T>> extends SubPa
      */
     static keywords: TokenTypeUnion<string>[] = [ TokenType.Devolver ];
 
-    /**
-     * @param parent - Reference to the main Parser orchestrator.
-     */
-    constructor (protected parent: Parser<T, N>) {
-        super(parent);
-    }
-    
+    /** What can follow `devolver` when it returns nothing. */
+    private static readonly END_OF_STATEMENT: readonly string[] = [ TokenType.R_BRACE, TokenType.Sino, TokenType.Ademas, TokenType.EOF ];
+
     public parse(): ReturnNode<T, N> {
         this.consume(TokenType.Devolver);
         
         let value: ASTNode<T, N> | undefined = undefined;
         const next = this.peek();
 
-        const isEndOfStatement = ([ TokenType.R_BRACE, TokenType.Sino, TokenType.Ademas, TokenType.EOF ] as TokenType[]).includes(next.type as TokenType);
-
-        if (!isEndOfStatement) {
+        if (!ReturnParser.END_OF_STATEMENT.includes(next.type)) {
             value = this.parent.get(ExpressionParser).parse();
         }
 

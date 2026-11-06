@@ -1,8 +1,6 @@
 import { SubParser } from "../../SubParser";
 import { ConditionNode, ASTNode, BaseNode, TokenType, TokenTypeUnion } from "../../../model/types";
 import { ExpressionParser } from "../Expressions/ExpressionParser";
-import { BlockParser } from "../BlockParser";
-import { Parser } from "../../Parser";
 
 export class ConditionParser<T extends string, N extends BaseNode<T>> extends SubParser<T, N> {
     /** To identify when this parser should be used */
@@ -13,13 +11,6 @@ export class ConditionParser<T extends string, N extends BaseNode<T>> extends Su
      */
     static keywords: TokenTypeUnion<string>[] = [ TokenType.Si, TokenType.Ademas, TokenType.Sino ];
 
-    /**
-     * @param parent - Reference to the main Parser orchestrator.
-     */
-    constructor (protected parent: Parser<T, N>) {
-        super(parent);
-    }
-
     public parse(): ConditionNode<T, N> {
         this.consume(TokenType.Si);
 
@@ -27,14 +18,14 @@ export class ConditionParser<T extends string, N extends BaseNode<T>> extends Su
         const test = this.parent.get(ExpressionParser).parse();
         this.consume(TokenType.R_PAREN);
 
-        const consequent: ASTNode<T, N>[] = (this.parent.get(BlockParser) as BlockParser<T, N>).parse().body;
+        const consequent: ASTNode<T, N>[] = this.parseBlockBody();
 
         let alternate: ConditionNode<T, N>['alternate'] = undefined;
 
         if (this.match(TokenType.Ademas)) {
             alternate = this.parse();
         } else if (this.match(TokenType.Sino)) {
-           alternate = (this.parent.get(BlockParser) as BlockParser<T, N>).parse().body;
+            alternate = this.parseBlockBody();
         }
 
         return this.createNode<ConditionNode<T, N>>({

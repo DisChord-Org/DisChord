@@ -1,6 +1,5 @@
 import { SubParser } from "../../SubParser";
 import { ASTNode, BaseNode, LiteralNode, LiteralTokens, TokenType, TokenTypeUnion } from "../../../model/types";
-import { Parser } from "../../Parser";
 
 export class LiteralParser<T extends string, N extends BaseNode<T>> extends SubParser<T, N> {
     /** To identify when this parser should be used */
@@ -11,10 +10,6 @@ export class LiteralParser<T extends string, N extends BaseNode<T>> extends SubP
      */
     static keywords: TokenTypeUnion<string>[] = [ TokenType.Verdadero, TokenType.Falso, TokenType.Indefinido ];
     
-    constructor(parent: Parser<T, N>) {
-        super(parent);
-    }
-
     public parse(): ASTNode<T, N> {
 
         const token = this.consume([ ...LiteralTokens ], `Se esperaba un literal (número, texto, booleano o indefinido)`);

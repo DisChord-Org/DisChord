@@ -3,6 +3,7 @@ import { CompilationContext } from "../model/CompilationContext";
 import { walkAST } from "../walkAST";
 import { BDOValidator } from "./BDOValidator";
 import { DisChordError, ErrorLevel } from "../../errors/ChordError";
+import { TypeInferrer } from "./TypeInferrer";
 
 /**
  * Base class for a single semantic analysis rule.
@@ -20,6 +21,18 @@ export abstract class AnalysisRule<T extends string, N extends BaseNode<T>> {
      * @param context - The active compilation context (symbol table, project paths, etc.).
      */
     constructor (protected context: CompilationContext<T>) {}
+
+    private typeInferrerInstance?: TypeInferrer<T, N>;
+
+    /**
+     * Infers the `DataType` of an expression — see `TypeInferrer`. Created on first use, so a rule
+     * that never infers a type doesn't build one.
+     * @returns {TypeInferrer<T, N>}
+     * @protected
+     */
+    protected get inferrer (): TypeInferrer<T, N> {
+        return this.typeInferrerInstance ??= new TypeInferrer<T, N>(this.context);
+    }
 
     /**
      * Runs this rule against a file's complete top-level AST. May mutate `nodes` directly (e.g.

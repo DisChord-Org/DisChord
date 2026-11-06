@@ -4,7 +4,7 @@ import { SubGenerator } from "../../SubGenerator";
 /**
  * Sub-generator responsible for compiling instantiation nodes ('Nuevo') into native JavaScript.
  * Handles the transpilation of class/object creation syntax.
- * * @class NewVisitor
+ * @class NewVisitor
  * @extends {SubGenerator<T, N>}
  * @template {string} T - Extensible token type registry.
  * @template {BaseNode<T>} N - Extensible Abstract Syntax Tree (AST) node structure.

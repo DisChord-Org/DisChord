@@ -19,7 +19,7 @@ export class SuperVisitor<T extends string, N extends BaseNode<T>> extends SubGe
 
     /**
      * Transpiles parent reference operators down to standard ECMAScript 'super' invocations.
-     * @param {N} node - The generic operational syntax tree node instance.
+     * @param {SuperNode<T>} node - The super syntax tree node.
      * @returns {string} The native JavaScript structural 'super' literal keyword string.
      * @public
      */

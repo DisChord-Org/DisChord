@@ -2,7 +2,6 @@ import { AnalysisRule } from "../AnalysisRule";
 import { ASTNode, BaseNode, FunctionNode, TokenType, VariableNode } from "../../model/types";
 import { ArrayDataType, DataType, TupleDataType, UnionDataType, UserClassDataType, VoidDataType } from "../../model/DataType";
 
-
 /**
  * Checks the names a `tipo` annotation uses, which `TypeAnnotationParser` can't: a class of the
  * user may be declared further down the file, so the parser leaves any unrecognized name as a
@@ -44,9 +43,15 @@ export class ValidateTypeAnnotationsRule<T extends string, N extends BaseNode<T>
      * @private
      */
     private validate (type: DataType, location: BaseNode<T>['location'], allowsVoid: boolean, inContainer = false): void {
-        if (type instanceof UserClassDataType && !this.context.symbolTable.classes.isUserClass(type.name)) this.fail(`Tipo desconocido '${type.name}'. Tipos válidos: ${this.context.coreLib.annotableTypeNames()} o una clase declarada en el archivo; también T[], [A, B] y A|B`, location);
+        if (type instanceof UserClassDataType && !this.context.symbolTable.classes.isUserClass(type.name)) {
+            this.fail(`Tipo desconocido '${type.name}'. Tipos válidos: ${this.context.coreLib.annotableTypeNames()} o una clase declarada en el archivo; también T[], [A, B] y A|B`, location);
+        }
 
-        if (type instanceof VoidDataType && !allowsVoid) this.fail(inContainer ? `'${VoidDataType.typeName}' no puede ser el tipo de los elementos de una lista ni de una tupla` : `'${VoidDataType.typeName}' solo puede usarse como tipo de retorno`, location);
+        if (type instanceof VoidDataType && !allowsVoid) {
+            this.fail(inContainer
+                ? `'${VoidDataType.typeName}' no puede ser el tipo de los elementos de una lista ni de una tupla`
+                : `'${VoidDataType.typeName}' solo puede usarse como tipo de retorno`, location);
+        }
 
         if (type instanceof UnionDataType) type.members.forEach(member => this.validate(member, location, allowsVoid));
         if (type instanceof ArrayDataType) this.validate(type.element, location, false, true);

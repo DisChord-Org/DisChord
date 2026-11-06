@@ -1,5 +1,4 @@
 import { ASTNode, BaseNode, TokenType, TokenTypeUnion } from "../../../model/types";
-import { Parser } from "../../Parser";
 import { SubParser } from "../../SubParser";
 import { AssignmentParser } from "./AssignmentParser";
 
@@ -14,28 +13,23 @@ import { AssignmentParser } from "./AssignmentParser";
  * 6.           ArithmeticParser
  * 7.           UnaryParser
  * 8.           AccessParser
- * 9.           PrimaryParser           ->      AssignmentParser
+ * 9.           PrimaryParser           ->      AssignmentParser (the items of a list and of a call),
+ *                                              ExpressionParser (a parenthesized expression),
+ *                                              BDOParser (a `{ ... }` block)
  */
 
 export class ExpressionParser<T extends string, N extends BaseNode<T>> extends SubParser<T, N> {
     /** To identify when this parser should be used */
     static triggerToken: TokenType | undefined;
 
-   /**
+    /**
      * Collection of reserved keywords this specific sub-parser registers
      */
     static keywords: TokenTypeUnion<string>[] = [];
 
     /**
-     * @param parent - Reference to the main Parser orchestrator.
-     */
-    constructor (protected parent: Parser<T, N>) {
-        super(parent);
-    }
-
-    /**
      * Entry point for the SubParser.
-     * Consumes the ES statement and calls the expressions subparsers.
+     * Delegates to the lowest-precedence level, `AssignmentParser`, which calls the rest.
      */
     public parse(): ASTNode<T, N> {
         return this.parent.get(AssignmentParser).parse();

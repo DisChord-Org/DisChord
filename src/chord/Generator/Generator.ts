@@ -132,14 +132,6 @@ export class Generator<T extends string, N extends BaseNode<T>> extends Generato
     }
 
     /**
-     * Secure utility method to evaluate optional or nullable structural properties.
-     * @param node - Optional AST child target.
-     */
-    public visitIfExists(node: ASTNode<T, N> | undefined): string | undefined {
-        return node ? this.visit(node) : undefined;
-    }
-
-    /**
      * Visits a node known to sit in *statement* position (a top-level program node, or an entry
      * in a block/loop/condition/function body) rather than expression position — deferring to the
      * responsible SubGenerator's `needsStatementParens` to decide whether its output needs

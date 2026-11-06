@@ -1,5 +1,4 @@
 import { BaseNode, PassLoopNode, TokenType, TokenTypeUnion } from "../../../../model/types";
-import { Parser } from "../../../Parser";
 import { SubParser } from "../../../SubParser";
 
 export class PassParser<T extends string, N extends BaseNode<T>> extends SubParser<T, N> {
@@ -10,13 +9,6 @@ export class PassParser<T extends string, N extends BaseNode<T>> extends SubPars
      * Collection of reserved keywords this specific sub-parser registers
      */
     static keywords: TokenTypeUnion<string>[] = [ TokenType.Pasar ];
-
-    /**
-     * @param parent - Reference to the main Parser orchestrator.
-     */
-    constructor (protected parent: Parser<T, N>) {
-        super(parent);
-    }
 
     public parse(): PassLoopNode<T> {
         this.consume(TokenType.Pasar);

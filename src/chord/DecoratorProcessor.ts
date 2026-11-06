@@ -3,9 +3,8 @@ import { Decorator } from './model/types';
 /** Name a decorator is kept under: one of the keys of `Decorator`, so a rename cannot go unnoticed by its consumers. */
 type DecoratorName = keyof typeof Decorator;
 
-type PrimitiveBoxTypes = boolean | string | string[];
-type DecoratorBoxContent = PrimitiveBoxTypes | Record<string, PrimitiveBoxTypes>;
-type DecoratorBoxRecord = Record<string, DecoratorBoxContent>;
+/** Decorators only flag the next node, so the box holds booleans. */
+type DecoratorBoxRecord = Partial<Record<DecoratorName, boolean>>;
 
 /**
  * Utility class to manage metadata provided by decorators.
@@ -17,18 +16,11 @@ export class DecoratorProcessor {
     private static DecoratorBox: DecoratorBoxRecord = {};
 
     /**
-     * @returns The current state of the decorator storage.
-     */
-    static get box (): DecoratorBoxRecord {
-        return this.DecoratorBox;
-    }
-
-    /**
      * Registers a decorator and its content in the buffer.
      * @param decorator - The unique identifier of the decorator.
      * @param content - The metadata value to store.
      */
-    static addDecorator (decorator: DecoratorName, content: DecoratorBoxContent): void {
+    static addDecorator (decorator: DecoratorName, content: boolean): void {
         this.DecoratorBox[decorator] = content;
     }
 
@@ -36,40 +28,20 @@ export class DecoratorProcessor {
      * Removes a decorator from the buffer to prevent it from affecting subsequent nodes.
      * @param decorator - The identifier of the decorator to remove.
      */
-    static deleteDecorator (decorator: DecoratorName): void {
+    private static deleteDecorator (decorator: DecoratorName): void {
         delete this.DecoratorBox[decorator];
     }
 
     /**
-     * Performs a deep comparison between the stored content and the provided value.
-     * Handles primitives and arrays of primitives correctly.
-     * * @param decorator - The identifier to check.
-     * @param content - The value to compare against the stored one.
-     * @returns True if the content matches (by value, not just reference).
-     */
-    static match (decorator: DecoratorName, content: DecoratorBoxContent): boolean {
-        const stored = this.DecoratorBox[decorator];
-
-        if (typeof stored !== typeof content) return false;
-
-        if (Array.isArray(stored) && Array.isArray(content)) {
-            if (stored.length !== content.length) return false;
-            return stored.every((val, index) => val === content[index]);
-        }
-
-        return stored === content;
-    }
-
-    /**
-     * Checks if a decorator matches the provided content and then immediately 
+     * Checks if a decorator matches the provided value and then immediately
      * removes it from the buffer regardless of the match result.
      * * This ensures the "one-shot" nature of decorators in the parser.
      * * @param decorator - The identifier to check.
      * @param content - The value to compare.
      * @returns True if the values matched before deletion.
      */
-    static matchAndDelete (decorator: DecoratorName, content: DecoratorBoxContent): boolean {
-        const isMatch = this.match(decorator, content);
+    static matchAndDelete (decorator: DecoratorName, content: boolean): boolean {
+        const isMatch = this.DecoratorBox[decorator] === content;
 
         this.deleteDecorator(decorator);
 

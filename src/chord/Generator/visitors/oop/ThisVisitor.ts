@@ -20,7 +20,7 @@ export class ThisVisitor<T extends string, N extends BaseNode<T>> extends SubGen
 
     /**
      * Transpiles context keywords yielding standard execution scope tokens.
-     * @param {N} node - The generic operational syntax tree node instance.
+     * @param {ThisNode<T>} node - The this syntax tree node.
      * @returns {string} The native JavaScript structural 'this' literal keyword string.
      * @public
      */

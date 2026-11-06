@@ -1,7 +1,5 @@
 import { SubParser } from "../../SubParser";
 import { BaseNode, DeclarationKind, FunctionNode, TokenType, TokenTypeUnion } from "../../../model/types";
-import { BlockParser } from "../BlockParser";
-import { Parser } from "../../Parser";
 import { DecoratorProcessor } from "../../../DecoratorProcessor";
 import { DataType } from "../../../model/DataType";
 import { TypeAnnotationParser } from "./TypeAnnotationParser";
@@ -16,13 +14,6 @@ export class FunctionParser<T extends string, N extends BaseNode<T>> extends Sub
      */
     static keywords: TokenTypeUnion<string>[] = [ TokenType.Funcion ];
 
-    /**
-     * @param parent - Reference to the main Parser orchestrator.
-     */
-    constructor (protected parent: Parser<T, N>) {
-        super(parent);
-    }
-
     private isConstructor: boolean = false;
     private isMethod: boolean = true;
 
@@ -36,10 +27,7 @@ export class FunctionParser<T extends string, N extends BaseNode<T>> extends Sub
         return this;
     }
 
-
     public parse(): FunctionNode<T, N> {
-        let id: string;
-
         const flags = {
             constructor: this.isConstructor,
             method: this.isMethod
@@ -52,27 +40,17 @@ export class FunctionParser<T extends string, N extends BaseNode<T>> extends Sub
         const isAsync: boolean = DecoratorProcessor.matchAndDelete('asincrono', true);
         const isStatic: boolean = DecoratorProcessor.matchAndDelete('fijar', true);
 
-        if (flags.constructor) {
-            id = this.declare(DeclarationKind.Constructor, this.consume(TokenType.IDENTIFICADOR, "Se esperaba el nombre del constructor."));
-        } else {
-            this.consume(TokenType.Funcion);
-
-            // a method may be named after a reserved word (`funcion en() {}`); a free function may not.
-            const nextToken = this.peek();
-            const nameType = flags.method && this.isReservedMemberName(nextToken) ? nextToken.type : TokenType.IDENTIFICADOR;
-            id = this.declare(flags.method ? DeclarationKind.Method : DeclarationKind.Function, this.consume(nameType, "Se esperaba el nombre de la función."));
-        }
+        const id = this.parseName(flags);
 
         return this.within(id, () => {
             this.consume(TokenType.L_PAREN, `Después del nombre de la función se debe abrir una expresión con '(' para especificar los parámetros.`);
             const typeParser = new TypeAnnotationParser(this.parent);
             const params: string[] = [];
             const paramTypes: (DataType | undefined)[] = [];
-            while (!this.isAtEnd() && this.peek().type !== TokenType.R_PAREN) {
+            this.parseDelimited(TokenType.R_PAREN, () => {
                 params.push(this.declare(DeclarationKind.Parameter, this.consume(TokenType.IDENTIFICADOR, "Se esperaba el nombre del parámetro.")));
                 paramTypes.push(typeParser.parse());
-                if (this.peek().type === TokenType.COMA) this.consume(TokenType.COMA);
-            }
+            }, true);
             this.consume(TokenType.R_PAREN);
 
             let returnType: DataType | undefined;
@@ -87,7 +65,7 @@ export class FunctionParser<T extends string, N extends BaseNode<T>> extends Sub
                 returnType = typeParser.parseType();
             }
 
-            const body = (this.parent.get(BlockParser) as BlockParser<T, N>).parse().body;
+            const body = this.parseBlockBody();
 
             return this.createNode<FunctionNode<T, N>>({
                 type: TokenType.Funcion,
@@ -104,6 +82,21 @@ export class FunctionParser<T extends string, N extends BaseNode<T>> extends Sub
                 body
             });
         });
+    }
+
+    /** Consumes and declares the name: the constructor's, or a method's or free function's after `funcion`. */
+    private parseName(flags: { constructor: boolean; method: boolean }): string {
+        if (flags.constructor) {
+            return this.declare(DeclarationKind.Constructor, this.consume(TokenType.IDENTIFICADOR, "Se esperaba el nombre del constructor."));
+        }
+
+        this.consume(TokenType.Funcion);
+
+        // a method may be named after a reserved word (`funcion en() {}`); a free function may not.
+        const nextToken = this.peek();
+        const nameType = flags.method && this.isReservedMemberName(nextToken) ? nextToken.type : TokenType.IDENTIFICADOR;
+
+        return this.declare(flags.method ? DeclarationKind.Method : DeclarationKind.Function, this.consume(nameType, "Se esperaba el nombre de la función."));
     }
 
     private reset () {

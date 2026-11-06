@@ -89,17 +89,9 @@ export class ValidateClassHierarchyRule<T extends string, N extends BaseNode<T>>
      * @private
      */
     private nearestAncestorMethod (className: string, name: string, methodsOf: Map<string, Map<string, FunctionNode<T, N>>>): { owner: string; method: FunctionNode<T, N> } | undefined {
-        const registry = this.context.symbolTable.classes;
-        const seen = new Set<string>();
-        let current: string | undefined = className;
-
-        while (current !== undefined && !seen.has(current) && registry.isUserClass(current)) {
-            seen.add(current);
-
+        for (const current of this.context.symbolTable.classes.chainOf(className)) {
             const method = methodsOf.get(current)?.get(name);
             if (method) return { owner: current, method };
-
-            current = registry.superClassOf(current);
         }
 
         return undefined;
@@ -112,17 +104,13 @@ export class ValidateClassHierarchyRule<T extends string, N extends BaseNode<T>>
      */
     private cycleThrough (node: ClassNode<T, N>): string[] | undefined {
         const registry = this.context.symbolTable.classes;
-        const chain = [ node.id ];
-        const seen = new Set<string>([ node.id ]);
-        let current = registry.superClassOf(node.id);
+        const parent = registry.superClassOf(node.id);
+        if (parent === undefined) return undefined;
 
-        while (current !== undefined && registry.isUserClass(current)) {
+        const chain = [ node.id ];
+        for (const current of registry.chainOf(parent)) {
             chain.push(current);
             if (current === node.id) return chain;
-            if (seen.has(current)) return undefined;
-
-            seen.add(current);
-            current = registry.superClassOf(current);
         }
 
         return undefined;

@@ -22,7 +22,7 @@ export class BinaryExpressionVisitor<T extends string, N extends BaseNode<T>> ex
      * @private
      * @readonly
      */
-    private readonly operatorsMap: Record<string, string> = {
+    private static readonly operatorsMap: Record<string, string> = {
         [TokenType.Mas]: "+",
         [TokenType.Menos]: "-",
         [TokenType.Por]: "*",
@@ -48,11 +48,7 @@ export class BinaryExpressionVisitor<T extends string, N extends BaseNode<T>> ex
      * @public
      */
     public visit(node: BinaryExpressionNode<T, N>): string {
-        const operation = this.operatorsMap[node.operator];
-
-        if (!operation) {
-            return `${this.parent.visit(node.left)} ${node.operator} ${this.parent.visit(node.right)}`;
-        }
+        const operation = BinaryExpressionVisitor.operatorsMap[node.operator] ?? node.operator;
 
         return `${this.parent.visit(node.left)} ${operation} ${this.parent.visit(node.right)}`;
     }

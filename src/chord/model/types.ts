@@ -6,6 +6,7 @@
  */
 
 export * from "./tokens";
+export * from "./operators";
 export * from "./symbolTypes";
 export * from "./declarations";
 export * from "./nodes";

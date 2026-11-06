@@ -19,14 +19,14 @@ export class ImportVisitor<T extends string, N extends BaseNode<T>> extends SubG
 
     /**
      * Normalizes and transpiles static file imports into standard JS module dependencies.
-     * @param {N} rawNode - The generic syntax tree node instance.
+     * @param {ImportNode<T>} node - The import syntax tree node.
      * @returns {string} The fully compiled inline ESM import statement or IIFE block wrapper string.
      * @public
      */
     public visit(node: ImportNode<T>): string {
         let path = node.path.replace(/\.chord$/, '');
 
-        if (path.startsWith('lib:')) {
+        if (ImportSpecifier.isLibrary(path)) {
             // an installed library lives at `<project root>/lib/<name>`, outside `dist/`: the specifier is
             // relative to where this file is written, so it climbs as many levels as the file is deep
             const libName = path.split(':')[1];

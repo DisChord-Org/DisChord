@@ -1,5 +1,4 @@
 import { AnalysisRule } from "../AnalysisRule";
-import { TypeInferrer } from "../TypeInferrer";
 import { ASTNode, BaseNode, ExpressionNode, PrimitiveType, TokenType } from "../../model/types";
 import { PrimitiveDataType } from "../../model/DataType";
 
@@ -14,8 +13,6 @@ import { PrimitiveDataType } from "../../model/DataType";
  * passes.
  */
 export class MarkInterpolatedBooleansRule<T extends string, N extends BaseNode<T>> extends AnalysisRule<T, N> {
-    private readonly typeInferrer: TypeInferrer<T, N> = new TypeInferrer(this.context);
-
     /**
      * @override
      */
@@ -23,10 +20,10 @@ export class MarkInterpolatedBooleansRule<T extends string, N extends BaseNode<T
         this.walkScoped(nodes, current => {
             if (current.type !== TokenType.EXPRESION || !(current as ExpressionNode<T, N>).interpolated) return;
 
-            const type = this.typeInferrer.infer((current as ExpressionNode<T, N>).object);
+            const type = this.inferrer.infer((current as ExpressionNode<T, N>).object);
 
             if (PrimitiveDataType.is(type, PrimitiveType.Booleano)) {
-                this.context.symbolTable.marks.markBoolean(current);
+                this.context.symbolTable.marks.booleans.set(current);
             }
         });
     }

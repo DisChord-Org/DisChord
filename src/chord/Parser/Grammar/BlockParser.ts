@@ -1,5 +1,4 @@
 import { ASTNode, BaseNode, BlockNode, TokenType, TokenTypeUnion } from "../../model/types";
-import { Parser } from "../Parser";
 import { SubParser } from "../SubParser";
 
 /**
@@ -15,13 +14,6 @@ export class BlockParser<T extends string, N extends BaseNode<T>> extends SubPar
      * Collection of reserved keywords this specific sub-parser registers
      */
     static keywords: TokenTypeUnion<string>[] = [];
-
-    /**
-     * @param parent - Reference to the main Parser orchestrator.
-     */
-    constructor (protected parent: Parser<T, N>) {
-        super(parent);
-    }
 
     /**
      * Parses a block of statements enclosed in braces.

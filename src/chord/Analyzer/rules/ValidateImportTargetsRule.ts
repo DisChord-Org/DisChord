@@ -3,6 +3,7 @@ import { AnalysisRule } from "../AnalysisRule";
 import { isImportNode } from "../../ast.guards";
 import { ASTNode, BaseNode } from "../../model/types";
 import { File } from "../../../utils/File";
+import { ImportSpecifier } from "../../../utils/ImportSpecifier";
 
 /**
  * Validates that every `importar` points at a module that actually exists, at analysis time —
@@ -39,8 +40,8 @@ export class ValidateImportTargetsRule<T extends string, N extends BaseNode<T>> 
      * @private
      */
     private resolveCandidates (specifier: string): string[] {
-        if (specifier.startsWith('lib:')) {
-            return [ this.context.projectRoot.resolve('lib', specifier.slice('lib:'.length), 'src', 'index.js') ];
+        if (ImportSpecifier.isLibrary(specifier)) {
+            return [ this.context.projectRoot.resolve('lib', specifier.slice(ImportSpecifier.LIB_PREFIX.length), 'src', 'index.js') ];
         }
 
         const sourceDir = this.context.codeProvider.currentFile.directory;

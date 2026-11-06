@@ -26,7 +26,7 @@ export class ClassVisitor<T extends string, N extends BaseNode<T>> extends SubGe
     }
 
     /**
-     * Transpiles a Class definition syntax node matching legacy indent structures.
+     * Transpiles a Class definition syntax node.
      * @param {ClassNode<T, N>} node - The target class analytical syntax tree node.
      * @returns {string} The fully compiled native JavaScript class code block representation.
      * @public

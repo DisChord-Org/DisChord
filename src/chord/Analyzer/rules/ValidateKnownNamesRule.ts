@@ -1,16 +1,18 @@
 import { AnalysisRule } from "../AnalysisRule";
 import { ASTNode, BaseNode, IdentificatorNode, ODBMode, ODBNode, SyntaxFunction, TokenType } from "../../model/types";
 import { JsGlobals } from "../../corelib/JsGlobals";
+import { EditDistance } from "../../../utils/EditDistance";
 
 /**
  * Rejects a name that is used but declared nowhere: `mostrar nadie` or `"hola {nadie}"` would compile
  * and fail only when run. Every identifier that is a reference (read, callee, target of an assignment,
- * object of an access, value in a block, the message of a `recolector`) must be, in this order:
+ * object of an access, value in a block, the message of a `recolector`) must be one of:
  *  1. a symbol of the table: a variable, parameter, function, class, import, or the name of a command or event;
- *  2. a name the rule tracks itself while it walks, since they are not symbols: the variable of a `para`
+ *  2. a JavaScript global of the curated list (`JsGlobals`);
+ *  3. a syntax function (`rango`) or a class of the core library;
+ *  4. a name the rule tracks itself while it walks, since they are not symbols: the variable of a `para`
  *     while its body lasts, and the keys of an intelligent block (`@BDOI`) while its body lasts;
- *  3. a class or function of the core library, or `rango`;
- *  4. a JavaScript global of the curated list (`JsGlobals`);
+ *  5. a function of the core library.
  * The message suggests a visible name close to the one written (`¿Querías decir 'nadie2'?`). A member
  * (`x.foo`) is not checked, and neither is using a name before declaring it.
  */
@@ -80,7 +82,7 @@ export class ValidateKnownNamesRule<T extends string, N extends BaseNode<T>> ext
         let bestDistance = 3;
 
         for (const candidate of candidates) {
-            const distance = ValidateKnownNamesRule.distance(name, candidate);
+            const distance = EditDistance.between(name, candidate);
 
             if (distance < bestDistance) {
                 best = candidate;
@@ -89,24 +91,5 @@ export class ValidateKnownNamesRule<T extends string, N extends BaseNode<T>> ext
         }
 
         return best;
-    }
-
-    /**
-     * The number of single-character edits (insert, delete, replace) between two names.
-     */
-    private static distance (a: string, b: string): number {
-        let previous = Array.from({ length: b.length + 1 }, (_, i) => i);
-
-        for (let i = 1; i <= a.length; i++) {
-            const row = [ i ];
-
-            for (let j = 1; j <= b.length; j++) {
-                row[j] = Math.min(previous[j] + 1, row[j - 1] + 1, previous[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
-            }
-
-            previous = row;
-        }
-
-        return previous[b.length];
     }
 }

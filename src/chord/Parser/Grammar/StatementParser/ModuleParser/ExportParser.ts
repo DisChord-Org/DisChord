@@ -1,6 +1,5 @@
 import { SubParser } from "../../../SubParser";
 import { BaseNode, ExportNode, TokenType, TokenTypeUnion } from "../../../../model/types";
-import { Parser } from "../../../Parser";
 
 export class ExportParser<T extends string, N extends BaseNode<T>> extends SubParser<T, N> {
     /** To identify when this parser should be used */
@@ -10,13 +9,6 @@ export class ExportParser<T extends string, N extends BaseNode<T>> extends SubPa
      * Collection of reserved keywords this specific sub-parser registers
      */
     static keywords: TokenTypeUnion<string>[] = [ TokenType.Exportar ];
-
-    /**
-     * @param parent - Reference to the main Parser orchestrator.
-     */
-    constructor (protected parent: Parser<T, N>) {
-        super(parent);
-    }
 
     public parse(): ExportNode<T, N> {
         this.consume(TokenType.Exportar);

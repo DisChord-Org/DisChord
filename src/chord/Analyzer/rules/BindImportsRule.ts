@@ -5,7 +5,7 @@ import { ASTNode, BaseNode, SymbolKind } from "../../model/types";
 /**
  * Pass 1 of the Analyzer's binding model ("Imports"): walks the complete AST and registers every
  * imported identifier into the `SymbolTable` as `SymbolKind.Declaration` (its real kind is opaque
- * at this stage — see `ClassParser.assertClassExists`'s old doc comment for why that mattered).
+ * at this stage).
  * Runs before the "Variables" pass so imported names are already known when declarations bind.
  */
 export class BindImportsRule<T extends string, N extends BaseNode<T>> extends AnalysisRule<T, N> {

@@ -1,7 +1,6 @@
 import { AnalysisRule } from "../AnalysisRule";
 import { AccessNodeByIndex, AssignmentNode, ASTNode, BaseNode, FunctionNode, LiteralNode, Symbol, TokenType, VariableNode } from "../../model/types";
 import { isIdentificatorNode } from "../../ast.guards";
-import { TypeInferrer } from "../TypeInferrer";
 
 /**
  * Validates that every reassignment (`x es <expr>`, an `ASIGNACION` node — not `var x tipo ... es
@@ -24,13 +23,6 @@ import { TypeInferrer } from "../TypeInferrer";
  * target.
  */
 export class ValidateAssignmentTypesRule<T extends string, N extends BaseNode<T>> extends AnalysisRule<T, N> {
-    /**
-     * Delegate for inferring a `DataType` from the assigned expression — see `TypeInferrer`.
-     * @private
-     * @readonly
-     */
-    private readonly typeInferrer: TypeInferrer<T, N> = new TypeInferrer(this.context);
-
     /**
      * The variables and parameters declared with a type. An element of a list or tuple is only checked
      * on assignment through one of these: one whose type was inferred stays free to change, as the
@@ -78,11 +70,7 @@ export class ValidateAssignmentTypesRule<T extends string, N extends BaseNode<T>
      * @private
      */
     private enter (node: ASTNode<T, N>): void {
-        switch (node.type) {
-            case TokenType.ASIGNACION:
-                this.validateAssignment(node as AssignmentNode<T, N>);
-                break;
-        }
+        if (node.type === TokenType.ASIGNACION) this.validateAssignment(node as AssignmentNode<T, N>);
     }
 
     /**
@@ -106,7 +94,7 @@ export class ValidateAssignmentTypesRule<T extends string, N extends BaseNode<T>
         const declaredType = this.context.symbolTable.lookup(node.left.value)?.dataType;
         if (!declaredType) return;
 
-        const assignedType = this.typeInferrer.infer(node.assignment);
+        const assignedType = this.inferrer.infer(node.assignment);
         if (!assignedType) return;
 
         if (!declaredType.isAssignableFrom(assignedType)) this.failAt(node, `La variable '${node.left.value}' es de tipo '${declaredType.format()}' pero se le asignó un valor de tipo '${assignedType.format()}'`);
@@ -126,8 +114,8 @@ export class ValidateAssignmentTypesRule<T extends string, N extends BaseNode<T>
         const symbol = isIdentificatorNode(root) ? this.context.symbolTable.lookup(root.value) : undefined;
         if (!symbol || !this.annotated.has(symbol)) return;
 
-        const elementType = this.typeInferrer.infer(target);
-        const assignedType = elementType ? this.typeInferrer.infer(node.assignment) : undefined;
+        const elementType = this.inferrer.infer(target);
+        const assignedType = elementType ? this.inferrer.infer(node.assignment) : undefined;
         if (!elementType || !assignedType) return;
 
         if (!elementType.isAssignableFrom(assignedType)) this.failAt(node, `La variable '${this.describe(target)}' es de tipo '${elementType.format()}' pero se le asignó un valor de tipo '${assignedType.format()}'`);

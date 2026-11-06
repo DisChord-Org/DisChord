@@ -1,15 +1,8 @@
-// if this file exceeds 500 lines of code, it will be refactored
-
 import { isIdentificatorNode } from "../ast.guards";
-import { AnyDataType, ArrayDataType, ClassDataType, DataType, PrimitiveDataType, UnionDataType } from "../model/DataType";
-import { AccessNode, ASTNode, BaseNode, CallNode, PrimitiveType, TokenType } from "../model/types";
-import { CoreLib, CoreLibClass, CoreLibMember, ResolvedMember } from "./corelib.types";
-
-/** Every member of a class counts: the lookup is made to know its type. */
-const anyMember = (): boolean => true;
-
-/** The members a runtime module provides are skipped: the lookup is made to translate the access. */
-const rewritableMember = (member: CoreLibMember): boolean => !member.runtime;
+import { AnyDataType, ArrayDataType, ClassDataType, DataType, UnionDataType } from "../model/DataType";
+import { AccessNode, ASTNode, BaseNode, CallNode, TokenType } from "../model/types";
+import { ResolvedMember } from "./corelib.types";
+import { CoreLibClasses } from "./CoreLibClasses";
 
 /**
  * Read-only lookups over a `CoreLib`, so callers pass the raw names they have from the AST and
@@ -21,9 +14,7 @@ const rewritableMember = (member: CoreLibMember): boolean => !member.runtime;
  * (merged) table and have the shared visitors use that one.
  * @template {string} C - Class names present in the table.
  */
-export class CoreLibUtils<C extends string = string> {
-    constructor(public readonly corelib: CoreLib<C>) {}
-
+export class CoreLibUtils<C extends string = string> extends CoreLibClasses<C> {
     /**
      * Resolves an access whose object is itself a core library class.
      * @param {AccessNode<T, N>} access - The access node.
@@ -44,26 +35,20 @@ export class CoreLibUtils<C extends string = string> {
      * @param {AccessNode<T, N>} access - The access node.
      * @returns {ResolvedMember | undefined} The member, or `undefined` if no class has it as an instance member.
      */
-    resolveInstance<T extends string, N extends BaseNode<T>> (access: AccessNode<T, N>): ResolvedMember | undefined {
-        for (const key of Object.keys(this.corelib.classes)) {
-            const found = this.findRewritable(key as C, access.property);
-
-            if (found && !found.member.static) return found;
-        }
-
-        return undefined;
+    private resolveInstance<T extends string, N extends BaseNode<T>> (access: AccessNode<T, N>): ResolvedMember | undefined {
+        return this.resolveInstanceMembers(access)[0];
     }
 
     /**
      * Every class's non-static member called `access.property`, in declaration order. Unlike
-     * {@link resolveInstance} it doesn't stop at the first one, so a caller that needs to know
+     * {@link resolveInstance} it doesn't keep only the first one, so a caller that needs to know
      * whether the name is ambiguous across classes can tell.
      * @param {AccessNode<T, N>} access - The access node.
      * @returns {ResolvedMember[]} The matches, empty if no class has it as an instance member.
      */
     resolveInstanceMembers<T extends string, N extends BaseNode<T>> (access: AccessNode<T, N>): ResolvedMember[] {
-        return Object.keys(this.corelib.classes)
-            .map(key => this.findRewritable(key as C, access.property))
+        return this.classNames()
+            .map(key => this.findRewritable(key, access.property))
             .filter((found): found is ResolvedMember => found !== undefined && !found.member.static);
     }
 
@@ -104,11 +89,8 @@ export class CoreLibUtils<C extends string = string> {
      * has no such member or the type belongs to no class (a `bdo`'s own fields, a `booleano`):
      * guessing there would type a user's field after a core library one that happens to share its
      * name. With no receiver type (or `cualquiera`), falls back to looking the name up in every
-     * class and only resolves if they all agree on its type instance. A member the file itself declares in a
-     * class (`declaredByUser`) wins over the core library one of the same name when the receiver's
-     * type is unknown, so the name is left to the user's declaration. A known receiver type or a
-     * static access is unaffected: the receiver decides once it is known. Classes imported from
-     * another file aren't seen by the caller, so a member they declare is still resolved by name.
+     * class and only resolves if they all agree on its type. See {@link resolveInstanceMember} for
+     * when a member the file declares itself wins.
      * @private
      */
     private findForReturnType<T extends string, N extends BaseNode<T>> (access: AccessNode<T, N>, receiverType: DataType | undefined, declaredByUser: boolean): ResolvedMember | undefined {
@@ -135,56 +117,6 @@ export class CoreLibUtils<C extends string = string> {
         if (symbols.lookup(callee.value)) return undefined;
 
         return this.corelib.functions[callee.value];
-    }
-
-    /**
-     * Looks a member up in a class to know its type: every member counts, also the ones a runtime
-     * module provides (`usuario.nombre` is a `texto` although it is never rewritten). Methods first and then properties.
-     * @param {C} className - Core library class.
-     * @param {string} propName - Member name as written in source code.
-     * @returns {ResolvedMember | undefined} The member, or `undefined` if the class has no such member.
-     */
-    findMember(className: C, propName: string): ResolvedMember | undefined {
-        return this.lookupMember(className, propName, anyMember);
-    }
-
-    /**
-     * Looks a member up in a class to translate it: the members a runtime module provides are skipped,
-     * since the compiler leaves them as written. Methods first and then properties.
-     * @param {C} className - Core library class.
-     * @param {string} propName - Member name as written in source code.
-     * @returns {ResolvedMember | undefined} The member, or `undefined` if the class has no such member.
-     */
-    findRewritable(className: C, propName: string): ResolvedMember | undefined {
-        return this.lookupMember(className, propName, rewritableMember);
-    }
-
-    /**
-     * The shared core of {@link findMember} and {@link findRewritable}.
-     * @param {(member: CoreLibMember) => boolean} accepts - Whether a member found by that name is the one wanted.
-     * @private
-     */
-    private lookupMember(className: C, propName: string, accepts: (member: CoreLibMember) => boolean): ResolvedMember | undefined {
-        const classEntry: CoreLibClass = this.corelib.classes[className];
-        const qualifiedName = `${className}.${propName}`;
-
-        if (this.hasOwn(classEntry.methods, propName) && accepts(classEntry.methods[propName])) {
-            return {
-                qualifiedName,
-                member: classEntry.methods[propName],
-                isProperty: false
-            };
-        }
-
-        if (classEntry.properties && this.hasOwn(classEntry.properties, propName) && accepts(classEntry.properties[propName])) {
-            return {
-                qualifiedName,
-                member: classEntry.properties[propName],
-                isProperty: true
-            };
-        }
-
-        return undefined;
     }
 
     /**
@@ -218,89 +150,12 @@ export class CoreLibUtils<C extends string = string> {
     }
 
     /**
-     * @param {string} name - A class name as written in source code.
-     * @returns {string | undefined} The JavaScript constructor of the core library class of that name (`Mapa` → `Map`), or `undefined` if there is none or it can't be instantiated.
-     */
-    resolveConstructorOf(name: string): string | undefined {
-        return this.hasOwn(this.corelib.classes, name) ? this.corelib.classes[name as C].constructs : undefined;
-    }
-
-    /**
      * @param {ASTNode<T, N>} target - What follows `nuevo`: a class name, called (`Mapa()`) or not.
      * @returns {ClassDataType | undefined} The type of the instance it creates, or `undefined` if it isn't a core library class typed by its class.
      */
     resolveConstructedType<T extends string, N extends BaseNode<T>> (target: ASTNode<T, N>): ClassDataType | undefined {
         const name = this.instantiatedName(target);
         return name === undefined ? undefined : this.resolveClassType(name);
-    }
-
-    /**
-     * @param {string} name - Class name as written in source code.
-     * @returns {ClassDataType | undefined} The type of an instance of that class, or `undefined` if it isn't a core library class whose instances are typed by their class (`Texto` has a primitive instead).
-     */
-    resolveClassType(name: string): ClassDataType | undefined {
-        if (!this.hasOwn(this.corelib.classes, name)) return undefined;
-
-        const receiver = this.corelib.classes[name as C].receiver;
-        return receiver instanceof ClassDataType ? receiver : undefined;
-    }
-
-    /**
-     * @param {string} name - A name as written in source code.
-     * @returns {boolean} Whether it is the name of a class of the table.
-     */
-    isClassName(name: string): boolean {
-        return this.hasOwn(this.corelib.classes, name);
-    }
-
-    /**
-     * @param {string} name - A name as written in source code.
-     * @returns {boolean} Whether it is the name of a class the compiler puts in scope itself (`cliente`, `canal`), which a program can't declare, except as a parameter.
-     */
-    isInjectedName(name: string): boolean {
-        return this.isClassName(name) && this.corelib.classes[name as C].injected === true;
-    }
-
-    /**
-     * @param {string} name - Class name as written in a `tipo` annotation.
-     * @returns {DataType | undefined} What a value of that class is typed as (`Lista` is `cualquiera[]`), or `undefined` if it isn't a core library class with a receiver.
-     */
-    resolveClassReceiver(name: string): DataType | undefined {
-        return this.hasOwn(this.corelib.classes, name) ? this.corelib.classes[name as C].receiver : undefined;
-    }
-
-    /**
-     * The names that can be written after `tipo` (or `->`) without declaring anything: the primitives,
-     * `cualquiera`, and the core library classes that are a type of their own (`Mapa`, `Lista`...). A
-     * class that is just another spelling of a primitive (`Texto`, `Numero`, `BDO`) and one with only
-     * static members (`Mates`, `JSON`, `consola`) are not in it. Derived from the real tables, so a
-     * message listing them can't drift from what is accepted.
-     * @returns {string} The names, separated by commas.
-     */
-    annotableTypeNames(): string {
-        return [ ...Object.values(PrimitiveType), AnyDataType.Any.format(), ...this.annotableClassNames() ].join(', ');
-    }
-
-    /**
-     * The classes a `tipo` annotation can name: those whose values have a type of their own, so
-     * not `consola` (nothing is an instance of it) nor `Texto` (its values are the primitive `texto`).
-     * @returns {C[]} Class names, in declaration order.
-     */
-    annotableClassNames(): C[] {
-        return (Object.keys(this.corelib.classes) as C[]).filter(name => {
-            const receiver = this.resolveClassReceiver(name);
-            return receiver !== undefined && !(receiver instanceof PrimitiveDataType);
-        });
-    }
-
-    /**
-     * A union belongs to a class only if that class's receiver accepts every member
-     * (`texto[]|numero[]` is a `Lista`); a mixed one (`texto|Mapa`) belongs to none, so member lookups on it resolve by name.
-     * @param {DataType} type - The type of a value.
-     * @returns {C | undefined} The class whose `receiver` accepts it, or `undefined` if it belongs to none.
-     */
-    classOf(type: DataType): C | undefined {
-        return (Object.keys(this.corelib.classes) as C[]).find(key => this.corelib.classes[key].receiver?.isAssignableFrom(type));
     }
 
     /**
@@ -329,14 +184,5 @@ export class CoreLibUtils<C extends string = string> {
     private instantiatedName<T extends string, N extends BaseNode<T>> (target: ASTNode<T, N>): string | undefined {
         const callee = target.type === TokenType.LLAMADA ? (target as CallNode<T, N>).object : target;
         return isIdentificatorNode(callee) ? callee.value : undefined;
-    }
-
-    /**
-     * @param {object} target - Object to inspect.
-     * @param {string} key - Key to look for.
-     * @returns {boolean} `true` if `key` is an own key of `target`, ignoring anything inherited.
-     */
-    private hasOwn(target: object, key: string): boolean {
-        return Object.prototype.hasOwnProperty.call(target, key);
     }
 }

@@ -32,6 +32,27 @@ export abstract class SubGenerator<T extends string, N extends BaseNode<T>> {
     public needsStatementParens(node: ASTNode<T, N>): boolean {
         return false;
     }
+
+    /**
+     * Renders the statements of a block body, one per line, indented and terminated by `;`.
+     * @param nodes - The statements of the block.
+     * @returns {string} The lines joined with newlines (without the surrounding braces).
+     * @protected
+     */
+    protected renderBlock(nodes: ASTNode<T, N>[]): string {
+        return nodes.map(node => "    " + this.parent.visitStatement(node) + ";").join('\n');
+    }
+
+    /**
+     * Wraps generated code in parens when it starts with `await`, so a member or index can be taken
+     * from the awaited value instead of from the promise.
+     * @param code - The generated receiver.
+     * @returns {string} The code, parenthesized if it is an await expression.
+     * @protected
+     */
+    protected parenthesizeAwait(code: string): string {
+        return code.startsWith('await ') ? `(${code})` : code;
+    }
 }
 
 /**

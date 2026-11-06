@@ -1,7 +1,6 @@
 import { AnalysisRule } from "../AnalysisRule";
-import { TypeInferrer } from "../TypeInferrer";
 import { UserMemberResolver } from "../UserMemberResolver";
-import { ASTNode, AccessNode, BaseNode, CallNode, ClassNode, FunctionNode, TokenType } from "../../model/types";
+import { ASTNode, AccessNode, BaseNode, CallNode, FunctionNode, TokenType } from "../../model/types";
 import { isAccessNode, isIdentificatorNode } from "../../ast.guards";
 import { AnyDataType, UnionDataType, UserClassDataType } from "../../model/DataType";
 import { asyncRuntimeHelperNames } from "../../corelib";
@@ -26,7 +25,6 @@ import { asyncRuntimeHelperNames } from "../../corelib";
  * earlier passes.
  */
 export class ResolveAwaitedCallsRule<T extends string, N extends BaseNode<T>> extends AnalysisRule<T, N> {
-    private readonly typeInferrer: TypeInferrer<T, N> = new TypeInferrer(this.context);
     private readonly members: UserMemberResolver<T> = new UserMemberResolver(this.context);
 
     /**
@@ -105,7 +103,7 @@ export class ResolveAwaitedCallsRule<T extends string, N extends BaseNode<T>> ex
 
         this.assertMayAwait(`Se llama a la función asíncrona '${name}' desde una función que no es asíncrona; márcala con @asincrono`, call.location);
 
-        this.context.symbolTable.marks.markAwaited(call);
+        this.context.symbolTable.marks.awaited.set(call);
     }
 
     /**
@@ -135,13 +133,11 @@ export class ResolveAwaitedCallsRule<T extends string, N extends BaseNode<T>> ex
             return !!this.members.resolve(access)?.metadata.isAsync;
         }
 
-        if (isIdentificatorNode(receiver)) {
-            if (this.context.coreLib.isClassName(receiver.value) && !symbolTable.lookup(receiver.value)) {
-                return !!this.context.coreLib.resolveStatic(access)?.member.async;
-            }
+        if (isIdentificatorNode(receiver) && this.context.coreLib.isClassName(receiver.value) && !symbolTable.lookup(receiver.value)) {
+            return !!this.context.coreLib.resolveStatic(access)?.member.async;
         }
 
-        const type = this.typeInferrer.infer(receiver);
+        const type = this.inferrer.infer(receiver);
         if (type instanceof UserClassDataType) return !!this.members.resolve(access, type)?.metadata.isAsync;
         if (type instanceof UnionDataType) return this.isAsyncOnUnion(type, access.property);
         if (type && !(type instanceof AnyDataType)) return false;

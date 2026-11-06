@@ -2,6 +2,7 @@ import { Location, NamedTextLiteral, Token, TokenType } from './model/types';
 import { ChordError, ErrorLevel } from '../errors/ChordError';
 import { CompilationContext } from './model/CompilationContext';
 import { SymbolTranslationMap } from './model/Symbols';
+import { interpolate } from './Interpolation';
 
 export class Lexer<T extends string> {
     /**
@@ -22,10 +23,20 @@ export class Lexer<T extends string> {
      */
     private static readonly ASCII_ONLY = /^[\u0000-\u007F]*$/;
 
+    /** A decimal digit. */
+    private static readonly DIGIT = /[0-9]/;
+
     private line = 1;
     private column = 1;
     private current = 0;
     private input: string;
+
+    /** The tokens read so far. */
+    private tokens: Token<T>[] = [];
+
+    // an empty line is one with nothing on it: no token and no comment
+    private lineHasContent = false;
+    private blankLinePending = false;
 
     /**
      * @param context - The compilation context.
@@ -71,300 +82,209 @@ export class Lexer<T extends string> {
         }
     }
 
-    /**
-     * Where the character at `offset` of a text's content is in the file: the content starts right
-     * after the opening quote, and a new line inside the text starts a new line of the file.
-     * @private
-     */
-    private locate (text: Token<T>, offset: number): Location {
-        const before = text.value.slice(0, offset).split('\n');
-
-        return before.length === 1
-            ? { line: text.location.line, column: text.location.column + 1 + offset }
-            : { line: text.location.line + before.length - 1, column: before[before.length - 1].length + 1 };
+    /** Throws a lexical error at `location`. */
+    private fail(message: string, location: Location): never {
+        throw new ChordError({ phase: ErrorLevel.Lexer, message, location });
     }
 
-    /**
-     * Rewrites an interpolated text (`"hola {n}!"`) to the tokens of `("hola " mas (n) mas "!")`.
-     * Each fragment of text spans exactly what it was read from, and what the rewrite invents (the
-     * parentheses, `mas`, and an empty text that opens the whole) is marked `synthetic` and has no
-     * width: the `(` and `mas` of an expression sit at its `{`, its `)` at its `}`, the outer
-     * parentheses at the start and at the end of the literal.
-     * @private
-     */
-    private interpolate (text: Token<T>): Token<T>[] {
-        const value = text.value;
-        const parts: ({ text: string; from: number; to: number } | { code: string; offset: number; open: number; close: number })[] = [];
-        let buffer = '';
-        let bufferStart = 0;
-        let found = false;
-        let index = 0;
-
-        while (index < value.length) {
-            const char = value[index];
-
-            if ((char === '{' || char === '}') && value[index + 1] === char) {
-                buffer += char;
-                index += 2;
-                continue;
-            }
-
-            if (char === '{') {
-                const close = value.indexOf('}', index + 1);
-                const code = close === -1 ? '' : value.slice(index + 1, close);
-
-                if (close !== -1 && /^\s*[\p{L}_]/u.test(code) && !code.includes('{')) {
-                    parts.push({ text: buffer, from: bufferStart, to: index }, { code, offset: index + 1, open: index, close });
-                    buffer = '';
-                    found = true;
-                    index = close + 1;
-                    bufferStart = index;
-                    continue;
-                }
-            }
-
-            buffer += char;
-            index++;
-        }
-
-        if (!found) return [ buffer === value ? text : { ...text, value: buffer } ];
-
-        parts.push({ text: buffer, from: bufferStart, to: value.length });
-
-        const synthetic = (type: TokenType, tokenValue: string, at: Location): Token<T> => ({ type, value: tokenValue, location: at, end: at, synthetic: true } as Token<T>);
-        const fragment = (content: string, from: number, to: number): Token<T> => ({ ...text, value: content, location: this.locate(text, from), end: this.locate(text, to) });
-        const start = this.locate(text, 0);
-        const result: Token<T>[] = [ synthetic(TokenType.L_PAREN, '(', text.location) ];
-        let first = true;
-
-        for (const part of parts) {
-            if ('code' in part) {
-                const open = this.locate(text, part.open);
-                const close = this.locate(text, part.close);
-
-                // the text always comes first, so the whole is a text however the expression is
-                if (first) result.push({ ...synthetic(TokenType.TEXTO, '', start) });
-
-                result.push(synthetic(TokenType.Mas, 'mas', open), synthetic(TokenType.L_PAREN, '(', open));
-                result.push(...this.tokenizeInside(text, part.code, part.offset));
-                result.push(synthetic(TokenType.R_PAREN, ')', close));
-                first = false;
-                continue;
-            }
-
-            if (part.text === '' && !first) continue;
-            if (part.text === '' && first && parts.length > 1) continue;
-
-            if (!first) result.push(synthetic(TokenType.Mas, 'mas', this.locate(text, part.from)));
-            result.push(fragment(part.text, part.from, part.to));
-            first = false;
-        }
-
-        result.push(synthetic(TokenType.R_PAREN, ')', text.end));
-
-        return result;
-    }
-
-    /**
-     * Tokenizes the expression written inside the braces of an interpolated text, with its tokens
-     * placed where they are in the file so an error points into the text.
-     * @private
-     */
-    private tokenizeInside (text: Token<T>, code: string, offset: number): Token<T>[] {
-        const inner = new Lexer<T>(this.context, code).tokenize();
-
-        // where each character of the text is in the file: the text starts right after its quote
-        const before = text.value.slice(0, offset).split('\n');
-        const line = text.location.line + before.length - 1;
-        const column = before.length === 1 ? text.location.column + 1 + offset : before[before.length - 1].length + 1;
-
-        const place = (at: Location): Location => at.line === 1
-            ? { line, column: column + at.column - 1 }
-            : { line: line + at.line - 1, column: at.column };
-
-        return inner.map(token => ({ ...token, location: place(token.location), end: place(token.end) }));
+    /** Adds a token to the output, carrying the blank line that precedes it, if any. */
+    private emit(token: Token<T>): void {
+        if (this.blankLinePending) token.blankLineBefore = true;
+        this.blankLinePending = false;
+        this.lineHasContent = true;
+        this.tokens.push(token);
     }
 
     public tokenize(): Token<T>[] {
-        const tokens: Token<T>[] = [];
-
-        // an empty line is one with nothing on it: no token and no comment
-        let lineHasContent = false;
-        let blankLinePending = false;
-
-        const emit = (token: Token<T>): void => {
-            if (blankLinePending) token.blankLineBefore = true;
-            blankLinePending = false;
-            lineHasContent = true;
-            tokens.push(token);
-        };
+        this.tokens = [];
+        this.lineHasContent = false;
+        this.blankLinePending = false;
 
         while (this.current < this.input.length) {
             const startLine = this.line;
             const startCol = this.column;
-            let char = this.peek();
+            const char = this.peek();
 
-            if (/\s/.test(char)) { // Espacios en blanco
-                if (char === '\n') {
-                    if (!lineHasContent) blankLinePending = true;
-                    lineHasContent = false;
-                }
-
-                this.advance();
-                continue;
+            if (/\s/.test(char)) {
+                this.skipWhitespace(char);
+            } else if (char === "/") {
+                this.readSlash(startLine, startCol);
+            } else if (char === '"') {
+                this.readString(startLine, startCol);
+            } else if (Lexer.DIGIT.test(char)) {
+                this.readNumber(startLine, startCol);
+            } else if (char === '@') {
+                this.readDecorator(startLine, startCol);
+            } else if (Lexer.WORD_START.test(char)) {
+                this.readWord(startLine, startCol);
+            } else {
+                this.readSymbol(char, startLine, startCol);
             }
-
-            if (char === "/") {  // Comentarios
-                lineHasContent = true;
-                this.advance();
-                const nextChar = this.peek(); // Consume el primer "/"
-            
-                if (nextChar === "/") { // Comentario de línea
-                    this.advance(); // Consume el segundo "/"
-                    while (this.current < this.input.length && this.peek() !== "\n") {
-                        this.advance();
-                    }
-                    continue;
-                } else if (nextChar === "*") { // Comentario de bloque
-                    this.advance(); // Consume "*"
-                    while (this.current < this.input.length) {
-                        if (this.peek() === "*" && this.input[this.current + 1] === "/") {
-                            this.advance(); // Consume "*"
-                            this.advance(); // Consume "/"
-                            break;
-                        }
-                        this.advance();
-                    }
-                    continue;
-                } else {
-                    // No es un comentario por lo que vamos a tratar "/" como operador "ENTRE"
-                    emit(this.createToken(SymbolTranslationMap["/"], SymbolTranslationMap["/"], startLine, startCol));
-                    continue;
-                }
-            }
-
-            if (char === '"') { // Strings
-                this.advance();
-                let value = "";
-                while (this.current < this.input.length && this.peek() !== '"') {
-                    value += this.advance();
-                }
-                this.advance();
-
-                const text = this.createToken("TEXTO", value, startLine, startCol);
-                const raw = tokens.length >= 1 && (tokens[tokens.length - 1].type === TokenType.Desde
-                    || (tokens.length >= 2 && tokens[tokens.length - 2].type === TokenType.JS && tokens[tokens.length - 1].type === TokenType.L_PAREN));
-
-                (raw ? [ text ] : this.interpolate(text)).forEach(emit);
-                continue;
-            }
-
-            if (/[0-9]/.test(char) || char === "0") { // Números y BigInt
-                let value = "";
-
-                if (this.peek() === "0" && /[bBoOxX]/.test(this.input[this.current + 1])) { // bin, oct, hex
-                    value += this.advance();
-                    value += this.advance();
-
-                    while (/[0-9a-fA-F]/.test(this.peek()) && this.current < this.input.length) {
-                        value += this.advance();
-                    }
-                } else {
-                    while (this.current < this.input.length) {
-                        const next = this.peek();
-                        
-                        if (/[0-9]/.test(next)) {
-                            value += this.advance();
-                        } else if (next === ".") {
-                            const nextChar = this.input[this.current + 1];
-                            if (/[0-9]/.test(nextChar) && !value.includes(".")) {
-                                value += this.advance();
-                            } else break; 
-                        } else break;
-                    }
-                }
-
-                if (this.peek() === "n") {
-                    value += this.advance();
-                    emit(this.createToken("BIGINT", value, startLine, startCol));
-                } else {
-                    emit(this.createToken(TokenType.NUMERO, value, startLine, startCol));
-                }
-                continue;
-            }
-
-            // Decoradores
-            if (char === '@') {
-                let value = this.advance();
-
-                while (this.current < this.input.length && Lexer.WORD_PART.test(this.peek())) {
-                    value += this.advance();
-                }
-
-                emit(this.createToken(TokenType.Decorador, value, startLine, startCol));
-                continue;
-            }
-
-            if (Lexer.WORD_START.test(char)) { // Keywords, identificadores, booleanos, undefined
-                let value = "";
-                while (Lexer.WORD_PART.test(this.peek()) && this.current < this.input.length) {
-                    value += this.advance();
-                }
-
-                // Composed and decomposed spellings of a letter (`ñ`) must be the same identifier.
-                value = value.normalize('NFC');
-
-                // A word right after `.` is always a member name, even if it is a reserved word
-                // (`lista.en(0)`, `fecha.entre`), so it never goes through the keyword lookup.
-                if (tokens[tokens.length - 1]?.type === TokenType.Punto) {
-                    emit(this.createToken(TokenType.IDENTIFICADOR, value, startLine, startCol));
-                } else if (value === TokenType.Verdadero || value === TokenType.Falso) {
-                    emit(this.createToken(TokenType.BOOLEANO, value, startLine, startCol));
-                } else if (value === TokenType.Indefinido) {
-                    emit(this.createToken(TokenType.Indefinido, value, startLine, startCol));
-                } else if (Object.prototype.hasOwnProperty.call(NamedTextLiteral, value)) {
-                    emit(this.createToken(TokenType.TEXTO, NamedTextLiteral[value as keyof typeof NamedTextLiteral], startLine, startCol));
-                } else if (Lexer.ASCII_ONLY.test(value) && this.context.keywordsManager.isKeyword(value)) {
-                    emit(this.createToken(this.context.keywordsManager.resolve(value.toLowerCase()) as TokenType, value, startLine, startCol));
-                } else {
-                    emit(this.createToken(TokenType.IDENTIFICADOR, value, startLine, startCol));
-                }
-                continue;
-            }
-
-            if (this.current < this.input.length - 1) {
-                const nextChar = this.input[this.current + 1];
-                const twoChar = char + nextChar;
-                if (SymbolTranslationMap[twoChar]) {
-                    this.advance();
-                    this.advance();
-                    emit(this.createToken(SymbolTranslationMap[twoChar], twoChar, startLine, startCol));
-                    continue;
-                }
-            }
-
-            if (char === ';') throw new ChordError({
-                phase: ErrorLevel.Lexer,
-                message: "No se usa ';': separa las propiedades y las sentencias con saltos de línea",
-                location: { line: startLine, column: startCol }
-            });
-
-            if (SymbolTranslationMap[char]) {
-                this.advance();
-                emit(this.createToken(SymbolTranslationMap[char], char, startLine, startCol));
-                continue;
-            }
-
-            throw new ChordError({
-                phase: ErrorLevel.Lexer,
-                message: `Carácter inesperado: ${char}`,
-                location: {
-                    line: this.line,
-                    column: this.column
-                }
-            });
         }
 
-        return tokens;
+        return this.tokens;
+    }
+
+    /** Consumes one whitespace character; a line break on a line with nothing on it makes a blank line. */
+    private skipWhitespace(char: string): void {
+        if (char === '\n') {
+            if (!this.lineHasContent) this.blankLinePending = true;
+            this.lineHasContent = false;
+        }
+
+        this.advance();
+    }
+
+    /** A `/` starts a line comment, a block comment, or is the `entre` operator. */
+    private readSlash(startLine: number, startCol: number): void {
+        this.lineHasContent = true;
+        this.advance(); // Consume el primer "/"
+        const nextChar = this.peek();
+
+        if (nextChar === "/") { // Comentario de línea
+            this.advance();
+            while (this.current < this.input.length && this.peek() !== "\n") this.advance();
+        } else if (nextChar === "*") { // Comentario de bloque
+            this.advance();
+            while (this.current < this.input.length) {
+                if (this.peek() === "*" && this.input[this.current + 1] === "/") {
+                    this.advance();
+                    this.advance();
+                    break;
+                }
+                this.advance();
+            }
+        } else { // No es un comentario: "/" es el operador "ENTRE"
+            this.emit(this.createToken(SymbolTranslationMap["/"], SymbolTranslationMap["/"], startLine, startCol));
+        }
+    }
+
+    /** Reads a text; an interpolated one is rewritten to several tokens, except right after `desde` or `js(`. */
+    private readString(startLine: number, startCol: number): void {
+        this.advance();
+        let value = "";
+        while (this.current < this.input.length && this.peek() !== '"') {
+            value += this.advance();
+        }
+        this.advance();
+
+        const text = this.createToken("TEXTO", value, startLine, startCol);
+        const previous = this.tokens[this.tokens.length - 1];
+        const beforePrevious = this.tokens[this.tokens.length - 2];
+        const raw = previous !== undefined && (previous.type === TokenType.Desde
+            || (beforePrevious?.type === TokenType.JS && previous.type === TokenType.L_PAREN));
+
+        (raw ? [ text ] : interpolate(text, code => new Lexer<T>(this.context, code).tokenize())).forEach(token => this.emit(token));
+    }
+
+    /** Reads a number: decimal, binary, octal or hexadecimal, and a BigInt when it ends in `n`. */
+    private readNumber(startLine: number, startCol: number): void {
+        let value = "";
+
+        if (this.peek() === "0" && /[bBoOxX]/.test(this.input[this.current + 1])) { // bin, oct, hex
+            value += this.advance();
+            value += this.advance();
+
+            while (/[0-9a-fA-F]/.test(this.peek()) && this.current < this.input.length) {
+                value += this.advance();
+            }
+        } else {
+            value = this.readDecimal();
+        }
+
+        if (this.peek() === "n") {
+            value += this.advance();
+            this.emit(this.createToken("BIGINT", value, startLine, startCol));
+        } else {
+            this.emit(this.createToken(TokenType.NUMERO, value, startLine, startCol));
+        }
+    }
+
+    /** Reads digits with, at most, one decimal point that has a digit after it. */
+    private readDecimal(): string {
+        let value = "";
+
+        while (this.current < this.input.length) {
+            const next = this.peek();
+
+            if (Lexer.DIGIT.test(next)) {
+                value += this.advance();
+            } else if (next === "." && Lexer.DIGIT.test(this.input[this.current + 1]) && !value.includes(".")) {
+                value += this.advance();
+            } else break;
+        }
+
+        return value;
+    }
+
+    private readDecorator(startLine: number, startCol: number): void {
+        let value = this.advance();
+
+        while (this.current < this.input.length && Lexer.WORD_PART.test(this.peek())) {
+            value += this.advance();
+        }
+
+        this.emit(this.createToken(TokenType.Decorador, value, startLine, startCol));
+    }
+
+    /** Reads a keyword, an identifier, a boolean, `indefinido` or a named text. */
+    private readWord(startLine: number, startCol: number): void {
+        let value = "";
+        while (Lexer.WORD_PART.test(this.peek()) && this.current < this.input.length) {
+            value += this.advance();
+        }
+
+        // Composed and decomposed spellings of a letter (`ñ`) must be the same identifier.
+        value = value.normalize('NFC');
+
+        const { type, text } = this.classifyWord(value);
+
+        this.emit(this.createToken(type, text, startLine, startCol));
+    }
+
+    /** The token type and text of a word. */
+    private classifyWord(value: string): { type: TokenType; text: string } {
+        const { keywordsManager } = this.context;
+
+        // A word right after `.` is always a member name, even if it is a reserved word
+        // (`lista.en(0)`, `fecha.entre`), so it never goes through the keyword lookup.
+        if (this.tokens[this.tokens.length - 1]?.type === TokenType.Punto) return { type: TokenType.IDENTIFICADOR, text: value };
+        if (value === TokenType.Verdadero || value === TokenType.Falso) return { type: TokenType.BOOLEANO, text: value };
+        if (value === TokenType.Indefinido) return { type: TokenType.Indefinido, text: value };
+        if (Object.prototype.hasOwnProperty.call(NamedTextLiteral, value)) {
+            return { type: TokenType.TEXTO, text: NamedTextLiteral[value as keyof typeof NamedTextLiteral] };
+        }
+
+        const keyword = Lexer.ASCII_ONLY.test(value) ? keywordsManager.resolve(value) : undefined;
+
+        if (keyword) return { type: keyword as TokenType, text: value };
+
+        return { type: TokenType.IDENTIFICADOR, text: value };
+    }
+
+    /** Reads an operator or delimiter of one or two characters; anything else is a lexical error. */
+    private readSymbol(char: string, startLine: number, startCol: number): void {
+        if (this.current < this.input.length - 1) {
+            const twoChar = char + this.input[this.current + 1];
+
+            if (SymbolTranslationMap[twoChar]) {
+                this.advance();
+                this.advance();
+                this.emit(this.createToken(SymbolTranslationMap[twoChar], twoChar, startLine, startCol));
+                return;
+            }
+        }
+
+        if (char === ';') {
+            this.fail("No se usa ';': separa las propiedades y las sentencias con saltos de línea", { line: startLine, column: startCol });
+        }
+
+        if (SymbolTranslationMap[char]) {
+            this.advance();
+            this.emit(this.createToken(SymbolTranslationMap[char], char, startLine, startCol));
+            return;
+        }
+
+        this.fail(`Carácter inesperado: ${char}`, { line: this.line, column: this.column });
     }
 }

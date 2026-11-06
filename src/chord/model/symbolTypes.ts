@@ -41,7 +41,6 @@ export enum SymbolKind {
  */
 export enum CompilerMetadataKind {
     IsInteraction = 'isInteraction',
-    RequiresAsync = 'requiresAsync',
     CurrentClass = 'currentClass'
 };
 
@@ -57,7 +56,6 @@ export interface Symbol {
     /** Compile-time flags and metadata modifier properties */
     metadata: {
         isAsync?: boolean;
-        isExported?: boolean;
         isStatic?: boolean;
     };
     /**

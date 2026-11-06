@@ -3,7 +3,7 @@ import { SubGenerator } from "../../SubGenerator";
 
 /**
  * Atomic SubGenerator compiling structured loop bypass operations ('Pasar').
- * @class ContinueVisitor
+ * @class PassVisitor
  * @extends {SubGenerator<T, N>}
  * @template {string} T - Extensible token type string vector.
  * @template {BaseNode<T>} N - Extensible abstract syntax tree node layout structure.
