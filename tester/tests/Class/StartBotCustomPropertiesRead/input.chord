@@ -1,0 +1,12 @@
+encender bot {
+    prefijo "!"
+    token "t"
+    version "1.0"
+}
+
+nuevo comando Prueba {
+    descripcion "prueba"
+
+    consola.imprimir(cliente.version)
+    cliente.version es "2"
+}

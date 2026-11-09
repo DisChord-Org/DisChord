@@ -2,6 +2,7 @@ import path from "node:path";
 
 import { DisChordNode, DisChordNodeType, DisChordTokenType, StartBotNode } from "../../../types";
 import { intentsMap, SeyfertLocations } from "../../constants/mappings";
+import { startBotCustomEntries } from "../../constants/schemas";
 import { SubGenerator } from "../../../../chord/Generator/SubGenerator";
 import { IdentificatorNode, ImportNode, TokenType, TokenTypeUnion } from "../../../../chord/model/types";
 import { walkAST } from "../../../../chord/walkAST";
@@ -39,17 +40,18 @@ export default class ClientInitVisitor extends SubGenerator<DisChordNodeType, Di
 
         this.requireOutputDirectories();
 
-        return this.clientTemplate(isArray ? prefix : `[${prefix}]`, includeSlash);
+        return this.clientTemplate(isArray ? prefix : `[${prefix}]`, includeSlash, this.customProperties(node));
     }
 
     /**
      * The code that creates and starts the client.
      * @param prefixes The generated array of command prefixes.
      * @param includeSlash Whether the slash commands must be uploaded once the client is up.
+     * @param customProperties The assignments of the block's custom properties to the client.
      * @returns The generated client code.
      * @private
      */
-    private clientTemplate (prefixes: string, includeSlash: boolean): string {
+    private clientTemplate (prefixes: string, includeSlash: boolean, customProperties: string): string {
         return `
             import { Client } from "seyfert";
             const client = new Client({
@@ -65,6 +67,8 @@ export default class ClientInitVisitor extends SubGenerator<DisChordNodeType, Di
                 }
             });
 
+            ${customProperties}
+
             client.start().then(async () => {
                 ${includeSlash ? 'await client.uploadCommands().catch(error => console.log(error));' : ''}
             });
@@ -73,6 +77,30 @@ export default class ClientInitVisitor extends SubGenerator<DisChordNodeType, Di
                 console.error(err);
             });
         `;
+    }
+
+    /**
+     * The custom properties of the block, set on the client before it starts so every command and
+     * event finds them. Each value is awaited, so one that is a promise (a call to an async
+     * function) is stored resolved; awaiting a value that isn't a promise changes nothing.
+     * @param node The StartBotNode with the block.
+     * @returns One assignment per custom property, in source order.
+     * @private
+     */
+    private customProperties (node: StartBotNode): string {
+        return startBotCustomEntries(node.object)
+            .map(([ key, value ]) => `client[${JSON.stringify(key)}] = ${this.awaited(value)};`)
+            .join('\n');
+    }
+
+    /**
+     * A value, awaited unless it is a literal or already awaits on its own.
+     * @private
+     */
+    private awaited (value: DisChordNode): string {
+        const code = this.parent.visit(value);
+
+        return (value.type as string) === TokenType.LITERAL || code.trimStart().startsWith('await ') ? code : `await (${code})`;
     }
 
     /**

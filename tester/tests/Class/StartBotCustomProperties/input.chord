@@ -1,0 +1,12 @@
+@asincrono
+funcion cargarDatos() {
+    devolver 5
+}
+
+encender bot {
+    prefijo "!"
+    token "t"
+    version "1.0"
+    contador 0
+    cargado cargarDatos()
+}
