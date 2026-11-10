@@ -22,6 +22,7 @@ export default class EventParser extends SubParser<DisChordNodeType, DisChordNod
      * @returns {EventNode} The AST node representing the event definition.
      */
     parse (): EventNode {
+        this.parent.requireTopLevel('evento');
         this.consume(DisChordTokenType.Evento);
 
         const eventName = this.declare(DisChordDeclarationKind.Event, this.consume(TokenType.IDENTIFICADOR));

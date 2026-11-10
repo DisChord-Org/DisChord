@@ -1,0 +1,6 @@
+nuevo comando A {
+    descripcion "x"
+
+    nuevo evento mensajeCreado {
+    }
+}

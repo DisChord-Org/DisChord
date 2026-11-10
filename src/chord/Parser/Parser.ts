@@ -1,4 +1,5 @@
 import { TokenStream } from "./TokenStream";
+import { ChordError, ErrorLevel } from "../../errors/ChordError";
 import { ASTNode, Token, TokenType, BaseNode, PeekType, Location, TokenTypeUnion } from "../model/types";
 
 import { CompilationContext } from "../model/CompilationContext";
@@ -51,6 +52,9 @@ export class Parser<T extends string, N extends BaseNode<T>> extends ParserConte
      * @type {ASTNode<T, N>[]}
      */
     public nodes: ASTNode<T, N>[] = [];
+
+    /** Where the token stream was when the statement of the top level being parsed began. */
+    private topLevelStart = 0;
 
     /**
      * Every name the parsed source declares, with where it is written and what it belongs to.
@@ -153,11 +157,31 @@ export class Parser<T extends string, N extends BaseNode<T>> extends ParserConte
      */
     public parse(): ASTNode<T, N>[] {
         while (!this.isAtEnd()) {
+            this.topLevelStart = this.cursor;
             const node: ASTNode<T, N> = this.parseStatement();
             if (node) this.nodes.push(node);
         }
 
         return this.nodes;
+    }
+
+    /**
+     * Fails at the current token if a construct that is a module of its own (a command, an event)
+     * is not a statement of the top level of the file. Called by its parser before it consumes
+     * the keyword, or right after the `nuevo` that comes before it.
+     *
+     * @public
+     * @param {string} construct - How the message names it.
+     * @throws {ChordError} If it sits inside a function, a class, a block...
+     */
+    public requireTopLevel (construct: string): void {
+        if (this.cursor - this.topLevelStart <= 1) return;
+
+        throw new ChordError({
+            phase: ErrorLevel.Parser,
+            message: `'${construct}' solo puede declararse en el nivel superior del archivo, no dentro de una función, una clase u otro bloque`,
+            location: this.peek().location
+        });
     }
 
     /**

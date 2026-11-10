@@ -1,0 +1,5 @@
+funcion f() {
+    nuevo comando A {
+        descripcion "x"
+    }
+}

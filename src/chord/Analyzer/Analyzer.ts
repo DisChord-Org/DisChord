@@ -1,6 +1,7 @@
 import { ASTNode, BaseNode, TokenType } from "../model/types";
 import { CompilationContext } from "../model/CompilationContext";
 import { AnalysisRule, AnalysisRuleClass } from "./AnalysisRule";
+import { ValidateStatementPlacementRule } from "./rules/ValidateStatementPlacementRule";
 import { ValidateDeclarationNamesRule } from "./rules/ValidateDeclarationNamesRule";
 import { BindImportsRule } from "./rules/BindImportsRule";
 import { ValidateImportTargetsRule } from "./rules/ValidateImportTargetsRule";
@@ -57,6 +58,9 @@ export class Analyzer<T extends string, N extends BaseNode<T>> {
      * @static
      */
     private static readonly Rules: AnalysisRuleClass<TokenType, BaseNode<TokenType>>[] = [
+        // A statement where the JavaScript it becomes is not valid (`salir` outside a loop...).
+        ValidateStatementPlacementRule,
+
         // A declared name can't be one of a class of the core library. First, so this is the error
         // given instead of a duplicate declaration.
         ValidateDeclarationNamesRule,

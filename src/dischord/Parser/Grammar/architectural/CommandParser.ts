@@ -22,7 +22,9 @@ export default class CommandParser extends SubParser<DisChordNodeType, DisChordN
      * @returns {CommandNode} The AST node representing the command definition.
      */
     parse (): CommandNode {
+        this.parent.requireTopLevel('comando');
         this.consume(DisChordTokenType.Comando);
+        
         const commandName = this.declare(DisChordDeclarationKind.Command, this.consume(TokenType.IDENTIFICADOR));
 
         const body = this.within(commandName, () => this.parent.get(BDOParser).setMode(ODBMode.Intelligent).parse() as DisChordODBNode);
