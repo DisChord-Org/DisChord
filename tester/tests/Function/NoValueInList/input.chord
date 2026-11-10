@@ -1,0 +1,5 @@
+funcion g() -> nada {
+    consola.imprimir("g")
+}
+
+var lista es [ g() ]

@@ -1,0 +1,5 @@
+funcion g() -> nada {
+    consola.imprimir("g")
+}
+
+var suma es 1 mas g()

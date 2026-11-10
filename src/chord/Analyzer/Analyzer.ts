@@ -12,6 +12,7 @@ import { ValidateTypeAnnotationsRule } from "./rules/ValidateTypeAnnotationsRule
 import { ResolveVariableTypesRule } from "./rules/ResolveVariableTypesRule";
 import { ValidateAssignmentTypesRule } from "./rules/ValidateAssignmentTypesRule";
 import { ValidateIndexAccessRule } from "./rules/ValidateIndexAccessRule";
+import { ValidateNoValueUsesRule } from "./rules/ValidateNoValueUsesRule";
 import { ValidateCallTargetsRule } from "./rules/ValidateCallTargetsRule";
 import { ValidateReturnTypesRule } from "./rules/ValidateReturnTypesRule";
 import { ValidateCallArgumentsRule } from "./rules/ValidateCallArgumentsRule";
@@ -88,6 +89,9 @@ export class Analyzer<T extends string, N extends BaseNode<T>> {
         ValidateKnownNamesRule,
 
         ResolveVariableTypesRule,
+
+        // A call that returns no value can only be a statement; needs the types above.
+        ValidateNoValueUsesRule,
         ValidateCallTargetsRule,
 
         // Reassignment validation — needs every variable's dataType already resolved by Pass 3

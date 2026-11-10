@@ -1,0 +1,36 @@
+funcion g() -> nada {
+    consola.imprimir("g")
+}
+
+@asincrono
+funcion pausa() -> nada {
+    consola.imprimir("pausa")
+}
+
+funcion devuelve() -> nada {
+    devolver g()
+}
+
+@asincrono
+funcion principal() {
+    pausa()
+    esperar(1)
+}
+
+var mapa es nuevo Mapa()
+mapa.poner("a", 1).poner("b", 2)
+var conjunto es nuevo Conjunto()
+conjunto.agregar(1).agregar(2)
+mapa.limpiar()
+conjunto.limpiar()
+
+g()
+para (i en rango(2)) {
+    g()
+}
+si (verdadero) {
+    g()
+} sino {
+    g()
+}
+principal()

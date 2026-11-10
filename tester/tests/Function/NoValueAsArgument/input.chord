@@ -1,0 +1,5 @@
+funcion g() -> nada {
+    consola.imprimir("g")
+}
+
+consola.imprimir(g())

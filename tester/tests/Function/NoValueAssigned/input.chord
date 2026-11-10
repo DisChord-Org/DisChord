@@ -1,0 +1,6 @@
+funcion g() -> nada {
+    consola.imprimir("g")
+}
+
+var x es 1
+x es g()
