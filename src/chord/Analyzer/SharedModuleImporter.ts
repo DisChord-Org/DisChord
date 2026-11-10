@@ -16,6 +16,20 @@ import { SharedModule } from "../model/SharedModule";
  */
 export class SharedModuleImporter<T extends string> {
     /**
+     * The imports this class inserted. They are marked here and not with a field of the node, which
+     * would show in the syntax tree.
+     */
+    private static readonly inserted: WeakSet<object> = new WeakSet();
+
+    /**
+     * @param {ASTNode<T, N>} node - Any node.
+     * @returns {boolean} Whether it is an import the compiler inserted, not one the user wrote.
+     */
+    public static isSynthetic (node: object): boolean {
+        return SharedModuleImporter.inserted.has(node);
+    }
+
+    /**
      * @param {CompilationContext<T>} context - The active compilation context.
      */
     constructor (private readonly context: CompilationContext<T>) {}
@@ -38,6 +52,7 @@ export class SharedModuleImporter<T extends string> {
             location: { line: 0, column: 0 }
         };
 
+        SharedModuleImporter.inserted.add(importNode);
         nodes.unshift(importNode);
 
         this.context.extraFiles.set(path.join(this.context.distDir, module.path), module.content);

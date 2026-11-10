@@ -1,0 +1,10 @@
+nuevo comando A {
+    descripcion "x"
+
+    opciones {
+        class {
+            tipo "texto"
+            descripcion "d"
+        }
+    }
+}

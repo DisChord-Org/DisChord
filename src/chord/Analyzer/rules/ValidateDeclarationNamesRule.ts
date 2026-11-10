@@ -1,8 +1,10 @@
 import { AnalysisRule } from "../AnalysisRule";
-import { ASTNode, BaseNode, ClassNode, FunctionNode, ImportNode, LoopNode, TokenType, VariableNode } from "../../model/types";
+import { JsReservedWords } from "../../corelib/JsReservedWords";
+import { ASTNode, BaseNode } from "../../model/types";
+import { DeclaredName, DeclaredNames } from "../DeclaredNames";
 
 /**
- * Rejects declaring a name that belongs to a class of the core library (`Mapa`, `Mates`,
+ * Rejects declaring a name JavaScript reserves (`class`, `await`, `eval`...), and one that belongs to a class of the core library (`Mapa`, `Mates`,
  * `consola`...): as a class, a variable, a free function, a parameter, an imported name or the
  * variable of a loop. A member of a class (a method or property) may carry such a name, and so may
  * a function named like a free function of the library (`esperar`), which wins over it.
@@ -21,50 +23,27 @@ export class ValidateDeclarationNamesRule<T extends string, N extends BaseNode<T
     }
 
     private validate (node: ASTNode<T, N>): void {
-        switch (node.type) {
-            case TokenType.Clase:
-                this.reject((node as ClassNode<T, N>).id, 'la clase', node, false);
-                break;
-
-            case TokenType.Funcion: {
-                const fn = node as FunctionNode<T, N>;
-                if (!fn.metadata.isMethod && !fn.metadata.isConstructor) this.reject(fn.id, 'la función', node, false);
-                fn.params.forEach(param => this.reject(param, 'el parámetro', node, true));
-                break;
-            }
-
-            case TokenType.VARIABLE:
-                this.reject((node as VariableNode<T, N>).id, 'la variable', node, false);
-                break;
-
-            case TokenType.BUCLE:
-                this.reject((node as LoopNode<T, N>).var, 'la variable del bucle', node, false);
-                break;
-
-            case TokenType.Importar:
-                (node as ImportNode<T>).identificators.forEach(name => this.reject(name, 'el nombre importado', node, false));
-                break;
-        }
+        DeclaredNames.of(node).forEach(declared => this.reject(declared, node));
     }
 
     /**
-     * @param {string} name - A name being declared.
-     * @param {string} what - What it declares, for the message.
+     * @param {DeclaredName} declared - A name being declared, with what it declares and whether it is a parameter, the one place an injected name is allowed.
      * @param {ASTNode<T, N>} node - The declaring node.
-     * @param {boolean} isParameter - Whether it is a parameter, the one place an injected name is allowed.
-     * @throws {DisChordError} If the name is one of a class of the core library.
+     * @throws {DisChordError} If the name is a reserved word of JavaScript or one of a class of the core library.
      * @private
      */
-    private reject (name: string, what: string, node: ASTNode<T, N>, isParameter: boolean): void {
+    private reject ({ name, description, isParameter }: DeclaredName, node: ASTNode<T, N>): void {
+        if (JsReservedWords.has(name)) this.fail(`No se puede declarar ${description} '${name}': es una palabra reservada de JavaScript`, node);
+
         const coreLib = this.context.coreLib;
         if (!coreLib.isClassName(name)) return;
 
         if (coreLib.isInjectedName(name)) {
             if (isParameter) return;
 
-            this.fail(`No se puede declarar ${what} '${name}': es un identificador reservado por DisChord`, node);
+            this.fail(`No se puede declarar ${description} '${name}': es un identificador reservado por DisChord`, node);
         }
 
-        this.fail(`No se puede declarar ${what} '${name}': es el nombre de una clase de la biblioteca estándar`, node);
+        this.fail(`No se puede declarar ${description} '${name}': es el nombre de una clase de la biblioteca estándar`, node);
     }
 }

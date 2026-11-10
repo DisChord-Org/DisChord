@@ -1,0 +1,5 @@
+clase Persona {
+    funcion class() {
+        devolver 1
+    }
+}

@@ -1,3 +1,4 @@
+import { JsReservedWords } from "../../../chord/corelib/JsReservedWords";
 import { CommandScopeNames } from "../../CommandScopeNames";
 import { AnalysisRule } from "../../../chord/Analyzer/AnalysisRule";
 import { ExpressionNode, TokenType } from "../../../chord/model/types";
@@ -57,6 +58,8 @@ export class ValidateCommandRule extends AnalysisRule<DisChordNodeType, DisChord
 
         Object.entries((options as DisChordODBNode).blocks).forEach(([ optionName, entry ]) => {
             this.validateName(`El nombre de la opción '${optionName}' del comando '${command.value}'`, optionName, entry.location);
+
+            if (JsReservedWords.has(optionName)) this.fail(`La opción '${optionName}' del comando '${command.value}' no puede llamarse así: es una palabra reservada de JavaScript.`, entry.location);
 
             if (entry.type !== TokenType.BDO) this.fail(`La opción '${optionName}' del comando '${command.value}' debe ser un bloque con sus propiedades: ${optionName} { tipo "texto" descripcion "..." }.`, entry.location);
 
