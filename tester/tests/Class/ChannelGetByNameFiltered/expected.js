@@ -17,7 +17,9 @@ export default class CanalesCommand extends Command {
     async run(contexto) {
         const cliente = contexto.client;
         const usuario = contexto.author;
-        const canal = contexto.interaction ? contexto.interaction.channel : cliente.channels.fetch(contexto.channelId);
+        const canal = contexto.interaction
+            ? contexto.interaction.channel
+            : await cliente.channels.fetch(contexto.channelId);
         const ctx = { cliente, contexto };
 
         let c = await getChannel(ctx, undefined, contexto.guildId, 'general', { type: 0, parent_id: '9' });

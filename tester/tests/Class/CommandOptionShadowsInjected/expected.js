@@ -26,7 +26,9 @@ export default class SaludaCommand extends Command {
 
     async run(contexto) {
         const cliente = contexto.client;
-        const canal = contexto.interaction ? contexto.interaction.channel : cliente.channels.fetch(contexto.channelId);
+        const canal = contexto.interaction
+            ? contexto.interaction.channel
+            : await cliente.channels.fetch(contexto.channelId);
         const ctx = { cliente, contexto };
 
         const { usuario } = contexto.options;

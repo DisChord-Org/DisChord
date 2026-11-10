@@ -27,7 +27,9 @@ export default class AvatarCommand extends Command {
     async run(contexto) {
         const cliente = contexto.client;
         const usuario = contexto.author;
-        const canal = contexto.interaction ? contexto.interaction.channel : cliente.channels.fetch(contexto.channelId);
+        const canal = contexto.interaction
+            ? contexto.interaction.channel
+            : await cliente.channels.fetch(contexto.channelId);
         const ctx = { cliente, contexto };
 
         const { mencion } = contexto.options;

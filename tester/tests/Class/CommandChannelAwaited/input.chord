@@ -1,0 +1,5 @@
+nuevo comando Canal {
+    descripcion "usa el canal"
+
+    consola.imprimir(canal.id)
+}

@@ -18,7 +18,7 @@ export const CommandContextParameter = 'contexto';
 export const CommandScope: Readonly<Record<string, string>> = {
     cliente: 'contexto.client',
     usuario: 'contexto.author',
-    canal: 'contexto.interaction ? contexto.interaction.channel : cliente.channels.fetch(contexto.channelId)',
+    canal: 'contexto.interaction ? contexto.interaction.channel : await cliente.channels.fetch(contexto.channelId)',
     ctx: '{ cliente, contexto }'
 };
 
