@@ -123,8 +123,8 @@ export class ResolveMemberAccessesRule<T extends string, N extends BaseNode<T>> 
 
         const className = ResolveMemberAccessesRule.classNameOf(resolved);
 
-        if (!resolved.isProperty && role === AccessRole.Read) this.failAt(access, `'${access.property}' es un método de ${className}: llámalo con paréntesis, ${access.property}()`);
-        if (resolved.isProperty && role === AccessRole.Callee) this.failAt(access, `'${access.property}' es una propiedad de ${className}, no un método`);
+        if (!resolved.isProperty && role === AccessRole.Read) this.fail(`'${access.property}' es un método de ${className}: llámalo con paréntesis, ${access.property}()`, access);
+        if (resolved.isProperty && role === AccessRole.Callee) this.fail(`'${access.property}' es una propiedad de ${className}, no un método`, access);
     }
 
     /**
@@ -140,6 +140,6 @@ export class ResolveMemberAccessesRule<T extends string, N extends BaseNode<T>> 
         const className = ResolveMemberAccessesRule.classNameOf(member);
         const kind = member.isProperty ? 'una propiedad' : 'un método';
 
-        this.failAt(access, `'${access.property}' es ${kind} de instancia de ${className}, no se puede usar sobre la clase`);
+        this.fail(`'${access.property}' es ${kind} de instancia de ${className}, no se puede usar sobre la clase`, access);
     }
 }

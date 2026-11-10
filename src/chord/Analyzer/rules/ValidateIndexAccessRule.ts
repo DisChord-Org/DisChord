@@ -43,7 +43,7 @@ export class ValidateIndexAccessRule<T extends string, N extends BaseNode<T>> ex
             ? typeof literal !== 'number' || !Number.isInteger(literal)
             : this.isKnownNonNumber(access);
 
-        if (invalid) this.failAt(access, `El índice de un texto debe ser un número entero`);
+        if (invalid) this.fail(`El índice de un texto debe ser un número entero`, access);
     }
 
     /**
@@ -70,6 +70,6 @@ export class ValidateIndexAccessRule<T extends string, N extends BaseNode<T>> ex
 
         const length = receiverType.elements.length;
 
-        this.failAt(access, `El índice ${position} está fuera de rango: la tupla tiene ${length} elemento(s) (índices del 0 al ${length - 1})`);
+        this.fail(`El índice ${position} está fuera de rango: la tupla tiene ${length} elemento(s) (índices del 0 al ${length - 1})`, access);
     }
 }

@@ -32,11 +32,11 @@ export class ValidateClassHierarchyRule<T extends string, N extends BaseNode<T>>
             if (node.superClass === undefined) return;
 
             const cycle = this.cycleThrough(node);
-            if (cycle) this.failAt(node, `La clase '${node.id}' hereda de sí misma (${cycle.join(' → ')})`);
+            if (cycle) this.fail(`La clase '${node.id}' hereda de sí misma (${cycle.join(' → ')})`, node);
 
             const parentPosition = firstPosition.get(node.superClass);
             if (parentPosition !== undefined && parentPosition > position) {
-                this.failAt(node, `La clase '${node.id}' extiende de '${node.superClass}', que se declara más abajo; declara '${node.superClass}' antes de '${node.id}'`);
+                this.fail(`La clase '${node.id}' extiende de '${node.superClass}', que se declara más abajo; declara '${node.superClass}' antes de '${node.id}'`, node);
             }
         });
 
@@ -74,10 +74,9 @@ export class ValidateClassHierarchyRule<T extends string, N extends BaseNode<T>>
                 const overridden = this.nearestAncestorMethod(node.superClass!, method.id, methodsOf);
                 if (!overridden || !!overridden.method.metadata.isAsync === !!method.metadata.isAsync) return;
 
-                this.failAt(method,
-                    method.metadata.isAsync
+                this.fail(method.metadata.isAsync
                         ? `El método '${method.id}' de '${node.id}' es asíncrono pero el de '${overridden.owner}' no`
-                        : `El método '${method.id}' de '${node.id}' no es asíncrono pero el de '${overridden.owner}' sí`);
+                        : `El método '${method.id}' de '${node.id}' no es asíncrono pero el de '${overridden.owner}' sí`, method);
             });
         });
     }

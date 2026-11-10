@@ -97,7 +97,7 @@ export class ValidateAssignmentTypesRule<T extends string, N extends BaseNode<T>
         const assignedType = this.inferrer.infer(node.assignment);
         if (!assignedType) return;
 
-        if (!declaredType.isAssignableFrom(assignedType)) this.failAt(node, `La variable '${node.left.value}' es de tipo '${declaredType.format()}' pero se le asignó un valor de tipo '${assignedType.format()}'`);
+        if (!declaredType.isAssignableFrom(assignedType)) this.fail(`La variable '${node.left.value}' es de tipo '${declaredType.format()}' pero se le asignó un valor de tipo '${assignedType.format()}'`, node);
     }
 
     /**
@@ -118,7 +118,7 @@ export class ValidateAssignmentTypesRule<T extends string, N extends BaseNode<T>
         const assignedType = elementType ? this.inferrer.infer(node.assignment) : undefined;
         if (!elementType || !assignedType) return;
 
-        if (!elementType.isAssignableFrom(assignedType)) this.failAt(node, `La variable '${this.describe(target)}' es de tipo '${elementType.format()}' pero se le asignó un valor de tipo '${assignedType.format()}'`);
+        if (!elementType.isAssignableFrom(assignedType)) this.fail(`La variable '${this.describe(target)}' es de tipo '${elementType.format()}' pero se le asignó un valor de tipo '${assignedType.format()}'`, node);
     }
 
     /**

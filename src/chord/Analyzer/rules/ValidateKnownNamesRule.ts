@@ -70,7 +70,7 @@ export class ValidateKnownNamesRule<T extends string, N extends BaseNode<T>> ext
         const close = this.closestVisible(node.value);
         const message = `El nombre '${node.value}' no está declarado.${close ? ` ¿Querías decir '${close}'?` : ''}`;
 
-        this.failAt(node, message);
+        this.fail(message, node);
     }
 
     /**

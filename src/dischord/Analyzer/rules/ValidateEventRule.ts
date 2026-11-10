@@ -18,7 +18,7 @@ export class ValidateEventRule extends AnalysisRule<DisChordNodeType, DisChordNo
 
             const renamed = RenamedEvents[eventNode.name];
 
-            this.failAt(eventNode, renamed ? `El evento '${eventNode.name}' ahora se llama '${renamed}'.` : `El evento '${eventNode.name}' no existe`);
+            this.fail(renamed ? `El evento '${eventNode.name}' ahora se llama '${renamed}'.` : `El evento '${eventNode.name}' no existe`, eventNode);
         });
     }
 }

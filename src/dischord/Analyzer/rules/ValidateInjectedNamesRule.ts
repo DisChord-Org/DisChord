@@ -59,6 +59,6 @@ export class ValidateInjectedNamesRule extends AnalysisRule<DisChordNodeType, Di
     private reject (name: string, node: DisChordASTNode): void {
         const owner = this.owners[this.owners.length - 1];
 
-        if (owner?.defined.includes(name)) this.failAt(node, `No se puede declarar '${name}': ${owner.kind} '${owner.name}' ya lo define.`);
+        if (owner?.defined.includes(name)) this.fail(`No se puede declarar '${name}': ${owner.kind} '${owner.name}' ya lo define.`, node);
     }
 }

@@ -38,8 +38,7 @@ export class ValidateReturnTypesRule<T extends string, N extends BaseNode<T>> ex
             const frame = this.functions.pop()!;
             const declared = frame.node.returnType;
 
-            if (declared && !frame.returns && !declared.isAssignableFrom(VoidDataType.Void)) this.failAt(frame.node,
-                `La función '${frame.node.id}' declara retorno '${declared.format()}' pero no devuelve ningún valor`);
+            if (declared && !frame.returns && !declared.isAssignableFrom(VoidDataType.Void)) this.fail(`La función '${frame.node.id}' declara retorno '${declared.format()}' pero no devuelve ningún valor`, frame.node);
         }
     }
 
@@ -59,14 +58,12 @@ export class ValidateReturnTypesRule<T extends string, N extends BaseNode<T>> ex
         const name = frame.node.id;
 
         if (!node.object) {
-            if (!declared.isAssignableFrom(VoidDataType.Void)) this.failAt(node,
-                `La función '${name}' declara retorno '${declared.format()}' pero 'devolver' no devuelve ningún valor`);
+            if (!declared.isAssignableFrom(VoidDataType.Void)) this.fail(`La función '${name}' declara retorno '${declared.format()}' pero 'devolver' no devuelve ningún valor`, node);
             return;
         }
 
         const valueType: DataType | undefined = this.inferrer.infer(node.object);
 
-        if (valueType && !declared.isAssignableFrom(valueType)) this.failAt(node,
-            `La función '${name}' declara retorno '${declared.format()}' pero devuelve un valor de tipo '${valueType.format()}'`);
+        if (valueType && !declared.isAssignableFrom(valueType)) this.fail(`La función '${name}' declara retorno '${declared.format()}' pero devuelve un valor de tipo '${valueType.format()}'`, node);
     }
 }

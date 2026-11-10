@@ -33,6 +33,6 @@ export class ValidateCallTargetsRule<T extends string, N extends BaseNode<T>> ex
 
         if (isCallableTarget) return;
 
-        this.failAt(callNode, "Se esperaba un identificador o un acceso de propiedad válido para ejecutar la llamada.");
+        this.fail("Se esperaba un identificador o un acceso de propiedad válido para ejecutar la llamada.", callNode);
     }
 }

@@ -188,9 +188,9 @@ export class ResolveVariableTypesRule<T extends string, N extends BaseNode<T>> e
 
         const inferredType = this.inferrer.infer(variableNode.value);
 
-        if (inferredType instanceof VoidDataType) this.failAt(variableNode, `La variable '${variableNode.id}' se inicializó con una llamada que no devuelve ningún valor`);
+        if (inferredType instanceof VoidDataType) this.fail(`La variable '${variableNode.id}' se inicializó con una llamada que no devuelve ningún valor`, variableNode);
 
-        if (variableNode.dataType && inferredType && !variableNode.dataType.isAssignableFrom(inferredType)) this.failAt(variableNode, `La variable '${variableNode.id}' se declaró con tipo '${variableNode.dataType.format()}' pero se le asignó un valor de tipo '${inferredType.format()}'`);
+        if (variableNode.dataType && inferredType && !variableNode.dataType.isAssignableFrom(inferredType)) this.fail(`La variable '${variableNode.id}' se declaró con tipo '${variableNode.dataType.format()}' pero se le asignó un valor de tipo '${inferredType.format()}'`, variableNode);
 
         if (variableNode.dataType) return variableNode.dataType;
 
@@ -214,13 +214,13 @@ export class ResolveVariableTypesRule<T extends string, N extends BaseNode<T>> e
      * @private
      */
     private validateTupleLiteral (id: string, tupleType: TupleDataType, listNode: ListNode<T, N>): void {
-        if (listNode.body.length !== tupleType.elements.length) this.failAt(listNode, `La variable '${id}' se declaró como tupla de ${tupleType.elements.length} elemento(s) pero se le asignó una lista de ${listNode.body.length}`);
+        if (listNode.body.length !== tupleType.elements.length) this.fail(`La variable '${id}' se declaró como tupla de ${tupleType.elements.length} elemento(s) pero se le asignó una lista de ${listNode.body.length}`, listNode);
 
         listNode.body.forEach((element, index) => {
             const elementType = this.inferrer.infer(element);
             const expectedType = tupleType.elements[index];
 
-            if (elementType && !expectedType.isAssignableFrom(elementType)) this.failAt(element, `La variable '${id}' se declaró con tipo '${tupleType.format()}', pero el elemento ${index} es de tipo '${elementType.format()}', se esperaba '${expectedType.format()}'`);
+            if (elementType && !expectedType.isAssignableFrom(elementType)) this.fail(`La variable '${id}' se declaró con tipo '${tupleType.format()}', pero el elemento ${index} es de tipo '${elementType.format()}', se esperaba '${expectedType.format()}'`, element);
         });
     }
 }

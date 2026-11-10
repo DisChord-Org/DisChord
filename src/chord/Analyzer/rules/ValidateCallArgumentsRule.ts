@@ -52,14 +52,12 @@ export class ValidateCallArgumentsRule<T extends string, N extends BaseNode<T>> 
             const parameterType = signature.params[index];
             const argumentType = this.inferrer.infer(argument);
 
-            if (parameterType && argumentType && !parameterType.isAssignableFrom(argumentType)) this.failAt(argument,
-                `El argumento ${index + 1} de '${name}' es de tipo '${argumentType.format()}', se esperaba '${parameterType.format()}'`);
+            if (parameterType && argumentType && !parameterType.isAssignableFrom(argumentType)) this.fail(`El argumento ${index + 1} de '${name}' es de tipo '${argumentType.format()}', se esperaba '${parameterType.format()}'`, argument);
         });
 
         const missing = signature.params.slice(call.params.length).some(type => type && !type.isAssignableFrom(PrimitiveDataType.Indefinido));
 
-        if (call.params.length > expected || missing) this.failAt(call,
-            `'${name}' espera ${expected} argumento(s) pero se le pasaron ${call.params.length}`);
+        if (call.params.length > expected || missing) this.fail(`'${name}' espera ${expected} argumento(s) pero se le pasaron ${call.params.length}`, call);
     }
 
     /**

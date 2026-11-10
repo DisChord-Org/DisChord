@@ -30,6 +30,6 @@ export class SingleWholeFileDeclarationRule extends AnalysisRule<DisChordNodeTyp
     check (nodes: DisChordASTNode[]): void {
         const wholeFileNodes = nodes.filter(node => SingleWholeFileDeclarationRule.WholeFileDeclarationTypes.includes(node.type));
 
-        if (wholeFileNodes.length > 1) this.failAt(wholeFileNodes[1], `Solo se permite un 'comando' o 'evento' por archivo. Este archivo declara ${wholeFileNodes.length}: separalos en un archivo por cada uno.`);
+        if (wholeFileNodes.length > 1) this.fail(`Solo se permite un 'comando' o 'evento' por archivo. Este archivo declara ${wholeFileNodes.length}: separalos en un archivo por cada uno.`, wholeFileNodes[1]);
     }
 }

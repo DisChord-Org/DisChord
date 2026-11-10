@@ -62,9 +62,9 @@ export class ValidateDeclarationNamesRule<T extends string, N extends BaseNode<T
         if (coreLib.isInjectedName(name)) {
             if (isParameter) return;
 
-            this.failAt(node, `No se puede declarar ${what} '${name}': es un identificador reservado por DisChord`);
+            this.fail(`No se puede declarar ${what} '${name}': es un identificador reservado por DisChord`, node);
         }
 
-        this.failAt(node, `No se puede declarar ${what} '${name}': es el nombre de una clase de la biblioteca estándar`);
+        this.fail(`No se puede declarar ${what} '${name}': es el nombre de una clase de la biblioteca estándar`, node);
     }
 }

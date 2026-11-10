@@ -39,7 +39,7 @@ export class BindDisChordDeclarationsRule extends AnalysisRule<DisChordNodeType,
         try {
             this.declare('@bot', node);
         } catch {
-            this.failAt(node, `Ya existe una declaración 'encender bot' en este archivo. Solo se permite una por archivo.`);
+            this.fail(`Ya existe una declaración 'encender bot' en este archivo. Solo se permite una por archivo.`, node);
         }
     }
 }

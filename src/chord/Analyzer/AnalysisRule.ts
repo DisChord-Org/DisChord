@@ -49,23 +49,16 @@ export abstract class AnalysisRule<T extends string, N extends BaseNode<T>> {
     /**
      * Reports a violation of this rule: an analysis error at a place in the source.
      * @param {string} message - What is wrong, in the language of the user.
-     * @param {Location} location - Where in the source.
+     * @param {Location | { location: Location }} at - Where in the source: a location, or the node the violation is about.
      * @throws {DisChordError} Always.
      * @protected
      */
-    protected fail (message: string, location: Location): never {
-        throw new DisChordError({ phase: ErrorLevel.Analysis, message, location });
-    }
-
-    /**
-     * Reports a violation of this rule at a node.
-     * @param {{ location: Location }} node - The node the violation is about.
-     * @param {string} message - What is wrong, in the language of the user.
-     * @throws {DisChordError} Always.
-     * @protected
-     */
-    protected failAt (node: { location: Location }, message: string): never {
-        return this.fail(message, node.location);
+    protected fail (message: string, at: Location | { location: Location }): never {
+        throw new DisChordError({
+            phase: ErrorLevel.Analysis,
+            message,
+            location: 'location' in at ? at.location : at
+        });
     }
 
     /**
