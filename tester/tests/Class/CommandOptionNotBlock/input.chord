@@ -1,0 +1,7 @@
+nuevo comando A {
+    descripcion "x"
+
+    opciones {
+        a 5
+    }
+}

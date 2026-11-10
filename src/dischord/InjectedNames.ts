@@ -74,17 +74,20 @@ export class InjectedNames {
      * (a literal `falso`; an option required by anything else gets the type alone).
      * @param {DisChordODBNode} options - The `opciones` block of the command.
      * @param {string} name - The option.
-     * @returns {DataType | undefined} The type, or `undefined` if the `tipo` is not one with a type.
+     * @returns {DataType | undefined} The type, or `undefined` if the option is not a block or its `tipo` is not one with a type.
      * @private
      */
     private static optionType (options: DisChordODBNode, name: string): DataType | undefined {
-        const option = options.blocks[name] as DisChordODBNode;
-        const keyword = literalStringValue<DisChordNodeType, DisChordNode>(option.blocks['tipo'] as ASTNode<DisChordNodeType, DisChordNode>)?.toLowerCase();
+        const option = options.blocks[name];
+        if (option.type !== TokenType.BDO) return undefined;
+
+        const { blocks } = option as DisChordODBNode;
+        const keyword = literalStringValue<DisChordNodeType, DisChordNode>(blocks['tipo'] as ASTNode<DisChordNodeType, DisChordNode>)?.toLowerCase();
         const typeName = keyword && keyword in DisChordTypeMap ? OptionValueTypes[DisChordTypeMap[keyword]] : undefined;
         if (!typeName) return undefined;
 
         const type = typeName === 'Usuario' ? ClassDataType.of(typeName) : PrimitiveDataType.of(typeName as PrimitiveTypeName);
-        const required = option.blocks['requerido'];
+        const required = blocks['requerido'];
 
         return required?.type === TokenType.LITERAL && (required as LiteralNode<DisChordNodeType>).value === false
             ? UnionDataType.ofTypes([ type, PrimitiveDataType.Indefinido ])

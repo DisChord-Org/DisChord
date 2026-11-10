@@ -58,6 +58,8 @@ export class ValidateCommandRule extends AnalysisRule<DisChordNodeType, DisChord
         Object.entries((options as DisChordODBNode).blocks).forEach(([ optionName, entry ]) => {
             this.validateName(`El nombre de la opción '${optionName}' del comando '${command.value}'`, optionName, entry.location);
 
+            if (entry.type !== TokenType.BDO) this.fail(`La opción '${optionName}' del comando '${command.value}' debe ser un bloque con sus propiedades: ${optionName} { tipo "texto" descripcion "..." }.`, entry.location);
+
             if (collisions.includes(optionName)) this.fail(`La opción '${optionName}' choca con un nombre que DisChord usa internamente.`, entry.location);
         });
     }
