@@ -94,16 +94,29 @@ Exit codes: `0` ok, `1` the code has errors (or the bot failed), `2` the tool co
 
 ## Safety
 
-Channel actions (`crear`, `editar`, `borrar canal`) come with barriers that the bot's code cannot turn off:
-no channel action inside a loop, none in the event it triggers, a reason for every deletion, the permission
-of whoever runs the command, the channel belonging to the server of the context, and a quota per server that
-grows with the number of servers the bot is in.
+The actions that change a server (`crear`, `editar` and `borrar canal`, `banear`, `desbanear` and `expulsar`) come with
+barriers that are part of the generated code and that the `.chord` file cannot turn off:
+
+- Never inside a loop, nor in the event that would set them off again (`crear canal` in `canalCreado`, `desbanear` in
+  `usuarioBaneado`, `expulsar` in `entradaMiembro`...).
+- A `razon` for every deletion and every moderation action; the audit log also records who ordered it.
+- Inside a command, whoever runs it needs the permission (*Manage Channels*, *Ban Members* or *Kick Members*); in an event
+  the bot acts alone. The `servidor` has to be the one the command runs in, and `editar`/`borrar canal` only work on channels
+  that person can see.
+- A quota per server and action in a window of 10 minutes (10 to create a channel, 10 to edit, 5 to delete; 3 bans, 5 unbans,
+  5 kicks) that doubles for every order of magnitude of servers the bot is in, up to ×8. Ids are compared in their canonical
+  form, so `11` and `011` share one quota.
+- Moderation never targets the bot, the owner of the server or whoever runs the command, and inside a command the target's
+  highest role must be below the invoker's (the owner is exempt). A 403 from Discord is rewritten in Spanish.
 
 Reading a channel is held to the same rules. `obtener canal { nombre "general" }` (optionally narrowed with `tipo` and
 `categoria`) fails when no channel or more than one has that name, and only counts the channels whoever runs the command
-can see, so the answer never reveals one they cannot. Inside a command it searches the server the command runs in.
-`listar canales` also filters by `nombre` and `nombreContiene`.
+can see, so the answer never reveals one they cannot; by `id` it gives one answer whether the channel does not exist, is in
+another server or is not visible. `listar canales` also filters by `nombre` and `nombreContiene`.
 
+Known and accepted limits: the barriers do not cover `js("...")` nor the direct use of `cliente`, `contexto` and the Seyfert
+objects; an action written inside a function that a loop calls is not seen as inside the loop (the quota is what is left); and
+the quota lives in memory, so it is lost when the bot restarts and is not shared between instances.
 
 ---
 
