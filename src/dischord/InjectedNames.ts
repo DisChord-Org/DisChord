@@ -111,7 +111,9 @@ export class InjectedNames {
         if (owner.type === DisChordTokenType.EVENTO) {
             const event = eventsMap[(owner as EventNode).name];
 
-            return (event ? eventParamNames(event) : []).map(name => ({ name, dataType: InjectedNames.typeOf(name) }));
+            const params = (event ? eventParamNames(event) : []).map(name => ({ name, dataType: InjectedNames.typeOf(name) }));
+
+            return [ ...params, ...CommandScopeNames.hiddenNames.map(name => ({ name, hidden: true })) ];
         }
 
         return [];

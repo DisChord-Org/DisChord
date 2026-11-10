@@ -32,6 +32,13 @@ export class CommandScopeNames {
     ]);
 
     /**
+     * @returns {readonly string[]} The names the generated code declares for itself, in a command or in an event: the user's code cannot read them nor declare them again.
+     */
+    public static get hiddenNames (): readonly string[] {
+        return CommandScopeNames.usedByGeneratedCode;
+    }
+
+    /**
      * @param {string} name - A name of the command's scope.
      * @returns {boolean} Whether it is for the generated code only (`ctx`): the user's code cannot read it.
      */
