@@ -58,9 +58,3 @@ export const moderationQuotaWindowMinutes = 10;
  * @type {number}
  */
 export const moderationQuotaMaxTier = 3;
-
-/**
- * The most characters Discord keeps of an audit log reason.
- * @type {number}
- */
-export const auditReasonMaxLength = 512;

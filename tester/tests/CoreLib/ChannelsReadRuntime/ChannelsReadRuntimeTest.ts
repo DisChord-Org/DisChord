@@ -89,7 +89,30 @@ export class ChannelsReadRuntimeTest extends Test {
         await this.expectRejection(() => getChannel(undefined, 'a-1', 'A'), 'No hay un cliente', 'no context');
         await this.expectRejection(() => getChannel({ cliente }, undefined, 'A'), "Falta el valor de 'id'", 'no id');
         await this.expectRejection(() => getChannel({ cliente }, 'b-1', 'A'), 'no pertenece al servidor del contexto', 'a channel of another server');
-        await this.expectRejection(() => getChannel({ cliente, contexto: this.command() }, 'a-hidden', 'A'), 'no puede ver ese canal', 'a channel the invoker can not see');
+
+        // inside a command a channel that is hidden, one of another server and one that does not exist get the same answer
+        const answer = async (id: string, client: any = cliente): Promise<string> => {
+            try {
+                await getChannel({ cliente: client, contexto: this.command() }, id, 'A');
+            } catch (error) {
+                return String((error as Error).message).replace(`'${id}'`, "'<id>'");
+            }
+
+            throw new Error(`${id} was read by a command`);
+        };
+
+        const ghost = { ...cliente, channels: { fetch: async () => { throw { metadata: { status: 404 } }; } } };
+        const answers = [ await answer('a-hidden'), await answer('b-1'), await answer('a-ghost'), await answer('a-ghost', ghost) ];
+
+        if (new Set(answers).size !== 1) throw new Error(`The three answers differ: ${JSON.stringify(answers)}`);
+        if (!answers[0].includes('No hay ningún canal con el identificador')) throw new Error(`Unexpected answer: ${answers[0]}`);
+
+        // a failure that is not about the channel is not hidden as "not found"
+        const broken = { ...cliente, channels: { fetch: async () => { throw new Error('network'); } } };
+        await this.expectRejection(() => getChannel({ cliente: broken, contexto: this.command() }, 'a-1', 'A'), 'network', 'a failure of the client');
+
+        // the server given has to be the one the command runs in
+        await this.expectRejection(() => getChannel({ cliente, contexto: this.command() }, 'a-1', 'B'), 'El servidor indicado no es el del contexto', 'another server given');
 
         const seen = await getChannel({ cliente, contexto: this.command() }, 'a-1', 'A');
         if (seen.id !== 'a-1') throw new Error('The channel the client fetched was not returned');

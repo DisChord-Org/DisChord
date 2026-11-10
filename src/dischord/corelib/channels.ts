@@ -1,6 +1,7 @@
 import { ChannelAction, ChannelPayload, ChannelProperty } from "../types";
 import { SharedModule } from "../../chord/model/SharedModule";
 import { QuotaRuntime } from "./QuotaRuntime";
+import { ContextRuntime } from "./ContextRuntime";
 import { channelHelperNames, channelActionPhrases, channelQuota, channelQuotaWindowMinutes, channelQuotaMaxTier } from "./channelsPolicy";
 
 export * from "./channelsPolicy";
@@ -56,9 +57,16 @@ export const channelsModule: SharedModule = {
 
     const usage = new Map();
 
+${ContextRuntime.renderIds()}
+
+${ContextRuntime.renderContextGuild(message => `throw new Error("DisChord Error: No se pudo " + WHAT[action] + ". ${message}");`)}
+
+${ContextRuntime.renderReason()}
+
+    // a value given as an object, a promise of one or an id, as the canonical id it names
     const idOf = async (value) => {
         const resolved = await value;
-        return resolved && typeof resolved === 'object' ? resolved.id : resolved;
+        return canonicalId(resolved && typeof resolved === 'object' ? resolved.id : resolved);
     };
 
     const requireClient = (ctx, action) => {
@@ -103,18 +111,6 @@ export const channelsModule: SharedModule = {
 
 ${QuotaRuntime.render(channelQuotaWindowMinutes, limit => `throw new Error("DisChord Error: No se pudo " + WHAT[action] + ". ${limit}");`)}
 
-    // the channel has to belong to the server of the context, when the context has one
-    const requireSameGuild = async (cliente, channelId, expectedGuildId, action) => {
-        const channel = await cliente.channels.fetch(channelId);
-        const guildId = channel.guildId;
-
-        if (expectedGuildId && guildId !== expectedGuildId) {
-            throw new Error("DisChord Error: No se pudo " + WHAT[action] + ". El canal no pertenece al servidor del contexto.");
-        }
-
-        return guildId ?? expectedGuildId;
-    };
-
     // inside a command, the bot reads for whoever ran it: it must be something they can see too
     const canSee = async (contexto, channel) => {
         if (!contexto.member || typeof channel.memberPermissions !== 'function') return false;
@@ -124,12 +120,35 @@ ${QuotaRuntime.render(channelQuotaWindowMinutes, limit => `throw new Error("DisC
         return permissions.has(['ViewChannel']);
     };
 
+    // the channel acted on: of the server of the context and, inside a command, one whoever ran it can see
+    const fetchOwnChannel = async (ctx, cliente, channelId, expectedGuildId, action) => {
+        const channel = await cliente.channels.fetch(channelId);
+        const guildId = canonicalId(channel.guildId);
+
+        if (expectedGuildId && !sameId(guildId, expectedGuildId)) {
+            throw new Error("DisChord Error: No se pudo " + WHAT[action] + ". El canal no pertenece al servidor del contexto.");
+        }
+
+        if (ctx.contexto) {
+            if (!sameId(guildId, ctx.contexto.guildId)) {
+                throw new Error("DisChord Error: No se pudo " + WHAT[action] + ". El canal no pertenece al servidor del contexto.");
+            }
+
+            if (!(await canSee(ctx.contexto, channel))) {
+                throw new Error("DisChord Error: No se pudo " + WHAT[action] + ". Quien ejecuta el comando no puede ver ese canal.");
+            }
+        }
+
+        return { channel, guildId: guildId ?? expectedGuildId };
+    };
+
     export const ${channelHelperNames.crear} = async (ctx, guild, body) => {
         const action = '${ChannelAction.Crear}';
         const cliente = requireClient(ctx, action);
         await requireInvoker(ctx, action);
 
         const guildId = await requireId(guild, '${ChannelProperty.Servidor}', action);
+        requireContextGuild(ctx, guildId, action);
         await consumeQuota(cliente, guildId, action);
 
         return await cliente.guilds.channels.create(guildId, await withParentId(body));
@@ -141,10 +160,10 @@ ${QuotaRuntime.render(channelQuotaWindowMinutes, limit => `throw new Error("DisC
         await requireInvoker(ctx, action);
 
         const channelId = await requireId(channel, '${ChannelProperty.Canal}', action);
-        const guildId = await requireSameGuild(cliente, channelId, await idOf(guild), action);
+        const { guildId } = await fetchOwnChannel(ctx, cliente, channelId, await idOf(guild), action);
         await consumeQuota(cliente, guildId, action);
 
-        return await cliente.channels.edit(channelId, await withParentId(body), { reason });
+        return await cliente.channels.edit(channelId, await withParentId(body), { reason: describeReason(ctx, await reason) });
     };
 
     export const ${channelHelperNames.borrar} = async (ctx, channel, reason, guild) => {
@@ -153,10 +172,10 @@ ${QuotaRuntime.render(channelQuotaWindowMinutes, limit => `throw new Error("DisC
         await requireInvoker(ctx, action);
 
         const channelId = await requireId(channel, '${ChannelProperty.Canal}', action);
-        const guildId = await requireSameGuild(cliente, channelId, await idOf(guild), action);
+        const { guildId } = await fetchOwnChannel(ctx, cliente, channelId, await idOf(guild), action);
         await consumeQuota(cliente, guildId, action);
 
-        return await cliente.channels.delete(channelId, { reason });
+        return await cliente.channels.delete(channelId, { reason: describeReason(ctx, await reason) });
     };
 
     // the channels of a list that pass the filters of listar canales (or the ones that narrow a search by name)
@@ -200,7 +219,7 @@ ${QuotaRuntime.render(channelQuotaWindowMinutes, limit => `throw new Error("DisC
         const guildId = await requireId(guild, '${ChannelProperty.Servidor}', action);
 
         // the permissions are those of the invoker in the server the command runs in
-        if (ctx.contexto && ctx.contexto.guildId !== guildId) {
+        if (ctx.contexto && !sameId(ctx.contexto.guildId, guildId)) {
             throw new Error("DisChord Error: No se pudo " + WHAT[action] + ". El canal no pertenece al servidor del contexto.");
         }
 
@@ -218,6 +237,28 @@ ${QuotaRuntime.render(channelQuotaWindowMinutes, limit => `throw new Error("DisC
         return channels[0];
     };
 
+    // obtener canal { id ... } inside a command: a channel that does not exist, one of another server and one
+    // whoever ran the command can not see get the same answer, so it does not tell which of the three it was
+    const findVisibleById = async (ctx, cliente, channelId, expectedGuildId, action) => {
+        requireContextGuild(ctx, expectedGuildId ?? ctx.contexto.guildId, action);
+
+        const missing = () => new Error("DisChord Error: No se pudo " + WHAT[action] + ". No hay ningún canal con el identificador '" + channelId + "'.");
+        let found;
+
+        try {
+            found = await cliente.channels.fetch(channelId);
+        } catch (error) {
+            const status = error && error.metadata ? error.metadata.status : error && error.status;
+            if (status === 404 || status === 403) throw missing();
+
+            throw error;
+        }
+
+        if (!found || !sameId(found.guildId, ctx.contexto.guildId) || !(await canSee(ctx.contexto, found))) throw missing();
+
+        return found;
+    };
+
     export const ${channelHelperNames.obtener} = async (ctx, channel, guild, name, filters) => {
         const action = '${ChannelAction.Obtener}';
         const cliente = requireClient(ctx, action);
@@ -225,15 +266,14 @@ ${QuotaRuntime.render(channelQuotaWindowMinutes, limit => `throw new Error("DisC
         if (name !== undefined) return await findByName(ctx, cliente, guild, name, filters, action);
 
         const channelId = await requireId(channel, '${ChannelProperty.Id}', action);
-        const found = await cliente.channels.fetch(channelId);
         const expectedGuildId = await idOf(guild);
 
-        if (expectedGuildId && found.guildId !== expectedGuildId) {
-            throw new Error("DisChord Error: No se pudo " + WHAT[action] + ". El canal no pertenece al servidor del contexto.");
-        }
+        if (ctx.contexto) return await findVisibleById(ctx, cliente, channelId, expectedGuildId, action);
 
-        if (ctx.contexto && !(await canSee(ctx.contexto, found))) {
-            throw new Error("DisChord Error: No se pudo " + WHAT[action] + ". Quien ejecuta el comando no puede ver ese canal.");
+        const found = await cliente.channels.fetch(channelId);
+
+        if (expectedGuildId && !sameId(found.guildId, expectedGuildId)) {
+            throw new Error("DisChord Error: No se pudo " + WHAT[action] + ". El canal no pertenece al servidor del contexto.");
         }
 
         return found;
@@ -244,6 +284,7 @@ ${QuotaRuntime.render(channelQuotaWindowMinutes, limit => `throw new Error("DisC
         const cliente = requireClient(ctx, action);
 
         const guildId = await requireId(guild, '${ChannelProperty.Servidor}', action);
+        requireContextGuild(ctx, guildId, action);
         const channels = await narrow(await cliente.guilds.channels.list(guildId), filters);
 
         // a command lists only what whoever ran it can see

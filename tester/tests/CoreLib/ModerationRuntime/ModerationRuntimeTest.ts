@@ -43,6 +43,8 @@ export class ModerationRuntimeTest extends Test {
             await this.invoker();
             await this.hierarchy();
             await this.quota();
+            await this.contextGuild();
+            await this.spellingsShareOneQuota();
             await this.refusals();
         } finally {
             fs.rmSync(directory, { recursive: true, force: true });
@@ -88,7 +90,7 @@ export class ModerationRuntimeTest extends Test {
     }
 
     private command (client: any, invoker: any): any {
-        return { cliente: client, contexto: { member: invoker, author: { id: invoker.id }, command: { name: 'castiga' } } };
+        return { cliente: client, contexto: { member: invoker, author: { id: invoker.id }, guildId: '11', command: { name: 'castiga' } } };
     }
 
     private async refused (action: () => Promise<unknown>, calls: any[], label: string, expected?: string): Promise<void> {
@@ -205,7 +207,7 @@ export class ModerationRuntimeTest extends Test {
         await this.refused(() => module.banMember(only([ 'KickMembers' ]), '300', '11', 'spam'), calls, 'ban without BanMembers', "'Banear miembros'");
         await this.refused(() => module.unbanMember(only([ 'KickMembers' ]), '300', '11', 'spam'), calls, 'unban without BanMembers', "'Banear miembros'");
         await this.refused(() => module.kickMember(only([ 'BanMembers' ]), '300', '11', 'spam'), calls, 'kick without KickMembers', "'Expulsar miembros'");
-        await this.refused(() => module.banMember({ cliente: client, contexto: { author: { id: '200' } } }, '300', '11', 'spam'), calls, 'no member in the interaction', 'Solo se puede desde un servidor');
+        await this.refused(() => module.banMember({ cliente: client, contexto: { author: { id: '200' }, guildId: '11' } }, '300', '11', 'spam'), calls, 'no member in the interaction', 'Solo se puede desde un servidor');
 
         // the permissions come from the roles when the interaction does not carry them
         const lazy = this.member('200', 5);
@@ -288,6 +290,44 @@ export class ModerationRuntimeTest extends Test {
         for (let index = 0; index < 24; index++) await big.banMember({ cliente: world.client }, `40${index}`, '11', 'spam');
         await this.refused(() => big.banMember({ cliente: world.client }, '499', '11', 'spam'), world.calls, 'beyond the top tier', 'límite de seguridad de 24');
         this.expect(world.calls.length, 24, 'the top tier allows 24 bans');
+    }
+
+    // inside a command the target server has to be the one the command runs in: the permission was checked there
+    private async contextGuild (): Promise<void> {
+        const module = await this.load();
+        const { client, calls } = this.world({ members: { '300': this.member('300', 1) } });
+        const ctx = this.command(client, this.member('200', 5));
+
+        for (const other of [ '12', Promise.resolve('12'), { id: '12' } ]) {
+            await this.refused(() => module.banMember(ctx, '300', other, 'spam'), calls, `ban in ${JSON.stringify(other)}`, 'no es el del contexto');
+            await this.refused(() => module.unbanMember(ctx, '300', other, 'spam'), calls, `unban in ${JSON.stringify(other)}`, 'no es el del contexto');
+            await this.refused(() => module.kickMember(ctx, '300', other, 'spam'), calls, `kick in ${JSON.stringify(other)}`, 'no es el del contexto');
+        }
+
+        // the same server written another way is the same server
+        for (const same of [ '11', '011', Promise.resolve({ id: '0011' }) ]) await module.unbanMember(ctx, '300', same, 'spam');
+        this.expect(calls.length, 3, 'the server of the context in any spelling');
+
+        // a command that carries no server (a direct message) is refused, not let through
+        const bare = this.command(client, this.member('200', 5));
+        delete bare.contexto.guildId;
+        await this.refused(() => module.unbanMember(bare, '300', '11', 'spam'), calls, 'command with no server', 'no es el del contexto');
+
+        // an event has no server of its own to compare with
+        await module.unbanMember({ cliente: client }, '300', '12', 'spam');
+        this.expect(calls.length, 4, 'an event may name its server');
+    }
+
+    // leading zeros do not make another count
+    private async spellingsShareOneQuota (): Promise<void> {
+        const module = await this.load();
+        const { client, calls } = this.world();
+        const ctx = { cliente: client };
+
+        await module.banMember(ctx, '301', '11', 'spam');
+        await module.banMember(ctx, '302', '011', 'spam');
+        await module.banMember(ctx, '303', Promise.resolve({ id: '0011' }), 'spam');
+        await this.refused(() => module.banMember(ctx, '304', '00011', 'spam'), calls, 'fourth spelling of the same server', 'límite de seguridad de 3');
     }
 
     private async refusals (): Promise<void> {

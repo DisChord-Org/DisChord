@@ -1,7 +1,8 @@
 import { ModerationAction, BanDeleteMessageSeconds } from "../types";
 import { SharedModule } from "../../chord/model/SharedModule";
 import { QuotaRuntime } from "./QuotaRuntime";
-import { moderationHelperNames, moderationActionPhrases, moderationPermissions, moderationQuota, moderationQuotaWindowMinutes, moderationQuotaMaxTier, auditReasonMaxLength } from "./moderationPolicy";
+import { ContextRuntime } from "./ContextRuntime";
+import { moderationHelperNames, moderationActionPhrases, moderationPermissions, moderationQuota, moderationQuotaWindowMinutes, moderationQuotaMaxTier } from "./moderationPolicy";
 
 export * from "./moderationPolicy";
 
@@ -54,7 +55,6 @@ export const moderationModule: SharedModule = {
     const WINDOW_MS = ${moderationQuotaWindowMinutes} * 60 * 1000;
     const BASE_QUOTA = ${JSON.stringify(moderationQuota)};
     const MAX_TIER = ${moderationQuotaMaxTier};
-    const REASON_MAX = ${auditReasonMaxLength};
     const DELETE_SECONDS = ${JSON.stringify(BanDeleteMessageSeconds)};
 
     const WHAT = ${JSON.stringify(moderationActionPhrases)};
@@ -66,21 +66,24 @@ export const moderationModule: SharedModule = {
         throw new Error("DisChord Error: No se pudo " + WHAT[action] + ". " + detail);
     };
 
+${ContextRuntime.renderIds()}
+
+${ContextRuntime.renderContextGuild(message => `fail(action, "${message}");`)}
+
     // a value given as an object, a promise of one or an id, as the id text it names
     const idOf = async (value, name, action) => {
         const resolved = await value;
         const id = resolved && typeof resolved === 'object' ? resolved.id : resolved;
 
-        if (typeof id !== 'string' || !/^[0-9]+$/.test(id)) {
+        if (!isId(id)) {
             fail(action, "'" + name + "' no es un identificador válido (un texto de dígitos, o algo que lo tenga como id).");
         }
 
-        // the same id can be written with leading zeros: compare and send the canonical text of the number
-        return BigInt(id).toString();
+        return canonicalId(id);
     };
 
     // the canonical text of an id, or undefined if it is not one
-    const canonical = (value) => typeof value === 'string' && /^[0-9]+$/.test(value) ? BigInt(value).toString() : undefined;
+    const canonical = (value) => isId(value) ? canonicalId(value) : undefined;
 
     const requireClient = (ctx, action) => {
         if (!ctx || !ctx.cliente) {
@@ -120,15 +123,7 @@ export const moderationModule: SharedModule = {
         return member;
     };
 
-    // who ordered the action, for the audit log (the bot is the one that acts)
-    const describeReason = (ctx, reason) => {
-        const { contexto } = ctx;
-        const prefix = contexto
-            ? "[DisChord] comando " + (contexto.command && contexto.command.name ? contexto.command.name : "") + " por " + (contexto.author ? contexto.author.id : "?") + ": "
-            : "[DisChord] evento: ";
-
-        return (prefix + reason).slice(0, REASON_MAX);
-    };
+${ContextRuntime.renderReason()}
 
 ${QuotaRuntime.render(moderationQuotaWindowMinutes, limit => `fail(action, "${limit}");`)}
 
@@ -216,6 +211,7 @@ ${QuotaRuntime.render(moderationQuotaWindowMinutes, limit => `fail(action, "${li
         const invoker = await requireInvoker(ctx, action);
 
         const guildId = await idOf(guild, 'servidor', action);
+        requireContextGuild(ctx, guildId, action);
         const targetId = await idOf(user, 'usuario', action);
         const text = await requireReason(reason, action);
 
