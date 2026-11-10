@@ -1,4 +1,5 @@
 import { CommandNode, DisChordNode, DisChordNodeType, DisChordTokenType } from "../../../types";
+import { GeneratedNames } from "../../constants/GeneratedNames";
 import { SubGenerator } from '../../../../chord/Generator/SubGenerator';
 import { VisitorHelpers } from "../VisitorHelpers";
 import { CompilerMetadataKind, TokenTypeUnion } from '../../../../chord/model/types';
@@ -37,7 +38,7 @@ export default class CommandVisitor extends SubGenerator<DisChordNodeType, DisCh
 
         const optionData = this.parent.get(CommandOptionVisitor).visitIfNodeExists(node.body);
         const optionsData = optionData.options;
-        const optionsConstDeclaration: string = optionsData.length > 0? 'options = options;' : '';
+        const optionsConstDeclaration: string = optionsData.length > 0? `${GeneratedNames.OptionsConstantName} = ${GeneratedNames.OptionsConstantName};` : '';
         const optionsConstExtraction: string = optionData.variables;
 
         // an option named like an injected name wins: it is declared with the other options below, and
@@ -49,11 +50,11 @@ export default class CommandVisitor extends SubGenerator<DisChordNodeType, DisCh
         const body = VisitorHelpers.renderStatements(this.parent, node.body.body);
 
         const commandBody: string = `
-            import { Command, IgnoreCommand, Embed, ActionRow, Button, createStringOption } from 'seyfert';
+            ${GeneratedNames.importStatement('command')}
 
             ${optionsData}
 
-            export default class ${commandName}Command extends Command {
+            export default class ${GeneratedNames.commandClassName(commandName)} extends Command {
                 ${commandFlags}
 
                 ${optionsConstDeclaration}

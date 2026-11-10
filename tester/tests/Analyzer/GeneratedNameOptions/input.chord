@@ -1,0 +1,12 @@
+var options es 5
+nuevo comando Hola {
+    descripcion "x"
+
+    opciones {
+        a {
+            tipo "texto"
+            descripcion "d"
+            requerido verdadero
+        }
+    }
+}

@@ -1,4 +1,5 @@
 import { DisChordNode, DisChordNodeType, DisChordTokenType, EventNode } from "../../../types";
+import { GeneratedNames } from "../../constants/GeneratedNames";
 import { SubGenerator } from '../../../../chord/Generator/SubGenerator';
 import { TokenTypeUnion } from '../../../../chord/model/types';
 import { VisitorHelpers } from "../VisitorHelpers";
@@ -38,7 +39,7 @@ export default class EventVisitor extends SubGenerator<DisChordNodeType, DisChor
         const ctxDeclaration = `const ctx = { ${ctxParams.join(', ')} };`;
 
         const eventBody: string = `
-            import { createEvent, Embed, ActionRow, Button } from 'seyfert';
+            ${GeneratedNames.importStatement('event')}
 
             export default createEvent({
                 data: { name: '${event.name}' },

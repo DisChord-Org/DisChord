@@ -1,0 +1,10 @@
+funcion createMessage() {
+    devolver 1
+}
+nuevo comando Hola {
+    descripcion "x"
+
+    enviar mensaje {
+        contenido "a"
+    }
+}

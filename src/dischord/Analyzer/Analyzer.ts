@@ -21,6 +21,7 @@ import { DisChordResolveAwaitedCallsRule } from "./rules/DisChordResolveAwaitedC
 import { ResolveAwaitedCallsRule } from "../../chord/Analyzer/rules/ResolveAwaitedCallsRule";
 import { BindDeclarationsRule } from "../../chord/Analyzer/rules/BindDeclarationsRule";
 import { DisChordBindDeclarationsRule } from "./rules/DisChordBindDeclarationsRule";
+import { ValidateGeneratedNamesRule } from "./rules/ValidateGeneratedNamesRule";
 import { ValidateInjectedNamesRule } from "./rules/ValidateInjectedNamesRule";
 
 /**
@@ -54,7 +55,10 @@ export class DisChordAnalyzer extends Analyzer<DisChordNodeType, DisChordNode> {
         RequiresChannelHelperRule,
         RequiresModerationHelperRule,
         RequiresChannelExtensionsRule,
-        ...PatchedMembersRules.build()
+        ...PatchedMembersRules.build(),
+
+        // last: it reads the imports every rule above inserted
+        ValidateGeneratedNamesRule
     ];
 
     /**

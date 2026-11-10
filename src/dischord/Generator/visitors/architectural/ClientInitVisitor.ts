@@ -1,4 +1,5 @@
 import path from "node:path";
+import { GeneratedNames } from "../../constants/GeneratedNames";
 
 import { DisChordNode, DisChordNodeType, DisChordTokenType, StartBotNode } from "../../../types";
 import { intentsMap, SeyfertLocations } from "../../constants/mappings";
@@ -53,15 +54,15 @@ export default class ClientInitVisitor extends SubGenerator<DisChordNodeType, Di
      */
     private clientTemplate (prefixes: string, includeSlash: boolean, customProperties: string): string {
         return `
-            import { Client } from "seyfert";
-            const client = new Client({
+            ${GeneratedNames.importStatement('client', '"')}
+            const ${GeneratedNames.ClientConstantName} = new Client({
                 commands: {
                     prefix: () => ${prefixes},
                     reply: () => true
                 }
             });
 
-            client.setServices({
+            ${GeneratedNames.ClientConstantName}.setServices({
                 cache: {
                     disabledCache: { bans: true, emojis: true, stickers: true, roles: true, presences: true }
                 }
@@ -69,8 +70,8 @@ export default class ClientInitVisitor extends SubGenerator<DisChordNodeType, Di
 
             ${customProperties}
 
-            client.start().then(async () => {
-                ${includeSlash ? 'await client.uploadCommands().catch(error => console.log(error));' : ''}
+            ${GeneratedNames.ClientConstantName}.start().then(async () => {
+                ${includeSlash ? `await ${GeneratedNames.ClientConstantName}.uploadCommands().catch(error => console.log(error));` : ''}
             });
 
             process.on('unhandledRejection', async (err) => {
@@ -89,7 +90,7 @@ export default class ClientInitVisitor extends SubGenerator<DisChordNodeType, Di
      */
     private customProperties (node: StartBotNode): string {
         return startBotCustomEntries(node.object)
-            .map(([ key, value ]) => `client[${JSON.stringify(key)}] = ${this.awaited(value)};`)
+            .map(([ key, value ]) => `${GeneratedNames.ClientConstantName}[${JSON.stringify(key)}] = ${this.awaited(value)};`)
             .join('\n');
     }
 

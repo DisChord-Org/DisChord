@@ -1,0 +1,8 @@
+var createChannel es 5
+var banMember es 6
+
+nuevo comando Hola {
+    descripcion "x"
+
+    consola.imprimir(createChannel mas banMember)
+}

@@ -1,0 +1,5 @@
+evento encendido {
+    funcion Embed() {
+        devolver 1
+    }
+}

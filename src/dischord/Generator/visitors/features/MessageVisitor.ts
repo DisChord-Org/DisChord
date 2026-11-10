@@ -6,6 +6,7 @@ import ButtonVisitor from "../components/ButtonVisitor";
 import EmbedVisitor from "../components/EmbedVisitor";
 import { MessageSchema } from "../../constants/schemas";
 import { JSFallback } from "../../../../chord/BDOSchema";
+import { createMessageHelperName } from "../../../corelib";
 
 /**
  * Generator class responsible for generating code related to message creation and interactions in DisChord.
@@ -35,6 +36,6 @@ export default class MessageVisitor extends SubGenerator<DisChordNodeType, DisCh
 
         const user = properties['usuario'] === JSFallback.Undefined ? '' : `, ${properties['usuario']}`;
 
-        return `await createMessage(${properties[ChannelProperty.Canal]}, { content: ${properties['contenido']} ${componentsData} }, ${interactionContext}, ctx${user})`;
+        return `await ${createMessageHelperName}(${properties[ChannelProperty.Canal]}, { content: ${properties['contenido']} ${componentsData} }, ${interactionContext}, ctx${user})`;
     }
 }

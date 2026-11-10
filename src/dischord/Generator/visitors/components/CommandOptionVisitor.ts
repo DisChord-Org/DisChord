@@ -1,4 +1,5 @@
 import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordODBNode, DisChordTokenType } from "../../../types";
+import { GeneratedNames } from "../../constants/GeneratedNames";
 import { SubGenerator } from "../../../../chord/Generator/SubGenerator";
 import { VisitorHelpers } from "../VisitorHelpers";
 import { TokenType, TokenTypeUnion } from "../../../../chord/model/types";
@@ -43,7 +44,7 @@ export default class CommandOptionVisitor extends SubGenerator<DisChordNodeType,
         };
 
         return {
-            options: `const options = [${this.visit(optionsBlock)}];`,
+            options: `const ${GeneratedNames.OptionsConstantName} = [${this.visit(optionsBlock)}];`,
             variables: this.generateVariables(CommandScopeNames.optionNames(node))
         };
     }

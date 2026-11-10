@@ -1,0 +1,7 @@
+nuevo evento mensajeCreado {
+    enviar mensaje {
+        embed {
+            titulo "x"
+        }
+    }
+}

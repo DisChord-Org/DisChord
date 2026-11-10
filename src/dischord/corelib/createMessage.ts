@@ -1,6 +1,13 @@
 import { SharedModule } from "../../chord/model/SharedModule";
 
 /**
+ * The name the shared `createMessage` module exports and the generated code calls. Written once:
+ * the module, the rule that imports it and the visitor that calls it read it from here.
+ * @type {string}
+ */
+export const createMessageHelperName = 'createMessage';
+
+/**
  * A shared module: its `path`, relative to the project's `dist` directory, where `CompileCommand` writes it,
  * and its `content`.
  *
@@ -19,7 +26,7 @@ import { SharedModule } from "../../chord/model/SharedModule";
 export const createMessageModule: SharedModule = {
     path: 'lib/createMessage.js',
     content: `
-    export const createMessage = async (channel, options, interactionContext, ctx, user) => {
+    export const ${createMessageHelperName} = async (channel, options, interactionContext, ctx, user) => {
         const { cliente, contexto, mensaje } = ctx || {};
 
         // if user (direct message), alongside the channel when both are given

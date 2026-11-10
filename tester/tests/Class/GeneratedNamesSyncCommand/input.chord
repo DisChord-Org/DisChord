@@ -1,0 +1,48 @@
+nuevo comando Fregadero {
+    descripcion "todo lo que genera un comando"
+
+    opciones {
+        objetivo {
+            tipo "usuario"
+            descripcion "a quien"
+            requerido verdadero
+        }
+    }
+
+    var canales es listar canales { }
+    para (c en canales) {
+        consola.imprimir(c.nombre)
+    }
+    var uno es obtener canal { nombre "general" }
+    crear canal {
+        nombre "nuevo"
+    }
+    editar canal {
+        canal uno
+        nombre "otro"
+    }
+    borrar canal {
+        canal uno
+        razon "limpieza"
+    }
+    banear miembro {
+        usuario objetivo
+        razon "spam"
+    }
+    desbanear usuario {
+        usuario "1"
+        razon "perdon"
+    }
+    expulsar miembro {
+        usuario objetivo
+        razon "spam"
+    }
+    enviar mensaje {
+        embed {
+            titulo "x"
+        }
+        boton [
+            { id "uno" etiqueta "1" estilo "verde" }
+        ]
+    }
+}

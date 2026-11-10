@@ -1,0 +1,5 @@
+var client es 5
+encender bot {
+    prefijo "!"
+    token "abc"
+}

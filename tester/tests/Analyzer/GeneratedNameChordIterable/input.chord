@@ -1,0 +1,9 @@
+var chordIterable es 5
+nuevo comando Hola {
+    descripcion "x"
+
+    var l es [1]
+    para (x en l) {
+        consola.imprimir(x)
+    }
+}
