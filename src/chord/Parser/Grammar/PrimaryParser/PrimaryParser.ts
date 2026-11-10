@@ -37,7 +37,9 @@ export class PrimaryParser<T extends string, N extends BaseNode<T>> extends SubP
 
         throw new ChordError({
             phase: ErrorLevel.Parser,
-            message: `Token inesperado en expresión: ${token.type} en la posición ${this.parent.cursor}`,
+            message: token.type === TokenType.EOF
+                ? 'Token inesperado: el archivo termina donde se esperaba un valor (un número, un texto, un nombre...)'
+                : `Token inesperado: se esperaba un valor (un número, un texto, un nombre...) y se encontró '${token.value}'`,
             location: token.location
         });
     }

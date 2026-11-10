@@ -113,10 +113,19 @@ export class BDOParser<T extends string, N extends BaseNode<T>> extends SubParse
     /** @throws {ChordError} If the block has properties and the code that follows them is not set apart by an empty line. */
     private assertBlankLineBeforeCode (blocks: Record<string, ASTNode<T, N>>): void {
         const token = this.peek();
+        if (Object.keys(blocks).length === 0 || token.blankLineBefore) return;
 
-        if (Object.keys(blocks).length > 0 && !token.blankLineBefore) throw new ChordError({
+        // on the line of the last property it is not code that lacks the blank line, it is a stray value
+        let last = this.parent.cursor - 1;
+        while (last > 0 && this.peek(last).type === TokenType.SEPARADOR) last--;
+
+        const sameLine = this.peek(last).end.line === token.location.line;
+
+        throw new ChordError({
             phase: ErrorLevel.Parser,
-            message: 'Separa el código de las propiedades con una línea en blanco',
+            message: sameLine
+                ? `Sobra '${token.value}': una propiedad se escribe como 'clave valor' y la siguiente va en otra línea`
+                : 'Separa el código de las propiedades con una línea en blanco',
             location: token.location
         });
     }

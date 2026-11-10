@@ -117,7 +117,7 @@ export class TokenStream<T extends string> {
 
         throw new ChordError({
             phase: ErrorLevel.Parser,
-            message: `${customMessage}. (En su lugar se encontró '${token.value}')`,
+            message: token.type === TokenType.EOF ? `${customMessage}. (El archivo termina antes)` : `${customMessage}. (En su lugar se encontró '${token.value}')`,
             location: token.location
         });
     }

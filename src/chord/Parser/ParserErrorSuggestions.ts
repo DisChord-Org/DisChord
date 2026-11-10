@@ -5,6 +5,7 @@ import { TokenType } from "../model/types";
  * Tailored specifically for Spanish educational contexts within the DisChord compiler ecosystem.
  */
 export const SUGGESTIONS: Record<string, string> = {
+    [TokenType.L_BRACE]: "Falta la llave '{' que abre el bloque",
     [TokenType.R_BRACE]: "Después de un bloque debes cerrarlo usando la llave '}'",
     [TokenType.R_PAREN]: "Se te olvidó cerrar el paréntesis ')'",
     [TokenType.Es]: "Se necesita la palabra 'es' para asignar el valor",
