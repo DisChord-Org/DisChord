@@ -2,7 +2,7 @@ import { Location, NamedTextLiteral, Token, TokenType } from './model/types';
 import { ChordError, ErrorLevel } from '../errors/ChordError';
 import { CompilationContext } from './model/CompilationContext';
 import { SymbolTranslationMap } from './model/Symbols';
-import { interpolate } from './Interpolation';
+import { InterpolatedText } from './InterpolatedText';
 
 export class Lexer<T extends string> {
     /**
@@ -173,7 +173,7 @@ export class Lexer<T extends string> {
         const raw = previous !== undefined && (previous.type === TokenType.Desde
             || (beforePrevious?.type === TokenType.JS && previous.type === TokenType.L_PAREN));
 
-        (raw ? [ text ] : interpolate(text, code => new Lexer<T>(this.context, code).tokenize())).forEach(token => this.emit(token));
+        (raw ? [ text ] : new InterpolatedText(text, code => new Lexer<T>(this.context, code).tokenize()).toTokens()).forEach(token => this.emit(token));
     }
 
     /** Reads a number: decimal, binary, octal or hexadecimal, and a BigInt when it ends in `n`. */
