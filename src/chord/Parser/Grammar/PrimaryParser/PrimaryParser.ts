@@ -27,8 +27,7 @@ export class PrimaryParser<T extends string, N extends BaseNode<T>> extends SubP
         if (token.type === TokenType.L_SQUARE) return this.parseList();
         if (token.type === TokenType.L_BRACE) return this.parseObject();
         if (token.type === TokenType.L_PAREN) return this.parseGroup();
-        // unlike the others, `js` is recognised by the token's text, not by its type
-        if (token.value === TokenType.JS) return this.parseJs();
+        if (token.type === TokenType.JS) return this.parseJs();
         if (token.type === TokenType.Esta) return this.parseWord<ThisNode<T>>(TokenType.Esta);
         if (token.type === TokenType.Super) return this.parseWord<SuperNode<T>>(TokenType.Super);
         if (token.type === TokenType.IDENTIFICADOR) return this.parseIdentifier();
