@@ -77,8 +77,19 @@ export abstract class Test {
      * @throws {Error} If the directory does not exist.
      */
     protected get fixture(): Directory {
-        return Directory.of(this.fixturePath);
+        // `fixturePath` is injected after the constructor, so the cache remembers which path it was made for
+        if (!this.cachedFixture || this.cachedFixture.path !== this.fixturePath) {
+            this.cachedFixture = { path: this.fixturePath, directory: Directory.of(this.fixturePath) };
+        }
+
+        return this.cachedFixture.directory;
     }
+
+    /** The directory `fixture` last resolved, so the `stat` happens once and not on every access. */
+    private cachedFixture?: { path: string; directory: Directory };
+
+    /** The snapshots of the fixture, created on the first comparison (see `assertOrUpdateSnapshot`). */
+    private snapshot?: Snapshot;
 
     /**
      * Reads the raw input .chord file for this test.
@@ -176,7 +187,10 @@ export abstract class Test {
      * @throws {Error} If comparison fails and not in snapshot update mode.
      */
     protected async assertOrUpdateSnapshot(actualContent: string, snapshotType: SnapshotType): Promise<void> {
-        await new Snapshot(this.fixture, this.forceUpdate).assertOrUpdate(actualContent, snapshotType);
+        // created lazily: `fixturePath` and `forceUpdate` are set after the constructor
+        this.snapshot ??= new Snapshot(this.fixture, this.forceUpdate);
+
+        await this.snapshot.assertOrUpdate(actualContent, snapshotType);
     }
 
     /**

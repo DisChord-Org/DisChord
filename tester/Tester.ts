@@ -87,6 +87,8 @@ export class Tester {
 
     /**
      * Recursively walks the given directory looking for source files and dynamically imports valid `Test` classes.
+     * Only the imports run concurrently; the result keeps the order of the directory walk, which is the
+     * order the tests run in (they have static state and must never run in parallel).
      *
      * @method discoverTestClasses
      * @param {string} [dir] - Target directory path to scan. Defaults to `this.testsDirectory` if omitted.
@@ -94,20 +96,30 @@ export class Tester {
      * @private
      */
     private async discoverTestClasses(dir?: string): Promise<Array<DiscoveredTest>> {
-        const testClasses: Array<DiscoveredTest> = [];
+        const testFiles = this.collectTestFiles(Directory.tryOf(dir ?? this.testsDirectory));
+        const found = await Promise.all(testFiles.map(file => this.testClassesOf(file)));
 
-        const directory = Directory.tryOf(dir ?? this.testsDirectory);
-        if (!directory) return testClasses;
+        return found.flat();
+    }
+
+    /**
+     * Recursively lists the files that may hold test classes, in walk order.
+     *
+     * @method collectTestFiles
+     * @param {Directory | undefined} directory - Directory to scan, if it exists.
+     * @returns {Array<File>}
+     * @private
+     */
+    private collectTestFiles(directory: Directory | undefined): Array<File> {
+        const files: Array<File> = [];
+        if (!directory) return files;
 
         for (const entry of directory.entries()) {
-            if (entry instanceof Directory) {
-                testClasses.push(...await this.discoverTestClasses(entry.absolutePath));
-            } else if (Tester.isTestFile(entry)) {
-                testClasses.push(...await this.testClassesOf(entry));
-            }
+            if (entry instanceof Directory) files.push(...this.collectTestFiles(entry));
+            else if (Tester.isTestFile(entry)) files.push(entry);
         }
 
-        return testClasses;
+        return files;
     }
 
     /**

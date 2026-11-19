@@ -45,13 +45,15 @@ export class RequiresRuntimeHelpersRule<T extends string, N extends BaseNode<T>>
     }
 
     /**
-     * What an access or a call is emitted as, when something other than the plain name decides it.
+     * What an access or a call is emitted as, when something other than the plain name decides it. A
+     * static member is the one `ResolveMemberAccessesRule` already resolved (`marks.statics`), the same
+     * the generator reads, and is not resolved again.
      * @private
      */
     private transpiledAs (node: ASTNode<T, N>): string | undefined {
         const marks = this.context.symbolTable.marks;
 
-        if (isAccessNode(node)) return marks.memberHelpers.get(node) ?? this.context.coreLib.resolveStatic(node)?.member.transpile;
+        if (isAccessNode(node)) return marks.memberHelpers.get(node) ?? marks.statics.get(node);
 
         if (!isCallNode(node)) return undefined;
 

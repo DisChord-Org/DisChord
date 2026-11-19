@@ -1,11 +1,13 @@
 import { Symbol } from "./types";
 
+type ClassEntry = { superClass?: string; members: ReadonlyMap<string, Symbol> };
+
 /**
  * The classes declared in the file, by name: each one's parent class and the members it declares
  * itself, so a member can be found from a class name and through inheritance.
  */
 export class ClassRegistry {
-    private readonly classes: Map<string, { superClass?: string; members: ReadonlyMap<string, Symbol> }> = new Map();
+    private readonly classes: Map<string, ClassEntry> = new Map();
 
     /**
      * Records a class being declared.
@@ -43,34 +45,31 @@ export class ClassRegistry {
      * @returns {Symbol | undefined} The member, or `undefined` if it isn't found in the chain.
      */
     public findMember(className: string, member: string): Symbol | undefined {
-        for (const current of this.chainOf(className)) {
-            const symbol = this.classes.get(current)!.members.get(member);
-            if (symbol) return symbol;
-        }
+        return this.walk(className, member, ClassRegistry.memberOf);
+    }
 
-        return undefined;
+    /**
+     * @param {string} className - A class name.
+     * @param {string} member - The member name.
+     * @returns {Symbol | undefined} The member only if that class declares it itself, not a parent.
+     */
+    public ownMember(className: string, member: string): Symbol | undefined {
+        return this.classes.get(className)?.members.get(member);
     }
 
     /**
      * The class and then each class it extends in turn, as long as they are classes of this file: a
-     * parent that isn't one ends the chain, and so does a cycle (a class is never yielded twice).
+     * parent that isn't one ends the chain, and so does a cycle (a class is never listed twice).
      *
      * @param {string} className - A class name.
-     * @yields {string} A user class name, starting with `className` itself.
+     * @returns {string[]} The user class names, starting with `className` itself.
      */
-    public *chainOf(className: string): Generator<string> {
-        const seen = new Set<string>();
-        let current: string | undefined = className;
+    public chainOf(className: string): string[] {
+        const chain: string[] = [];
 
-        while (current !== undefined && !seen.has(current)) {
-            const entry = this.classes.get(current);
-            if (!entry) return;
+        this.walk(className, chain, ClassRegistry.collect);
 
-            seen.add(current);
-            yield current;
-
-            current = entry.superClass;
-        }
+        return chain;
     }
 
     /**
@@ -79,17 +78,51 @@ export class ClassRegistry {
      * @returns {boolean} Whether `sub` is `base` or extends it, directly or through other classes. A cycle in the chain is cut.
      */
     public isSubclassOf(sub: string, base: string): boolean {
-        const seen = new Set<string>();
-        let current: string | undefined = sub;
+        return this.walk(sub, base, ClassRegistry.isBase) === true;
+    }
 
-        while (current !== undefined && !seen.has(current)) {
-            if (current === base) return true;
+    /**
+     * The one walk up the superclass chain, shared by every query: calls `probe` on `start` and then
+     * on each class it extends, until `probe` answers something, a parent isn't a class of this file
+     * or the chain is cut. `probe` is a function that captures nothing, taking what it needs as `arg`,
+     * so a query allocates nothing.
+     *
+     * @param {string} start - A class name.
+     * @param {A} arg - Whatever the probe needs.
+     * @param probe - Called with each name and its entry (`undefined` if it isn't a class of this file); a result other than `undefined` ends the walk.
+     * @returns {R | undefined} What the probe answered, or `undefined` if it never did.
+     */
+    private walk<A, R>(start: string, arg: A, probe: (name: string, entry: ClassEntry | undefined, arg: A) => R | undefined): R | undefined {
+        let current: string | undefined = start;
 
-            seen.add(current);
-            current = this.classes.get(current)?.superClass;
+        // a chain longer than the classes of the file (plus an unregistered `start`) passes through one twice: it is a cycle
+        for (let steps = this.classes.size + 1; current !== undefined && steps > 0; steps--) {
+            const entry = this.classes.get(current);
+            const result = probe(current, entry, arg);
+
+            if (result !== undefined || !entry) return result;
+
+            current = entry.superClass;
         }
 
-        return false;
+        return undefined;
+    }
+
+    private static memberOf(_name: string, entry: ClassEntry | undefined, member: string): Symbol | undefined {
+        return entry?.members.get(member);
+    }
+
+    private static isBase(name: string, _entry: ClassEntry | undefined, base: string): true | undefined {
+        return name === base ? true : undefined;
+    }
+
+    /** Lists `name` into `chain`, ending the walk (`true`) on one already listed: that is a cycle. */
+    private static collect(name: string, entry: ClassEntry | undefined, chain: string[]): true | undefined {
+        if (!entry || chain.includes(name)) return true;
+
+        chain.push(name);
+
+        return undefined;
     }
 
     /**

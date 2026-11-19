@@ -102,7 +102,7 @@ export class ValidateCallArgumentsRule<T extends string, N extends BaseNode<T>> 
         const classes = this.context.symbolTable.classes;
 
         for (const current of classes.chainOf(className)) {
-            const own = classes.findMember(current, current);
+            const own = classes.ownMember(current, current);
             if (own?.kind === SymbolKind.Function) return own;
         }
 

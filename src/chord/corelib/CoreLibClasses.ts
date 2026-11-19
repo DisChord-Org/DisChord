@@ -171,12 +171,22 @@ export class CoreLibClasses<C extends string = string> {
             .map(([name]) => name);
     }
 
+    /** The names of the classes, kept with the table they were read from. */
+    private cachedNames?: { classes: object; names: C[] };
+
     /**
-     * @returns {C[]} The names of the classes of the table, in declaration order.
+     * The table is data merged once when its module loads, so the names are read the first time they
+     * are asked for (never in the constructor) and kept; if `corelib.classes` is ever replaced by
+     * another object, they are read again.
+     * @returns {C[]} The names of the classes of the table, in declaration order. Not to be changed.
      * @protected
      */
     protected classNames(): C[] {
-        return Object.keys(this.corelib.classes) as C[];
+        const classes = this.corelib.classes;
+
+        if (this.cachedNames?.classes !== classes) this.cachedNames = { classes, names: Object.keys(classes) as C[] };
+
+        return this.cachedNames.names;
     }
 
     /**
