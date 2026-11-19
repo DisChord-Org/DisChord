@@ -1,0 +1,8 @@
+clase A {
+    @fijar
+    prop x es {
+        funcion f() {
+            devolver 1
+        }
+    }
+}

@@ -32,13 +32,13 @@ export class PropertyParser<T extends string, N extends BaseNode<T>> extends Sub
         const nameType = isClassMember && this.isReservedMemberName(nextToken) ? nextToken.type : TokenType.IDENTIFICADOR;
         const id = this.declare(DeclarationKind.Property, this.consume(nameType, "Se esperaba el nombre de la propiedad"));
         
+        const isStatic: boolean = this.parent.decorators.matchAndDelete('fijar', true);
+
         let value: ASTNode<T, N> = this.createUndefinedLiteral();
 
         if (this.match(TokenType.Es)) {
             value = this.parent.get(ExpressionParser).parse();
         }
-
-        const isStatic: boolean = this.parent.decorators.matchAndDelete('fijar', true);
 
         return this.createNode<PropertyNode<T, N>>({
             type: TokenType.PROPIEDAD,
