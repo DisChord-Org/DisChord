@@ -81,14 +81,33 @@ The language is taught in the tutorials of the DisChord website.
 | Option | What it does |
 | :--- | :--- |
 | `--no-run` | Compiles without running the resulting bot. |
-| `--check` | Runs every phase without writing anything or running the bot. |
+| `--check` | Runs every phase without writing anything or running the bot. On a file it checks only that file (for the whole project: `--check src`). It also works on files inside subfolders of `src/`: the project root is the nearest `package.json`. |
 | `--json` | Prints the diagnostics as a single JSON document. Without `--check` the bot is run afterwards; an editor wants `--check --json`. |
 | `--stdin`, `--stdin-filepath <path>` | Compiles the code on standard input as if it were that file. |
 | `--emit tokens\|ast` | Prints the tokens or the syntax tree of a file as JSON. |
 | `-o, --out-dir <dir>` | Output directory. |
+| `-d, --debug <phase>`, `-D, --depth <level>` | Debug output of `lexer`, `parser`, `generator` or `all`, and how deep it is inspected. |
+| `run <file.js>` | Runs code that was compiled earlier. |
 | `corelib [--json]` | Prints the vocabulary of the language (keywords, classes, blocks, events), for editors. |
 
 Exit codes: `0` ok, `1` the code has errors (or the bot failed), `2` the tool could not do its job.
+
+A project is compiled all at once: if any file fails, nothing is written to `dist/`.
+
+### What the compiler checks
+
+Besides the types, the compiler rejects before generating code:
+
+- In `encender bot`, any key that is not `prefijo`, `token` or `intenciones` becomes a property of `cliente` (`cliente.<key>` in
+  commands and events; the value can be any expression and it can be reassigned). A key that already exists in `cliente`
+  (`cache`, `logger`...) is an error, and so is one that looks like a typo of the bot's own (`intencion`).
+- A field of a block with a value of a type that can never fit (`embed 5`, `boton "x"`, `color "noexiste"`...).
+- A member that does not exist on a core library value (`t.noExiste()` on a `texto`), with a suggestion; the native JavaScript
+  members (`toUpperCase`, `push`) are still allowed.
+- A class member used without `esta`, `rango` with the wrong number of arguments or outside a `para`, a call that returns
+  nothing used as a value, and a name the generated code already uses in the file.
+- A command or an event inside `src/` but outside `src/comandos/` or `src/eventos/` (Seyfert would not load it), a text or a block comment that is
+  never closed, a block whose closing `}` is missing at the end of the file, and the JavaScript reserved words used as names.
 
 ---
 
