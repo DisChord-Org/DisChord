@@ -1,8 +1,8 @@
 import { ASTNode, BaseNode, LoopNode, PrimitiveType, TokenType } from "../model/types";
 import { isRangeCall } from "../ast.guards";
 import { ArrayDataType, DataType, PrimitiveDataType, TupleDataType, UnionDataType } from "../model/DataType";
-import { CompilationContext } from "../model/CompilationContext";
-import { SubInferrerClass } from "./SubInferrer";
+import type { CompilationContext } from "../model/CompilationContext";
+import { SubInferrer, SubInferrerClass } from "./SubInferrer";
 import { LiteralInferrer } from "./inferrers/LiteralInferrer";
 import { IdentifierInferrer } from "./inferrers/IdentifierInferrer";
 import { BinaryExpressionInferrer } from "./inferrers/BinaryExpressionInferrer";
@@ -24,10 +24,10 @@ import { NoUnaryInferrer } from "./inferrers/NoUnaryInferrer";
  * `if`-chain, so a new inferrable node shape is a new `SubInferrer` subclass registered here,
  * instead of another branch added to that rule.
  *
- * Unlike `GeneratorContext`, this doesn't cache `SubInferrer` instances: inference runs over a
- * handful of nodes once per variable declaration during a single Analyzer pass, not repeatedly
- * over the whole tree the way generation does, so a fresh instance per dispatch is cheap and needs
- * no IoC-style instance registry.
+ * Dispatch is a lookup in a `Map` by `triggerToken` (built once), and each `SubInferrer` is created once and
+ * reused: they keep no state, so the same instance serves every node. Nothing is cached per node: the
+ * `dataType` of a symbol changes between passes (`ResolveVariableTypesRule`), so an inference made before
+ * may not hold later. A context has one `TypeInferrer` shared by all its rules (`CompilationContext.inferrer`).
  * @template {string} T - Extensible token type string vector.
  * @template {BaseNode<T>} N - Extensible abstract syntax tree node layout.
  */
@@ -37,6 +37,9 @@ export class TypeInferrer<T extends string, N extends BaseNode<T>> {
      * by a `SubInferrer` (e.g. `IdentifierInferrer`) via `this.parent.context`.
      */
     constructor (public readonly context: CompilationContext<T>) {}
+
+    /** The `SubInferrer` of each node type, created on first use. */
+    private readonly instances = new Map<string, SubInferrer<T, N>>();
 
     /**
      * Every inferrable node shape chord knows about, in no particular order (dispatch is a lookup
@@ -52,6 +55,11 @@ export class TypeInferrer<T extends string, N extends BaseNode<T>> {
         UnaryInferrer, NoUnaryInferrer
     ];
 
+    /** The `SubInferrer` class of each node type. */
+    private static readonly byToken = new Map<string, SubInferrerClass<TokenType, BaseNode<TokenType>>>(
+        TypeInferrer.SubInferrers.filter(cls => cls.triggerToken !== undefined).map(cls => [ cls.triggerToken as string, cls ])
+    );
+
     /**
      * Infers `node`'s `DataType`, recursively (a `SubInferrer` may call back into this method for
      * its own children — see `BinaryExpressionInferrer`/`ListInferrer`).
@@ -60,10 +68,17 @@ export class TypeInferrer<T extends string, N extends BaseNode<T>> {
      * registered `SubInferrer`, or that `SubInferrer` itself couldn't infer one.
      */
     public infer (node: ASTNode<T, N>): DataType | undefined {
-        const InferrerClass = TypeInferrer.SubInferrers.find(cls => cls.triggerToken === node.type);
-        if (!InferrerClass) return undefined;
+        let inferrer = this.instances.get(node.type);
 
-        return new (InferrerClass as unknown as SubInferrerClass<T, N>)(this).infer(node);
+        if (!inferrer) {
+            const InferrerClass = TypeInferrer.byToken.get(node.type);
+            if (!InferrerClass) return undefined;
+
+            inferrer = new (InferrerClass as unknown as SubInferrerClass<T, N>)(this);
+            this.instances.set(node.type, inferrer);
+        }
+
+        return inferrer.infer(node);
     }
 
     /**

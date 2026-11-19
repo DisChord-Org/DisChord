@@ -6,7 +6,6 @@ import { SymbolTable } from "../../../../src/chord/model/SymbolsTable";
 import { CodeProvider } from "../../../../src/chord/CodeProvider";
 import { walkAST } from "../../../../src/chord/walkAST";
 import { isAccessNode } from "../../../../src/chord/ast.guards";
-import { disChordCoreLibUtils } from "../../../../src/dischord/corelib";
 import { DisChordParser } from "../../../../src/dischord/Parser/Parser";
 import { DisChordAnalyzer } from "../../../../src/dischord/Analyzer/Analyzer";
 import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType } from "../../../../src/dischord/types";
@@ -14,6 +13,7 @@ import { FileSystem } from "../../../../src/utils/FileSystem";
 import { File } from "../../../../src/utils/File";
 import { CompilationContext } from "../../../../src/chord/model/CompilationContext";
 import { DisChordCompilationContext } from "../../../../src/cli/DisChordCompilationContext";
+import { disChordCoreLibUtils } from "../../../../src/dischord/corelib";
 
 /**
  * Programs that between them use every kind of member access: on texts, lists, typed and untyped

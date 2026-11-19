@@ -1,5 +1,4 @@
 import { AnalysisRule } from "../../../chord/Analyzer/AnalysisRule";
-import { TypeInferrer } from "../../../chord/Analyzer/TypeInferrer";
 import { ArrayDataType, PrimitiveDataType, TupleDataType, UnionDataType } from "../../../chord/model/DataType";
 import { LiteralNode, TokenType } from "../../../chord/model/types";
 import { BanDeleteMessageSeconds, CommandNode, DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType, EventNode, ModerationAction, ModerationActionNode, ModerationBlockName, ModerationProperty } from "../../types";
@@ -24,7 +23,7 @@ import { CommandGuildSource, EventSelfTriggers, eventGuildSource } from "../../t
 export class ValidateModerationActionsRule extends AnalysisRule<DisChordNodeType, DisChordNode> {
     private readonly validator = this.createBDOValidator();
 
-    private readonly typeInferrer = new TypeInferrer<DisChordNodeType, DisChordNode>(this.context);
+    private readonly typeInferrer = this.context.inferrer;
 
     /** The command or event enclosing the node being visited, innermost last. */
     private readonly enclosing: (CommandNode | EventNode)[] = [];

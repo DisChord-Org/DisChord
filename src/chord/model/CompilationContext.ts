@@ -4,6 +4,8 @@ import { KeyWords } from '../KeywordsManager';
 import { CodeProvider } from '../CodeProvider';
 import { CoreLibUtils } from '../corelib/CoreLibUtils';
 import { CoreLibDispatch } from '../corelib/CoreLibDispatch';
+import type { TypeInferrer } from '../Analyzer/TypeInferrer';
+import type { BaseNode } from './types';
 
 /**
  * Shared state context passed through compiler pipeline phases.
@@ -28,4 +30,6 @@ export interface CompilationContext<T extends string = string> {
     coreLib: CoreLibUtils<string>;
     /** How a call on a receiver of ambiguous type is emitted, over the same table as `coreLib`. */
     coreLibDispatch: CoreLibDispatch<string>;
+    /** The type inferrer shared by every rule of the compilation; created on first use. */
+    inferrer: TypeInferrer<T, BaseNode<T>>;
 }

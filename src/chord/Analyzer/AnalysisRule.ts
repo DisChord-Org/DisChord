@@ -22,16 +22,14 @@ export abstract class AnalysisRule<T extends string, N extends BaseNode<T>> {
      */
     constructor (protected context: CompilationContext<T>) {}
 
-    private typeInferrerInstance?: TypeInferrer<T, N>;
-
     /**
-     * Infers the `DataType` of an expression — see `TypeInferrer`. Created on first use, so a rule
-     * that never infers a type doesn't build one.
+     * Infers the `DataType` of an expression — see `TypeInferrer`. The one of the context,
+     * shared by all the rules of the compilation.
      * @returns {TypeInferrer<T, N>}
      * @protected
      */
     protected get inferrer (): TypeInferrer<T, N> {
-        return this.typeInferrerInstance ??= new TypeInferrer<T, N>(this.context);
+        return this.context.inferrer;
     }
 
     /**
