@@ -1,0 +1,7 @@
+clase Contador {
+    prop valor es 0
+
+    funcion sumar(n) {
+        valor es valor mas n
+    }
+}

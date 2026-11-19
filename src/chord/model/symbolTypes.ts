@@ -36,11 +36,10 @@ export enum SymbolKind {
  * Defines internal compiler-tracked flags stored per-scope in the Symbol Table.
  * Unlike user-declared symbols, these are compiler-owned state used during
  * generation (or other phases) to track contextual information across nested scopes —
- * e.g. whether the current code is being generated inside an interaction callback.
+ * e.g. the class whose body is being analyzed.
  * @enum {string}
  */
 export enum CompilerMetadataKind {
-    IsInteraction = 'isInteraction',
     CurrentClass = 'currentClass'
 };
 

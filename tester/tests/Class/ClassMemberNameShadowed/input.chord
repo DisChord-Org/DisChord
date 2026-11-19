@@ -1,0 +1,20 @@
+funcion ayuda(n) {
+    devolver n mas 1
+}
+
+clase Base {
+    prop total es 0
+}
+
+clase Contador extiende Base {
+    prop valor es 0
+
+    funcion sumar(valor) {
+        var total es valor mas 1
+        esta.valor es total
+    }
+
+    funcion ayuda() {
+        devolver ayuda(esta.valor)
+    }
+}

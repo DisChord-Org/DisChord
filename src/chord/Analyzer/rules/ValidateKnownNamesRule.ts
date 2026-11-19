@@ -1,5 +1,5 @@
 import { AnalysisRule } from "../AnalysisRule";
-import { ASTNode, BaseNode, IdentificatorNode, ODBMode, ODBNode, SyntaxFunction, TokenType } from "../../model/types";
+import { ASTNode, BaseNode, CompilerMetadataKind, IdentificatorNode, ODBMode, ODBNode, SymbolKind, SyntaxFunction, TokenType } from "../../model/types";
 import { JsGlobals } from "../../corelib/JsGlobals";
 import { EditDistance } from "../../../utils/EditDistance";
 
@@ -15,6 +15,10 @@ import { EditDistance } from "../../../utils/EditDistance";
  *  5. a function of the core library.
  * The message suggests a visible name close to the one written (`¿Querías decir 'nadie2'?`). A member
  * (`x.foo`) is not checked, and neither is using a name before declaring it.
+ *
+ * A member of the class being declared (a property or a method, its own or inherited) is not a name by
+ * itself: `valor` in a method would reach the JavaScript as a variable that does not exist, so it is
+ * rejected with the way to write it (`esta.valor`, or `Clase.valor` for a `@fijar` one).
  */
 export class ValidateKnownNamesRule<T extends string, N extends BaseNode<T>> extends AnalysisRule<T, N> {
     /**
@@ -65,6 +69,8 @@ export class ValidateKnownNamesRule<T extends string, N extends BaseNode<T>> ext
      * @throws {DisChordError} If the identifier names nothing visible.
      */
     private validate (node: IdentificatorNode<T>): void {
+        this.rejectBareMember(node);
+
         if (this.isKnown(node.value, node)) return;
 
         const close = this.closestVisible(node.value);
@@ -74,22 +80,27 @@ export class ValidateKnownNamesRule<T extends string, N extends BaseNode<T>> ext
     }
 
     /**
+     * @throws {DisChordError} If the name is that of a member of the class the identifier is in, with nothing declared closer taking the name.
+     */
+    private rejectBareMember (node: IdentificatorNode<T>): void {
+        const table = this.context.symbolTable;
+        const className = table.getMetadata<string>(CompilerMetadataKind.CurrentClass);
+        const member = className === undefined ? undefined : table.classes.findMember(className, node.value);
+
+        // anything else of that name, declared closer or outside the class, is what the name is in the JavaScript
+        if (className === undefined || member === undefined || table.lookupAll(node.value).some(symbol => symbol !== member)) return;
+
+        const what = member.kind === SymbolKind.Property ? 'una propiedad' : 'un método';
+        const owner = member.metadata.isStatic ? className : 'esta';
+
+        this.fail(`'${node.value}' es ${what} de la clase '${className}', no un nombre suelto: escribe '${owner}.${node.value}'`, node);
+    }
+
+    /**
      * @returns {string | undefined} The visible name nearest to `name`, if one is within two edits.
      */
     private closestVisible (name: string): string | undefined {
         const candidates = [ ...this.context.symbolTable.visibleNames(), ...this.tracked.flat() ];
-        let best: string | undefined;
-        let bestDistance = 3;
-
-        for (const candidate of candidates) {
-            const distance = EditDistance.between(name, candidate);
-
-            if (distance < bestDistance) {
-                best = candidate;
-                bestDistance = distance;
-            }
-        }
-
-        return best;
+        return EditDistance.closest(name, candidates, 2);
     }
 }

@@ -1,0 +1,11 @@
+clase Contador {
+    prop valor es 0
+
+    funcion sumar(n) {
+        esta.valor es esta.valor mas n
+    }
+
+    funcion doble() {
+        sumar(esta.valor)
+    }
+}

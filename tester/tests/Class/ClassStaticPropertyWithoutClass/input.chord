@@ -1,0 +1,8 @@
+clase Contador {
+    @fijar
+    prop total es 0
+
+    funcion sumar() {
+        consola.imprimir(total)
+    }
+}

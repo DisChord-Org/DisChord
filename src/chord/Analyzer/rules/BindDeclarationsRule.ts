@@ -45,7 +45,7 @@ export class BindDeclarationsRule<T extends string, N extends BaseNode<T>> exten
         else if (isFunctionNode(node)) this.bindFunction(node);
         else if (node.type === TokenType.BUCLE) this.bindLoopVariable(node as LoopNode<T, N>);
         else if (isVariableNode(node)) this.declare(node.id, SymbolKind.Variable, node.location);
-        else if (isPropertyNode(node)) this.declare(node.id, SymbolKind.Property, node.location);
+        else if (isPropertyNode(node)) this.context.symbolTable.register(node.id, { name: node.id, kind: SymbolKind.Property, metadata: { isStatic: node.isStatic } }, node.location);
     }
 
     /**
@@ -86,7 +86,8 @@ export class BindDeclarationsRule<T extends string, N extends BaseNode<T>> exten
             name: node.id,
             kind: SymbolKind.Function,
             metadata: {
-                isAsync: node.metadata.isAsync
+                isAsync: node.metadata.isAsync,
+                isStatic: node.metadata.isStatic
             },
             signature: {
                 params: node.params.map((_, index) => node.paramTypes?.[index]),

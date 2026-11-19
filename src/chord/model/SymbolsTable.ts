@@ -197,6 +197,18 @@ export class SymbolTable {
     }
 
     /**
+     * @param {string} name - The identifier name to find.
+     * @returns {Symbol[]} Every symbol of that name from the current scope up to the global one, innermost
+     * first: the first is what {@link lookup} gives, the rest are the ones it hides.
+     */
+    public lookupAll(name: string): Symbol[] {
+        return this.scopes
+            .map(scope => scope.symbols.get(name))
+            .filter((symbol): symbol is Symbol => symbol !== undefined)
+            .reverse();
+    }
+
+    /**
      * @returns {string[]} The names of every symbol visible from the current scope.
      */
     public visibleNames(): string[] {

@@ -1,0 +1,9 @@
+clase Base {
+    prop valor es 0
+}
+
+clase Contador extiende Base {
+    funcion ver() {
+        consola.imprimir(valor)
+    }
+}
