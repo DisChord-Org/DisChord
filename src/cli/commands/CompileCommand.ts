@@ -13,6 +13,18 @@ import { FileCompiler, FileCompilation } from './FileCompiler';
 import { EmitPhase } from './EmitPhase';
 import { RunCommand } from './RunCommand';
 
+/** What compiling a whole project gathers: the content to write by absolute path, and the directories to create. */
+type Compilation = {
+    outputs: Map<string, string>;
+    extraDirectories: Set<string>;
+};
+
+/** What compiling one file gives: where its output belongs and what the compilation produced. */
+type CompiledFile = {
+    target: string;
+    compiled: FileCompilation;
+};
+
 /**
  * Command handler responsible for orchestrating project compilation and execution.
  *
@@ -77,11 +89,11 @@ export class CompileCommand {
 
         this.log(options, `Compilando proyecto: ${config.projectRoot}`);
 
-        const { extraFiles, extraDirectories } = await this.compileAll(files, config, options);
+        const { outputs, extraDirectories } = this.compileAll(files, config, options);
 
         if (options.check) return undefined;
 
-        await this.writeExtraFiles(extraFiles);
+        await this.writeOutputs(outputs);
 
         this.removeStaleOutputs(config, options);
 
@@ -94,40 +106,49 @@ export class CompileCommand {
     }
 
     /**
-     * Compiles every file of the project and gathers the extra files and directories they asked for.
+     * Compiles every file of the project, synchronously and in order, and gathers what has to be
+     * written: nothing is written here, so a file that fails to compile leaves `dist/` untouched
+     * and the first error is always the one of the first failing file.
      *
      * @private
      * @param {File[]} files - The .chord files of the project.
      * @param {CompilerConfig} config - Layout of the project.
      * @param {GlobalCLIOptions} options - Parsed Commander options.
-     * @returns {Promise<Omit<FileCompilation, 'output'>>} The merged extra files and directories.
+     * @returns {Compilation} The content to write
+     * keyed by absolute path (the compiled files first, then the extra files: an extra file wins a clash)
+     * and the directories the compilation asked for.
      */
-    private async compileAll(files: File[], config: CompilerConfig, options: GlobalCLIOptions): Promise<Omit<FileCompilation, 'output'>> {
+    private compileAll(files: File[], config: CompilerConfig, options: GlobalCLIOptions): Compilation {
+        const outputs = new Map<string, string>();
         const extraFiles = new Map<string, string>();
         const extraDirectories = new Set<string>();
 
         for (const file of files) {
-            const compiled = await this.compileFile(file, config, options);
+            const { target, compiled } = this.compileFile(file, config, options);
+
+            outputs.set(target, compiled.output);
             compiled.extraFiles.forEach((content, absolutePath) => extraFiles.set(absolutePath, content));
             compiled.extraDirectories.forEach(directory => extraDirectories.add(directory));
         }
 
-        return { extraFiles, extraDirectories };
+        extraFiles.forEach((content, absolutePath) => outputs.set(absolutePath, content));
+
+        return { outputs, extraDirectories };
     }
 
     /**
-     * Compiles a single .chord source file into Javascript and writes it, unless only checking.
-     * A compiler error leaves the method tagged with the file it belongs to.
+     * Compiles a single .chord source file into Javascript, without writing it. A compiler error
+     * leaves the method tagged with the file it belongs to.
      *
      * @private
      * @param {File} file - The .chord file.
      * @param {CompilerConfig} config - Layout of the project the file belongs to.
      * @param {GlobalCLIOptions} options - CLI flags for debugging and output control.
-     * @returns {Promise<FileCompilation>} What the compilation produced, including the extra files
-     * and directories (shared runtime modules, project-level config files, ...) any phase
-     * determined it needs — see `CompilationContext.extraFiles`.
+     * @returns {CompiledFile} Where the output belongs and what the
+     * compilation produced, including the extra files and directories (shared runtime modules,
+     * project-level config files, ...) any phase determined it needs — see `CompilationContext.extraFiles`.
      */
-    private async compileFile(file: File, config: CompilerConfig, options: GlobalCLIOptions): Promise<FileCompilation> {
+    private compileFile(file: File, config: CompilerConfig, options: GlobalCLIOptions): CompiledFile {
         const relativeFile = file.relativeTo(config.projectRoot.absolutePath);
         this.log(options, `Compilando: ${relativeFile}`);
 
@@ -136,20 +157,12 @@ export class CompileCommand {
             ? path.resolve(options.outDir)
             : path.join(config.distDir, path.dirname(relativePath));
 
-        let compiled;
-
         try {
-            compiled = new FileCompiler(options).compile(file, config, targetDir);
+            const compiled = new FileCompiler(options).compile(file, config, targetDir);
+            return { target: path.join(targetDir, `${file.baseName}.js`), compiled };
         } catch (error) {
             throw BaseChordError.attachFile(error, file);
         }
-
-        if (options.check) return compiled;
-
-        const written = await Prettifier.savePrettified(Directory.create(targetDir).resolve(`${file.baseName}.js`), compiled.output);
-        this.emitted.add(written.absolutePath);
-
-        return compiled;
     }
 
     /**
@@ -191,21 +204,25 @@ export class CompileCommand {
     }
 
     /**
-     * Writes out whatever extra files any phase determined the compiled project needs (see
-     * `CompilationContext.extraFiles`) — shared runtime modules, project-level config files,
-     * anything. Purely generic: writes absolute path/content pairs without knowing what any of
-     * them are for or which phase asked for them — that's each rule/visitor's own concern.
+     * Writes out everything the compilation produced: the compiled files and whatever extra files any
+     * phase determined the project needs (see `CompilationContext.extraFiles`) — shared runtime
+     * modules, project-level config files, anything. Purely generic: writes absolute path/content pairs
+     * without knowing what any of them are for. The files are formatted and written concurrently.
      *
      * @private
      * @param {Map<string, string>} files - Content keyed by absolute output path.
      * @returns {Promise<void>}
      */
-    private async writeExtraFiles(files: Map<string, string>): Promise<void> {
-        for (const [absolutePath, content] of files) {
-            Directory.create(path.dirname(absolutePath));
-            const written = await Prettifier.savePrettified(absolutePath, content);
-            this.emitted.add(written.absolutePath);
-        }
+    private async writeOutputs(files: Map<string, string>): Promise<void> {
+        const directories = new Set<string>();
+
+        for (const absolutePath of files.keys()) directories.add(path.dirname(absolutePath));
+
+        directories.forEach(directory => Directory.create(directory));
+
+        const written = await Promise.all([...files].map(([absolutePath, content]) => Prettifier.savePrettified(absolutePath, content)));
+
+        written.forEach(file => this.emitted.add(file.absolutePath));
     }
 
     /**
