@@ -42,8 +42,7 @@ export class RunCommand {
         } catch (error) {
             throw new DisChordError({
                 phase: ErrorLevel.Execution,
-                message: ErrorMessage.of(error),
-                location: error instanceof Error && error.stack ? { line: 0, column: 0 } : undefined
+                message: ErrorMessage.of(error)
             });
         }
     }
