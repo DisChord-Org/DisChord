@@ -1,0 +1,1 @@
+[{"type":"Variable","id":"x","value":{"type":"Literal","value":1,"raw":"1","location":{"line":1,"column":10}},"location":{"line":1,"column":10}},{"type":"exportar","object":{"type":"IDENTIFICADOR","value":"x","location":{"line":2,"column":10}},"location":{"line":2,"column":10}}]

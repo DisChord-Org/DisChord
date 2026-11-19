@@ -25,7 +25,7 @@ export class ExportVisitor<T extends string, N extends BaseNode<T>> extends SubG
     public visit(node: ExportNode<T, N>): string {
         const innerNode = node.object;
 
-        if (innerNode.type === 'Identificador') {
+        if (innerNode.type === TokenType.IDENTIFICADOR) {
             return `export { ${this.parent.visit(innerNode)} }`;
         }
 
