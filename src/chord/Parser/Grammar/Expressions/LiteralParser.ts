@@ -21,8 +21,10 @@ export class LiteralParser<T extends string, N extends BaseNode<T>> extends SubP
                 value = token.value === TokenType.Verdadero;
                 break;
             case TokenType.NUMERO:
-            case TokenType.BIGINT:
                 value = Number(token.value);
+                break;
+            case TokenType.BIGINT:
+                value = Number(token.value.slice(0, -1));
                 break;
             case TokenType.Indefinido:
                 value = undefined;

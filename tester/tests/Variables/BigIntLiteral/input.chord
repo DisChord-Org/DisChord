@@ -1,0 +1,3 @@
+var grande es 12n
+var hex es 0xFFn
+consola.imprimir(grande, hex)
