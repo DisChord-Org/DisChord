@@ -1,0 +1,7 @@
+/* uno */ var a es "texto" /* dos
+   lineas */
+var b es 4 / 2 // tres
+var c es "varias
+lineas"
+/**/
+consola.imprimir(a, b, c) /* al final */

@@ -146,14 +146,12 @@ export class Lexer<T extends string> {
             while (this.current < this.input.length && this.peek() !== "\n") this.advance();
         } else if (nextChar === "*") { // Comentario de bloque
             this.advance();
-            while (this.current < this.input.length) {
-                if (this.peek() === "*" && this.input[this.current + 1] === "/") {
-                    this.advance();
-                    this.advance();
-                    break;
-                }
+            while (!(this.peek() === "*" && this.input[this.current + 1] === "/")) {
+                if (this.current >= this.input.length) this.fail("Comentario sin cerrar: falta '*/'", { line: startLine, column: startCol });
                 this.advance();
             }
+            this.advance();
+            this.advance();
         } else { // No es un comentario: "/" es el operador "ENTRE"
             this.emit(this.createToken(SymbolTranslationMap["/"], SymbolTranslationMap["/"], startLine, startCol));
         }
@@ -166,6 +164,7 @@ export class Lexer<T extends string> {
         while (this.current < this.input.length && this.peek() !== '"') {
             value += this.advance();
         }
+        if (this.current >= this.input.length) this.fail("Texto sin cerrar: falta la comilla '\"' de cierre", { line: startLine, column: startCol });
         this.advance();
 
         const text = this.createToken("TEXTO", value, startLine, startCol);
