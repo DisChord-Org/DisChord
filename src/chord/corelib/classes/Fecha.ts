@@ -3,6 +3,7 @@ import { ClassesEnum } from "./ClassesEnum";
 
 export const fechaClass = {
     receiver: ClassDataType.of(ClassesEnum.Fecha),
+    native: 'Date',
     constructs: 'Date',
     methods: {
         ahora: {

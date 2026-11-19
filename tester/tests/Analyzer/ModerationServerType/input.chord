@@ -1,0 +1,9 @@
+nuevo comando Prueba {
+    descripcion "prueba"
+
+    banear miembro {
+        usuario usuario
+        razon "spam"
+        servidor 7
+    }
+}

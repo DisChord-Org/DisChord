@@ -1,0 +1,4 @@
+var lista es [ 1 ]
+para (i en rango(2)) {
+    lista.agregar(rango(i))
+}

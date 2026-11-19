@@ -1,6 +1,6 @@
 import { AnalysisRule } from "../../../chord/Analyzer/AnalysisRule";
 import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType, MessageNode } from "../../types";
-import { MessageSchema } from "../../Generator/constants/schemas";
+import { MessageSchema } from "../../tables/schemas";
 import { NodePredicates } from "../NodePredicates";
 
 /**
@@ -24,7 +24,7 @@ export class ValidateMessagesRule extends AnalysisRule<DisChordNodeType, DisChor
      * @override
      */
     check (nodes: DisChordASTNode[]): void {
-        this.walk(nodes, current => {
+        this.walkScoped(nodes, current => {
                 if (NodePredicates.isScopeOwner(current)) this.enclosing++;
                 if (current.type === DisChordTokenType.CREAR_MENSAJE) this.validate(current as MessageNode);
             },

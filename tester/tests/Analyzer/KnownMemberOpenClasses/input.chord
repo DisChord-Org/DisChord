@@ -1,0 +1,5 @@
+nuevo comando Prueba {
+    descripcion "prueba"
+
+    consola.imprimir(cliente.noExiste, contexto.algo, usuario.noExiste)
+}

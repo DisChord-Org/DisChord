@@ -82,6 +82,8 @@ export class ResolveMemberAccessesRule<T extends string, N extends BaseNode<T>> 
 
         if (staticMember) {
             this.checkInstanceMemberOnClass(node, staticMember);
+            symbolTable.marks.statics.set(node, staticMember.member.transpile);
+            
             return;
         }
 

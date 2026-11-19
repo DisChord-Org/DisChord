@@ -1,0 +1,26 @@
+nuevo embed Hola {
+    titulo "a"
+}
+
+var n es 5
+
+nuevo comando Prueba {
+    descripcion "prueba"
+    opciones {
+        nota {
+            tipo "texto"
+            descripcion "una nota"
+            requerido falso
+        }
+    }
+
+    var c es "#ff0000"
+    var n es "local"
+    var crudo es {
+        title "sin traducir"
+    }
+    enviar mensaje {
+        contenido "n vale {n}"
+        embed [ Hola, crudo, { titulo "{c}" color c descripcion n }, { color 255 descripcion nota }, { color "Verde" hora verdadero autor verdadero } ]
+    }
+}

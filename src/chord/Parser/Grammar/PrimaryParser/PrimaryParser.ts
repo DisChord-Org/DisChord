@@ -2,7 +2,6 @@ import { SubParser } from "../../SubParser";
 import { ASTNode, BaseNode, ExpressionNode, IdentificatorNode, JSNode, ListNode, isLiteralToken, NewNode, ODBMode, SuperNode, ThisNode, TokenType, TokenTypeUnion } from "../../../model/types";
 import { ExpressionParser } from "../Expressions/ExpressionParser";
 import { AssignmentParser } from "../Expressions/AssignmentParser";
-import { DecoratorProcessor } from "../../../DecoratorProcessor";
 import { ChordError, ErrorLevel } from "../../../../errors/ChordError";
 import { BDOParser } from "../BDOParser";
 import { LiteralParser } from "../Expressions/LiteralParser";
@@ -75,7 +74,7 @@ export class PrimaryParser<T extends string, N extends BaseNode<T>> extends SubP
 
     /** `{ ... }`: an object, simple or intelligent when a `@BDOI` decorator precedes it. */
     private parseObject(): ASTNode<T, N> {
-        const isIntelligent = DecoratorProcessor.matchAndDelete('BDOI', true);
+        const isIntelligent = this.parent.decorators.matchAndDelete('BDOI', true);
         const parser: BDOParser<T, N> = this.parent.get(BDOParser) as BDOParser<T, N>;
 
         return parser.setMode(isIntelligent ? ODBMode.Intelligent : ODBMode.Simple).parse();

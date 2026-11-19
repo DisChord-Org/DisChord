@@ -62,12 +62,14 @@ export abstract class AnalysisRule<T extends string, N extends BaseNode<T>> {
     }
 
     /**
-     * A validator of BDOs that reports its violations through {@link fail}.
+     * A validator of BDOs that reports its violations through {@link fail} and knows the types of the
+     * values through {@link inferrer}: the rule has to walk with the scopes entered ({@link walkScoped})
+     * for a name to be the one visible where the block is.
      * @returns {BDOValidator<T, N>}
      * @protected
      */
     protected createBDOValidator (): BDOValidator<T, N> {
-        return new BDOValidator<T, N>((message, location) => this.fail(message, location));
+        return new BDOValidator<T, N>((message, location) => this.fail(message, location), node => this.inferrer.infer(node));
     }
 
     /**

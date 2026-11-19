@@ -10,6 +10,7 @@ import { ClassesEnum } from "./ClassesEnum";
  */
 export const conjuntoClass = {
     receiver: ClassDataType.of(ClassesEnum.Conjunto),
+    native: 'Set',
     constructs: 'Set',
     methods: {
         agregar: {

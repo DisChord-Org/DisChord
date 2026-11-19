@@ -1,8 +1,9 @@
 import { Analyzer } from "../../chord/Analyzer/Analyzer";
 import { AnalysisRuleClass } from "../../chord/Analyzer/AnalysisRule";
 import { DisChordNode, DisChordNodeType, DisChordTokenType } from "../types";
-import { BindDisChordDeclarationsRule } from "./rules/BindDisChordDeclarationsRule";
+import { BindComponentDeclarationsRule } from "./rules/BindComponentDeclarationsRule";
 import { SingleWholeFileDeclarationRule } from "./rules/SingleWholeFileDeclarationRule";
+import { ValidateHandlerFolderRule } from "./rules/ValidateHandlerFolderRule";
 import { ValidateStartBotRule } from "./rules/ValidateStartBotRule";
 import { ValidateEventRule } from "./rules/ValidateEventRule";
 import { ValidateCommandRule } from "./rules/ValidateCommandRule";
@@ -20,7 +21,7 @@ import { PatchedMembersRules } from "./rules/PatchedMembersRules";
 import { DisChordResolveAwaitedCallsRule } from "./rules/DisChordResolveAwaitedCallsRule";
 import { ResolveAwaitedCallsRule } from "../../chord/Analyzer/rules/ResolveAwaitedCallsRule";
 import { BindDeclarationsRule } from "../../chord/Analyzer/rules/BindDeclarationsRule";
-import { DisChordBindDeclarationsRule } from "./rules/DisChordBindDeclarationsRule";
+import { BindHandlerScopeRule } from "./rules/BindHandlerScopeRule";
 import { ValidateGeneratedNamesRule } from "./rules/ValidateGeneratedNamesRule";
 import { ValidateInjectedNamesRule } from "./rules/ValidateInjectedNamesRule";
 
@@ -39,9 +40,10 @@ export class DisChordAnalyzer extends Analyzer<DisChordNodeType, DisChordNode> {
      */
     private static readonly DisChordRules: AnalysisRuleClass<DisChordNodeType, DisChordNode>[] = [
         // Pass 2 ("Variables"), dischord's own declarations: comando/evento/encender bot.
-        BindDisChordDeclarationsRule,
+        BindComponentDeclarationsRule,
 
         SingleWholeFileDeclarationRule,
+        ValidateHandlerFolderRule,
         ValidateStartBotRule,
         ValidateEventRule,
         ValidateCommandRule,
@@ -75,7 +77,7 @@ export class DisChordAnalyzer extends Analyzer<DisChordNodeType, DisChordNode> {
         // so the context stack is tracked once and not duplicated in a second rule.
         this.replaceRule(ResolveAwaitedCallsRule, new DisChordResolveAwaitedCallsRule(this.context));
         // and so is the one that binds declarations, which also declares what a command and an event put in scope
-        this.replaceRule(BindDeclarationsRule, new DisChordBindDeclarationsRule(this.context));
+        this.replaceRule(BindDeclarationsRule, new BindHandlerScopeRule(this.context));
 
         // the rejection of declaring a name a command or an event defines only needs the tree, and must run before
         // the binding, which would otherwise report the redeclaration first with its own, less specific message

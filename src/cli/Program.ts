@@ -3,7 +3,6 @@ import pkg from '../../package.json';
 import { CompileCommand } from './commands/CompileCommand';
 import { CorelibCommand } from './commands/CorelibCommand';
 import { RunCommand } from './commands/RunCommand';
-import { TestCommand } from './commands/TestCommand';
 
 /**
  * Enumeration of available debug flags for compiler phases.
@@ -84,7 +83,6 @@ export class Program {
         this.declareCompile();
         this.declareRun();
         this.declareCorelib();
-        this.declareTest();
     }
 
     /** Declares the root command, which compiles a project or a file. */
@@ -128,16 +126,6 @@ export class Program {
             .option('--json', 'Imprime la información como un documento JSON')
             .action((options: { json?: boolean }) => {
                 new CorelibCommand().execute(options);
-            });
-    }
-
-    /** Declares `test`, which runs the compiler's own test suite. */
-    private declareTest(): void {
-        this.program
-            .command('test')
-            .description('Ejecuta la suite de pruebas internas del compilador')
-            .action(async () => {
-                await new TestCommand().execute();
             });
     }
 

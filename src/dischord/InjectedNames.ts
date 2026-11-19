@@ -1,7 +1,7 @@
 import { ClassDataType, DataType, PrimitiveDataType, UnionDataType } from "../chord/model/DataType";
 import { ASTNode, LiteralNode, PrimitiveTypeName, TokenType } from "../chord/model/types";
 import { literalStringValue } from "../chord/BDOSchema";
-import { DisChordTypeMap, eventParamNames, eventsMap, InjectedTypes, OptionValueTypes } from "./Generator/constants/mappings";
+import { DisChordTypeMap, eventParamNames, eventsMap, InjectedTypes, OptionValueTypes } from "./tables/mappings";
 import { CommandScopeNames } from "./CommandScopeNames";
 import { CommandNode, DisChordASTNode, DisChordNode, DisChordNodeType, DisChordODBNode, DisChordTokenType, EventNode } from "./types";
 

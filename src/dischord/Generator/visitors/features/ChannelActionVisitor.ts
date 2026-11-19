@@ -3,7 +3,7 @@ import { SubGenerator } from "../../../../chord/Generator/SubGenerator";
 import { VisitorHelpers } from "../VisitorHelpers";
 import { fieldKeys, JSFallback } from "../../../../chord/BDOSchema";
 import { TokenTypeUnion } from "../../../../chord/model/types";
-import { ChannelActionSchemas } from "../../constants/schemas";
+import { ChannelActionSchemas } from "../../../tables/schemas";
 import { channelHelperNames } from "../../../corelib";
 
 /**

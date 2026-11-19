@@ -17,6 +17,12 @@ export interface CompilerConfig {
  * belong to it and where its output goes.
  */
 export class FileSystem {
+    /** The folder of a project that holds its `.chord` sources. */
+    public static readonly SOURCE_DIR = 'src';
+
+    /** The file that marks the root of a project. */
+    private static readonly PROJECT_MANIFEST = 'package.json';
+
     /**
      * Initializes the compiler configuration by analyzing the input path.
      * @param rawInput - The raw string path received from the CLI.
@@ -32,18 +38,42 @@ export class FileSystem {
     /**
      * The compiler configuration for an entry that is already a `File` or a `Directory` — the
      * way to configure for a file whose content lives in memory (see `File.withContent`).
+     *
+     * A file belongs to the project of the nearest `package.json` above it, wherever it sits
+     * (`src/comandos/ping.chord` is part of the project that holds `src/`). Without one, and for
+     * a directory, the root is the entry's own directory, or the one that holds it if it is `src`.
      * @param input - The entry: a single script or a whole project.
      * @returns The project layout the entry belongs to.
      */
     static layoutOf(input: File | Directory): CompilerConfig {
         const baseDir = input instanceof Directory ? input : Directory.of(input.directory);
-        const projectRoot = baseDir.name === 'src' ? baseDir.parent : baseDir;
+        const enclosing = input instanceof Directory ? undefined : FileSystem.nearestProject(baseDir);
+        const projectRoot = enclosing ?? (baseDir.name === FileSystem.SOURCE_DIR ? baseDir.parent : baseDir);
 
         return {
             input,
             projectRoot,
             distDir: projectRoot.resolve('dist')
         };
+    }
+
+    /**
+     * The closest directory, from `start` upwards, that holds a `package.json`.
+     * @param start - Where to start looking.
+     * @returns That directory, or `undefined` if none up to the root of the disk has one.
+     */
+    private static nearestProject(start: Directory): Directory | undefined {
+        let current = start;
+
+        while (!current.hasFile(FileSystem.PROJECT_MANIFEST)) {
+            const parent = current.parent;
+
+            if (parent.absolutePath === current.absolutePath) return undefined;
+
+            current = parent;
+        }
+
+        return current;
     }
 
     /**
@@ -82,14 +112,18 @@ export class FileSystem {
      * events, ...), with no indication anything was left out. A file that *isn't* inside a `src/`
      * folder (e.g. a standalone script outside any project) keeps the original, literal
      * single-file behavior.
+     *
+     * With `alone`, a single file is only ever itself: checking `src/index.chord` reports what is
+     * wrong with that file, not with a sibling the question was not about.
      * @param input - The entry: a directory, or a single file.
+     * @param alone - Whether a single file stands for itself and never for the project around it.
      * @returns Every discovered .chord file.
      * @throws {Error} If a single input is not a `.chord` file.
      */
-    static getChordFiles(input: File | Directory): File[] {
+    static getChordFiles(input: File | Directory, alone: boolean = false): File[] {
         if (input instanceof Directory) return input.files('.chord');
 
-        if (FileSystem.isProjectCompile(input)) return Directory.of(input.directory).files('.chord');
+        if (!alone && FileSystem.isProjectCompile(input)) return Directory.of(input.directory).files('.chord');
 
         if (!input.hasExtension('.chord')) {
             throw new Error(`Se esperaba un archivo .chord: ${input}`);
@@ -106,6 +140,6 @@ export class FileSystem {
      * @param input - The entry.
      */
     static isProjectCompile(input: File | Directory): boolean {
-        return input instanceof Directory || Directory.of(input.directory).name === 'src';
+        return input instanceof Directory || Directory.of(input.directory).name === FileSystem.SOURCE_DIR;
     }
 }

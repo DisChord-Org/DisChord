@@ -94,6 +94,8 @@ export class ResolveAwaitedCallsRule<T extends string, N extends BaseNode<T>> ex
         } else if (isIdentificatorNode(callee)) {
             name = callee.value;
             const helper = this.context.coreLib.resolveFunction(callee, this.context.symbolTable);
+            
+            this.context.symbolTable.marks.callees.set(call, helper ?? name);
             awaited = helper !== undefined
                 ? asyncRuntimeHelperNames.has(helper)
                 : !!this.context.symbolTable.lookup(name)?.metadata.isAsync;

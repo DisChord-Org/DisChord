@@ -2,10 +2,10 @@ import { CommandNode, DisChordNode, DisChordNodeType, DisChordTokenType } from "
 import { GeneratedNames } from "../../constants/GeneratedNames";
 import { SubGenerator } from '../../../../chord/Generator/SubGenerator';
 import { VisitorHelpers } from "../VisitorHelpers";
-import { CompilerMetadataKind, TokenTypeUnion } from '../../../../chord/model/types';
+import { TokenTypeUnion } from '../../../../chord/model/types';
 import CommandOptionVisitor from '../components/CommandOptionVisitor';
-import { CommandSchema } from '../../constants/schemas';
-import { CommandContextParameter, CommandScope } from '../../constants/mappings';
+import { CommandSchema } from '../../../tables/schemas';
+import { CommandContextParameter, CommandScope } from '../../../tables/mappings';
 import { slugifyCommandName } from '../../constants/commandNames';
 import { CommandScopeNames } from '../../../CommandScopeNames';
 
@@ -28,9 +28,6 @@ export default class CommandVisitor extends SubGenerator<DisChordNodeType, DisCh
     visit (node: CommandNode): string {
         // reopening the scope the analyzer bound to this command
         this.parent.context.symbolTable.enterScope(node);
-        // adding interaction context
-        // read by MessageVisitor to pick the interaction argument of createMessage
-        this.parent.context.symbolTable.setMetadata(CompilerMetadataKind.IsInteraction, false);
 
         // generating command flags & body
         const commandName = node.value;

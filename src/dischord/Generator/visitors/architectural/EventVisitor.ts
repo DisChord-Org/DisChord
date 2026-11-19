@@ -3,7 +3,7 @@ import { GeneratedNames } from "../../constants/GeneratedNames";
 import { SubGenerator } from '../../../../chord/Generator/SubGenerator';
 import { TokenTypeUnion } from '../../../../chord/model/types';
 import { VisitorHelpers } from "../VisitorHelpers";
-import { eventParamNames, eventParamSignature, eventsMap } from '../../constants/mappings';
+import { eventParamNames, eventParamSignature, eventsMap } from '../../../tables/mappings';
 
 /**
  * Generator class responsible for generating code related to listeners in DisChord.

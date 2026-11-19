@@ -43,7 +43,7 @@ export class CallVisitor<T extends string, N extends BaseNode<T>> extends SubGen
         }
 
         if (isIdentificatorNode(node.object)) {
-            const translation = this.parent.context.coreLib.resolveFunction(node.object, this.parent.context.symbolTable) ?? node.object.value;
+            const translation = marks.callees.get(node)!;
             const isAsyncCall = asyncRuntimeHelperNames.has(translation) || marks.awaited.has(node);
 
             return `${CallVisitor.awaitPrefix(isAsyncCall)}${translation}(${args})`;

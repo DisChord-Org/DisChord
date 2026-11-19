@@ -45,6 +45,7 @@ export class BDOResolver<T extends string, N extends BaseNode<T>> {
         switch (field.kind) {
             case FieldKind.Value:
             case FieldKind.List:
+            case FieldKind.NamedValue:
                 return this.visit(value);
             case FieldKind.MappedLiteral:
                 return this.resolveMappedLiteral(value, field);

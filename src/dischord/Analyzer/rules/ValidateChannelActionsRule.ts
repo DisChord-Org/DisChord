@@ -1,9 +1,9 @@
 import { AnalysisRule } from "../../../chord/Analyzer/AnalysisRule";
 import { fieldKeys } from "../../../chord/BDOSchema";
 import { TokenType } from "../../../chord/model/types";
-import { ChannelAction, ChannelActionNode, ChannelActionObject, ChannelProperty, ChannelWriteActions, CommandNode, DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType, EventNode } from "../../types";
-import { ChannelActionSchemas } from "../../Generator/constants/schemas";
-import { CommandGuildSource, EventSelfTriggers, eventGuildSource } from "../../Generator/constants/mappings";
+import { ChannelAction, ChannelActionNode, ChannelBlockName, ChannelProperty, ChannelWriteActions, CommandNode, DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType, EventNode } from "../../types";
+import { ChannelActionSchemas } from "../../tables/schemas";
+import { CommandGuildSource, EventSelfTriggers, eventGuildSource } from "../../tables/mappings";
 
 /**
  * Validates every `crear canal`, `editar canal` and `borrar canal` block, and settles what the
@@ -36,7 +36,7 @@ export class ValidateChannelActionsRule extends AnalysisRule<DisChordNodeType, D
      * @override
      */
     check (nodes: DisChordASTNode[]): void {
-        this.walk(nodes, current => {
+        this.walkScoped(nodes, current => {
                 if (current.type === DisChordTokenType.CREAR_COMANDO || current.type === DisChordTokenType.EVENTO) {
                     this.enclosing.push(current as CommandNode | EventNode);
                 }
@@ -63,7 +63,7 @@ export class ValidateChannelActionsRule extends AnalysisRule<DisChordNodeType, D
 
         const context = this.enclosing[this.enclosing.length - 1];
 
-        const name = `${node.action} ${ChannelActionObject[node.action]}`;
+        const name = ChannelBlockName[node.action];
 
         if (!context) this.fail(
             `'${name}' solo puede usarse dentro de un comando o un evento: necesita el cliente y el servidor de su contexto`,
@@ -119,7 +119,7 @@ export class ValidateChannelActionsRule extends AnalysisRule<DisChordNodeType, D
             .flatMap(field => fieldKeys(field.key));
 
         if (!changes.some(key => node.object.blocks[key])) this.fail(
-            `'editar canal' necesita al menos una propiedad que cambiar: ${changes.join(' / ')}.`,
+            `'${ChannelBlockName[ChannelAction.Editar]}' necesita al menos una propiedad que cambiar: ${changes.join(' / ')}.`,
             node.location
         );
     }
@@ -134,16 +134,16 @@ export class ValidateChannelActionsRule extends AnalysisRule<DisChordNodeType, D
         const byId = blocks[ChannelProperty.Id] !== undefined;
         const byName = blocks[ChannelProperty.Nombre] !== undefined;
 
-        if (!byId && !byName) this.fail(`En 'obtener canal' se esperaba '${ChannelProperty.Id}' o '${ChannelProperty.Nombre}'.`, node.location);
+        if (!byId && !byName) this.fail(`En '${ChannelBlockName[ChannelAction.Obtener]}' se esperaba '${ChannelProperty.Id}' o '${ChannelProperty.Nombre}'.`, node.location);
 
-        if (byId && byName) this.fail(`En 'obtener canal' no se pueden dar '${ChannelProperty.Id}' y '${ChannelProperty.Nombre}' a la vez.`, node.location);
+        if (byId && byName) this.fail(`En '${ChannelBlockName[ChannelAction.Obtener]}' no se pueden dar '${ChannelProperty.Id}' y '${ChannelProperty.Nombre}' a la vez.`, node.location);
 
         const narrowing = ChannelActionSchemas[node.action].fields
             .filter(field => field.output !== undefined)
             .flatMap(field => fieldKeys(field.key))
             .find(key => blocks[key] !== undefined);
 
-        if (!byName && narrowing !== undefined) this.fail(`En 'obtener canal', '${narrowing}' solo se usa junto a '${ChannelProperty.Nombre}'.`, node.location);
+        if (!byName && narrowing !== undefined) this.fail(`En '${ChannelBlockName[ChannelAction.Obtener]}', '${narrowing}' solo se usa junto a '${ChannelProperty.Nombre}'.`, node.location);
     }
 
     /**

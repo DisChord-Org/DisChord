@@ -3,7 +3,7 @@ import { Symbol, TokenType } from "../../../chord/model/types";
 import { isIdentificatorNode, isVariableNode } from "../../../chord/ast.guards";
 import { CollectorNode, DisChordASTNode, DisChordNode, DisChordNodeType, DisChordODBNode, DisChordTokenType, MessageNode } from "../../types";
 import { ButtonIdIndex } from "../ButtonIdIndex";
-import { CollectorSchema } from "../../Generator/constants/schemas";
+import { CollectorSchema } from "../../tables/schemas";
 
 /**
  * Validates a `recolector`'s own properties against {@link CollectorSchema} — the same schema

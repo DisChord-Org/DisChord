@@ -1,5 +1,5 @@
 import { TokenType } from "../chord/model/types";
-import { CommandContextParameter, CommandScope } from "./Generator/constants/mappings";
+import { CommandContextParameter, CommandScope } from "./tables/mappings";
 import { DisChordODBNode } from "./types";
 
 /**

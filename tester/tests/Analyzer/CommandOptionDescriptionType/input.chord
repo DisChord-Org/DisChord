@@ -1,0 +1,10 @@
+nuevo comando Prueba {
+    descripcion "prueba"
+    opciones {
+        nota {
+            tipo "texto"
+            descripcion 5
+            requerido falso
+        }
+    }
+}

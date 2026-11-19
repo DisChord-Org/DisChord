@@ -1,0 +1,6 @@
+funcion rango(a, b, c) {
+    devolver [ a, b, c ]
+}
+
+var r es rango(1, 2, 3)
+consola.imprimir(r)

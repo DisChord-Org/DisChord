@@ -51,6 +51,12 @@ export interface CoreLibClass {
     readonly constructs?: string;
     /** Whether the name is an identifier the compiler puts in scope itself (`cliente`, `canal`), so it can be a parameter but never declared otherwise. Omitted means `false`. */
     readonly injected?: boolean;
+    /**
+     * The JavaScript class its instances are when the program runs (`Texto` → `String`). A class that names it is closed:
+     * on a value of its type, a member that is neither in this table nor a member of that JavaScript class is an error.
+     * Omitted leaves the class open: its values hold members the table can't know (the fields of a `bdo`).
+     */
+    readonly native?: string;
     readonly methods: Readonly<Record<string, CoreLibMember>>;
     readonly properties?: Readonly<Record<string, CoreLibMember>>;
 }

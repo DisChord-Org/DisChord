@@ -7,6 +7,7 @@ import { BindImportsRule } from "./rules/BindImportsRule";
 import { ValidateImportTargetsRule } from "./rules/ValidateImportTargetsRule";
 import { BindDeclarationsRule } from "./rules/BindDeclarationsRule";
 import { ValidateKnownNamesRule } from "./rules/ValidateKnownNamesRule";
+import { ValidateRangeCallsRule } from "./rules/ValidateRangeCallsRule";
 import { ValidateClassHierarchyRule } from "./rules/ValidateClassHierarchyRule";
 import { ValidateTypeAnnotationsRule } from "./rules/ValidateTypeAnnotationsRule";
 import { ResolveVariableTypesRule } from "./rules/ResolveVariableTypesRule";
@@ -16,6 +17,7 @@ import { ValidateNoValueUsesRule } from "./rules/ValidateNoValueUsesRule";
 import { ValidateCallTargetsRule } from "./rules/ValidateCallTargetsRule";
 import { ValidateReturnTypesRule } from "./rules/ValidateReturnTypesRule";
 import { ValidateCallArgumentsRule } from "./rules/ValidateCallArgumentsRule";
+import { ValidateKnownMembersRule } from "./rules/ValidateKnownMembersRule";
 import { ResolveAwaitedCallsRule } from "./rules/ResolveAwaitedCallsRule";
 import { ResolveDispatchedCallsRule } from "./rules/ResolveDispatchedCallsRule";
 import { ResolveMemberAccessesRule } from "./rules/ResolveMemberAccessesRule";
@@ -88,6 +90,9 @@ export class Analyzer<T extends string, N extends BaseNode<T>> {
         // Every name that is used has to be declared somewhere; runs before the rules that type the names.
         ValidateKnownNamesRule,
 
+        // `rango` only as what a `para` goes over, with one or two arguments; before anything types the call.
+        ValidateRangeCallsRule,
+
         ResolveVariableTypesRule,
 
         // A call that returns no value can only be a statement; needs the types above.
@@ -106,6 +111,9 @@ export class Analyzer<T extends string, N extends BaseNode<T>> {
 
         // Checks the arguments of each call against the declared parameter types.
         ValidateCallArgumentsRule,
+
+        // A member that a value of a closed core library class does not have; needs the same resolved types.
+        ValidateKnownMembersRule,
 
         // Decides which calls are awaited; needs the types resolved by Pass 3.
         ResolveAwaitedCallsRule,

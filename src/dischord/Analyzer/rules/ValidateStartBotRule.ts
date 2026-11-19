@@ -1,6 +1,6 @@
 import { AnalysisRule } from "../../../chord/Analyzer/AnalysisRule";
 import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType, StartBotNode } from "../../types";
-import { StartBotSchema, startBotCustomEntries, startBotDeclaredKeys } from "../../Generator/constants/schemas";
+import { StartBotSchema, startBotCustomEntries, startBotDeclaredKeys } from "../../tables/schemas";
 import { EditDistance } from "../../../utils/EditDistance";
 import { reservedClientMembers } from "../../Generator/constants/clientMembers";
 
@@ -20,7 +20,7 @@ export class ValidateStartBotRule extends AnalysisRule<DisChordNodeType, DisChor
      * @override
      */
     check (nodes: DisChordASTNode[]): void {
-        this.walk(nodes, current => {
+        this.walkScoped(nodes, current => {
             if (current.type !== DisChordTokenType.ENCENDER_BOT) return;
 
             const { object } = current as StartBotNode;

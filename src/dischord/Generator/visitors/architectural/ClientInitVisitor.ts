@@ -2,8 +2,8 @@ import path from "node:path";
 import { GeneratedNames } from "../../constants/GeneratedNames";
 
 import { DisChordNode, DisChordNodeType, DisChordTokenType, StartBotNode } from "../../../types";
-import { intentsMap, SeyfertLocations } from "../../constants/mappings";
-import { startBotCustomEntries } from "../../constants/schemas";
+import { intentsMap, SeyfertLocations } from "../../../tables/mappings";
+import { startBotCustomEntries } from "../../../tables/schemas";
 import { SubGenerator } from "../../../../chord/Generator/SubGenerator";
 import { IdentificatorNode, ImportNode, TokenType, TokenTypeUnion } from "../../../../chord/model/types";
 import { walkAST } from "../../../../chord/walkAST";

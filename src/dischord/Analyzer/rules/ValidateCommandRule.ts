@@ -3,7 +3,7 @@ import { CommandScopeNames } from "../../CommandScopeNames";
 import { AnalysisRule } from "../../../chord/Analyzer/AnalysisRule";
 import { ExpressionNode, TokenType } from "../../../chord/model/types";
 import { CommandNode, DisChordASTNode, DisChordODBNode, DisChordNode, DisChordNodeType, DisChordTokenType } from "../../types";
-import { CommandSchema } from "../../Generator/constants/schemas";
+import { CommandSchema } from "../../tables/schemas";
 import { discordNameProblem, slugifyCommandName } from "../../Generator/constants/commandNames";
 
 /**
@@ -17,7 +17,7 @@ export class ValidateCommandRule extends AnalysisRule<DisChordNodeType, DisChord
     check (nodes: DisChordASTNode[]): void {
         const validator = this.createBDOValidator();
 
-        this.walk(nodes, current => {
+        this.walkScoped(nodes, current => {
             if (current.type !== DisChordTokenType.CREAR_COMANDO) return;
 
             const command = current as CommandNode;

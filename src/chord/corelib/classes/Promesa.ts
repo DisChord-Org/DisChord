@@ -3,6 +3,7 @@ import { ClassesEnum } from "./ClassesEnum";
 
 export const promesaClass = {
     receiver: ClassDataType.of(ClassesEnum.Promesa),
+    native: 'Promise',
     constructs: 'Promise',
     methods: {
         todas: {

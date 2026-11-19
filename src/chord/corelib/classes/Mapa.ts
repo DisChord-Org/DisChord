@@ -3,6 +3,7 @@ import { ClassesEnum } from "./ClassesEnum";
 
 export const mapaClass = {
     receiver: ClassDataType.of(ClassesEnum.Mapa),
+    native: 'Map',
     constructs: 'Map',
     methods: {
         obtener: {

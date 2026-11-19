@@ -1,7 +1,7 @@
 import { AnalysisRule } from "../../../chord/Analyzer/AnalysisRule";
 import { TokenType } from "../../../chord/model/types";
 import { ButtonDeclarationNode, DisChordASTNode, DisChordNode, DisChordNodeType, DisChordODBNode, DisChordTokenType, MessageNode } from "../../types";
-import { ButtonSchema } from "../../Generator/constants/schemas";
+import { ButtonSchema } from "../../tables/schemas";
 import { ButtonRows } from "../../ButtonRows";
 
 /**
@@ -21,7 +21,7 @@ export class ValidateButtonsRule extends AnalysisRule<DisChordNodeType, DisChord
      * @override
      */
     check (nodes: DisChordASTNode[]): void {
-        this.walk(nodes, current => {
+        this.walkScoped(nodes, current => {
             if (current.type === DisChordTokenType.CREAR_BOTON) this.validator.validate((current as ButtonDeclarationNode).body, ButtonSchema);
             if (current.type === DisChordTokenType.CREAR_MENSAJE) this.validateButtonProperty((current as MessageNode).object.blocks['boton']);
         });
@@ -61,10 +61,12 @@ export class ValidateButtonsRule extends AnalysisRule<DisChordNodeType, DisChord
     /**
      * Validates one button-producing element: an inline BDO gets checked against
      * {@link ButtonSchema}; anything else is a reference to an already-declared button, validated
-     * at its own site.
+     * at its own site, unless it is a value that can never be a button (`boton "x"`).
      * @private
      */
     private validateButtonElement (element: DisChordASTNode): void {
-        if (element.type === TokenType.BDO) this.validator.validate(element as DisChordODBNode, ButtonSchema);
+        if (element.type === TokenType.BDO) return this.validator.validate(element as DisChordODBNode, ButtonSchema);
+
+        this.validator.rejectPlainBlockValue(element, 'boton', 'un botón');
     }
 }

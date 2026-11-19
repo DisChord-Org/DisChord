@@ -72,7 +72,8 @@ export class CompileCommand {
 
         FileSystem.assertEsmProject(config.projectRoot);
 
-        const files = stdinFile ? [stdinFile] : FileSystem.getChordFiles(config.input);
+        // a check of one file is about that file alone, even when it is the entry of a project
+        const files = stdinFile ? [stdinFile] : FileSystem.getChordFiles(config.input, options.check === true);
 
         this.log(options, `Compilando proyecto: ${config.projectRoot}`);
 
@@ -130,7 +131,7 @@ export class CompileCommand {
         const relativeFile = file.relativeTo(config.projectRoot.absolutePath);
         this.log(options, `Compilando: ${relativeFile}`);
 
-        const relativePath = path.relative(config.projectRoot.resolve('src'), file.absolutePath);
+        const relativePath = path.relative(config.projectRoot.resolve(FileSystem.SOURCE_DIR), file.absolutePath);
         const targetDir = options.outDir
             ? path.resolve(options.outDir)
             : path.join(config.distDir, path.dirname(relativePath));

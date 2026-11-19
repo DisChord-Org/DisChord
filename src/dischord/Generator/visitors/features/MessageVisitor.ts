@@ -1,10 +1,10 @@
 import { ChannelProperty, DisChordNode, DisChordNodeType, DisChordTokenType, MessageNode } from "../../../types";
 import { SubGenerator } from "../../../../chord/Generator/SubGenerator";
 import { VisitorHelpers } from "../VisitorHelpers";
-import { CompilerMetadataKind, TokenTypeUnion } from "../../../../chord/model/types";
+import { TokenTypeUnion } from "../../../../chord/model/types";
 import ButtonVisitor from "../components/ButtonVisitor";
 import EmbedVisitor from "../components/EmbedVisitor";
-import { MessageSchema } from "../../constants/schemas";
+import { MessageSchema } from "../../../tables/schemas";
 import { JSFallback } from "../../../../chord/BDOSchema";
 import { createMessageHelperName } from "../../../corelib";
 
@@ -32,7 +32,8 @@ export default class MessageVisitor extends SubGenerator<DisChordNodeType, DisCh
         const embeds = this.parent.get(EmbedVisitor).visitIfNodeExists(node.object);
 
         const componentsData = [ buttons, embeds ].join('');
-        const interactionContext: string = this.parent.context.symbolTable.getMetadata<boolean>(CompilerMetadataKind.IsInteraction)? 'interaccion' : 'null';
+        // no message is sent as the reply of an interaction yet: the helper takes `null` where it would take one
+        const interactionContext: string = 'null';
 
         const user = properties['usuario'] === JSFallback.Undefined ? '' : `, ${properties['usuario']}`;
 

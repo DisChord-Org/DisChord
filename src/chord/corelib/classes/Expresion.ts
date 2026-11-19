@@ -3,6 +3,7 @@ import { ClassesEnum } from "./ClassesEnum";
 
 export const expresionClass = {
     receiver: ClassDataType.of(ClassesEnum.Expresion),
+    native: 'RegExp',
     constructs: 'RegExp',
     methods: {
         probar: {

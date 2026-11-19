@@ -3,9 +3,9 @@ import path from "node:path";
 
 process.env.UPDATE_SNAPSHOTS = "true";
 
-const entryPoint = path.join(process.cwd(), "src", "index.ts");
+const entryPoint = path.join(process.cwd(), "tester", "run.ts");
 
-const child = spawn("npx", ["tsx", entryPoint, "test"], {
+const child = spawn("npx", ["tsx", entryPoint], {
     stdio: "inherit",
     shell: true,
     env: process.env

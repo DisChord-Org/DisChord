@@ -1,0 +1,4 @@
+nuevo comando Prueba {
+    descripcion "prueba"
+    opciones 5
+}

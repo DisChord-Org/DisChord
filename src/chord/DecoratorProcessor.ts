@@ -9,27 +9,28 @@ type DecoratorBoxRecord = Partial<Record<DecoratorName, boolean>>;
 /**
  * Utility class to manage metadata provided by decorators.
  * It acts as a temporary buffer (box) where decorators deposit configurations
- * to be consumed by the next relevant AST node.
+ * to be consumed by the next relevant AST node. Each `Parser` owns its own, so parsing a file never sees the
+ * decorators another parse left pending.
  */
 export class DecoratorProcessor {
     /** Internal storage for active decorators and their associated content. */
-    private static DecoratorBox: DecoratorBoxRecord = {};
+    private readonly decoratorBox: DecoratorBoxRecord = {};
 
     /**
      * Registers a decorator and its content in the buffer.
      * @param decorator - The unique identifier of the decorator.
      * @param content - The metadata value to store.
      */
-    static addDecorator (decorator: DecoratorName, content: boolean): void {
-        this.DecoratorBox[decorator] = content;
+    addDecorator (decorator: DecoratorName, content: boolean): void {
+        this.decoratorBox[decorator] = content;
     }
 
     /**
      * Removes a decorator from the buffer to prevent it from affecting subsequent nodes.
      * @param decorator - The identifier of the decorator to remove.
      */
-    private static deleteDecorator (decorator: DecoratorName): void {
-        delete this.DecoratorBox[decorator];
+    private deleteDecorator (decorator: DecoratorName): void {
+        delete this.decoratorBox[decorator];
     }
 
     /**
@@ -40,8 +41,8 @@ export class DecoratorProcessor {
      * @param content - The value to compare.
      * @returns True if the values matched before deletion.
      */
-    static matchAndDelete (decorator: DecoratorName, content: boolean): boolean {
-        const isMatch = this.DecoratorBox[decorator] === content;
+    matchAndDelete (decorator: DecoratorName, content: boolean): boolean {
+        const isMatch = this.decoratorBox[decorator] === content;
 
         this.deleteDecorator(decorator);
 

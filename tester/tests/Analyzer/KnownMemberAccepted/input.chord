@@ -1,0 +1,9 @@
+var t es "hola"
+var l es [1, 2]
+var m es nuevo Mapa()
+var u tipo texto|numero es "a"
+var c tipo cualquiera es "a"
+
+l.push(3)
+m.set("a", 1)
+consola.imprimir(t.toUpperCase(), l.length, m.size, u.noExiste, c.noExiste, t.longitud, m.tamano)

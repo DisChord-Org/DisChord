@@ -1,0 +1,14 @@
+var lista es [ 1, 2 ]
+var n es 3
+
+para (i en rango(lista.longitud)) {
+    lista.agregar(i)
+}
+para (i en rango(1, n)) {
+    para (j en rango(i)) {
+        consola.imprimir(j)
+    }
+}
+para (i en rango(n, 5)) {
+    consola.imprimir(i)
+}

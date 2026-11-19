@@ -1,8 +1,8 @@
 import { BDOSchema, fieldKeys, FieldSpec, NestedSpec } from "../../chord/BDOSchema";
-import { CommandContextParameter, CommandScope, EmbedColors, eventParamNames, eventsMap } from "../Generator/constants/mappings";
+import { CommandContextParameter, CommandScope, EmbedColors, eventParamNames, eventsMap } from "../tables/mappings";
 import {
-    BanMemberSchema, ButtonSchema, CollectorSchema, CommandSchema, KickMemberSchema, UnbanUserSchema, CreateChannelSchema, DeleteChannelSchema, EditChannelSchema, GetChannelSchema, ListChannelsSchema, EmbedAuthorSchema, EmbedFieldSchema, EmbedFooterSchema, EmbedSchema, MessageSchema, OptionSchema, StartBotSchema
-} from "../Generator/constants/schemas";
+    ButtonSchema, CollectorSchema, CommandSchema, ChannelActionSchemas, ModerationActionSchemas, EmbedAuthorSchema, EmbedFieldSchema, EmbedFooterSchema, EmbedSchema, MessageSchema, OptionSchema, StartBotSchema
+} from "../tables/schemas";
 import { UnreservedComponentDeclarations } from "../Parser/Grammar/UnreservedComponentDeclarations";
 import { DisChordNode, DisChordNodeType } from "../types";
 
@@ -85,15 +85,14 @@ export class DisChordVocabulary {
         'pie': EmbedFooterSchema,
         'recolector': CollectorSchema,
         'mensaje': MessageSchema,
-        'crear canal': CreateChannelSchema,
-        'editar canal': EditChannelSchema,
-        'borrar canal': DeleteChannelSchema,
-        'obtener canal': GetChannelSchema,
-        'listar canales': ListChannelsSchema,
-        'banear miembro': BanMemberSchema,
-        'desbanear usuario': UnbanUserSchema,
-        'expulsar miembro': KickMemberSchema
+        ...DisChordVocabulary.namedAfter(ChannelActionSchemas),
+        ...DisChordVocabulary.namedAfter(ModerationActionSchemas)
     };
+
+    /** The schemas of a table of actions, each under the name it declares (`crear canal`): the name is written once, in the schema. */
+    private static namedAfter(table: Readonly<Record<string, BDOSchema<DisChordNodeType, DisChordNode>>>): Record<string, BDOSchema<DisChordNodeType, DisChordNode>> {
+        return Object.fromEntries(Object.values(table).map(schema => [schema.name, schema]));
+    }
 
     /**
      * @returns {DisChordVocabularyDescription} The vocabulary, every list in declaration order.

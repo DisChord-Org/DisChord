@@ -140,6 +140,38 @@ export class CoreLibClasses<C extends string = string> {
     }
 
     /**
+     * @param {C} className - Core library class.
+     * @returns {boolean} Whether a value of that class has no other members than the ones known for it (see `CoreLibClass.native`).
+     */
+    isClosed(className: C): boolean {
+        return this.corelib.classes[className].native !== undefined;
+    }
+
+    /**
+     * @param {C} className - Core library class.
+     * @param {string} name - A member name as written in source code.
+     * @returns {boolean} Whether the JavaScript class behind the instances of `className` has that member (`toUpperCase` for a `Texto`), so it works as written.
+     */
+    hasNativeMember(className: C, name: string): boolean {
+        const native = this.corelib.classes[className].native;
+        const prototype: unknown = native === undefined ? undefined : (globalThis as unknown as Record<string, { prototype?: unknown } | undefined>)[native]?.prototype;
+
+        return prototype !== undefined && prototype !== null && Reflect.has(Object(prototype), name);
+    }
+
+    /**
+     * @param {C} className - Core library class.
+     * @returns {string[]} The names of the members a value of that class has: its methods and then its properties, without the static ones.
+     */
+    instanceMemberNames(className: C): string[] {
+        const entry: CoreLibClass = this.corelib.classes[className];
+
+        return Object.entries({ ...entry.methods, ...entry.properties })
+            .filter(([, member]) => !member.static)
+            .map(([name]) => name);
+    }
+
+    /**
      * @returns {C[]} The names of the classes of the table, in declaration order.
      * @protected
      */

@@ -1,7 +1,7 @@
 import { Test } from "../../../Test";
 import { CorelibCommand, CorelibDocument } from "../../../../src/cli/commands/CorelibCommand";
-import { eventsMap, CommandScope, EmbedColors } from "../../../../src/dischord/Generator/constants/mappings";
-import { CommandSchema, ButtonSchema, StartBotSchema } from "../../../../src/dischord/Generator/constants/schemas";
+import { eventsMap, CommandScope, EmbedColors } from "../../../../src/dischord/tables/mappings";
+import { CommandSchema, ButtonSchema, StartBotSchema } from "../../../../src/dischord/tables/schemas";
 import { UnreservedComponentDeclarations } from "../../../../src/dischord/Parser/Grammar/UnreservedComponentDeclarations";
 import { CoreLibCatalog } from "../../../../src/chord/corelib/CoreLibCatalog";
 import { CoreLibMember } from "../../../../src/chord/corelib/corelib.types";

@@ -1,7 +1,7 @@
 import { AnalysisRule } from "../../../chord/Analyzer/AnalysisRule";
 import { TokenType } from "../../../chord/model/types";
 import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordODBNode, DisChordTokenType, EmbedDeclarationNode, MessageNode } from "../../types";
-import { EmbedSchema } from "../../Generator/constants/schemas";
+import { EmbedSchema } from "../../tables/schemas";
 
 /**
  * Validates every embed DisChord can reach at generation time against {@link EmbedSchema} — the
@@ -19,7 +19,7 @@ export class ValidateEmbedsRule extends AnalysisRule<DisChordNodeType, DisChordN
      * @override
      */
     check (nodes: DisChordASTNode[]): void {
-        this.walk(nodes, current => {
+        this.walkScoped(nodes, current => {
             if (current.type === DisChordTokenType.CREAR_EMBED) this.validator.validate((current as EmbedDeclarationNode).body, EmbedSchema);
             if (current.type === DisChordTokenType.CREAR_MENSAJE) this.validateEmbedProperty((current as MessageNode).object.blocks['embed']);
         });
@@ -28,7 +28,7 @@ export class ValidateEmbedsRule extends AnalysisRule<DisChordNodeType, DisChordN
     /**
      * A message's `embed` property can be a single embed, or a list of them. A reference to an
      * already-declared embed is left alone — it's validated once, at its own `CREAR_EMBED`
-     * declaration site.
+     * declaration site. A value that can never be an embed (`embed 5`) is rejected.
      * @private
      */
     private validateEmbedProperty (embed: DisChordASTNode | undefined): void {
@@ -36,8 +36,10 @@ export class ValidateEmbedsRule extends AnalysisRule<DisChordNodeType, DisChordN
 
         const embeds = embed.type === TokenType.LISTA ? embed.body : [ embed ];
 
-        embeds
-            .filter(item => item.type === TokenType.BDO)
-            .forEach(item => this.validator.validate(item as DisChordODBNode, EmbedSchema));
+        embeds.forEach(item => {
+            if (item.type === TokenType.BDO) return this.validator.validate(item as DisChordODBNode, EmbedSchema);
+
+            this.validator.rejectPlainBlockValue(item, 'embed', 'un embed');
+        });
     }
 }

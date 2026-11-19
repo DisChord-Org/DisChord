@@ -2,9 +2,9 @@ import { AnalysisRule } from "../../../chord/Analyzer/AnalysisRule";
 import { TypeInferrer } from "../../../chord/Analyzer/TypeInferrer";
 import { ArrayDataType, PrimitiveDataType, TupleDataType, UnionDataType } from "../../../chord/model/DataType";
 import { LiteralNode, TokenType } from "../../../chord/model/types";
-import { BanDeleteMessageSeconds, CommandNode, DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType, EventNode, ModerationAction, ModerationActionNode, ModerationActionObject, ModerationProperty } from "../../types";
-import { ModerationActionSchemas } from "../../Generator/constants/schemas";
-import { CommandGuildSource, EventSelfTriggers, eventGuildSource } from "../../Generator/constants/mappings";
+import { BanDeleteMessageSeconds, CommandNode, DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType, EventNode, ModerationAction, ModerationActionNode, ModerationBlockName, ModerationProperty } from "../../types";
+import { ModerationActionSchemas } from "../../tables/schemas";
+import { CommandGuildSource, EventSelfTriggers, eventGuildSource } from "../../tables/mappings";
 
 /**
  * Validates every `banear miembro`, `desbanear usuario` and `expulsar miembro` block, and settles what the
@@ -60,7 +60,7 @@ export class ValidateModerationActionsRule extends AnalysisRule<DisChordNodeType
     private validate (node: ModerationActionNode): void {
         this.validator.validate(node.object, ModerationActionSchemas[node.action]);
 
-        const name = `${node.action} ${ModerationActionObject[node.action]}`;
+        const name = ModerationBlockName[node.action];
         const context = this.enclosing[this.enclosing.length - 1];
 
         if (!context) this.fail(
@@ -133,7 +133,7 @@ export class ValidateModerationActionsRule extends AnalysisRule<DisChordNodeType
         const valid = typeof seconds === 'number' && Number.isInteger(seconds) && seconds >= BanDeleteMessageSeconds.Min && seconds <= BanDeleteMessageSeconds.Max;
 
         if (!valid) this.fail(
-            `En 'banear miembro', '${ModerationProperty.BorrarMensajes}' son los segundos de mensajes a borrar: un número entero de ${BanDeleteMessageSeconds.Min} a ${BanDeleteMessageSeconds.Max}.`,
+            `En '${ModerationBlockName[ModerationAction.Banear]}', '${ModerationProperty.BorrarMensajes}' son los segundos de mensajes a borrar: un número entero de ${BanDeleteMessageSeconds.Min} a ${BanDeleteMessageSeconds.Max}.`,
             node.location
         );
     }

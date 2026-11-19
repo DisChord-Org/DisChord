@@ -25,10 +25,10 @@ export class AccessVisitor<T extends string, N extends BaseNode<T>> extends SubG
      * @public
      */
     public visit(node: AccessNode<T, N>): string {
-        const staticMember = this.parent.context.coreLib.resolveStatic(node);
-        if (staticMember) return staticMember.member.transpile;
-
         const marks = this.parent.context.symbolTable.marks;
+
+        const staticMember = marks.statics.get(node);
+        if (staticMember) return staticMember;
 
         const helper = marks.memberHelpers.get(node);
         if (helper) return `${helper}(${this.parent.visit(node.object)})`;

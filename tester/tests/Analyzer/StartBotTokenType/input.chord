@@ -1,0 +1,4 @@
+encender bot {
+    prefijo "!"
+    token 5
+}

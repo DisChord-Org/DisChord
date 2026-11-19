@@ -1,4 +1,3 @@
-import { DecoratorProcessor } from "../../../DecoratorProcessor";
 import { ASTNode, BaseNode, Decorator, TokenType, TokenTypeUnion } from "../../../model/types";
 import { SubParser } from "../../SubParser";
 import { ExpressionParser } from "../Expressions/ExpressionParser";
@@ -32,7 +31,7 @@ export class StatementParser<T extends string, N extends BaseNode<T>> extends Su
             this.consume(TokenType.Decorador);
         
             const known = (Object.keys(Decorator) as (keyof typeof Decorator)[]).find(name => Decorator[name] === decorator);
-            if (known) DecoratorProcessor.addDecorator(known, true);
+            if (known) this.parent.decorators.addDecorator(known, true);
 
             return (this.parent.get(StatementParser)).parse(classContext);
         }

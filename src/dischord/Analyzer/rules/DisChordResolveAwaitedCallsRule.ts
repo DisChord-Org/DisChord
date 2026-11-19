@@ -1,5 +1,5 @@
 import { ResolveAwaitedCallsRule } from "../../../chord/Analyzer/rules/ResolveAwaitedCallsRule";
-import { ChannelActionObject, ModerationActionObject, DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType } from "../../types";
+import { ChannelBlockName, ModerationBlockName, DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType } from "../../types";
 
 /** Why a dischord construct that is emitted as an `await` can only go where an await can. */
 const awaitedWhere = "espera una respuesta y solo puede usarse en un comando, un evento, una función @asincrono o a nivel superior";
@@ -20,11 +20,11 @@ export class DisChordResolveAwaitedCallsRule extends ResolveAwaitedCallsRule<Dis
         }
 
         if (node.type === DisChordTokenType.ACCION_CANAL) {
-            return `'${node.action} ${ChannelActionObject[node.action]}' ${awaitedWhere}`;
+            return `'${ChannelBlockName[node.action]}' ${awaitedWhere}`;
         }
 
         if (node.type === DisChordTokenType.ACCION_MODERACION) {
-            return `'${node.action} ${ModerationActionObject[node.action]}' ${awaitedWhere}`;
+            return `'${ModerationBlockName[node.action]}' ${awaitedWhere}`;
         }
 
         return undefined;

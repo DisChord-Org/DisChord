@@ -3,7 +3,7 @@ import { Test } from "../../../Test";
 /**
  * @class DuplicateBotTest
  * @description Validates that a second `encender bot { ... }` block in the same file throws,
- * now via `BindDisChordDeclarationsRule` (Analyzer's "Variables" pass) instead of the
+ * now via `BindComponentDeclarationsRule` (Analyzer's "Variables" pass) instead of the
  * `try/catch` around `SymbolTable.register` that used to live in `ClientParser`.
  */
 export class DuplicateBotTest extends Test {

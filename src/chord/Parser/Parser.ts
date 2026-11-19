@@ -4,6 +4,7 @@ import { ASTNode, Token, TokenType, BaseNode, PeekType, Location, TokenTypeUnion
 
 import { CompilationContext } from "../model/CompilationContext";
 import { DeclarationLog } from "../model/DeclarationLog";
+import { DecoratorProcessor } from "../DecoratorProcessor";
 import { ParserContext } from "./ParserContext";
 import { SubParser, SubParserClass } from "./SubParser";
 import { SymbolTable } from "../model/SymbolsTable";
@@ -63,6 +64,12 @@ export class Parser<T extends string, N extends BaseNode<T>> extends ParserConte
      * @type {DeclarationLog<T>}
      */
     public readonly declarations: DeclarationLog<T> = new DeclarationLog<T>();
+
+    /**
+     * The decorators read and not yet consumed by a node. Per parser: a file is parsed with nothing left over from another.
+     * @public
+     */
+    public readonly decorators: DecoratorProcessor = new DecoratorProcessor();
     
     /** The tokens being parsed and the cursor over them. */
     private readonly stream: TokenStream<T>;

@@ -1,6 +1,6 @@
 import { AnalysisRule } from "../../../chord/Analyzer/AnalysisRule";
 import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType, EventNode } from "../../types";
-import { eventsMap, RenamedEvents } from "../../Generator/constants/mappings";
+import { eventsMap, RenamedEvents } from "../../tables/mappings";
 
 /**
  * Validates that an `evento <nombre>` names an event `eventsMap` recognizes.

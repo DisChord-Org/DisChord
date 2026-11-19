@@ -3,6 +3,7 @@ import { PrimitiveType } from "../../model/types";
 
 export const textoClass = {
     receiver: PrimitiveDataType.Texto,
+    native: 'String',
     methods: {
         limpiar: {
             transpile: 'trim',

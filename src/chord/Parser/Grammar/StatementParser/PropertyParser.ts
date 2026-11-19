@@ -1,7 +1,6 @@
 import { SubParser } from "../../SubParser";
 import { PropertyNode, ASTNode, BaseNode, DeclarationKind, TokenType, TokenTypeUnion } from "../../../model/types";
 import { ExpressionParser } from "../Expressions/ExpressionParser";
-import { DecoratorProcessor } from "../../../DecoratorProcessor";
 
 export class PropertyParser<T extends string, N extends BaseNode<T>> extends SubParser<T, N> {
     /** To identify when this parser should be used */
@@ -39,7 +38,7 @@ export class PropertyParser<T extends string, N extends BaseNode<T>> extends Sub
             value = this.parent.get(ExpressionParser).parse();
         }
 
-        const isStatic: boolean = DecoratorProcessor.matchAndDelete('fijar', true);
+        const isStatic: boolean = this.parent.decorators.matchAndDelete('fijar', true);
 
         return this.createNode<PropertyNode<T, N>>({
             type: TokenType.PROPIEDAD,

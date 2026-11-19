@@ -1,6 +1,5 @@
 import { SubParser } from "../../SubParser";
 import { BaseNode, DeclarationKind, FunctionNode, TokenType, TokenTypeUnion } from "../../../model/types";
-import { DecoratorProcessor } from "../../../DecoratorProcessor";
 import { DataType } from "../../../model/DataType";
 import { TypeAnnotationParser } from "./TypeAnnotationParser";
 import { ChordError, ErrorLevel } from "../../../../errors/ChordError";
@@ -37,8 +36,8 @@ export class FunctionParser<T extends string, N extends BaseNode<T>> extends Sub
 
         // Taken before the body is parsed: the decorator box is global, so a function nested in the
         // body would otherwise consume the decorators written for this one.
-        const isAsync: boolean = DecoratorProcessor.matchAndDelete('asincrono', true);
-        const isStatic: boolean = DecoratorProcessor.matchAndDelete('fijar', true);
+        const isAsync: boolean = this.parent.decorators.matchAndDelete('asincrono', true);
+        const isStatic: boolean = this.parent.decorators.matchAndDelete('fijar', true);
 
         const id = this.parseName(flags);
 

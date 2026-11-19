@@ -3,7 +3,7 @@ import { SubGenerator } from "../../../../chord/Generator/SubGenerator";
 import { VisitorHelpers } from "../VisitorHelpers";
 import { TokenTypeUnion } from "../../../../chord/model/types";
 import { BDOVisitor } from "../../../../chord/Generator/visitors/expressions/BDOVisitor";
-import { CollectorSchema } from "../../constants/schemas";
+import { CollectorSchema } from "../../../tables/schemas";
 
 /** Config for the Collector Generator param. */
 interface CollectorConfig {

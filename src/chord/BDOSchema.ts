@@ -1,4 +1,5 @@
 import { ASTNode, BaseNode, LiteralNode, ODBNode, TokenType } from "./model/types";
+import { DataType } from "./model/DataType";
 
 /**
  * @file BDOSchema.ts
@@ -28,13 +29,17 @@ import { ASTNode, BaseNode, LiteralNode, ODBNode, TokenType } from "./model/type
  *    key of `mapping` when present.
  *  - `MappedList`: a list of closed-vocabulary strings (e.g. `integraciones`, `intenciones`) —
  *    every element must be a key of `mapping` when present.
+ *  - `NamedValue`: like `Value`, but a text written as a literal must be a key of `mapping` (an
+ *    embed's `color "Verde"`); any other expression passes through, and so does the literal: the
+ *    visitor that reads the field translates the name.
  * @type {const}
  */
 export const FieldKind = {
     Value: 'value',
     List: 'list',
     MappedLiteral: 'mappedLiteral',
-    MappedList: 'mappedList'
+    MappedList: 'mappedList',
+    NamedValue: 'namedValue'
 } as const;
 
 /** Unified type extracting values from the `FieldKind` constant registry. */
@@ -66,9 +71,13 @@ export interface FieldSpec<M = unknown> {
      * used (e.g. `['prefijo', 'prefijos']`) — the first one present wins. */
     key: string | string[];
     kind: FieldKind;
-    /** Required for `'mappedLiteral'`/`'mappedList'`: the closed vocabulary this field's value(s)
-     * must belong to. Ignored otherwise. */
+    /** Required for `'mappedLiteral'`/`'mappedList'`/`'namedValue'`: the closed vocabulary this
+     * field's value(s) must belong to. Ignored otherwise. */
     mapping?: Record<string, M>;
+    /** The type the value must have (`descripcion` takes a `texto`). Only a value whose type is known
+     * and can never be this one is rejected: one of unknown type, `cualquiera`, or a union with a
+     * member that fits, passes. Omit for a field that takes any value. */
+    type?: DataType;
     /** Whether the field must be present at all. Defaults to `false`. */
     required?: boolean;
     /** The JS expression substituted at generation time when the field is absent (and not
@@ -82,7 +91,7 @@ export interface FieldSpec<M = unknown> {
      * dynamic expression only a later phase can resolve). */
     invalidMessage?: string;
     /** Message factory for a recognized-shape value that isn't a key of `mapping`
-     * (`'mappedLiteral'`/`'mappedList'` only). */
+     * (`'mappedLiteral'`/`'mappedList'`/`'namedValue'` only). */
     unknownMessage?: (value: string) => string;
     /** The name the field takes in the object the generator builds from the block, when it goes
      * in one (a channel's `nombre` is `name` in Discord's payload). A field without it is not
@@ -118,6 +127,9 @@ export interface NestedSpec<T extends string, N extends BaseNode<T>> {
     /** Message factory for a `forEachItem` list element that isn't a BDO, given the element's
      * actual node type. */
     typeMismatchMessage?: (foundType: string) => string;
+    /** Message when the value is not what holds the nested BDOs: a list for `forEachItem`, a BDO
+     * otherwise. Omit to accept a differently-shaped value, which is then not validated. */
+    invalidMessage?: string;
 }
 
 /**

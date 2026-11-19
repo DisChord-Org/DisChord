@@ -1,0 +1,8 @@
+nuevo comando Prueba {
+    descripcion "prueba"
+
+    banear miembro {
+        usuario usuario
+        razon 5
+    }
+}

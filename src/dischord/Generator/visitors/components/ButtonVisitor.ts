@@ -5,7 +5,7 @@ import { VisitorHelpers } from "../VisitorHelpers";
 import { TokenType, TokenTypeUnion } from "../../../../chord/model/types";
 import { BDOVisitor } from "../../../../chord/Generator/visitors/expressions/BDOVisitor";
 import ActionRowVisitor from "./ActionRowVisitor";
-import { ButtonSchema } from "../../constants/schemas";
+import { ButtonSchema } from "../../../tables/schemas";
 
 /**
  * Generator class responsible for generating code related to message buttons in DisChord.

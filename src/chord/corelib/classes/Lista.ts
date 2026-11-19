@@ -2,6 +2,7 @@ import { ArrayDataType, PrimitiveDataType, AnyDataType, VoidDataType } from "../
 
 export const listaClass = {
     receiver: ArrayDataType.AnyList,
+    native: 'Array',
     methods: {
         agregar: {
             transpile: 'push',

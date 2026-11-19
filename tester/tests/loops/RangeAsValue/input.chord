@@ -1,0 +1,2 @@
+var r es rango(3)
+consola.imprimir(r)

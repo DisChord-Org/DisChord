@@ -1,0 +1,8 @@
+nuevo comando Prueba {
+    descripcion "prueba"
+
+    var veces es 5
+    enviar mensaje {
+        embed { titulo veces }
+    }
+}

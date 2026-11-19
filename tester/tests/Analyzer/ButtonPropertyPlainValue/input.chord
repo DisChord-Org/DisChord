@@ -1,0 +1,7 @@
+nuevo comando Prueba {
+    descripcion "prueba"
+
+    enviar mensaje {
+        boton "x"
+    }
+}

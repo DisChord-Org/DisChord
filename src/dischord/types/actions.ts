@@ -30,6 +30,15 @@ export const ChannelActionObject: Readonly<Record<ChannelAction, string>> = {
 };
 
 /**
+ * What each channel block is called, verb and object together (`crear canal`, `listar canales`): the one
+ * place the name is composed, for the schemas, the vocabulary and the messages of the rules.
+ * @type {Readonly<Record<ChannelAction, string>>}
+ */
+export const ChannelBlockName: Readonly<Record<ChannelAction, string>> = Object.fromEntries(
+    Object.values(ChannelAction).map(action => [action, `${action} ${ChannelActionObject[action]}`])
+) as Record<ChannelAction, string>;
+
+/**
  * The actions that change something on the server, which are the ones the preventive barriers
  * apply to. Reading (`obtener`, `listar`) changes nothing.
  * @type {readonly ChannelAction[]}
@@ -60,6 +69,15 @@ export const ModerationActionObject: Readonly<Record<ModerationAction, string>> 
     [ModerationAction.Desbanear]: 'usuario',
     [ModerationAction.Expulsar]: 'miembro'
 };
+
+/**
+ * What each moderation block is called, verb and object together (`banear miembro`): the one place the
+ * name is composed, for the schemas, the vocabulary and the messages of the rules.
+ * @type {Readonly<Record<ModerationAction, string>>}
+ */
+export const ModerationBlockName: Readonly<Record<ModerationAction, string>> = Object.fromEntries(
+    Object.values(ModerationAction).map(action => [action, `${action} ${ModerationActionObject[action]}`])
+) as Record<ModerationAction, string>;
 
 /**
  * The properties of a moderation block that are read by name outside the schemas: the user it is

@@ -28,6 +28,17 @@ export class CompilationMarks {
      */
     public readonly memberHelpers = new NodeMarks<string>();
 
+    /**
+     * The name a call to a free function is emitted with: the runtime helper of the core library function it
+     * stands for (`esperar` -> `chordEsperar`), or the name as written when it stands for none.
+     */
+    public readonly callees = new NodeMarks<string>();
+
+    /**
+     * The JavaScript an access to a static core library member is emitted as (`Mates.PI` -> `Math.PI`).
+     */
+    public readonly statics = new NodeMarks<string>();
+
     /** Calls on a receiver of union type that the analyzer decided to emit differently. */
     public readonly dispatches = new NodeMarks<CallDispatch>();
 

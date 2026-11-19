@@ -2,6 +2,7 @@ import { AnyDataType, PrimitiveDataType } from "../../model/DataType";
 
 export const numeroClass = {
     receiver: PrimitiveDataType.Numero,
+    native: 'Number',
     methods: {
         esEntero: {
             transpile: 'Number.isInteger',

@@ -1,4 +1,4 @@
-import { ChannelTypes } from "../Generator/constants/mappings";
+import { ChannelTypes } from "../tables/mappings";
 import { DisChordClassesEnum } from "./corelib.data";
 import { ExtensionModules } from "./ExtensionModules";
 import { SharedModule } from "../../chord/model/SharedModule";

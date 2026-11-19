@@ -22,4 +22,26 @@ export class EditDistance {
 
         return previous[b.length];
     }
+
+    /**
+     * @param {string} name - A name.
+     * @param {Iterable<string>} candidates - The names it could have been meant for.
+     * @param {number} maxDistance - The most edits a candidate may be away and still be suggested.
+     * @returns {string | undefined} The nearest candidate, if one is within `maxDistance` edits.
+     */
+    public static closest (name: string, candidates: Iterable<string>, maxDistance: number): string | undefined {
+        let best: string | undefined;
+        let bestDistance = maxDistance + 1;
+
+        for (const candidate of candidates) {
+            const distance = EditDistance.between(name, candidate);
+
+            if (distance < bestDistance) {
+                best = candidate;
+                bestDistance = distance;
+            }
+        }
+
+        return best;
+    }
 }

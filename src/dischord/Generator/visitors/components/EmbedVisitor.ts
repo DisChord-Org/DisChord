@@ -1,11 +1,11 @@
 import { DisChordError, ErrorLevel } from "../../../../errors/ChordError";
-import { EmbedColors } from "../../constants/mappings";
+import { EmbedColors } from "../../../tables/mappings";
 import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordODBNode, DisChordTokenType } from "../../../types";
 import { SubGenerator } from "../../../../chord/Generator/SubGenerator";
 import { VisitorHelpers } from "../VisitorHelpers";
 import { TokenType, TokenTypeUnion } from "../../../../chord/model/types";
 import { BDOVisitor } from "../../../../chord/Generator/visitors/expressions/BDOVisitor";
-import { EmbedAuthorSchema, EmbedFieldSchema, EmbedFooterSchema, EmbedSchema } from "../../constants/schemas";
+import { EmbedAuthorSchema, EmbedFieldSchema, EmbedFooterSchema, EmbedSchema } from "../../../tables/schemas";
 
 /**
  * Generator class responsible for generating code related to message embeds in DisChord.

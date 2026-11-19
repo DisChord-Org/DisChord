@@ -1,0 +1,2 @@
+var m es nuevo Mapa()
+m.guardar("a", 1)

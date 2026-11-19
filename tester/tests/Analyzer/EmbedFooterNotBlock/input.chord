@@ -1,0 +1,7 @@
+nuevo comando Prueba {
+    descripcion "prueba"
+
+    enviar mensaje {
+        embed { pie 5 }
+    }
+}

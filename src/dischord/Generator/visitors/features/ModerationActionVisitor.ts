@@ -2,7 +2,7 @@ import { ModerationAction, ModerationActionNode, ModerationProperty, DisChordNod
 import { SubGenerator } from "../../../../chord/Generator/SubGenerator";
 import { VisitorHelpers } from "../VisitorHelpers";
 import { TokenTypeUnion } from "../../../../chord/model/types";
-import { ModerationActionSchemas } from "../../constants/schemas";
+import { ModerationActionSchemas } from "../../../tables/schemas";
 import { moderationHelperNames } from "../../../corelib";
 
 /**

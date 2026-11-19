@@ -4,7 +4,7 @@ import { SubGenerator } from "../../../../chord/Generator/SubGenerator";
 import { VisitorHelpers } from "../VisitorHelpers";
 import { TokenType, TokenTypeUnion } from "../../../../chord/model/types";
 import { BDOVisitor } from "../../../../chord/Generator/visitors/expressions/BDOVisitor";
-import { OptionSchema } from "../../constants/schemas";
+import { OptionSchema } from "../../../tables/schemas";
 import { CommandScopeNames } from "../../../CommandScopeNames";
 
 /**
