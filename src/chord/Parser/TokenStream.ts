@@ -13,6 +13,10 @@ export class TokenStream<T extends string> {
         private current: number = 0
     ) {}
 
+    private startSentinel?: Token<T>;
+    private endSentinel?: Token<T>;
+    private endSentinelAfter?: Token<T>;
+
     /**
      * Inserts a token into the stream ahead of the cursor. A sub-parser uses it to close, with a
      * separator, an entry the grammar would otherwise run on into the next one.
@@ -40,22 +44,27 @@ export class TokenStream<T extends string> {
      * @returns {Token<T>} The inspected token at the target relative position.
      */
     public peek(type: PeekType = 'this'): Token<T> {
-        if (typeof type == 'number') return this.tokens[type];
+        const targetIndex = typeof type === 'number'
+            ? type
+            : type === 'next' ? this.cursor + 1 : type === 'prev' ? this.cursor - 1 : this.cursor;
 
-        let targetIndex = this.cursor;
+        if (targetIndex < 0) return this.startSentinel ??= this.sentinel(TokenType.SOF, { line: 1, column: 1 }, { line: 1, column: 1 });
 
-        if (type === 'next') targetIndex = this.cursor + 1;
-        if (type === 'prev') targetIndex = this.cursor - 1;
-
-        if (targetIndex < 0) return this.sentinel(TokenType.SOF, { line: 1, column: 1 }, { line: 1, column: 1 });
-
-        if (targetIndex >= this.tokens.length) {
-            const last = this.tokens[this.tokens.length - 1];
-
-            return this.sentinel(TokenType.EOF, last?.location || { line: 1, column: 1 }, last?.end || { line: 1, column: 1 });
-        }
+        if (targetIndex >= this.tokens.length) return this.endToken();
 
         return this.tokens[targetIndex];
+    }
+
+    /** The end-of-file token: one per stream, rebuilt only if the last token changed. */
+    private endToken(): Token<T> {
+        const last = this.tokens[this.tokens.length - 1];
+
+        if (!this.endSentinel || this.endSentinelAfter !== last) {
+            this.endSentinel = this.sentinel(TokenType.EOF, last?.location || { line: 1, column: 1 }, last?.end || { line: 1, column: 1 });
+            this.endSentinelAfter = last;
+        }
+
+        return this.endSentinel;
     }
 
     /** The start-of-file or end-of-file token, which is not in the source and is not in `tokens`. */
@@ -80,15 +89,12 @@ export class TokenStream<T extends string> {
      * @returns {boolean} True if the token was matched and consumed.
      */
     public match(types: string | string[]): boolean {
-        const expected = Array.isArray(types) ? types : [types];
-        const currentToken = this.peek();
+        const type = this.peek().type;
 
-        if (expected.includes(currentToken.type)) {
-            this.consume(currentToken.type);
-            return true;
-        }
+        if (Array.isArray(types) ? !types.includes(type) : types !== type) return false;
 
-        return false;
+        this.current++;
+        return true;
     }
 
     /**
@@ -102,9 +108,12 @@ export class TokenStream<T extends string> {
      */
     public consume(expectedTypes: string | string[], message?: string): Token<T> {
         const token = this.peek();
-        const expected = Array.isArray(expectedTypes) ? expectedTypes : [expectedTypes];
 
-        if (expected.includes(token.type)) return this.tokens[this.current++];
+        const isList = Array.isArray(expectedTypes);
+
+        if (isList ? expectedTypes.includes(token.type) : expectedTypes === token.type) return this.tokens[this.current++];
+
+        const expected = isList ? expectedTypes : [expectedTypes];
 
         let customMessage = message;
         
