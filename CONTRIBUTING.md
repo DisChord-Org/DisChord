@@ -28,7 +28,7 @@ Thank you for your interest in contributing to **DisChord**! We're excited to se
 
 DisChord is two layers, and each one goes through the same stages:
 - **Chord** (`src/chord/`): the base language. **Dischord** (`src/dischord/`): the Discord layer on top of it. A feature that has nothing to do with Discord belongs in Chord.
-- **Lexer** (`src/chord/Lexer.ts`): turns text into tokens.
+- **Lexer** (`src/chord/Lexer/`): turns text into tokens; `InterpolatedText` rewrites an interpolated text to its tokens.
 - **Parser** (`src/chord/Parser/`, and `src/dischord/Parser/` for the Discord syntax): builds the AST (Abstract Syntax Tree). Each construct has its own parser under `Grammar/`.
 - **Analyzer** (`src/chord/Analyzer/`, `src/dischord/Analyzer/`): a list of rules that validate the AST and decide what the generator needs to know. Errors belong here.
 - **Generator** (`src/chord/Generator/`, `src/dischord/Generator/`): turns AST nodes into standard JavaScript, one visitor per node type. It translates what the analyzer decided; it does not decide.

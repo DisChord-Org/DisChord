@@ -6,7 +6,7 @@ import { UnreservedComponentDeclarations } from "../../../../src/dischord/Parser
 import { CoreLibCatalog } from "../../../../src/chord/corelib/CoreLibCatalog";
 import { CoreLibMember } from "../../../../src/chord/corelib/corelib.types";
 import { CodeProvider } from "../../../../src/chord/CodeProvider";
-import { Lexer } from "../../../../src/chord/Lexer";
+import { Lexer } from "../../../../src/chord/Lexer/Lexer";
 import { TokenType } from "../../../../src/chord/model/types";
 import { corelib } from "../../../../src/dischord/corelib/corelib.data";
 import { DisChordParser } from "../../../../src/dischord/Parser/Parser";

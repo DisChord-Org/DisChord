@@ -1,7 +1,7 @@
 import path from "node:path";
 
 import { Test } from "../../../Test";
-import { Lexer } from "../../../../src/chord/Lexer";
+import { Lexer } from "../../../../src/chord/Lexer/Lexer";
 import { SymbolTable } from "../../../../src/chord/model/SymbolsTable";
 import { CodeProvider } from "../../../../src/chord/CodeProvider";
 import { walkAST } from "../../../../src/chord/walkAST";

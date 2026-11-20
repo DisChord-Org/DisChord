@@ -1,4 +1,4 @@
-import { Location, Token, TokenType } from "./model/types";
+import { Location, Token, TokenType } from "../model/types";
 
 /** A run of plain text between two expressions, as offsets into the content of the text. */
 type TextPart = {

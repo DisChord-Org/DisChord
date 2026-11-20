@@ -1,7 +1,7 @@
 import path from "node:path";
 
 import { Test } from "../../../Test";
-import { Lexer } from "../../../../src/chord/Lexer";
+import { Lexer } from "../../../../src/chord/Lexer/Lexer";
 import { CodeProvider } from "../../../../src/chord/CodeProvider";
 import { DisChordParser } from "../../../../src/dischord/Parser/Parser";
 import { DisChordAnalyzer } from "../../../../src/dischord/Analyzer/Analyzer";
