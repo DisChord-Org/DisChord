@@ -1,0 +1,7 @@
+importar { cargar } desde "lib:tareas"
+
+funcion principal() {
+    cargar("a.json")
+}
+
+principal()

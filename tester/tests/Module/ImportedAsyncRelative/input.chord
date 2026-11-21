@@ -1,0 +1,9 @@
+importar { cargar, leer } desde "./otro"
+
+@asincrono
+funcion principal() {
+    cargar("a.json")
+    leer("a.json")
+}
+
+principal()

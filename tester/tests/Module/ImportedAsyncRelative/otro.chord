@@ -1,0 +1,10 @@
+exportar
+@asincrono
+funcion cargar(ruta) {
+    devolver ruta
+}
+
+exportar
+funcion leer(ruta) {
+    devolver ruta
+}

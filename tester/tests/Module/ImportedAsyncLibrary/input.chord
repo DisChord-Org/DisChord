@@ -1,0 +1,12 @@
+importar { cargar, leer, procesar, interna } desde "lib:tareas"
+
+@asincrono
+funcion principal() {
+    var datos es cargar("a.json")
+    leer("a.json")
+    procesar()
+    interna()
+    devolver datos
+}
+
+principal()

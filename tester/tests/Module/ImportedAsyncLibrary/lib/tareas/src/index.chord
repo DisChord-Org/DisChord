@@ -1,0 +1,30 @@
+exportar
+@asincrono
+funcion cargar(ruta) {
+    devolver ruta
+}
+
+exportar
+funcion leer(ruta) {
+    devolver ruta
+}
+
+exportar
+@asincrono
+funcion guardar(ruta) {
+    devolver cargar(ruta)
+}
+
+clase Servicio {
+    @asincrono
+    funcion procesar() {
+        devolver 1
+    }
+}
+
+funcion externa() {
+    @asincrono
+    funcion interna() {
+        devolver 1
+    }
+}
