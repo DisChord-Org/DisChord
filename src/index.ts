@@ -2,6 +2,7 @@ import { CommanderError } from 'commander';
 import { Program } from './cli/Program';
 import { ExitCode } from './cli/ExitCode';
 import { BaseChordError } from './errors/ChordError';
+import { ErrorMessage } from './errors/ErrorMessage';
 
 /** Red tag every unexpected failure is printed with. */
 const FATAL_PREFIX = '\x1b[31m[Fatal Error]\x1b[0m';
@@ -30,7 +31,7 @@ new Program()
         } else if (error instanceof Error) {
             // a path that does not exist is a usage error: one clear line, the trace only with --debug
             const { code, path } = error as NodeJS.ErrnoException;
-            const message = code === 'ENOENT' && path ? `No existe la ruta: ${path}` : error.message;
+            const message = code === 'ENOENT' && path ? `No existe la ruta: ${path}` : ErrorMessage.of(error);
 
             console.error(`${FATAL_PREFIX} ${message}`);
             if (error.stack && wantsTrace) console.error(error.stack);
