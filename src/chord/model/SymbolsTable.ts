@@ -3,7 +3,8 @@ import { ScopeOwnerRegistry, ScopeOwnerOptions } from "./ScopeOwnerRegistry";
 import { DataType } from "./DataType";
 import { ClassRegistry } from "./ClassRegistry";
 import { CompilationMarks } from "./CompilationMarks";
-import { ChordError, ErrorLevel } from "../../errors/ChordError";
+import { ChordError } from "../../errors/ChordError";
+import { ErrorLevel } from "../../errors/types";
 
 /**
  * One lexical scope: the symbols declared in it plus its contextual compilation metadata.

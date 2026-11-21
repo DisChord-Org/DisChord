@@ -1,4 +1,5 @@
-import { ChordError, ErrorLevel } from "../../../errors/ChordError";
+import { ChordError } from "../../../errors/ChordError";
+import { ErrorLevel } from "../../../errors/types";
 import { ASTNode, BaseNode, isBinaryOperator, isLiteralToken, ODBMode, ODBNode, TokenType, TokenTypeUnion } from "../../model/types";
 import { SubParser } from "../SubParser";
 import { ExpressionParser } from "./Expressions/ExpressionParser";

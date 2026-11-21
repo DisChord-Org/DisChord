@@ -1,6 +1,7 @@
 import { SUGGESTIONS } from "./ParserErrorSuggestions";
 import { PeekType, Token, TokenType } from "../model/types";
-import { ChordError, ErrorLevel } from "../../errors/ChordError";
+import { ChordError } from "../../errors/ChordError";
+import { ErrorLevel } from "../../errors/types";
 
 /**
  * The token stream a parser reads: the tokens, the cursor over them, lookahead and the consumption

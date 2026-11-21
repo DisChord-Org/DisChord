@@ -1,7 +1,7 @@
 import { CommanderError } from 'commander';
 import { Program } from './cli/Program';
 import { ExitCode } from './cli/ExitCode';
-import { BaseChordError } from './errors/ChordError';
+import { BaseChordError } from './errors/BaseChordError';
 import { ErrorMessage } from './errors/ErrorMessage';
 
 /** Red tag every unexpected failure is printed with. */

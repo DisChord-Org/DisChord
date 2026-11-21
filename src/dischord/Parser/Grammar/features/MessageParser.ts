@@ -2,7 +2,8 @@ import { DisChordNode, DisChordNodeType, DisChordODBNode, DisChordTokenType, Mes
 import { ODBMode, TokenType, TokenTypeUnion } from "../../../../chord/model/types";
 import { SubParser } from "../../../../chord/Parser/SubParser";
 import { BDOParser } from "../../../../chord/Parser/Grammar/BDOParser";
-import { ChordError, ErrorLevel } from "../../../../errors/ChordError";
+import { ChordError } from "../../../../errors/ChordError";
+import { ErrorLevel } from "../../../../errors/types";
 
 /**
  * The Message Parser.

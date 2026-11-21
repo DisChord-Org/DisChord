@@ -1,5 +1,6 @@
 import { Location, Token, TokenType } from '../model/types';
-import { ChordError, ErrorLevel } from '../../errors/ChordError';
+import { ChordError } from '../../errors/ChordError';
+import { ErrorLevel } from '../../errors/types';
 import { CompilationContext } from '../model/CompilationContext';
 import { SymbolTranslationMap } from '../model/Symbols';
 import { InterpolatedText } from './InterpolatedText';

@@ -2,7 +2,8 @@ import { BaseNode, PrimitiveType, PrimitiveTypeName, TokenType } from "../../../
 import { AnyDataType, ArrayDataType, DataType, PrimitiveDataType, TupleDataType, UnionDataType, UserClassDataType, VoidDataType } from "../../../model/DataType";
 
 import { Parser } from "../../Parser";
-import { ChordError, ErrorLevel } from "../../../../errors/ChordError";
+import { ChordError } from "../../../../errors/ChordError";
+import { ErrorLevel } from "../../../../errors/types";
 
 /**
  * Parses a `tipo <anotación>` clause: a primitive (`texto`), a core library class (`Mapa`, `Lista`),

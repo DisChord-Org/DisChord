@@ -1,7 +1,7 @@
 import path from "node:path";
 import { Test } from "../../../Test";
 import { RunCommand } from "../../../../src/cli/commands/RunCommand";
-import { DisChordError } from "../../../../src/errors/ChordError";
+import { DisChordError } from "../../../../src/errors/DisChordError";
 
 /**
  * @class RunErrorWithoutLocationTest

@@ -1,5 +1,5 @@
 import { CommanderError } from 'commander';
-import { BaseChordError } from '../errors/ChordError';
+import { BaseChordError } from '../errors/BaseChordError';
 
 /**
  * The process exit codes of the CLI, so that whoever calls it (a script, CI, an IDE) can tell

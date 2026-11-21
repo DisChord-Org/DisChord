@@ -1,6 +1,6 @@
 import { EmitKind, GlobalCLIOptions } from '../Program';
 import { CompilerConfig } from '../../utils/FileSystem';
-import { BaseChordError } from '../../errors/ChordError';
+import { BaseChordError } from '../../errors/BaseChordError';
 import { File } from '../../utils/File';
 import { Location } from '../../chord/model/types';
 import { FileCompiler } from './FileCompiler';

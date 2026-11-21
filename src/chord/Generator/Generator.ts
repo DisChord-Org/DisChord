@@ -1,4 +1,5 @@
-import { ChordError, ErrorLevel } from "../../errors/ChordError";
+import { ChordError } from "../../errors/ChordError";
+import { ErrorLevel } from "../../errors/types";
 import { CompilationContext } from "../model/CompilationContext";
 import { ASTNode, BaseNode, TokenType } from "../model/types";
 import { GeneratorContext } from "./GeneratorContext";

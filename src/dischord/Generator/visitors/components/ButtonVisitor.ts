@@ -1,4 +1,5 @@
-import { DisChordError, ErrorLevel } from "../../../../errors/ChordError";
+import { DisChordError } from "../../../../errors/DisChordError";
+import { ErrorLevel } from "../../../../errors/types";
 import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordODBNode, DisChordTokenType } from "../../../types";
 import { SubGenerator } from "../../../../chord/Generator/SubGenerator";
 import { VisitorHelpers } from "../VisitorHelpers";

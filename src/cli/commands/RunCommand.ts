@@ -1,5 +1,6 @@
 import { pathToFileURL } from 'url';
-import { DisChordError, ErrorLevel } from '../../errors/ChordError';
+import { DisChordError } from '../../errors/DisChordError';
+import { ErrorLevel } from '../../errors/types';
 import { ErrorMessage } from '../../errors/ErrorMessage';
 import { File } from '../../utils/File';
 import { Directory } from '../../utils/Directory';

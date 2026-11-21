@@ -1,5 +1,6 @@
 import { TokenStream } from "./TokenStream";
-import { ChordError, ErrorLevel } from "../../errors/ChordError";
+import { ChordError } from "../../errors/ChordError";
+import { ErrorLevel } from "../../errors/types";
 import { ASTNode, Token, TokenType, BaseNode, PeekType, Location, TokenTypeUnion } from "../model/types";
 
 import { CompilationContext } from "../model/CompilationContext";

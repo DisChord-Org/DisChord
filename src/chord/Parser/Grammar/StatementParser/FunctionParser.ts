@@ -2,7 +2,8 @@ import { SubParser } from "../../SubParser";
 import { BaseNode, DeclarationKind, FunctionNode, TokenType, TokenTypeUnion } from "../../../model/types";
 import { DataType } from "../../../model/DataType";
 import { TypeAnnotationParser } from "./TypeAnnotationParser";
-import { ChordError, ErrorLevel } from "../../../../errors/ChordError";
+import { ChordError } from "../../../../errors/ChordError";
+import { ErrorLevel } from "../../../../errors/types";
 
 export class FunctionParser<T extends string, N extends BaseNode<T>> extends SubParser<T, N> {
     /** To identify when this parser should be used */

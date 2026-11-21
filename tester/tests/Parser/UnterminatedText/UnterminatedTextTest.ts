@@ -1,5 +1,5 @@
 import { Test } from "../../../Test";
-import { BaseChordError } from "../../../../src/errors/ChordError";
+import { BaseChordError } from "../../../../src/errors/BaseChordError";
 
 /**
  * @class UnterminatedTextTest

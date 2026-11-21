@@ -2,7 +2,8 @@ import { ASTNode, BaseNode, Location } from "../model/types";
 import { CompilationContext } from "../model/CompilationContext";
 import { walkAST } from "../walkAST";
 import { BDOValidator } from "./BDOValidator";
-import { DisChordError, ErrorLevel } from "../../errors/ChordError";
+import { DisChordError } from "../../errors/DisChordError";
+import { ErrorLevel } from "../../errors/types";
 import { TypeInferrer } from "./TypeInferrer";
 
 /**
