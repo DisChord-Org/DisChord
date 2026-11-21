@@ -1,6 +1,7 @@
 import { BaseNode, ImportNode, TokenType, TokenTypeUnion } from "../../../model/types";
 import { SubGenerator } from "../../SubGenerator";
 import { ImportSpecifier } from "../../../../utils/ImportSpecifier";
+import { ImportedModule } from "../../../ImportedModule";
 
 /**
  * Atomic SubGenerator compiling modular file dependencies and framework internal libraries definitions.
@@ -26,12 +27,11 @@ export class ImportVisitor<T extends string, N extends BaseNode<T>> extends SubG
     public visit(node: ImportNode<T>): string {
         let path = node.path.replace(/\.chord$/, '');
 
-        if (ImportSpecifier.isLibrary(path)) {
-            // an installed library lives at `<project root>/lib/<name>`, outside `dist/`: the specifier is
-            // relative to where this file is written, so it climbs as many levels as the file is deep
-            const libName = path.split(':')[1];
-            const entry = this.parent.context.projectRoot.resolve('lib', libName, 'src', 'index.js');
+        // an installed library lives at `<project root>/lib/<name>`, outside `dist/`: the specifier is
+        // relative to where this file is written, so it climbs as many levels as the file is deep
+        const entry = new ImportedModule(this.parent.context, path).libraryEntry();
 
+        if (entry !== undefined) {
             return this.renderImportStatement(node, ImportSpecifier.relative(this.parent.context.outputDir, entry));
         }
 

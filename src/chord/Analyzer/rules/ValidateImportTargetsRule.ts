@@ -3,7 +3,7 @@ import { AnalysisRule } from "../AnalysisRule";
 import { isImportNode } from "../../ast.guards";
 import { ASTNode, BaseNode } from "../../model/types";
 import { File } from "../../../utils/File";
-import { ImportSpecifier } from "../../../utils/ImportSpecifier";
+import { ImportedModule } from "../../ImportedModule";
 
 /**
  * Validates that every `importar` points at a module that actually exists, at analysis time —
@@ -25,28 +25,11 @@ export class ValidateImportTargetsRule<T extends string, N extends BaseNode<T>> 
         this.walk(nodes, current => {
             if (!isImportNode(current)) return;
 
-            const candidates = this.resolveCandidates(current.path);
+            const candidates = new ImportedModule(this.context, current.path).targets();
 
             if (candidates.some(candidate => File.tryOf(candidate))) return;
 
             this.fail(`No se encontró el módulo '${current.path}' (se buscó en: ${candidates.map(candidate => path.relative(this.context.projectRoot.absolutePath, candidate)).join(', ')}).`, current);
         });
-    }
-
-    /**
-     * Every absolute path that would satisfy `specifier`; the import is valid if any one exists.
-     * @param {string} specifier - The import's raw path, as written after `desde`.
-     * @returns {string[]} Candidate file paths, in lookup order.
-     * @private
-     */
-    private resolveCandidates (specifier: string): string[] {
-        if (ImportSpecifier.isLibrary(specifier)) {
-            return [ this.context.projectRoot.resolve('lib', specifier.slice(ImportSpecifier.LIB_PREFIX.length), 'src', 'index.js') ];
-        }
-
-        const sourceDir = this.context.codeProvider.currentFile.directory;
-        const base = path.resolve(sourceDir, specifier.replace(/\.chord$/, ''));
-
-        return [ `${base}.chord`, base ];
     }
 }

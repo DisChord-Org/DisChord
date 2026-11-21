@@ -9,6 +9,7 @@ import { IdentificatorNode, ImportNode, TokenType, TokenTypeUnion } from "../../
 import { walkAST } from "../../../../chord/walkAST";
 import { ImportSpecifier } from "../../../../utils/ImportSpecifier";
 import { ImportVisitor } from "../../../../chord/Generator/visitors/modularity/ImportVisitor";
+import { ImportedModule } from "../../../../chord/ImportedModule";
 
 /**
  * Generator class responsible for generating code related to starting the bot and setting up the client in DisChord.
@@ -190,9 +191,10 @@ export default class ClientInitVisitor extends SubGenerator<DisChordNodeType, Di
 
         let absoluteTarget: string;
 
-        if (ImportSpecifier.isLibrary(cleanPath)) {
-            const libName = cleanPath.split(':')[1];
-            absoluteTarget = projectRoot.resolve('lib', libName, 'src', 'index.js');
+        const libraryEntry = new ImportedModule(this.parent.context, cleanPath).libraryEntry();
+
+        if (libraryEntry !== undefined) {
+            absoluteTarget = libraryEntry;
         } else {
             absoluteTarget = path.join(this.parent.context.outputDir, cleanPath);
             if (!absoluteTarget.endsWith('.js')) absoluteTarget += '.js';
