@@ -5,7 +5,7 @@
 DisChord is a programming language that replaces symbolic operators with natural, Spanish word-based keywords, and compiles to standard JavaScript. On top of the base language (`chord`) it has a layer for Discord bots (`dischord`) that translates to [Seyfert](https://github.com/tiramisulabs/seyfert).
 
 [![License: ISC](https://img.shields.io/badge/License-ISC-blue.svg)](https://opensource.org/licenses/ISC)
-[![Version](https://img.shields.io/badge/Version-1.9.0-green.svg)](package.json)
+[![Version](https://img.shields.io/badge/Version-1.10.0-green.svg)](package.json)
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/DisChord-Org/DisChord)
 
 ---
