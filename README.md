@@ -21,13 +21,14 @@ DisChord is a programming language that replaces symbolic operators with natural
 
 ## Quick Start
 
+Create a project with the `chord` CLI (it needs `pnpm`):
+
 ```bash
-git clone https://github.com/DisChord-Org/DisChord.git
-cd DisChord
-pnpm install
+chord init mi-proyecto
+cd mi-proyecto
 ```
 
-Create `hello.chord`:
+It creates a `package.json` (with `"type": "module"` and Seyfert installed), a `.gitignore` and an empty `src/index.chord`. Put this in it:
 
 ```js
 var nombre es "Mundo"
@@ -43,14 +44,27 @@ si (total mayor 10) {
 Compile and run it:
 
 ```bash
-dischord hello.chord
+chord run .
 ```
 
-Without installing it, from the repository: `npm run dev hello.chord`. To get the `dischord` command, run `npm link` (or `pnpm link --global`) in the repository.
+This compiles the project to `dist/` and executes `src/index.chord`.
 
-This compiles `hello.chord` to `dist/hello.js` and executes it.
+### A bot
 
-A bot, with a command:
+Commands and events live in their own folders inside `src/`, one per file. `chord init` does not create them: you add them yourself, or the code editor does it for you.
+
+```
+mi-bot/
+└── src/
+    ├── index.chord     (encender bot)
+    ├── comandos/       (one command per file)
+    │   └── ping.chord
+    └── eventos/        (one event per file)
+```
+
+A command or an event has to be in `src/comandos/` or `src/eventos/` (at any depth): Seyfert only loads those folders, and the compiler rejects them anywhere else inside `src/`. The compiler generates the `seyfert.config.mjs` that points Seyfert at them.
+
+`src/index.chord`:
 
 ```js
 encender bot {
@@ -58,7 +72,11 @@ encender bot {
     prefijo "!"
     intenciones [ "MensajesDelServidor", "ContenidoDelMensaje" ]
 }
+```
 
+`src/comandos/ping.chord`:
+
+```js
 nuevo comando Ping {
     descripcion "¡Prueba la latencia del bot!"
 
