@@ -1,7 +1,7 @@
 import { AnalysisRule } from "../../../chord/Analyzer/AnalysisRule";
 import { DisChordASTNode, DisChordNode, DisChordNodeType, DisChordTokenType, StartBotNode } from "../../types";
 import { StartBotSchema, startBotCustomEntries, startBotDeclaredKeys } from "../../tables/schemas";
-import { EditDistance } from "../../../utils/EditDistance";
+import { Suggestion } from "../../../utils/Suggestion";
 import { reservedClientMembers } from "../../Generator/constants/clientMembers";
 
 /**
@@ -11,9 +11,6 @@ import { reservedClientMembers } from "../../Generator/constants/clientMembers";
  * for `intenciones`), which would otherwise be accepted silently as a property.
  */
 export class ValidateStartBotRule extends AnalysisRule<DisChordNodeType, DisChordNode> {
-    /** The most edits between a custom key and a declared one for it to be taken for a typo. */
-    private static readonly TYPO_DISTANCE = 2;
-
     private readonly validator = this.createBDOValidator();
 
     /**
@@ -39,9 +36,9 @@ export class ValidateStartBotRule extends AnalysisRule<DisChordNodeType, DisChor
         startBotCustomEntries(object).forEach(([ key, value ]) => {
             if (reservedClientMembers.has(key)) this.fail(`'${key}' ya existe en 'cliente' y 'encender bot' no puede sobrescribirlo. Usa otro nombre para esa propiedad.`, value.location);
 
-            const intended = startBotDeclaredKeys().find(declared => EditDistance.between(key, declared) <= ValidateStartBotRule.TYPO_DISTANCE);
+            const suggestion = Suggestion.didYouMean(key, startBotDeclaredKeys());
 
-            if (intended) this.fail(`'encender bot' no admite '${key}'. ¿Querías decir '${intended}'?`, value.location);
+            if (suggestion) this.fail(`'encender bot' no admite '${key}'.${suggestion}`, value.location);
         });
     }
 }
