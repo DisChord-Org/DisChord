@@ -1,7 +1,7 @@
 import { AnalysisRule } from "../AnalysisRule";
 import { ASTNode, BaseNode, CompilerMetadataKind, IdentificatorNode, ODBMode, ODBNode, SymbolKind, SyntaxFunction, TokenType } from "../../model/types";
 import { JsGlobals } from "../../corelib/JsGlobals";
-import { EditDistance } from "../../../utils/EditDistance";
+import { Suggestion } from "../../../utils/Suggestion";
 
 /**
  * Rejects a name that is used but declared nowhere: `mostrar nadie` or `"hola {nadie}"` would compile
@@ -73,8 +73,7 @@ export class ValidateKnownNamesRule<T extends string, N extends BaseNode<T>> ext
 
         if (this.isKnown(node.value, node)) return;
 
-        const close = this.closestVisible(node.value);
-        const message = `El nombre '${node.value}' no está declarado.${close ? ` ¿Querías decir '${close}'?` : ''}`;
+        const message = `El nombre '${node.value}' no está declarado.${Suggestion.didYouMean(node.value, this.visibleCandidates())}`;
 
         this.fail(message, node);
     }
@@ -97,10 +96,9 @@ export class ValidateKnownNamesRule<T extends string, N extends BaseNode<T>> ext
     }
 
     /**
-     * @returns {string | undefined} The visible name nearest to `name`, if one is within two edits.
+     * @returns {string[]} The names the identifier could have been meant for: the visible ones.
      */
-    private closestVisible (name: string): string | undefined {
-        const candidates = [ ...this.context.symbolTable.visibleNames(), ...this.tracked.flat() ];
-        return EditDistance.closest(name, candidates, 2);
+    private visibleCandidates (): string[] {
+        return [ ...this.context.symbolTable.visibleNames(), ...this.tracked.flat() ];
     }
 }

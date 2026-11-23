@@ -2,7 +2,7 @@ import { AnalysisRule } from "../AnalysisRule";
 import { ASTNode, AccessNode, BaseNode } from "../../model/types";
 import { isAccessNode } from "../../ast.guards";
 import { AnyDataType } from "../../model/DataType";
-import { EditDistance } from "../../../utils/EditDistance";
+import { Suggestion } from "../../../utils/Suggestion";
 
 /**
  * Rejects a member that a value of a known type does not have: `t.noExiste()` on a `texto`, or
@@ -16,9 +16,6 @@ import { EditDistance } from "../../../utils/EditDistance";
  * Runs after every variable's type is resolved, walking the tree with the same scopes as the earlier passes.
  */
 export class ValidateKnownMembersRule<T extends string, N extends BaseNode<T>> extends AnalysisRule<T, N> {
-    /** A member this many edits away from the one written is suggested. */
-    private static readonly SuggestionDistance = 2;
-
     /** With no member to suggest, the members of the class are listed if they are no more than these. */
     private static readonly ListedMembers = 10;
 
@@ -54,9 +51,9 @@ export class ValidateKnownMembersRule<T extends string, N extends BaseNode<T>> e
      * @private
      */
     private hint (name: string, className: string, members: string[]): string {
-        const close = EditDistance.closest(name, members, ValidateKnownMembersRule.SuggestionDistance);
+        const suggestion = Suggestion.didYouMean(name, members);
 
-        if (close) return ` ¿Querías decir '${close}'?`;
+        if (suggestion) return suggestion;
 
         return members.length <= ValidateKnownMembersRule.ListedMembers ? ` ${className} tiene: ${members.join(' / ')}.` : '';
     }
